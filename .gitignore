@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.npm
+.yarn
+.pnpm
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+*.lcov
+
+# Temporary files
+.tmp/
+.temp/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+
+# Testing
+.nyc_output
+
+# Storybook
+storybook-static/
+
+# Mobile
+*.ipa
+*.apk
+*.aab
+
+# Local development
+.vercel
