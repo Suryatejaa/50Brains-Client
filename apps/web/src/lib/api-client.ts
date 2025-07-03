@@ -31,8 +31,37 @@ interface APIErrorResponse {
 
 export type APIResponse<T = any> = APISuccessResponse<T> | APIErrorResponse;
 
+// Define public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/about',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/pricing',
+  '/features',
+  '/blog',
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/auth/verify-email',
+  '/api/auth/refresh',
+  '/api/public',
+];
+
 class APIClient {
   private axiosInstance: AxiosInstance;
+  private isRefreshing: boolean = false;
+  private failedQueue: Array<{
+    resolve: (value?: any) => void;
+    reject: (error?: any) => void;
+  }> = [];
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -42,30 +71,24 @@ class APIClient {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      withCredentials: true, // Include cookies in requests
-      // Allow all status codes to be handled as responses instead of throwing errors
-      validateStatus: () => true,
+      // Enable cookies for cookie-based authentication
+      withCredentials: true,
+      // Let axios throw errors for 4xx/5xx so interceptors can handle them
+      validateStatus: (status) => status < 400,
     });
 
     this.setupInterceptors();
   }
 
   private setupInterceptors() {
-    // Request interceptor - no need to add auth token since backend uses cookies
+    // Request interceptor for setting common headers
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        // Backend handles authentication via cookies, so no Authorization header needed
-        // The withCredentials: true option ensures cookies are sent automatically
+        // For cookie-based auth we don't need to set Authorization headers
+        // as cookies are automatically sent with requests
 
-        // Debug: Log outgoing requests
-        console.log('📤 API Request:', {
-          method: config.method?.toUpperCase(),
-          url: config.url,
-          baseURL: config.baseURL,
-          fullURL: `${config.baseURL}${config.url}`,
-          withCredentials: config.withCredentials,
-          headers: config.headers,
-        });
+        // Note: Removed custom headers that were causing CORS issues
+        // We don't need to add these headers for the API to function properly
 
         return config;
       },
@@ -74,57 +97,127 @@ class APIClient {
       }
     );
 
-    // Response interceptor to handle errors
+    // Response interceptor - handle token refresh via cookies
     this.axiosInstance.interceptors.response.use(
-      (response: AxiosResponse) => {
-        // Don't throw errors for 4xx status codes - let the API methods handle them
-        // Only throw for actual network/axios errors
-        return response;
-      },
-      async (error: AxiosError) => {
-        // Handle 401 errors (authentication failures) - but only if it's not already handled
-        if (error.response?.status === 401) {
-          // Since backend manages auth via cookies, just handle auth failure
-          this.handleAuthFailure();
-          return Promise.reject(error);
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        // Check for 401 Unauthorized error
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          // Prevent infinite retry loops
+          originalRequest._retry = true;
+
+          console.log(
+            '🔄 Got 401 error - attempting token refresh via cookies'
+          );
+
+          try {
+            // Try to refresh the token
+            const refreshResponse = await this.refreshTokenViaCookies();
+            if (refreshResponse.success) {
+              console.log(
+                '✅ Token refresh successful, retrying original request'
+              );
+
+              // Retry the original request with fresh cookies
+              return this.axiosInstance(originalRequest);
+            } else {
+              console.error('❌ Token refresh rejected by server');
+              // Let the error propagate - auth will handle it
+            }
+          } catch (refreshError) {
+            console.error('❌ Token refresh failed with error:', refreshError);
+            // Don't handle auth failure here, just let the error propagate
+          }
         }
 
-        // Don't redirect on server errors (5xx), only on auth failures
-        if (error.response && error.response.status >= 500) {
-          // Just return the error, don't redirect
-          return Promise.reject(error);
+        // For network errors, add more user-friendly context
+        if (!error.response && error.code === 'ERR_NETWORK') {
+          console.warn('Network error detected - could be offline');
+          error.isOffline = true; // Add flag for auth handler
         }
 
+        // For all other errors, or if refresh fails, reject the promise
         return Promise.reject(error);
       }
     );
   }
 
-  private handleAuthFailure(): void {
-    // Since backend manages auth via cookies, just redirect to login
-    if (typeof window !== 'undefined') {
-      const currentPath = window.location.pathname;
-
-      // Don't redirect if already on login/register pages
-      if (
-        !currentPath.includes('/login') &&
-        !currentPath.includes('/register')
-      ) {
-        // Use setTimeout to avoid redirect during request processing
-        setTimeout(() => {
-          // Check if we're on a protected route that requires auth
-          const protectedRoutes = ['/dashboard', '/profile', '/my/', '/admin'];
-          const isProtectedRoute = protectedRoutes.some((route) =>
-            currentPath.startsWith(route)
-          );
-
-          if (isProtectedRoute) {
-            window.location.href =
-              '/login?returnUrl=' + encodeURIComponent(currentPath);
-          }
-        }, 100);
+  private processQueue(error: any) {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
       }
+    });
+
+    this.failedQueue = [];
+  }
+
+  private async refreshTokenViaCookies(): Promise<APIResponse<any>> {
+    try {
+      console.log('🍪 Calling refresh endpoint with cookies');
+
+      const response = await axios.post(
+        `${this.axiosInstance.defaults.baseURL}/api/auth/refresh`,
+        {}, // Empty body - backend reads refresh token from cookies
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true, // Include cookies
+          validateStatus: (status) => status < 500, // Allow 4xx for error handling
+        }
+      );
+
+      console.log('🔄 Refresh response:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data,
+        headers: response.headers,
+      });
+
+      if (response.status === 200 && response.data.success) {
+        console.log('✅ Token refresh successful - cookies updated by backend');
+        return response.data;
+      } else {
+        return {
+          success: false,
+          error: 'REFRESH_FAILED',
+          message: response.data?.message || 'Token refresh failed',
+          timestamp: new Date().toISOString(),
+          statusCode: response.status,
+        };
+      }
+    } catch (error) {
+      console.log('❌ Refresh request failed:', error);
+      return {
+        success: false,
+        error: 'REFRESH_ERROR',
+        message: 'Failed to refresh token',
+        timestamp: new Date().toISOString(),
+      };
     }
+  }
+
+  // Check if a route is public (doesn't require authentication)
+  public isPublicRoute(path: string): boolean {
+    return PUBLIC_ROUTES.some((route) => {
+      if (route.endsWith('*')) {
+        // Handle wildcard routes
+        return path.startsWith(route.slice(0, -1));
+      }
+      return path === route || path.startsWith(route + '/');
+    });
+  }
+
+  // Check if current route is protected
+  public isProtectedRoute(path?: string): boolean {
+    const currentPath =
+      path || (typeof window !== 'undefined' ? window.location.pathname : '/');
+    return !this.isPublicRoute(currentPath);
   }
 
   // Public methods for making API calls
@@ -138,52 +231,9 @@ class APIClient {
       console.log('📡 API GET Response:', {
         status: response.status,
         statusText: response.statusText,
-        data: response.data,
-        headers: response.headers,
         url: response.config.url,
-        method: response.config.method,
+        success: response.data?.success,
       });
-
-      // Check if the response status indicates an error or if response data has success: false
-      if (
-        response.status >= 400 ||
-        (response.data &&
-          typeof response.data === 'object' &&
-          'success' in response.data &&
-          !response.data.success)
-      ) {
-        console.log('📡 API GET indicates failure:', {
-          status: response.status,
-          data: response.data,
-        });
-
-        // If we have response data with error info, use it; otherwise create from status
-        if (
-          response.data &&
-          typeof response.data === 'object' &&
-          'message' in response.data
-        ) {
-          const errorResponse: APIErrorResponse = {
-            success: false,
-            error: response.data.error || `HTTP_${response.status}`,
-            message: response.data.message || 'Request failed',
-            timestamp: response.data.timestamp || new Date().toISOString(),
-            statusCode: response.status,
-            details: response.data.details || response.data,
-          };
-          return errorResponse;
-        } else {
-          // Create error response from status code
-          const errorResponse: APIErrorResponse = {
-            success: false,
-            error: `HTTP_${response.status}`,
-            message: response.statusText || 'Request failed',
-            timestamp: new Date().toISOString(),
-            statusCode: response.status,
-          };
-          return errorResponse;
-        }
-      }
 
       return response.data;
     } catch (error) {
@@ -200,53 +250,12 @@ class APIClient {
     try {
       const response = await this.axiosInstance.post(url, data, config);
 
-      console.log('📡 API POST Success:', {
+      console.log('📡 API POST Response:', {
         status: response.status,
         statusText: response.statusText,
-        data: response.data,
-        headers: response.headers,
         url: response.config.url,
-        method: response.config.method,
+        success: response.data?.success,
       });
-
-      // Check if the response data indicates an error (either via status code or success flag)
-      if (
-        response.status >= 400 ||
-        (response.data &&
-          typeof response.data === 'object' &&
-          'success' in response.data &&
-          !response.data.success)
-      ) {
-        console.log('📡 API Response indicates failure:', {
-          status: response.status,
-          data: response.data,
-        });
-
-        // If we have response data with error info, use it; otherwise create from status
-        if (
-          response.data &&
-          typeof response.data === 'object' &&
-          'message' in response.data
-        ) {
-          const errorResponse: APIErrorResponse = {
-            success: false,
-            error: response.data.error || `HTTP_${response.status}`,
-            message: response.data.message || 'Request failed',
-            timestamp: response.data.timestamp || new Date().toISOString(),
-            statusCode: response.status,
-            details: response.data.details || response.data,
-          };
-          return errorResponse;
-        } else {
-          // Create error response from status code
-          const error = new Error(
-            `Request failed with status ${response.status}`
-          ) as any;
-          error.response = response;
-          error.config = response.config;
-          throw error;
-        }
-      }
 
       return response.data;
     } catch (error) {
@@ -254,13 +263,8 @@ class APIClient {
         message: (error as AxiosError).message,
         code: (error as AxiosError).code,
         url: (error as AxiosError).config?.url,
-        method: (error as AxiosError).config?.method,
-        requestData: (error as AxiosError).config?.data,
-        requestHeaders: (error as AxiosError).config?.headers,
         responseStatus: (error as AxiosError)?.response?.status,
-        responseStatusText: (error as AxiosError)?.response?.statusText,
         responseData: (error as AxiosError)?.response?.data,
-        responseHeaders: (error as AxiosError)?.response?.headers,
       });
       return this.handleError(error as AxiosError);
     }
@@ -301,6 +305,31 @@ class APIClient {
       return response.data;
     } catch (error) {
       return this.handleError(error as AxiosError);
+    }
+  }
+
+  private createErrorResponse(response: AxiosResponse): APIErrorResponse {
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      'message' in response.data
+    ) {
+      return {
+        success: false,
+        error: response.data.error || `HTTP_${response.status}`,
+        message: response.data.message || 'Request failed',
+        timestamp: response.data.timestamp || new Date().toISOString(),
+        statusCode: response.status,
+        details: response.data.details || response.data,
+      };
+    } else {
+      return {
+        success: false,
+        error: `HTTP_${response.status}`,
+        message: response.statusText || 'Request failed',
+        timestamp: new Date().toISOString(),
+        statusCode: response.status,
+      };
     }
   }
 
@@ -378,7 +407,7 @@ class APIClient {
       case 403:
         return {
           success: false,
-          error: 'Account suspended',
+          error: 'Access forbidden',
           message: 'You do not have permission to perform this action.',
           timestamp,
           statusCode: 403,
@@ -386,7 +415,7 @@ class APIClient {
       case 404:
         return {
           success: false,
-          error: 'User not found',
+          error: 'Resource not found',
           message: 'The requested resource was not found.',
           timestamp,
           statusCode: 404,
@@ -394,7 +423,7 @@ class APIClient {
       case 409:
         return {
           success: false,
-          error: 'Email already registered',
+          error: 'Resource conflict',
           message: 'This resource already exists.',
           timestamp,
           statusCode: 409,
@@ -452,80 +481,127 @@ class APIClient {
     }
   }
 
-  // Method to check if user is authenticated (with cookie-based auth, we'll rely on API responses)
+  // Method to check if user is authenticated (for cookie-based auth)
   public isAuthenticated(): boolean {
-    // With cookie-based auth, we can't easily check auth status from frontend
-    // This will need to be determined by making an API call to a protected endpoint
-    // For now, return true and let API responses handle auth failures
-    return true;
+    // For cookie-based auth, we can't reliably check on client side
+    // The server will validate via cookies on each request
+    // We can make a simple check by trying to access a protected endpoint
+    return true; // Optimistic - real validation happens on server
   }
 
-  // Token management methods (no-ops for cookie-based auth)
-  public setAuthTokens(accessToken: string, refreshToken: string): void {
-    // No-op for cookie-based auth - tokens are managed by server via cookies
-    console.log('🍪 Token management handled by server cookies');
-  }
-
-  public clearAuthTokens(): void {
-    // No-op for cookie-based auth - tokens are managed by server via cookies
-    console.log('🍪 Token cleanup handled by server cookies');
-  }
-
-  public getAccessToken(): string | null {
-    // Not applicable for cookie-based auth
-    return null;
-  }
-
-  public getRefreshToken(): string | null {
-    // Not applicable for cookie-based auth
-    return null;
-  }
-
-  // Method to test authentication by making a simple API call
+  // Method to test authentication by making API calls
   public async testAuth(): Promise<{
     isAuthenticated: boolean;
-    cookies?: string;
+    user?: any;
   }> {
     try {
-      // Check for auth cookies in browser
-      const cookies =
-        typeof window !== 'undefined' ? document.cookie : 'N/A (server)';
-      console.log('🍪 Current cookies:', cookies);
+      console.log('🔍 Testing authentication with cookies');
 
-      // Try multiple auth endpoints to see which one works
+      // Try auth endpoints
       const endpoints = [
-        '/api/auth/me',
         '/api/user/profile',
         '/api/auth/check',
       ];
-      const results: any = {};
 
       for (const endpoint of endpoints) {
         try {
           console.log(`🔍 Testing endpoint: ${endpoint}`);
           const response = await this.get(endpoint);
-          results[endpoint] = response;
 
           if (response.success) {
-            console.log(`✅ ${endpoint} succeeded`);
-            return { isAuthenticated: true, cookies };
+            console.log(`✅ ${endpoint} succeeded - user is authenticated`);
+            return {
+              isAuthenticated: true,
+              user: response.data,
+            };
           }
         } catch (error) {
           console.log(`❌ ${endpoint} failed:`, error);
-          results[endpoint] = { error: error };
         }
       }
 
-      console.log('📊 All endpoint results:', results);
-      return { isAuthenticated: false, cookies };
+      console.log('❌ All auth endpoints failed');
+      return {
+        isAuthenticated: false,
+      };
     } catch (error) {
       console.log('🔐 Auth test failed:', error);
       return {
         isAuthenticated: false,
-        cookies:
-          typeof window !== 'undefined' ? document.cookie : 'N/A (server)',
       };
     }
+  }
+
+  // Logout method - calls backend to clear cookies
+  public async logout(): Promise<APIResponse<any>> {
+    try {
+      const response = await this.post('/api/auth/logout');
+
+      if (response.success) {
+        console.log('🚪 Logout successful - cookies cleared by backend');
+        // Optionally redirect to login page
+        if (typeof window !== 'undefined') {
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 100);
+        }
+      }
+
+      return response;
+    } catch (error) {
+      console.log('❌ Logout failed:', error);
+      return {
+        success: false,
+        error: 'LOGOUT_ERROR',
+        message: 'Failed to logout',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  // Add or remove routes from public routes array
+  public addPublicRoute(route: string): void {
+    if (!PUBLIC_ROUTES.includes(route)) {
+      PUBLIC_ROUTES.push(route);
+    }
+  }
+
+  public removePublicRoute(route: string): void {
+    const index = PUBLIC_ROUTES.indexOf(route);
+    if (index > -1) {
+      PUBLIC_ROUTES.splice(index, 1);
+    }
+  }
+
+  public getPublicRoutes(): string[] {
+    return [...PUBLIC_ROUTES];
+  }
+
+  // Legacy token methods - no-ops for cookie-based auth
+  public setAuthTokens(accessToken?: string, refreshToken?: string): void {
+    console.log(
+      '🍪 Cookie-based auth: setAuthTokens is a no-op - backend manages cookies'
+    );
+  }
+
+  public clearAuthTokens(): void {
+    console.log(
+      '🍪 Cookie-based auth: clearAuthTokens is a no-op - use logout() instead'
+    );
+  }
+
+  public getAccessToken(): string | null {
+    console.log(
+      '🍪 Cookie-based auth: getAccessToken is a no-op - tokens in cookies'
+    );
+    return null;
+  }
+
+  public getRefreshToken(): string | null {
+    console.log(
+      '🍪 Cookie-based auth: getRefreshToken is a no-op - tokens in cookies'
+    );
+    return null;
   }
 }
 

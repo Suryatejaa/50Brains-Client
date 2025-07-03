@@ -10,7 +10,7 @@ export function CTA() {
           success on 50BraIns.
         </p>
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <button className="btn-secondary">Start as Creator</button>
+          <button className="btn-outline-white">Start as Creator</button>
           <button className="btn-outline-white">I'm a Brand</button>
         </div>
         <p className="text-primary-200 mt-6 text-sm">

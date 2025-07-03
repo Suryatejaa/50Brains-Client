@@ -1,13 +1,11 @@
 'use client';
 
 import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 import Link from 'next/link';
 
 export default function MarketplacePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <div className="page-container min-h-screen pt-16">
         <div className="content-container py-8">
           {/* Marketplace Header */}
@@ -162,7 +160,6 @@ export default function MarketplacePage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

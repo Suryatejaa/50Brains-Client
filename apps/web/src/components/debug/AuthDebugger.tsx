@@ -26,9 +26,9 @@ export function AuthDebugger() {
       results.tests.authTest = authTest;
 
       // Test 2: Direct API calls
-      console.log('🔍 Testing /api/auth/me...');
+      console.log('🔍 Testing /api/user/profile...');
       try {
-        const authMeResponse = await apiClient.get('/api/auth/me');
+        const authMeResponse = await apiClient.get('/api/user/profile');
         results.tests.authMe = authMeResponse;
       } catch (error: any) {
         results.tests.authMe = { error: error?.message || 'Unknown error' };

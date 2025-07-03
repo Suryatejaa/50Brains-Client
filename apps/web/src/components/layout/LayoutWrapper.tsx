@@ -15,33 +15,12 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
 
-  // Routes where we don't show footer (protected routes)
-  const protectedRoutes = [
-    '/dashboard',
-    '/marketplace',
-    '/create-gig',
-    '/my/',
-    '/profile',
-    '/clans',
-    '/credits',
-    '/admin',
-    '/analytics',
-    '/portfolio',
-    '/applications',
-    '/social-media',
-  ];
+  // Show header ONLY for unauthenticated users (landing, auth pages)
+  const showHeader = !isAuthenticated;
 
-  // Check if current route is protected
-  const isProtectedRoute =
-    isAuthenticated &&
-    protectedRoutes.some((route) => pathname.startsWith(route));
-
-  // Routes where we don't show header (e.g., auth pages might want custom headers)
-  const noHeaderRoutes = ['/login', '/register'];
-  const showHeader = !noHeaderRoutes.includes(pathname);
-
-  // Show bottom navigation only on protected routes and mobile
-  const showBottomNav = isProtectedRoute;
+  // Show bottom navigation for ALL authenticated users on ALL pages
+  // This creates a mobile-first experience similar to Instagram/TikTok
+  const showBottomNav = isAuthenticated;
 
   return (
     <>
@@ -57,7 +36,6 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
         {children}
       </main>
 
-      {!isProtectedRoute && <Footer />}
       {showBottomNav && <BottomNavigation />}
     </>
   );

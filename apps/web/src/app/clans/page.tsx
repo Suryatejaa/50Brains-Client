@@ -1,12 +1,8 @@
 'use client';
 
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-
 export default function ClansPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <div className="page-container min-h-screen pt-16">
         <div className="content-container py-8">
           {/* Clans Header */}
@@ -287,7 +283,6 @@ export default function ClansPage() {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     </div>
   );

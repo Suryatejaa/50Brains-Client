@@ -33,6 +33,7 @@ export const BottomNavigation: React.FC = () => {
   const { getUserType, hasPermission, hasRole } = usePermissions();
   const pathname = usePathname();
 
+  // Always show bottom nav for authenticated users (mobile-first approach)
   if (!isAuthenticated || !user) {
     return null;
   }
@@ -40,85 +41,49 @@ export const BottomNavigation: React.FC = () => {
   const userType = getUserType();
 
   const getNavigationItems = (): NavigationItem[] => {
+    // Core navigation that's always visible (like Instagram/TikTok)
     const baseItems: NavigationItem[] = [
       {
         path: '/dashboard',
         label: 'Home',
         icon: Home,
       },
+      {
+        path: '/marketplace',
+        label: 'Explore',
+        icon: Search,
+      },
     ];
 
-    // Creator-specific navigation
+    // Add role-specific center action
     if (userType === 'creator') {
-      baseItems.push(
-        {
-          path: '/marketplace',
-          label: 'Browse',
-          icon: Search,
-          permission: 'gig.view',
-        },
-        {
-          path: '/my/applications',
-          label: 'Applications',
-          icon: Mail,
-        },
-        {
-          path: '/portfolio',
-          label: 'Portfolio',
-          icon: FolderOpen,
-          permission: 'portfolio.manage',
-        }
-      );
+      baseItems.push({
+        path: '/my/applications',
+        label: 'Applications',
+        icon: Mail,
+      });
+    } else if (userType === 'brand') {
+      baseItems.push({
+        path: '/create-gig',
+        label: 'Create',
+        icon: Plus,
+      });
+    } else if (userType === 'admin') {
+      baseItems.push({
+        path: '/admin',
+        label: 'Admin',
+        icon: Shield,
+      });
+    } else {
+      // Default for other user types
+      baseItems.push({
+        path: '/clans',
+        label: 'Clans',
+        icon: Building2,
+      });
     }
 
-    // Brand-specific navigation
-    if (userType === 'brand') {
-      baseItems.push(
-        {
-          path: '/create-gig',
-          label: 'Create',
-          icon: Plus,
-          permission: 'gig.create',
-        },
-        {
-          path: '/my/campaigns',
-          label: 'Campaigns',
-          icon: Megaphone,
-        },
-        {
-          path: '/analytics',
-          label: 'Analytics',
-          icon: BarChart3,
-          permission: 'analytics.view',
-        }
-      );
-    }
-
-    // Admin navigation
-    if (userType === 'admin') {
-      baseItems.push(
-        {
-          path: '/admin/users',
-          label: 'Users',
-          icon: Users,
-          permission: 'users.manage',
-        },
-        {
-          path: '/admin/moderation',
-          label: 'Moderation',
-          icon: Shield,
-          permission: 'content.moderate',
-        },
-        {
-          path: '/admin/system',
-          label: 'System',
-          icon: Settings,
-          permission: 'system.configure',
-        }
-      );
-    }
-
-    // Common items for all users
+    // Always include these core items
     baseItems.push(
       {
         path: '/clans',
@@ -132,8 +97,13 @@ export const BottomNavigation: React.FC = () => {
       }
     );
 
-    // Limit to 5 items for better mobile UX
-    return baseItems.slice(0, 5);
+    // Limit to 5 unique items for optimal mobile UX
+    const uniqueItems = baseItems.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.path === item.path)
+    );
+
+    return uniqueItems.slice(0, 5);
   };
 
   const navigationItems = getNavigationItems().filter((item) => {
@@ -160,7 +130,7 @@ export const BottomNavigation: React.FC = () => {
         {navigationItems.map((item) => {
           const active = isActive(item.path);
           const IconComponent = item.icon;
-          
+
           return (
             <Link
               key={item.path}
@@ -176,10 +146,10 @@ export const BottomNavigation: React.FC = () => {
                   active ? 'scale-110' : ''
                 }`}
               >
-                <IconComponent 
+                <IconComponent
                   className={`h-6 w-6 ${
                     active ? 'text-[#247eab]' : 'text-gray-600'
-                  }`} 
+                  }`}
                 />
               </div>
               <span

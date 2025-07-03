@@ -34,32 +34,7 @@ export function Header() {
                         '👤'}
                     </span>
                   </div>                                  
-                </button>
-
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <div className="bg-brand-glass border-brand-border absolute right-0 mt-2 w-48 rounded-lg border py-2 shadow-lg backdrop-blur-md">
-                    <Link
-                      href="/profile"
-                      className="text-body hover:bg-brand-light-blue/20 block px-4 py-2 transition-colors"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/credits"
-                      className="text-body hover:bg-brand-light-blue/20 block px-4 py-2 transition-colors"
-                    >
-                      Credits
-                    </Link>
-                    <div className="border-brand-border my-2 border-t"></div>
-                    <button
-                      onClick={logout}
-                      className="text-body hover:bg-brand-light-blue/20 block w-full px-4 py-2 text-left transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
+                </button>              
               </div>
             </div>
 
@@ -110,13 +85,7 @@ export function Header() {
                   </div>
                 </div>
 
-                <Link
-                  href="/profile"
-                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Profile
-                </Link>
+                
                 <Link
                   href="/credits"
                   className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
@@ -150,29 +119,7 @@ export function Header() {
           <Link href="/" className="flex items-center">
             <h1 className="text-accent text-2xl font-bold">50BraIns</h1>
           </Link>
-
-          {/* 🧭 Desktop Navigation */}
-          <nav className="hidden items-center space-x-8 md:flex">
-            <Link
-              href="/marketplace"
-              className="text-body hover:text-accent font-medium transition-colors duration-200"
-            >
-              Marketplace
-            </Link>
-            <Link
-              href="/clans"
-              className="text-body hover:text-accent font-medium transition-colors duration-200"
-            >
-              Clans
-            </Link>
-            <Link
-              href="/create-gig"
-              className="text-body hover:text-accent font-medium transition-colors duration-200"
-            >
-              Create Gig
-            </Link>
-          </nav>
-
+        
           {/* 🚀 Desktop CTA */}
           <div className="hidden items-center space-x-4 md:flex">
             <Link href="/login" className="btn-ghost px-4 py-2">

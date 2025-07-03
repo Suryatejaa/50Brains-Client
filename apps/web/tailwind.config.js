@@ -8,49 +8,63 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                // 🎨 50BraIns Glassmorphism Theme
+                // 🎨 Professional 50BraIns Design System
                 brand: {
-                    primary: '#247eab',     // Cyan-blue for CTAs & accents
-                    base: '#FFFFFF',        // Main background (paper white)
-                    glass: 'rgba(255,255,255,0.6)', // Frosted cards
-                    'light-blue': '#E0F5FE', // Hover BG, input focus highlight
-                    soft: '#F8FBFF',        // Extra light backgrounds
+                    primary: '#2563EB',     // Strong blue for CTAs & accents
+                    base: '#FFFFFF',        // Clean white background
+                    surface: '#F9FAFB',     // Subtle background for sections
+                    border: '#E5E7EB',      // Professional borders
                     text: {
-                        main: '#1E1E1E',    // Headers and content
-                        muted: '#5E6A79',   // Placeholder, secondary text
+                        primary: '#111827',  // Sharp black text
+                        secondary: '#374151', // Medium gray text
+                        muted: '#6B7280',    // Light gray text
                     },
-                    border: '#E5EAF2',     // Card, input borders
                 },
 
-                // Legacy primary/secondary for compatibility
+                // Updated primary color - more saturated and professional
                 primary: {
-                    50: '#E0F5FE',
-                    100: '#BAE8FB',
-                    200: '#7DD3F5',
-                    300: '#247eab',  // Main brand color
-                    400: '#4DAFED',
-                    500: '#247eab',
-                    600: '#1E90D4',
-                    700: '#1A7CB8',
-                    800: '#15689C',
-                    900: '#105480',
-                    950: '#0A3A5C',
+                    50: '#EFF6FF',
+                    100: '#DBEAFE',
+                    200: '#BFDBFE',
+                    300: '#93C5FD',
+                    400: '#60A5FA',
+                    500: '#2563EB',  // Main brand color - strong blue
+                    600: '#1D4ED8',
+                    700: '#1E40AF',
+                    800: '#1E3A8A',
+                    900: '#1E3A8A',
+                    950: '#172554',
                 },
 
-                // Status colors (minimal, glassmorphism-friendly)
-                success: '#10B981',
-                warning: '#F59E0B',
-                error: '#EF4444',
-                info: '#247eab',
+                // Professional grays
+                gray: {
+                    50: '#F9FAFB',
+                    100: '#F3F4F6',
+                    200: '#E5E7EB',
+                    300: '#D1D5DB',
+                    400: '#9CA3AF',
+                    500: '#6B7280',
+                    600: '#4B5563',
+                    700: '#374151',
+                    800: '#1F2937',
+                    900: '#111827',
+                    950: '#030712',
+                },
+
+                // Status colors - more saturated and professional
+                success: '#059669',
+                warning: '#D97706',
+                error: '#DC2626',
+                info: '#2563EB',
 
                 // Reputation system colors
                 reputation: {
                     bronze: '#CD7F32',
                     silver: '#C0C0C0',
-                    gold: '#FFD700',
+                    gold: '#F59E0B',
                     platinum: '#E5E4E2',
-                    diamond: '#B9F2FF',
-                    legend: '#FF69B4',
+                    diamond: '#3B82F6',
+                    legend: '#8B5CF6',
                 },
             },
 
@@ -62,13 +76,14 @@ module.exports = {
             },
 
             boxShadow: {
-                'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-                'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                'md-soft': '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+                'card-hover': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                'professional': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
             },
 
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
+                sans: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+                display: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
             },
 
             animation: {

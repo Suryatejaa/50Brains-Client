@@ -153,9 +153,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Cache key for localStorage
+  const CACHE_KEY = '50brains_user_cache';
+  const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours - extended for better persistence
+
+  // Load user from cache on mount
   useEffect(() => {
+    loadUserFromCache();
     checkAuthStatus();
   }, []);
+
+  // Save user to cache whenever user state changes
+  useEffect(() => {
+    if (user) {
+      saveUserToCache(user);
+    } else {
+      clearUserCache();
+    }
+  }, [user]);
+
+  const saveUserToCache = (userData: User) => {
+    try {
+      const cacheData = {
+        user: userData,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      console.log('💾 User data cached successfully');
+    } catch (error) {
+      console.warn('Failed to cache user data:', error);
+    }
+  };
+
+  const loadUserFromCache = () => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return;
+
+      const cacheData = JSON.parse(cached);
+      const isExpired = Date.now() - cacheData.timestamp > CACHE_EXPIRY;
+
+      if (!isExpired && cacheData.user) {
+        setUser(cacheData.user);
+        console.log('📱 User data loaded from cache');
+        return true;
+      } else if (isExpired) {
+        localStorage.removeItem(CACHE_KEY);
+      }
+    } catch (error) {
+      console.warn('Failed to load user from cache:', error);
+      localStorage.removeItem(CACHE_KEY);
+    }
+    return false;
+  };
+
+  const clearUserCache = () => {
+    try {
+      localStorage.removeItem(CACHE_KEY);
+      console.log('🗑️ User cache cleared');
+    } catch (error) {
+      console.warn('Failed to clear cache:', error);
+    }
+  };
 
   const clearError = () => {
     setError(null);
@@ -163,50 +222,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuthStatus = async () => {
     try {
-      setError(null);
+      // First try to load from cache
+      const loadedFromCache = loadUserFromCache();
 
-      // Don't check auth status on public routes
-      if (typeof window !== 'undefined') {
-        const currentPath = window.location.pathname;
-        const publicRoutes = [
-          '/login',
-          '/register',
-          '/forgot-password',
-          '/',
-          '/terms',
-          '/privacy',
-        ];
-        const isPublicRoute = publicRoutes.some(
-          (route) => currentPath === route || currentPath.startsWith(route)
+      // If cached user data is available, use it to prevent logout on network issues
+      if (loadedFromCache) {
+        console.log('📱 Using cached auth data initially');
+        // Keep the user authenticated with cached data
+        // This prevents logout on page refresh when there are network issues
+      }
+
+      // Then try to verify with server
+      try {
+        const response = await apiClient.get<{ user: User }>(
+          '/api/user/profile'
         );
+        if (response.success && response.data) {
+          setUser(response.data.user);
+          console.log('✅ Auth status verified with server');
+        } else if (!loadedFromCache) {
+          // Only logout if there's no cached user data
+          console.log('❌ Auth check failed, no cached user data');
+          setUser(null);
+        }
+      } catch (error) {
+        console.log('⚠️ Auth status check failed:', error);
 
-        if (isPublicRoute) {
-          console.log('Skipping auth check for public route:', currentPath);
-          setIsLoading(false);
-          return;
+        // Check for CORS or network errors
+        const anyError = error as any;
+        const isNetworkError =
+          anyError.code === 'ERR_NETWORK' ||
+          anyError.message?.includes('Network Error');
+        const isCorsError = anyError.message?.includes('CORS');
+
+        if (isNetworkError || isCorsError) {
+          console.log(
+            '⚠️ Network or CORS error detected - keeping cached authentication'
+          );
+          // Do nothing - keep the user authenticated with cached data
+          // This is critical for maintaining auth state during API connectivity issues
+        } else if (!loadedFromCache) {
+          // Only clear user if we don't have cached data and it's not a network/CORS issue
+          console.log('❌ No cached user data, clearing auth state');
+          setUser(null);
+        } else {
+          console.log('⚠️ Error but using cached user data');
         }
       }
-
-      if (!apiClient.isAuthenticated()) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await apiClient.get<{ user: User }>('/api/auth/me');
-
-      if (response.success) {
-        setUser(response.data.user);
-      } else {
-        // Token is invalid, clear tokens
-        apiClient.clearAuthTokens();
-        setUser(null);
-        // Don't set error on auth check failure
-      }
-    } catch (error: any) {
-      console.error('Auth check failed:', error);
-      apiClient.clearAuthTokens();
-      setUser(null);
-      // Don't set error on initial check to avoid showing error on first load
     } finally {
       setIsLoading(false);
     }
@@ -410,8 +472,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       // Always clear local state
       apiClient.clearAuthTokens();
+      clearUserCache(); // Explicitly clear user cache on logout
       setUser(null);
-      router.push('/');
+
+      // Only redirect to home if this was triggered by user action (not on auth check failure)
+      // And avoid redirecting during initial loading to prevent redirect loops
+      if (!isLoading) {
+        // Add some logging to track logout redirects
+        console.log('🚪 Logout complete, redirecting to home');
+        router.push('/');
+      } else {
+        console.log('🔄 Silent logout during auth check, not redirecting');
+      }
     }
   };
 
@@ -421,7 +493,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // For cookie-based auth, refresh is handled automatically by the server
       // We just need to make a request to check if our session is still valid
-      const response = await apiClient.get<{ user: User }>('/api/auth/me');
+      const response = await apiClient.get<{ user: User }>('/api/user/profile');
 
       if (response.success) {
         // Update user data if session is still valid

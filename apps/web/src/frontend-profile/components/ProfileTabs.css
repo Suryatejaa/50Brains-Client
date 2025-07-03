@@ -1,0 +1,75 @@
+/* ProfileTabs.css - Professional Design */
+.profile-tabs {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.profile-tabs__nav {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.profile-tabs__nav-item {
+  flex: 1;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.profile-tabs__nav-item:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.profile-tabs__nav-item--active {
+  background: white;
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  font-weight: 600;
+}
+
+.profile-tabs__nav-icon {
+  font-size: 16px;
+}
+
+.profile-tabs__nav-label {
+  font-size: 14px;
+}
+
+.profile-tabs__content {
+  padding: 24px;
+  min-height: 400px;
+  background: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-tabs__nav-item {
+    flex-direction: column;
+    padding: 12px 8px;
+    gap: 4px;
+    text-transform: none;
+  }
+
+  .profile-tabs__nav-label {
+    font-size: 12px;
+  }
+
+  .profile-tabs__content {
+    padding: 16px;
+  }
+}

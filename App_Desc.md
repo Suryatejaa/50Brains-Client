@@ -116,3 +116,151 @@
 ---
 
 *Ready to revolutionize the creator economy with a platform that truly understands and serves the creative community.*
+
+
+// API_CONTRACT.md - Frontend-Backend Agreement
+
+## 🔗 **50BraIns API Contract v1.0**
+
+### **Base Configuration**
+```javascript
+// Frontend API Client Setup
+const API_BASE_URL = 'http://localhost:3000'
+const API_ENDPOINTS = {
+  // Authentication
+  auth: {
+    login: '/api/auth/login',
+    register: '/api/auth/register',
+    refresh: '/api/auth/refresh',
+    logout: '/api/auth/logout'
+  },
+  
+  // User Management
+  user: {
+    profile: '/api/user/profile',
+    updateProfile: '/api/user/profile',
+    settings: '/api/user/settings',
+    profilePicture: '/api/user/profile-picture'
+  },
+  
+  // Public Data
+  public: {
+    userProfile: (userId) => `/api/public/users/${userId}`,
+    influencerProfile: (userId) => `/api/public/influencers/${userId}`,
+    brandProfile: (userId) => `/api/public/brands/${userId}`,
+    stats: '/api/public/stats'
+  },
+  
+  // Search & Discovery
+  search: {
+    users: '/api/search/users',
+    influencers: '/api/search/influencers',
+    brands: '/api/search/brands'
+  }
+}
+```
+
+### **2. Standardized Response Format**
+
+```javascript
+// All API responses follow this format
+interface APIResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  message?: string
+  timestamp: string
+  pagination?: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+// Success Response Example
+{
+  "success": true,
+  "data": {
+    "user": { /* user object */ }
+  },
+  "message": "Profile updated successfully",
+  "timestamp": "2024-12-28T14:30:00.000Z"
+}
+
+// Error Response Example
+{
+  "success": false,
+  "error": "Validation Error",
+  "message": "Email is required",
+  "timestamp": "2024-12-28T14:30:00.000Z"
+}
+```
+
+### **3. User Data Structure Contract**
+
+```typescript
+// types/user.types.ts
+interface BaseUser {
+  id: string
+  email: string
+  username: string
+  firstName?: string
+  lastName?: string
+  phone?: string
+  bio?: string
+  location?: string
+  profilePicture?: string
+  coverImage?: string
+  
+  // Social handles
+  instagramHandle?: string
+  twitterHandle?: string
+  linkedinHandle?: string
+  youtubeHandle?: string
+  website?: string
+  
+  // Account info
+  roles: ('USER' | 'INFLUENCER' | 'BRAND' | 'CREW')[]
+  status: 'PENDING_VERIFICATION' | 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'BANNED'
+  isActive: boolean
+  emailVerified: boolean
+  
+  // Timestamps
+  createdAt: string
+  updatedAt: string
+  lastLoginAt?: string
+}
+
+interface InfluencerData {
+  contentCategories: string[]
+  primaryNiche?: string
+  primaryPlatform?: string
+  estimatedFollowers?: number
+}
+
+interface BrandData {
+  companyName?: string
+  companyType?: string
+  industry?: string
+  gstNumber?: string
+  companyWebsite?: string
+  marketingBudget?: string
+  targetAudience: string[]
+  campaignTypes: string[]
+  designationTitle?: string
+}
+
+interface CrewData {
+  crewSkills: string[]
+  experienceLevel?: string
+  equipmentOwned: string[]
+  portfolioUrl?: string
+  hourlyRate?: number
+  availability?: string
+  workStyle?: string
+  specializations: string[]
+}
+
+type FullUser = BaseUser & InfluencerData & BrandData & CrewData
+``` 

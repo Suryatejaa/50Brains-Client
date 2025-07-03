@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api-client';
 import { DashboardHeader } from '../shared/DashboardHeader';
 import { MetricCard } from '../shared/MetricCard';
 import { QuickActionsGrid } from '../shared/QuickActions';
-import { ProfileCompletionWidget } from '@/components/profile/ProfileCompletionWidget';
+import { ProfileCompletionWidget } from '@/components/ProfileCompletionWidget';
 
 interface BrandDashboardData {
   campaigns: {

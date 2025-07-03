@@ -270,12 +270,12 @@ export class AuthService {
   }
 
   async getCurrentUser(): Promise<User> {
-    const response = await this.client.get<User>('/api/auth/me');
+    const response = await this.client.get<User>('/api/user/profile');
     return response.data;
   }
 
   async updateProfile(data: Partial<User>): Promise<User> {
-    const response = await this.client.patch<User>('/api/auth/me', data);
+    const response = await this.client.patch<User>('/api/user/profile', data);
     return response.data;
   }
 

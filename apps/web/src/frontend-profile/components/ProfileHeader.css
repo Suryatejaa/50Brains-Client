@@ -1,0 +1,112 @@
+/* ProfileHeader.css - Professional Design */
+.profile-header {
+  position: relative;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.profile-header__cover {
+  position: relative;
+  height: 12rem;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  overflow: hidden;
+}
+
+.profile-header__cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-header__content {
+  position: relative;
+  padding: 0 1.5rem 1.5rem;
+  background: white;
+}
+
+.profile-header__avatar-container {
+  position: relative;
+  margin-top: -4rem;
+  margin-bottom: 1rem;
+}
+
+.profile-header__avatar {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 8px;
+  border: 4px solid white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  object-fit: cover;
+  background: #f9fafb;
+}
+
+.profile-header__actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.profile-header__edit-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-header__edit-button:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.profile-header__save-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #059669;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-header__save-button:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+.profile-header__cancel-button {
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-header__cancel-button:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .profile-header__content {
+    padding: 0 1rem 1rem;
+  }
+
+  .profile-header__avatar {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 6px;
+  }
+}

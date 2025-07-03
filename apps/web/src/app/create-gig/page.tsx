@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 
 export default function CreateGigPage() {
   const [formData, setFormData] = useState({
@@ -73,7 +71,6 @@ export default function CreateGigPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <div className="page-container min-h-screen pt-16">
         <div className="content-container py-8">
           {/* Header */}
@@ -570,7 +567,6 @@ export default function CreateGigPage() {
             </div>
           </form>
         </div>
-        <Footer />
       </div>
     </div>
   );
