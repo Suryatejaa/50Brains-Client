@@ -1,20 +1,24 @@
 // components/ProfileHeader.tsx
-import React, { useState } from 'react'
-import { UserProfileData, AnalyticsData, ReputationData } from '../types/profile.types'
-import RoleBadges from './common/RoleBadges'
-import EditableField from './common/EditableField'
-import ImageUpload from './common/ImageUpload'
-import './ProfileHeader.css'
+import React, { useState } from 'react';
+import {
+  UserProfileData,
+  AnalyticsData,
+  ReputationData,
+} from '../types/profile.types';
+import RoleBadges from './common/RoleBadges';
+import EditableField from './common/EditableField';
+import ImageUpload from './common/ImageUpload';
+import './ProfileHeader.css';
 
 interface ProfileHeaderProps {
-  user: UserProfileData
-  analytics?: AnalyticsData | null
-  reputation?: ReputationData | null
-  isOwner: boolean
-  isEditing: boolean
-  onEditClick: () => void
-  onSaveEdit: (data: any) => Promise<void>
-  onCancelEdit: () => void
+  user: UserProfileData;
+  analytics?: AnalyticsData | null;
+  reputation?: ReputationData | null;
+  isOwner: boolean;
+  isEditing: boolean;
+  onEditClick: () => void;
+  onSaveEdit: (data: any) => Promise<void>;
+  onCancelEdit: () => void;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -25,7 +29,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isEditing,
   onEditClick,
   onSaveEdit,
-  onCancelEdit
+  onCancelEdit,
 }) => {
   const [editData, setEditData] = useState({
     firstName: user.firstName || '',
@@ -33,12 +37,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     bio: user.bio || '',
     location: user.location || '',
     profilePicture: user.profilePicture || '',
-    coverImage: user.coverImage || ''
-  })
+    coverImage: user.coverImage || '',
+  });
 
   const handleSave = async () => {
-    await onSaveEdit(editData)
-  }
+    await onSaveEdit(editData);
+  };
 
   const handleCancel = () => {
     setEditData({
@@ -47,16 +51,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       bio: user.bio || '',
       location: user.location || '',
       profilePicture: user.profilePicture || '',
-      coverImage: user.coverImage || ''
-    })
-    onCancelEdit()
-  }
+      coverImage: user.coverImage || '',
+    });
+    onCancelEdit();
+  };
 
   const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
-    return num.toString()
-  }
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
 
   return (
     <div className="profile-header">
@@ -64,15 +68,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <div className="profile-header__cover">
         {isEditing ? (
           <ImageUpload
-            value={editData.coverImage}
-            onChange={(url) => setEditData({ ...editData, coverImage: url })}
-            type="cover"
-            placeholder="Upload cover image"
+            currentImage={editData.coverImage}
+            onImageChange={(file) => {
+              if (file) {
+                const url = URL.createObjectURL(file);
+                setEditData({ ...editData, coverImage: url });
+              } else {
+                setEditData({ ...editData, coverImage: '' });
+              }
+            }}
+            label="Cover Image"
           />
         ) : (
-          <img 
-            src={user.coverImage || '/default-cover.jpg'} 
-            alt="Cover" 
+          <img
+            src={user.coverImage || '/default-cover.jpg'}
+            alt="Cover"
             className="profile-header__cover-image"
           />
         )}
@@ -85,14 +95,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="profile-header__avatar">
             {isEditing ? (
               <ImageUpload
-                value={editData.profilePicture}
-                onChange={(url) => setEditData({ ...editData, profilePicture: url })}
-                type="avatar"
-                placeholder="Upload profile picture"
+                currentImage={editData.profilePicture}
+                onImageChange={(file) => {
+                  if (file) {
+                    const url = URL.createObjectURL(file);
+                    setEditData({ ...editData, profilePicture: url });
+                  } else {
+                    setEditData({ ...editData, profilePicture: '' });
+                  }
+                }}
+                label="Profile Picture"
+                aspectRatio="square"
               />
             ) : (
-              <img 
-                src={user.profilePicture || '/default-avatar.jpg'} 
+              <img
+                src={user.profilePicture || '/default-avatar.jpg'}
                 alt={`${user.firstName} ${user.lastName}`}
                 className="profile-header__avatar-image"
               />
@@ -107,14 +124,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   <input
                     type="text"
                     value={editData.firstName}
-                    onChange={(e) => setEditData({ ...editData, firstName: e.target.value })}
+                    onChange={(e) =>
+                      setEditData({ ...editData, firstName: e.target.value })
+                    }
                     placeholder="First name"
                     className="profile-header__name-input"
                   />
                   <input
                     type="text"
                     value={editData.lastName}
-                    onChange={(e) => setEditData({ ...editData, lastName: e.target.value })}
+                    onChange={(e) =>
+                      setEditData({ ...editData, lastName: e.target.value })
+                    }
                     placeholder="Last name"
                     className="profile-header__name-input"
                   />
@@ -136,7 +157,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   <input
                     type="text"
                     value={editData.location}
-                    onChange={(e) => setEditData({ ...editData, location: e.target.value })}
+                    onChange={(e) =>
+                      setEditData({ ...editData, location: e.target.value })
+                    }
                     placeholder="Location"
                     className="profile-header__location-input"
                   />
@@ -153,7 +176,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               {isEditing ? (
                 <textarea
                   value={editData.bio}
-                  onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
+                  onChange={(e) =>
+                    setEditData({ ...editData, bio: e.target.value })
+                  }
                   placeholder="Tell us about yourself..."
                   className="profile-header__bio-textarea"
                   rows={3}
@@ -177,27 +202,33 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   <span className="profile-header__stat-value">
                     {formatNumber(analytics.profileViews)}
                   </span>
-                  <span className="profile-header__stat-label">Profile Views</span>
+                  <span className="profile-header__stat-label">
+                    Profile Views
+                  </span>
                 </div>
                 <div className="profile-header__stat">
                   <span className="profile-header__stat-value">
                     {analytics.popularityScore.toFixed(1)}
                   </span>
-                  <span className="profile-header__stat-label">Popularity Score</span>
+                  <span className="profile-header__stat-label">
+                    Popularity Score
+                  </span>
                 </div>
               </>
             )}
-            
-            {reputation && (
-              <div className="profile-header__stat">
-                <span className="profile-header__stat-value">
-                  {reputation.overallRating.toFixed(1)} ⭐
-                </span>
-                <span className="profile-header__stat-label">
-                  ({reputation.totalReviews} reviews)
-                </span>
-              </div>
-            )}
+
+            {reputation &&
+              reputation.metrics &&
+              typeof reputation.metrics.averageRating === 'number' && (
+                <div className="profile-header__stat">
+                  <span className="profile-header__stat-value">
+                    {reputation.metrics.averageRating.toFixed(1)} ⭐
+                  </span>
+                  <span className="profile-header__stat-label">
+                    ({reputation.metrics.gigsCompleted || 0} gigs)
+                  </span>
+                </div>
+              )}
 
             {user.roles.includes('INFLUENCER') && user.estimatedFollowers && (
               <div className="profile-header__stat">
@@ -213,15 +244,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="profile-header__actions">
             {isEditing ? (
               <div className="profile-header__edit-actions">
-                <button 
+                <button
                   onClick={handleSave}
-                  className="profile-header__save-btn"
+                  className="btn btn-primary flex-1"
                 >
                   Save Changes
                 </button>
-                <button 
+                <button
                   onClick={handleCancel}
-                  className="profile-header__cancel-btn"
+                  className="btn btn-secondary flex-1"
                 >
                   Cancel
                 </button>
@@ -229,7 +260,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             ) : (
               <>
                 {isOwner ? (
-                  <button 
+                  <button
                     onClick={onEditClick}
                     className="profile-header__edit-btn"
                   >
@@ -254,7 +285,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProfileHeader
+export default ProfileHeader;

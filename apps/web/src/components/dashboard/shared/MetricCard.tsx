@@ -34,7 +34,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   };
 
   const cardClassName = `
-    card-glass p-6 transition-all duration-200 hover:shadow-lg
+    card-glass dashboard-card-padding transition-all duration-200 hover:shadow-lg
     ${urgent ? 'border-l-4 border-red-500' : ''}
     ${onClick ? 'cursor-pointer hover:scale-105' : ''}
   `.trim();
@@ -43,7 +43,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     return (
       <div className={cardClassName}>
         <div className="animate-pulse">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-mobile flex items-center justify-between">
             <div className="h-4 w-20 rounded bg-gray-300"></div>
             <div className="h-8 w-8 rounded bg-gray-300"></div>
           </div>
@@ -55,7 +55,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div className={cardClassName} onClick={onClick}>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-mobile flex items-center justify-between">
         <h3 className="text-muted text-sm font-medium uppercase tracking-wide">
           {title}
         </h3>

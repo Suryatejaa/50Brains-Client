@@ -4,6 +4,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, type APIResponse } from '@/lib/api-client';
 
+// Import cache systems for clearing on logout
+import profileCache from '@/frontend-profile/hooks/useProfileCache';
+import { reputationCacheInstance } from '@/hooks/useReputationCache';
+
 // Types based on complete API documentation
 interface User {
   id: string;
@@ -213,6 +217,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log('🗑️ User cache cleared');
     } catch (error) {
       console.warn('Failed to clear cache:', error);
+    }
+  };
+
+  const clearAllCachesOnLogout = () => {
+    try {
+      console.log('🗑️ Clearing all caches on logout...');
+
+      // Clear profile cache (clear all profiles)
+      if (profileCache && profileCache.clear) {
+        profileCache.clear(); // Clear all cache when no key provided
+        console.log('✅ Profile cache cleared');
+      }
+
+      // Clear reputation cache
+      if (reputationCacheInstance && reputationCacheInstance.clearAll) {
+        reputationCacheInstance.clearAll();
+        console.log('✅ Reputation cache cleared');
+      }
+
+      // Clear data persistence cache (localStorage items starting with '50brains_')
+      try {
+        const keys = Object.keys(localStorage).filter((key) =>
+          key.startsWith('50brains_')
+        );
+        keys.forEach((key) => localStorage.removeItem(key));
+        console.log(`✅ Data persistence cache cleared (${keys.length} items)`);
+      } catch (error) {
+        console.warn('Failed to clear data persistence cache:', error);
+      }
+
+      console.log('🎉 All caches cleared successfully');
+    } catch (error) {
+      console.error('❌ Error clearing caches on logout:', error);
     }
   };
 
@@ -473,6 +510,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Always clear local state
       apiClient.clearAuthTokens();
       clearUserCache(); // Explicitly clear user cache on logout
+
+      // Clear ALL cache systems on logout
+      clearAllCachesOnLogout();
+
       setUser(null);
 
       // Only redirect to home if this was triggered by user action (not on auth check failure)

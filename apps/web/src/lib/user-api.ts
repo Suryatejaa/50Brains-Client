@@ -298,10 +298,7 @@ export class UserAPI {
     formData.append('profilePicture', file);
     return apiClient.put<{ profilePicture: string }>(
       '/api/user/profile-picture',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+      formData
     );
   }
 
@@ -312,16 +309,10 @@ export class UserAPI {
     formData.append('coverPhoto', file);
     return apiClient.put<{ coverPhoto: string }>(
       '/api/user/cover-photo',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+      formData
     );
   }
 
-  /**
-   * Social Media Management
-   */
   static async updateSocialHandles(
     data: UpdateSocialHandlesRequest
   ): Promise<APIResponse<UserProfile>> {

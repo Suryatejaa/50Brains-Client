@@ -1,12 +1,12 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,6 +14,13 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,7 +37,15 @@ export default function LoginPage() {
 
     try {
       await login(formData);
-      router.push('/dashboard');
+
+      // Check for saved redirect URL
+      const savedRedirectUrl = localStorage.getItem('authRedirectUrl');
+      if (savedRedirectUrl) {
+        localStorage.removeItem('authRedirectUrl');
+        router.push(savedRedirectUrl as any);
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error: any) {
       setError(error.message || 'Login failed. Please try again.');
     } finally {

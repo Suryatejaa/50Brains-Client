@@ -32,7 +32,7 @@ export const NotificationBell: React.FC = () => {
         `/api/notifications/user/${user.id}?limit=10`
       );
       if (response.success) {
-        const notificationData = response.data || [];
+        const notificationData = Array.isArray(response.data) ? response.data : [];
         setNotifications(notificationData);
         setUnreadCount(
           notificationData.filter((n: Notification) => !n.isRead).length

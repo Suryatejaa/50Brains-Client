@@ -1,12 +1,19 @@
-'use client';
-
-import React from 'react';
+// app/dashboard/page.tsx - Server Component Dashboard Page
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { DashboardRouter } from '@/components/dashboard/DashboardRouter';
 
-export default function DashboardPage() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardRouter />
-    </div>
-  );
+export default async function DashboardPage() {
+  // Server-side auth check using cookies
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const refreshToken = cookieStore.get('refreshToken')?.value;
+
+  // Redirect to login if no tokens
+  if (!accessToken && !refreshToken) {
+    redirect('/login');
+  }
+
+  // Return the client router which will handle user-specific routing
+  return <DashboardRouter />;
 }

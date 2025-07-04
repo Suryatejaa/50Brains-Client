@@ -130,7 +130,7 @@ export const AdminDashboard: React.FC = () => {
         systemStats:
           systemStatsResponse.status === 'fulfilled' &&
           systemStatsResponse.value.success
-            ? systemStatsResponse.value.data
+            ? (systemStatsResponse.value.data as AdminDashboardData['systemStats'])
             : {
                 totalUsers: 0,
                 activeUsers: 0,
@@ -143,7 +143,7 @@ export const AdminDashboard: React.FC = () => {
         userAnalytics:
           userAnalyticsResponse.status === 'fulfilled' &&
           userAnalyticsResponse.value.success
-            ? userAnalyticsResponse.value.data
+            ? (userAnalyticsResponse.value.data as AdminDashboardData['userAnalytics'])
             : {
                 newUsers: 0,
                 userGrowth: 0,
@@ -154,7 +154,7 @@ export const AdminDashboard: React.FC = () => {
         platformMetrics:
           platformMetricsResponse.status === 'fulfilled' &&
           platformMetricsResponse.value.success
-            ? platformMetricsResponse.value.data
+            ? (platformMetricsResponse.value.data as AdminDashboardData['platformMetrics'])
             : {
                 activeGigs: 0,
                 completedGigs: 0,
@@ -167,13 +167,13 @@ export const AdminDashboard: React.FC = () => {
         moderationQueue:
           moderationResponse.status === 'fulfilled' &&
           moderationResponse.value.success
-            ? moderationResponse.value.data
+            ? (moderationResponse.value.data as AdminDashboardData['moderationQueue'])
             : [],
 
         systemHealth:
           systemHealthResponse.status === 'fulfilled' &&
           systemHealthResponse.value.success
-            ? systemHealthResponse.value.data
+            ? (systemHealthResponse.value.data as AdminDashboardData['systemHealth'])
             : {
                 status: 'warning',
                 services: [],
@@ -183,7 +183,7 @@ export const AdminDashboard: React.FC = () => {
         recentActivities:
           activitiesResponse.status === 'fulfilled' &&
           activitiesResponse.value.success
-            ? activitiesResponse.value.data
+            ? (activitiesResponse.value.data as AdminDashboardData['recentActivities'])
             : [],
       };
 

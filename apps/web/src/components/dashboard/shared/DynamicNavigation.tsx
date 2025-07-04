@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 
 type UserRole =
   | 'USER'
@@ -24,13 +25,14 @@ interface NavigationItem {
 
 export const DynamicNavigation: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { getUserType, hasPermission, hasRole } = usePermissions();
+  const { hasPermission, hasRole } = usePermissions();
+  const { currentRole, getUserTypeForRole } = useRoleSwitch();
 
   if (!isAuthenticated || !user) {
     return null;
   }
 
-  const userType = getUserType();
+  const userType = getUserTypeForRole(currentRole);
 
   const getNavigationItems = (): NavigationItem[] => {
     const baseItems: NavigationItem[] = [

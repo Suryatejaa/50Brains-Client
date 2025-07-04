@@ -5,6 +5,7 @@ import ProfileHeader from './ProfileHeader';
 import ProfileTabs from './ProfileTabs';
 import LoadingSpinner from './common/LoadingSpinner';
 import ErrorMessage from './common/ErrorMessage';
+import CacheIndicator from './CacheIndicator';
 import './ProfilePage.css';
 import './common/ComponentStyles.css';
 
@@ -24,6 +25,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
     startEditing,
     cancelEditing,
     refreshSection,
+    forceRefreshProfile,
   } = useProfile(userId);
 
   if (isLoading && !profile) {
@@ -60,6 +62,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
 
   return (
     <div className="profile-page">
+      {/* Cache Indicator for debugging */}
+      {/* <CacheIndicator userId={userId} /> */}
+
       {/* Profile Header Section */}
       <ProfileHeader
         user={profile.user}
@@ -102,6 +107,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
       {isLoading && profile && (
         <div className="profile-page__loading-overlay">
           <LoadingSpinner size="medium" message="Updating..." />
+        </div>
+      )}
+
+      {/* Debug Controls */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-2">
+          <button
+            onClick={forceRefreshProfile}
+            className="rounded bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+          >
+            🔄 Force Refresh
+          </button>
         </div>
       )}
     </div>

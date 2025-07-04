@@ -81,13 +81,13 @@ export const ClanDashboard: React.FC = () => {
         `/api/clan/user/${user.id}/membership`
       );
 
-      if (!membershipResponse.success || !membershipResponse.data?.clanId) {
+      if (!membershipResponse.success || !(membershipResponse.data as any)?.clanId) {
         setError('You are not currently a member of any clan.');
         setLoading(false);
         return;
       }
 
-      const clanId = membershipResponse.data.clanId;
+      const clanId = (membershipResponse.data as { clanId: string }).clanId;
       setUserClanId(clanId);
 
       const [
@@ -110,7 +110,7 @@ export const ClanDashboard: React.FC = () => {
         clanInfo:
           clanInfoResponse.status === 'fulfilled' &&
           clanInfoResponse.value.success
-            ? clanInfoResponse.value.data
+            ? (clanInfoResponse.value.data as ClanDashboardData['clanInfo'])
             : {
                 id: '',
                 name: 'Unknown Clan',
@@ -124,13 +124,13 @@ export const ClanDashboard: React.FC = () => {
         members:
           membersResponse.status === 'fulfilled' &&
           membersResponse.value.success
-            ? membersResponse.value.data
+            ? (membersResponse.value.data as ClanDashboardData['members'])
             : [],
 
         rankings:
           rankingsResponse.status === 'fulfilled' &&
           rankingsResponse.value.success
-            ? rankingsResponse.value.data
+            ? (rankingsResponse.value.data as ClanDashboardData['rankings'])
             : {
                 position: 0,
                 totalClans: 0,
@@ -141,19 +141,19 @@ export const ClanDashboard: React.FC = () => {
         projects:
           projectsResponse.status === 'fulfilled' &&
           projectsResponse.value.success
-            ? projectsResponse.value.data
+            ? (projectsResponse.value.data as ClanDashboardData['projects'])
             : { active: [], completed: 0, totalEarnings: 0 },
 
         activities:
           activitiesResponse.status === 'fulfilled' &&
           activitiesResponse.value.success
-            ? activitiesResponse.value.data
+            ? (activitiesResponse.value.data as ClanDashboardData['activities'])
             : [],
 
         invitations:
           invitationsResponse.status === 'fulfilled' &&
           invitationsResponse.value.success
-            ? invitationsResponse.value.data
+            ? (invitationsResponse.value.data as ClanDashboardData['invitations'])
             : [],
       };
 

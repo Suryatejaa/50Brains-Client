@@ -2,8 +2,17 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/apiClient';
 import { CompleteProfileData, ProfileState } from '../types/profile.types';
+import { useProfileCache } from './useProfileCache';
 
 export const useProfile = (userId?: string) => {
+  const {
+    getFromCache,
+    setInCache,
+    isValidInCache,
+    clearFromCache,
+    getCacheInfo,
+  } = useProfileCache();
+
   const [state, setState] = useState<ProfileState>({
     profile: null,
     loading: true,
@@ -13,8 +22,28 @@ export const useProfile = (userId?: string) => {
   });
 
   // Fetch complete profile data from all services
-  const fetchProfile = async (targetUserId?: string) => {
+  const fetchProfile = async (targetUserId?: string, forceRefresh = false) => {
     try {
+      // Check cache first (unless force refresh)
+      if (!forceRefresh) {
+        const cachedProfile = getFromCache(targetUserId);
+        if (cachedProfile) {
+          const cacheInfo = getCacheInfo(targetUserId);
+          console.log(
+            `🎯 Using cached profile data (age: ${Math.round((cacheInfo?.age || 0) / 1000)}s, expires in: ${Math.round((cacheInfo?.expiresIn || 0) / 1000)}s)`
+          );
+
+          setState((prev) => ({
+            ...prev,
+            profile: cachedProfile,
+            loading: false,
+            isOwner: !targetUserId,
+            errors: {},
+          }));
+          return;
+        }
+      }
+
       setState((prev) => ({ ...prev, loading: true, errors: {} }));
 
       const isPublicView = !!targetUserId;
@@ -48,22 +77,23 @@ export const useProfile = (userId?: string) => {
       const profile: CompleteProfileData = {
         user:
           userResult.status === 'fulfilled' && userResult.value.success
-            ? userResult.value.data.user || userResult.value.data
+            ? (userResult.value.data as any).user ||
+              (userResult.value.data as any)
             : null,
         workHistory:
           workHistoryResult.status === 'fulfilled' &&
           workHistoryResult.value.success
-            ? workHistoryResult.value.data
+            ? (workHistoryResult.value.data as any)
             : null,
         analytics:
           analyticsResult.status === 'fulfilled' &&
           analyticsResult.value.success
-            ? analyticsResult.value.data
+            ? (analyticsResult.value.data as any)
             : null,
         reputation:
           reputationResult.status === 'fulfilled' &&
           reputationResult.value.success
-            ? reputationResult.value.data
+            ? (reputationResult.value.data as any)
             : null,
       };
 
@@ -83,6 +113,12 @@ export const useProfile = (userId?: string) => {
         loading: false,
         isOwner: !isPublicView,
       }));
+
+      // Cache the profile data for 60 seconds
+      if (profile.user) {
+        console.log('💾 Caching profile data for 60 seconds');
+        setInCache(profile, targetUserId, 60 * 1000); // 60 seconds
+      }
 
       // Track profile view for analytics
       if (isPublicView && profile.user) {
@@ -129,28 +165,39 @@ export const useProfile = (userId?: string) => {
       const response = await apiClient.put(endpoint, payload);
 
       if (response.success) {
+        // Clear cache since profile was updated
+        console.log('🗑️ Clearing profile cache due to update');
+        clearFromCache(userId);
+
         // Update local state with new data
+        const updatedProfile = state.profile
+          ? {
+              ...state.profile,
+              user: {
+                ...state.profile.user,
+                ...(response.success ? (response.data as any).user : {}),
+              },
+            }
+          : null;
+
         setState((prev) => ({
           ...prev,
-          profile: prev.profile
-            ? {
-                ...prev.profile,
-                user: {
-                  ...prev.profile.user,
-                  ...(response.success ? response.data.user : {}),
-                },
-              }
-            : null,
+          profile: updatedProfile,
           editing: { section: null, data: null },
           loading: false,
         }));
+
+        // Cache the updated profile
+        if (updatedProfile) {
+          setInCache(updatedProfile, userId, 60 * 1000);
+        }
 
         // Track profile edit
         trackProfileEdit(section, Object.keys(data));
 
         return { success: true };
       } else {
-        return { success: false, error: response.error || 'Update failed' };
+        return { success: false, error: 'Update failed' };
       }
     } catch (error: any) {
       setState((prev) => ({
@@ -248,20 +295,28 @@ export const useProfile = (userId?: string) => {
     }
   };
 
+  // Force refresh profile (bypasses cache)
+  const forceRefreshProfile = async () => {
+    console.log('🔄 Force refreshing profile (bypassing cache)');
+    clearFromCache(userId);
+    await fetchProfile(userId, true);
+  };
+
   // Load profile on mount or when userId changes
   useEffect(() => {
     fetchProfile(userId);
   }, [userId]);
 
-
-
   return {
     ...state,
     fetchProfile,
+    forceRefreshProfile,
     updateProfileSection,
     startEditing,
     cancelEditing,
     refreshSection,
+    clearCache: () => clearFromCache(userId),
+    getCacheInfo: () => getCacheInfo(userId),
     isLoading: state.loading,
     hasError: Object.keys(state.errors).length > 0,
   };

@@ -2,18 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { apiClient } from '@/lib/api-client';
+import {
+  brandApiClient,
+  BrandProfile,
+  BrandGig,
+  BrandWallet,
+} from '@/lib/brand-api-client';
 import { DashboardHeader } from '../shared/DashboardHeader';
 import { MetricCard } from '../shared/MetricCard';
 import { QuickActionsGrid } from '../shared/QuickActions';
 import { ProfileCompletionWidget } from '@/components/ProfileCompletionWidget';
 
 interface BrandDashboardData {
-  campaigns: {
-    active: number;
-    completed: number;
-    totalSpent: number;
-    averageROI: number;
+  profile: BrandProfile | null;
+  gigsStats: {
+    totalGigs: number;
+    activeGigs: number;
+    completedGigs: number;
+    totalBudget: number;
   };
   applications: {
     total: number;
@@ -21,29 +27,24 @@ interface BrandDashboardData {
     approved: number;
     rejected: number;
   };
-  analytics: {
-    totalReach: number;
-    totalEngagement: number;
-    conversionRate: number;
-    topPerformingCampaign: string;
-  };
-  reputation: {
-    score: number;
-    reviews: number;
-    averageRating: number;
-  };
-  credits: {
-    balance: number;
-    spent: number;
-    reserved: number;
-  };
+  wallet: BrandWallet | null;
+  recentGigs: BrandGig[];
 }
 
 export const BrandDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<BrandDashboardData | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<BrandDashboardData>({
+    profile: null,
+    gigsStats: {
+      totalGigs: 0,
+      activeGigs: 0,
+      completedGigs: 0,
+      totalBudget: 0,
+    },
+    applications: { total: 0, pending: 0, approved: 0, rejected: 0 },
+    wallet: null,
+    recentGigs: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,55 +59,74 @@ export const BrandDashboard: React.FC = () => {
     setError(null);
 
     try {
-      const [
-        campaignsResponse,
-        applicationsResponse,
-        analyticsResponse,
-        reputationResponse,
-        creditsResponse,
-      ] = await Promise.allSettled([
-        apiClient.get('/api/my/campaigns/summary'),
-        apiClient.get('/api/applications/received/summary'),
-        apiClient.get('/api/analytics/campaigns'),
-        apiClient.get(`/api/reputation/${user.id}`),
-        apiClient.get('/api/credit/balance'),
-      ]);
+      const [profileResponse, gigsResponse, walletResponse] =
+        await Promise.allSettled([
+          brandApiClient.getProfile(),
+          brandApiClient.getMyGigs({ limit: 5 }),
+          brandApiClient.getWallet(),
+        ]);
+
+      // Calculate application stats from recent gigs
+      let applicationsStats = {
+        total: 0,
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+      };
+
+      if (
+        gigsResponse.status === 'fulfilled' &&
+        gigsResponse.value.success &&
+        gigsResponse.value.data?.gigs
+      ) {
+        // Sum up applications from all gigs
+        const gigs = gigsResponse.value.data.gigs;
+        applicationsStats.total = gigs.reduce(
+          (sum, gig) => sum + gig.applicationsCount,
+          0
+        );
+        // Note: We'd need to fetch individual applications to get pending/approved/rejected counts
+        // For now, we'll estimate based on accepted vs total
+        applicationsStats.approved = gigs.reduce(
+          (sum, gig) => sum + gig.acceptedCount,
+          0
+        );
+        applicationsStats.pending =
+          applicationsStats.total - applicationsStats.approved;
+      }
 
       const data: BrandDashboardData = {
-        campaigns:
-          campaignsResponse.status === 'fulfilled' &&
-          campaignsResponse.value.success
-            ? campaignsResponse.value.data
-            : { active: 0, completed: 0, totalSpent: 0, averageROI: 0 },
+        profile:
+          profileResponse.status === 'fulfilled' &&
+          profileResponse.value.success
+            ? profileResponse.value.data || null
+            : null,
 
-        applications:
-          applicationsResponse.status === 'fulfilled' &&
-          applicationsResponse.value.success
-            ? applicationsResponse.value.data
-            : { total: 0, pending: 0, approved: 0, rejected: 0 },
-
-        analytics:
-          analyticsResponse.status === 'fulfilled' &&
-          analyticsResponse.value.success
-            ? analyticsResponse.value.data
+        gigsStats:
+          gigsResponse.status === 'fulfilled' &&
+          gigsResponse.value.success &&
+          gigsResponse.value.data?.stats
+            ? gigsResponse.value.data.stats
             : {
-                totalReach: 0,
-                totalEngagement: 0,
-                conversionRate: 0,
-                topPerformingCampaign: 'N/A',
+                totalGigs: 0,
+                activeGigs: 0,
+                completedGigs: 0,
+                totalBudget: 0,
               },
 
-        reputation:
-          reputationResponse.status === 'fulfilled' &&
-          reputationResponse.value.success
-            ? reputationResponse.value.data
-            : { score: 0, reviews: 0, averageRating: 0 },
+        wallet:
+          walletResponse.status === 'fulfilled' && walletResponse.value.success
+            ? walletResponse.value.data || null
+            : null,
 
-        credits:
-          creditsResponse.status === 'fulfilled' &&
-          creditsResponse.value.success
-            ? creditsResponse.value.data
-            : { balance: 0, spent: 0, reserved: 0 },
+        applications: applicationsStats,
+
+        recentGigs:
+          gigsResponse.status === 'fulfilled' &&
+          gigsResponse.value.success &&
+          gigsResponse.value.data?.gigs
+            ? gigsResponse.value.data.gigs
+            : [],
       };
 
       setDashboardData(data);
@@ -176,7 +196,7 @@ export const BrandDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">⚠️</span>
@@ -194,61 +214,228 @@ export const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
       <div className="mx-auto max-w-7xl">
         <DashboardHeader
-          title="Brand Dashboard"
-          subtitle="Manage your influencer marketing campaigns and track performance"
+          title={`Welcome back, ${dashboardData.profile?.companyName || 'Brand'}`}
+          subtitle="Manage your campaigns and connect with top creators"
         />
 
         {/* Key Metrics */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-3 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           <MetricCard
-            title="Active Campaigns"
-            value={dashboardData?.campaigns?.active || 0}
-            icon="📢"
+            title="Active Gigs"
+            value={dashboardData.gigsStats.activeGigs}
+            icon="🎯"
             loading={loading}
-            onClick={() =>
-              (window.location.href = '/my/campaigns?status=active')
-            }
+            onClick={() => (window.location.href = '/my-gigs?status=ACTIVE')}
           />
           <MetricCard
             title="Pending Applications"
-            value={dashboardData?.applications?.pending || 0}
+            value={dashboardData.applications.pending}
             icon="📨"
             loading={loading}
-            urgent={(dashboardData?.applications?.pending || 0) > 10}
+            urgent={dashboardData.applications.pending > 10}
             onClick={() =>
-              (window.location.href = '/applications/received?status=pending')
+              (window.location.href = '/applications?status=pending')
             }
           />
           <MetricCard
-            title="Total Reach"
-            value={dashboardData?.analytics?.totalReach || 0}
-            icon="👥"
+            title="Profile Views"
+            value={dashboardData.profile?.profileViews || 0}
+            icon="�️"
             loading={loading}
-            onClick={() => (window.location.href = '/analytics/reach')}
+            onClick={() => (window.location.href = '/profile')}
           />
           <MetricCard
             title="Credits Balance"
-            value={`$${dashboardData?.credits?.balance || 0}`}
+            value={`₹${dashboardData.wallet?.balance || 0}`}
             icon="💰"
             loading={loading}
             onClick={() => (window.location.href = '/credits')}
           />
         </div>
 
-        {/* Campaign Performance Overview */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Main Dashboard Grid */}
+        <div className="mb-3 grid grid-cols-1 gap-3 md:mb-6 md:gap-6 lg:grid-cols-3">
           {/* Profile Completion Widget */}
           <div className="lg:col-span-1">
-            <ProfileCompletionWidget />
+            <div className="card-glass p-6">
+              <h3 className="text-heading mb-4 text-lg font-semibold">
+                🏢 Company Overview
+              </h3>
+
+              {loading ? (
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 w-3/4 rounded bg-gray-300"></div>
+                  <div className="h-3 w-1/2 rounded bg-gray-300"></div>
+                  <div className="h-3 w-2/3 rounded bg-gray-300"></div>
+                </div>
+              ) : dashboardData.profile ? (
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-heading font-semibold">
+                      {dashboardData.profile.companyName}
+                    </div>
+                    <div className="text-muted text-sm">
+                      {dashboardData.profile.industry}
+                    </div>
+                  </div>
+
+                  {dashboardData.profile.bio && (
+                    <p className="text-body text-sm">
+                      {dashboardData.profile.bio}
+                    </p>
+                  )}
+
+                  <div className="flex items-center space-x-4 text-sm">
+                    <span
+                      className={`flex items-center space-x-1 ${
+                        dashboardData.profile.isVerified
+                          ? 'text-green-600'
+                          : 'text-gray-500'
+                      }`}
+                    >
+                      <span>
+                        {dashboardData.profile.isVerified ? '✓' : '⚠'}
+                      </span>
+                      <span>
+                        {dashboardData.profile.isVerified
+                          ? 'Verified'
+                          : 'Unverified'}
+                      </span>
+                    </span>
+                  </div>
+
+                  {dashboardData.profile.analytics && (
+                    <div className="mt-4 rounded-lg bg-gray-50 p-3">
+                      <div className="text-sm font-medium text-gray-700">
+                        Profile Completion
+                      </div>
+                      <div className="mt-1 flex items-center">
+                        <div className="h-2 flex-1 rounded-full bg-gray-200">
+                          <div
+                            className="h-2 rounded-full bg-blue-500"
+                            style={{
+                              width: `${dashboardData.profile.analytics.completionPercentage}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-600">
+                          {dashboardData.profile.analytics.completionPercentage}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-muted text-center">
+                  <p>Profile information not available</p>
+                  <button
+                    onClick={() => (window.location.href = '/profile/edit')}
+                    className="btn-primary mt-2"
+                  >
+                    Complete Profile
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Recent Gigs */}
+          <div className="lg:col-span-2">
+            <div className="card-glass p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-heading text-lg font-semibold">
+                  📝 Recent Gigs
+                </h3>
+                <button
+                  onClick={() => (window.location.href = '/create-gig')}
+                  className="btn-primary text-sm"
+                >
+                  Create New
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="animate-pulse space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="border-b border-gray-200 pb-4">
+                      <div className="mb-2 h-4 w-3/4 rounded bg-gray-300"></div>
+                      <div className="h-3 w-1/2 rounded bg-gray-300"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : dashboardData.recentGigs.length > 0 ? (
+                <div className="space-y-4">
+                  {dashboardData.recentGigs.map((gig) => (
+                    <div
+                      key={gig.id}
+                      className="cursor-pointer rounded border-b border-gray-200 p-2 pb-4 last:border-b-0 hover:bg-gray-50"
+                      onClick={() => (window.location.href = `/gig/${gig.id}`)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-heading font-medium">
+                            {gig.title}
+                          </h4>
+                          <p className="text-muted mt-1 text-sm">
+                            {gig.description.substring(0, 100)}
+                            {gig.description.length > 100 ? '...' : ''}
+                          </p>
+                          <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                            <span>Budget: ₹{gig.budget.toLocaleString()}</span>
+                            <span>Applications: {gig.applicationsCount}</span>
+                            <span>Views: {gig.viewsCount}</span>
+                          </div>
+                        </div>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                            gig.status === 'ACTIVE'
+                              ? 'bg-green-100 text-green-800'
+                              : gig.status === 'COMPLETED'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {gig.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-4 text-center">
+                    <button
+                      onClick={() => (window.location.href = '/my-gigs')}
+                      className="btn-secondary text-sm"
+                    >
+                      View All Gigs
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <span className="mb-2 block text-4xl">📝</span>
+                  <p className="text-muted mb-4">No gigs posted yet</p>
+                  <button
+                    onClick={() => (window.location.href = '/create-gig')}
+                    className="btn-primary"
+                  >
+                    Create Your First Gig
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Performance and Applications Grid */}
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="card-glass p-6">
               <h3 className="text-heading mb-6 text-lg font-semibold">
-                📊 Campaign Performance
+                📊 Gig Performance
               </h3>
 
               {loading ? (
@@ -260,29 +447,27 @@ export const BrandDashboard: React.FC = () => {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.campaigns?.completed || 0}
+                      {dashboardData.gigsStats.completedGigs}
                     </div>
-                    <div className="text-muted text-sm">
-                      Completed Campaigns
-                    </div>
+                    <div className="text-muted text-sm">Completed Gigs</div>
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      ${dashboardData?.campaigns?.totalSpent || 0}
+                      ₹{dashboardData.gigsStats.totalBudget.toLocaleString()}
                     </div>
-                    <div className="text-muted text-sm">Total Spent</div>
+                    <div className="text-muted text-sm">Total Budget</div>
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.analytics?.conversionRate || 0}%
+                      {dashboardData.applications.total}
                     </div>
-                    <div className="text-muted text-sm">Conversion Rate</div>
+                    <div className="text-muted text-sm">Total Applications</div>
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.campaigns?.averageROI || 0}%
+                      {dashboardData.applications.approved}
                     </div>
-                    <div className="text-muted text-sm">Average ROI</div>
+                    <div className="text-muted text-sm">Approved</div>
                   </div>
                 </div>
               )}
@@ -309,69 +494,62 @@ export const BrandDashboard: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
-                      <span className="text-xs font-semibold text-white">
-                        JD
-                      </span>
-                    </div>
-                    <div>
-                      <div className="text-body font-medium">John Doe</div>
-                      <div className="text-muted text-xs">
-                        Instagram Campaign
+                {dashboardData.applications.total > 0 ? (
+                  <>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-heading text-lg font-bold">
+                          {dashboardData.applications.pending}
+                        </div>
+                        <div className="text-muted text-xs">Pending</div>
+                      </div>
+                      <div>
+                        <div className="text-heading text-lg font-bold">
+                          {dashboardData.applications.approved}
+                        </div>
+                        <div className="text-muted text-xs">Approved</div>
+                      </div>
+                      <div>
+                        <div className="text-heading text-lg font-bold">
+                          {dashboardData.applications.rejected}
+                        </div>
+                        <div className="text-muted text-xs">Rejected</div>
                       </div>
                     </div>
-                  </div>
-                  <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-600">
-                    Pending
-                  </span>
-                </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-blue-500">
-                      <span className="text-xs font-semibold text-white">
-                        SM
-                      </span>
+                    <div className="border-t pt-4">
+                      <div className="text-center">
+                        <div className="text-heading mb-2 text-2xl font-bold">
+                          {dashboardData.applications.total}
+                        </div>
+                        <div className="text-muted mb-4 text-sm">
+                          Total Applications Received
+                        </div>
+                        <button
+                          onClick={() =>
+                            (window.location.href = '/applications')
+                          }
+                          className="btn-primary w-full"
+                        >
+                          Review Applications
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-body font-medium">Sarah Miller</div>
-                      <div className="text-muted text-xs">TikTok Campaign</div>
-                    </div>
+                  </>
+                ) : (
+                  <div className="py-8 text-center">
+                    <span className="mb-2 block text-4xl">📨</span>
+                    <p className="text-muted mb-4">
+                      No applications received yet
+                    </p>
+                    <button
+                      onClick={() => (window.location.href = '/create-gig')}
+                      className="btn-primary"
+                    >
+                      Create Your First Gig
+                    </button>
                   </div>
-                  <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-600">
-                    Approved
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
-                      <span className="text-xs font-semibold text-white">
-                        MJ
-                      </span>
-                    </div>
-                    <div>
-                      <div className="text-body font-medium">Mike Johnson</div>
-                      <div className="text-muted text-xs">YouTube Campaign</div>
-                    </div>
-                  </div>
-                  <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-600">
-                    Pending
-                  </span>
-                </div>
-
-                <div className="border-t pt-2">
-                  <button
-                    onClick={() =>
-                      (window.location.href = '/applications/received')
-                    }
-                    className="text-accent w-full text-sm hover:underline"
-                  >
-                    View All Applications
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -381,7 +559,7 @@ export const BrandDashboard: React.FC = () => {
         <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="card-glass p-6">
             <h3 className="text-heading mb-6 text-lg font-semibold">
-              📈 Analytics Overview
+              📈 Gig Analytics
             </h3>
 
             {loading ? (
@@ -396,40 +574,38 @@ export const BrandDashboard: React.FC = () => {
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-body">Total Engagement</span>
+                  <span className="text-body">Total Gigs Posted</span>
                   <span className="text-heading font-semibold">
-                    {(
-                      dashboardData?.analytics?.totalEngagement || 0
-                    ).toLocaleString()}
+                    {dashboardData.gigsStats.totalGigs}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-body">Conversion Rate</span>
+                  <span className="text-body">Active Gigs</span>
                   <span className="text-heading font-semibold">
-                    {dashboardData?.analytics?.conversionRate || 0}%
+                    {dashboardData.gigsStats.activeGigs}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-body">Top Campaign</span>
-                  <span className="text-heading text-sm font-semibold">
-                    {dashboardData?.analytics?.topPerformingCampaign || 'N/A'}
+                  <span className="text-body">Completed Gigs</span>
+                  <span className="text-heading font-semibold">
+                    {dashboardData.gigsStats.completedGigs}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-body">Brand Rating</span>
+                  <span className="text-body">Company Rating</span>
                   <span className="text-heading font-semibold">
-                    {dashboardData?.reputation?.averageRating || 0}/5 ⭐
+                    {dashboardData.profile?.isVerified
+                      ? 'Verified ✓'
+                      : 'Not Verified'}
                   </span>
                 </div>
 
                 <div className="border-t pt-2">
                   <button
-                    onClick={() =>
-                      (window.location.href = '/analytics/detailed')
-                    }
+                    onClick={() => (window.location.href = '/analytics')}
                     className="text-accent w-full text-sm hover:underline"
                   >
                     View Detailed Analytics
@@ -441,28 +617,35 @@ export const BrandDashboard: React.FC = () => {
 
           <div className="card-glass p-6">
             <h3 className="text-heading mb-6 text-lg font-semibold">
-              💰 Budget Management
+              💰 Wallet Management
             </h3>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-body">Available Credits</span>
                 <span className="text-heading font-semibold text-green-600">
-                  ${dashboardData?.credits?.balance || 0}
+                  ₹{dashboardData.wallet?.balance || 0}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-body">Reserved for Campaigns</span>
-                <span className="text-heading font-semibold text-yellow-600">
-                  ${dashboardData?.credits?.reserved || 0}
+                <span className="text-body">Total Purchased</span>
+                <span className="text-heading font-semibold text-blue-600">
+                  ₹{dashboardData.wallet?.totalPurchased || 0}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-body">Total Spent</span>
                 <span className="text-heading font-semibold">
-                  ${dashboardData?.credits?.spent || 0}
+                  ₹{dashboardData.wallet?.totalSpent || 0}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-body">Currency</span>
+                <span className="text-heading text-sm font-medium">
+                  {dashboardData.wallet?.currency || 'INR'}
                 </span>
               </div>
 
@@ -481,6 +664,42 @@ export const BrandDashboard: React.FC = () => {
                     View History
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Overview */}
+        <div className="mb-8">
+          <div className="card-glass p-6">
+            <h3 className="text-heading mb-6 text-lg font-semibold">
+              📈 Performance Overview
+            </h3>
+
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              <div className="text-center">
+                <div className="text-heading text-2xl font-bold">
+                  {dashboardData.gigsStats.completedGigs}
+                </div>
+                <div className="text-muted text-sm">Completed Gigs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-heading text-2xl font-bold">
+                  ₹{dashboardData.gigsStats.totalBudget.toLocaleString()}
+                </div>
+                <div className="text-muted text-sm">Total Investment</div>
+              </div>
+              <div className="text-center">
+                <div className="text-heading text-2xl font-bold">
+                  {dashboardData.wallet?.totalSpent.toLocaleString() || 0}
+                </div>
+                <div className="text-muted text-sm">Credits Spent</div>
+              </div>
+              <div className="text-center">
+                <div className="text-heading text-2xl font-bold">
+                  {dashboardData.profile?.profileViews || 0}
+                </div>
+                <div className="text-muted text-sm">Profile Views</div>
               </div>
             </div>
           </div>

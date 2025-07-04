@@ -3,6 +3,7 @@ export interface APISuccessResponse<T> {
   success: true;
   data: T;
   message?: string;
+  details?: any; // For compatibility with legacy code
   pagination?: {
     page: number;
     limit: number;
@@ -66,11 +67,38 @@ export interface User {
   isEmailVerified: boolean;
   isProfileVerified: boolean;
 
+  // Influencer-specific fields
+  contentCategories?: string[];
+  estimatedFollowers?: number;
+  collaborationRates?: {
+    postRate?: number;
+    storyRate?: number;
+    reelRate?: number;
+    videoRate?: number;
+  };
+  targetAudience?: {
+    ageGroups?: string[];
+    interests?: string[];
+    geography?: string[];
+  };
+  mediaKit?: string; // URL to media kit
+
+  // Crew-specific fields
+  crewSkills?: string[];
+  equipmentOwned?: string[];
+  hourlyRate?: number;
+  experienceLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT' | 'SPECIALIST';
+  serviceCategories?: string[];
+  portfolioItems?: any[];
+  certifications?: string[];
+  availabilityStatus?: 'AVAILABLE' | 'BUSY' | 'UNAVAILABLE';
+
   // Contact & Social
   phone?: string;
   website?: string;
   location?: string;
   timezone?: string;
+  socialMediaHandles?: SocialMediaHandle[];
 
   // Professional Info
   currentRole?: string;
@@ -330,6 +358,253 @@ export interface Notification {
 
   createdAt: string;
   readAt?: string;
+  updatedAt: string;
+}
+
+// Dashboard-specific types
+export interface InfluencerDashboardMetrics {
+  contentMetrics: {
+    totalFollowers: number;
+    avgEngagementRate: number;
+    monthlyReach: number;
+    topPerformingPlatform: string;
+    contentViews: number;
+    storiesViewed: number;
+    postsLiked: number;
+    commentsReceived: number;
+  };
+  campaignMetrics: {
+    activeCollaborations: number;
+    pendingApplications: number;
+    completedCampaigns: number;
+    campaignSuccessRate: number;
+    averageCampaignValue: number;
+    brandPartnerships: number;
+    totalCampaignReach: number;
+  };
+  earningsMetrics: {
+    monthlyEarnings: number;
+    totalEarnings: number;
+    avgGigPayment: number;
+    pendingPayments: number;
+    lastPaymentDate: string;
+    topPayingBrand: string;
+    earningsGrowth: number;
+  };
+  audienceMetrics: {
+    demographicBreakdown: {
+      age: Record<string, number>;
+      gender: Record<string, number>;
+      location: Record<string, number>;
+      interests: Record<string, number>;
+    };
+    engagementTrends: {
+      week: number[];
+      month: number[];
+      quarter: number[];
+    };
+    bestPostingTimes: {
+      days: string[];
+      hours: number[];
+    };
+  };
+}
+
+export interface CrewDashboardMetrics {
+  projectMetrics: {
+    activeProjects: number;
+    pendingBids: number;
+    completedProjects: number;
+    avgProjectValue: number;
+    projectSuccessRate: number;
+    onTimeDeliveryRate: number;
+    clientRetentionRate: number;
+  };
+  skillMetrics: {
+    totalSkills: number;
+    expertiseLevel: string;
+    hourlyRate: number;
+    equipmentCount: number;
+    certificationCount: number;
+    skillProficiencyScores: Record<string, number>;
+  };
+  businessMetrics: {
+    monthlyRevenue: number;
+    totalRevenue: number;
+    utilizationRate: number;
+    averageProjectDuration: number;
+    repeatClientPercentage: number;
+    revenueGrowth: number;
+    profitMargin: number;
+  };
+  portfolioMetrics: {
+    totalPortfolioItems: number;
+    portfolioViews: number;
+    portfolioLikes: number;
+    showcaseCategories: string[];
+    topViewedItems: any[];
+  };
+}
+
+export interface SocialMediaAnalytics {
+  userId: string;
+  platforms: {
+    platform: string;
+    followers: number;
+    following: number;
+    posts: number;
+    engagement: number;
+    growthRate: number;
+    lastUpdated: string;
+  }[];
+  totalFollowers: number;
+  totalEngagement: number;
+  averageEngagement: number;
+  reachScore: number;
+  influencerTier: string;
+  growthTrends: {
+    daily: number[];
+    weekly: number[];
+    monthly: number[];
+  };
+  topContent: {
+    posts: any[];
+    stories: any[];
+    reels: any[];
+  };
+}
+
+export interface CampaignApplication {
+  id: string;
+  gigId: string;
+  applicantId: string;
+  status:
+    | 'PENDING'
+    | 'REVIEWING'
+    | 'SHORTLISTED'
+    | 'ACCEPTED'
+    | 'REJECTED'
+    | 'WITHDRAWN';
+  appliedAt: string;
+  proposedRate?: number;
+  coverLetter?: string;
+  deliverables?: string[];
+  timeline?: string;
+  portfolioLinks?: string[];
+  gig?: Gig;
+  applicant?: User;
+  brand?: User;
+
+  // Campaign-specific fields
+  contentType?: 'POST' | 'STORY' | 'REEL' | 'VIDEO' | 'BLOG' | 'LIVE';
+  platforms?: string[];
+  targetAudience?: string[];
+  hashtags?: string[];
+  mentions?: string[];
+
+  // Crew-specific fields
+  projectScope?: string;
+  technicalRequirements?: string[];
+  equipmentNeeded?: string[];
+  skillsRequired?: string[];
+
+  // Payment & Timeline
+  milestones?: {
+    name: string;
+    description: string;
+    dueDate: string;
+    amount: number;
+    status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'APPROVED';
+  }[];
+
+  // Communication
+  messages?: any[];
+  lastMessageAt?: string;
+
+  updatedAt: string;
+}
+
+export interface WorkHistoryItem {
+  id: string;
+  userId: string;
+  gigId: string;
+  clientId: string;
+  type: 'CAMPAIGN' | 'PROJECT' | 'COLLABORATION';
+  title: string;
+  description: string;
+  category: string;
+
+  // Timeline
+  startDate: string;
+  endDate: string;
+  duration: number; // in days
+
+  // Financial
+  agreedAmount: number;
+  finalAmount: number;
+  currency: string;
+  paymentStatus: 'PENDING' | 'PARTIAL' | 'COMPLETED' | 'OVERDUE';
+
+  // Performance
+  rating: number;
+  review?: string;
+  feedback?: string;
+
+  // Deliverables
+  deliverables: {
+    type: string;
+    url: string;
+    description: string;
+    submittedAt: string;
+    approvedAt?: string;
+  }[];
+
+  // Status
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  completionRate: number;
+
+  // Relationships
+  gig?: Gig;
+  client?: User;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BrandRecommendation {
+  id: string;
+  brandId: string;
+  brand: User;
+  matchScore: number;
+  reasons: string[];
+  openGigs: number;
+  avgBudget: number;
+  category: string;
+  preferredContentTypes: string[];
+  audienceAlignment: number;
+  pastCollaborations: number;
+  responseRate: number;
+  paymentReliability: number;
+  campaignSuccess: number;
+}
+
+export interface CrewOpportunity {
+  id: string;
+  gigId: string;
+  gig: Gig;
+  matchScore: number;
+  reasons: string[];
+  skillsMatched: string[];
+  budgetRange: {
+    min: number;
+    max: number;
+  };
+  urgency: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  clientRating: number;
+  projectComplexity: 'SIMPLE' | 'MODERATE' | 'COMPLEX' | 'EXPERT';
+  estimatedDuration: string;
+  isRemote: boolean;
+  competitionLevel: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 // Social Media Types

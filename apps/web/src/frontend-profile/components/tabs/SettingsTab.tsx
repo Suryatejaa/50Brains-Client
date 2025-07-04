@@ -1,8 +1,11 @@
 // components/tabs/SettingsTab.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';
+import ConfirmDialog from '../common/ConfirmDialog';
 import { useAuth } from '@/hooks/useAuth';
+import { useAccountActions } from '@/hooks/useAccountActions';
+import '../common/ConfirmDialog.css';
 
 interface SettingsTabProps {
   user: UserProfileData;
@@ -26,6 +29,71 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
   const isEditingNotifications = editing.section === 'notifications';
   const isEditingAccount = editing.section === 'account';
   const { logout, isLoading } = useAuth();
+  const {
+    deactivateAccount,
+    deleteAccount,
+    isLoading: accountActionsLoading,
+    error: accountError,
+  } = useAccountActions();
+
+  // Dialog state management
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    type: 'logout' | 'deactivate' | 'delete' | null;
+    loading: boolean;
+  }>({
+    isOpen: false,
+    type: null,
+    loading: false,
+  });
+
+  const openDialog = (type: 'logout' | 'deactivate' | 'delete') => {
+    setConfirmDialog({
+      isOpen: true,
+      type,
+      loading: false,
+    });
+  };
+
+  const closeDialog = () => {
+    if (!confirmDialog.loading) {
+      setConfirmDialog({
+        isOpen: false,
+        type: null,
+        loading: false,
+      });
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    setConfirmDialog((prev) => ({ ...prev, loading: true }));
+
+    try {
+      let success = false;
+
+      switch (confirmDialog.type) {
+        case 'logout':
+          await logout();
+          success = true;
+          break;
+        case 'deactivate':
+          success = await deactivateAccount();
+          break;
+        case 'delete':
+          success = await deleteAccount();
+          break;
+      }
+
+      if (success) {
+        closeDialog();
+      } else {
+        setConfirmDialog((prev) => ({ ...prev, loading: false }));
+      }
+    } catch (error) {
+      console.error(`Failed to ${confirmDialog.type} account:`, error);
+      setConfirmDialog((prev) => ({ ...prev, loading: false }));
+    }
+  };
 
   const handlePrivacyEdit = () => {
     onStartEditing('privacy', {
@@ -57,12 +125,42 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     }
   };
 
-  const handleLogout = () => {
-    // Implement logout functionality
-    logout().catch((error) => {
-      console.error('Logout failed:', error);
-    });
-  };    
+  // Dialog configuration based on type
+  const getDialogConfig = () => {
+    switch (confirmDialog.type) {
+      case 'logout':
+        return {
+          title: 'Confirm Logout',
+          message:
+            'Are you sure you want to logout? You will need to login again to access your account.',
+          confirmText: 'Logout',
+          danger: false,
+        };
+      case 'deactivate':
+        return {
+          title: 'Deactivate Account',
+          message:
+            'Are you sure you want to deactivate your account? Your profile will be hidden from other users, but you can reactivate it later by logging in.',
+          confirmText: 'Deactivate',
+          danger: true,
+        };
+      case 'delete':
+        return {
+          title: 'Delete Account',
+          message:
+            'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost forever.',
+          confirmText: 'Delete Forever',
+          danger: true,
+        };
+      default:
+        return {
+          title: '',
+          message: '',
+          confirmText: 'Confirm',
+          danger: false,
+        };
+    }
+  };
 
   return (
     <div className="settings-tab">
@@ -307,9 +405,9 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
       <div className="settings-section">
         <h4>Logout</h4>
         <div className="settings-content">
-          <button 
+          <button
             className="btn btn--danger"
-            onClick={handleLogout}
+            onClick={() => openDialog('logout')}
             disabled={isLoading}
           >
             Logout
@@ -322,14 +420,54 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
         <h4>Danger Zone</h4>
         <div className="settings-content">
           <div className="danger-actions">
-            <button className="btn btn--danger">Deactivate Account</button>
-            <button className="btn btn--danger">Delete Account</button>
+            <button
+              className="btn btn--danger"
+              onClick={() => openDialog('deactivate')}
+              disabled={accountActionsLoading}
+            >
+              {accountActionsLoading && confirmDialog.type === 'deactivate'
+                ? 'Processing...'
+                : 'Deactivate Account'}
+            </button>
+            <button
+              className="btn btn--danger"
+              onClick={() => openDialog('delete')}
+              disabled={accountActionsLoading}
+            >
+              {accountActionsLoading && confirmDialog.type === 'delete'
+                ? 'Processing...'
+                : 'Delete Account'}
+            </button>
           </div>
           <p className="danger-warning">
             These actions are irreversible. Please proceed with caution.
           </p>
+          {accountError && (
+            <div
+              className="error-message"
+              style={{
+                marginTop: '12px',
+                padding: '8px',
+                backgroundColor: '#fee2e2',
+                border: '1px solid #fecaca',
+                borderRadius: '6px',
+                color: '#dc2626',
+              }}
+            >
+              {accountError}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        {...getDialogConfig()}
+        onConfirm={handleConfirmAction}
+        onCancel={closeDialog}
+        loading={confirmDialog.loading}
+      />
     </div>
   );
 };

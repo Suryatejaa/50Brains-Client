@@ -9,7 +9,7 @@ export { DashboardHeader } from './shared/DashboardHeader';
 export { DynamicNavigation } from './shared/DynamicNavigation';
 
 // Role-specific Dashboards
-export { CreatorDashboard } from './creator/CreatorDashboard';
+export { CreatorDashboardClient } from './creator/CreatorDashboardClient';
 export { BrandDashboard } from './brand/BrandDashboard';
 export { ClanDashboard } from './clan/ClanDashboard';
 export { AdminDashboard } from './admin/AdminDashboard';

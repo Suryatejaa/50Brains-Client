@@ -25,10 +25,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <div className="card-glass mb-6 p-6">
+    <div className="card-glass dashboard-section-margin dashboard-card-padding">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-heading mb-2 text-2xl font-bold">{title}</h1>
+          <h1 className="text-heading mb-1 text-2xl font-bold">{title}</h1>
           {subtitle ? (
             <p className="text-muted">{subtitle}</p>
           ) : (
@@ -38,33 +38,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               your dashboard.
             </p>
           )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          {actions}
-          <NotificationBell />
-
-          {/* User Avatar */}
-          <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
-              {user?.profilePicture ? (
-                <img
-                  src={user.profilePicture}
-                  alt={user.displayName || user.email}
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-sm font-semibold text-white">
-                  {(
-                    user?.firstName?.[0] ||
-                    user?.displayName?.[0] ||
-                    user?.email?.[0] ||
-                    'U'
-                  ).toUpperCase()}
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

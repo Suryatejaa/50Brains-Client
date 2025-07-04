@@ -71,20 +71,20 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
           <>
             <div className="stat-item">
               <span className="stat-value">
-                ⭐ {reputation.overallRating?.toFixed(1) || 'N/A'}
+                ⭐ {reputation.metrics?.averageRating?.toFixed(1) || 'N/A'}
               </span>
-              <span className="stat-label">Overall Rating</span>
-            </div>
-
-            <div className="stat-item">
-              <span className="stat-value">{reputation.totalReviews || 0}</span>
-              <span className="stat-label">Total Reviews</span>
+              <span className="stat-label">Average Rating</span>
             </div>
 
             <div className="stat-item">
               <span className="stat-value">
-                {reputation.reputationScore || 0}
+                {reputation.metrics?.gigsCompleted || 0}
               </span>
+              <span className="stat-label">Completed Gigs</span>
+            </div>
+
+            <div className="stat-item">
+              <span className="stat-value">{reputation.finalScore || 0}</span>
               <span className="stat-label">Reputation Score</span>
             </div>
 
@@ -162,12 +162,11 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
             {user.emailVerified ? '✓' : '⚠'} Email Verified
           </div>
 
-          {reputation?.verificationStatus && (
+          {reputation?.tier && (
             <div
-              className={`verification-item ${reputation.verificationStatus === 'verified' ? 'verified' : 'unverified'}`}
+              className={`verification-item ${reputation.tier !== 'BRONZE' ? 'verified' : 'unverified'}`}
             >
-              {reputation.verificationStatus === 'verified' ? '✓' : '⚠'}{' '}
-              Profile Verified
+              {reputation.tier !== 'BRONZE' ? '✓' : '⚠'} {reputation.tier} Tier
             </div>
           )}
         </div>

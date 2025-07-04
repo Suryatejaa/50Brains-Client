@@ -12,7 +12,6 @@ export async function loadDashboardData<T>(
   endpoints: Array<{
     key: string;
     url: string;
-    defaultValue: any;
   }>
 ): Promise<T> {
   try {
@@ -27,7 +26,7 @@ export async function loadDashboardData<T>(
       data[endpoint.key] =
         response.status === 'fulfilled' && response.value.success
           ? response.value.data
-          : endpoint.defaultValue;
+          : null;
     });
 
     return data as T;
@@ -43,44 +42,22 @@ export async function loadCreatorDashboardData(userId: string) {
     {
       key: 'reputation',
       url: `/api/reputation/${userId}`,
-      defaultValue: {
-        totalScore: 0,
-        trend: 0,
-        level: 'Bronze',
-        nextLevelPoints: 100,
-      },
     },
     {
       key: 'socialMedia',
       url: `/api/social-media/${userId}`,
-      defaultValue: {
-        totalFollowers: 0,
-        totalEngagement: 0,
-        connectedAccounts: 0,
-        growth: 0,
-        accounts: [],
-      },
     },
     {
       key: 'gigs',
       url: '/api/my/gigs/summary',
-      defaultValue: {
-        activeApplications: 0,
-        completedGigs: 0,
-        totalEarnings: 0,
-        averageRating: 0,
-        pendingWork: 0,
-      },
     },
     {
       key: 'credits',
       url: '/api/credit/balance',
-      defaultValue: { balance: 0, earned: 0, spent: 0 },
     },
     {
       key: 'portfolio',
       url: '/api/portfolio/summary',
-      defaultValue: { totalItems: 0, views: 0, likes: 0 },
     },
   ];
 
@@ -93,32 +70,22 @@ export async function loadBrandDashboardData(userId: string) {
     {
       key: 'campaigns',
       url: '/api/my/campaigns/summary',
-      defaultValue: { active: 0, completed: 0, totalSpent: 0, averageROI: 0 },
     },
     {
       key: 'applications',
       url: '/api/applications/received/summary',
-      defaultValue: { total: 0, pending: 0, approved: 0, rejected: 0 },
     },
     {
       key: 'analytics',
       url: '/api/analytics/campaigns',
-      defaultValue: {
-        totalReach: 0,
-        totalEngagement: 0,
-        conversionRate: 0,
-        topPerformingCampaign: 'N/A',
-      },
     },
     {
       key: 'reputation',
       url: `/api/reputation/${userId}`,
-      defaultValue: { score: 0, reviews: 0, averageRating: 0 },
     },
     {
       key: 'credits',
       url: '/api/credit/balance',
-      defaultValue: { balance: 0, spent: 0, reserved: 0 },
     },
   ];
 
@@ -131,45 +98,26 @@ export async function loadClanDashboardData(clanId: string) {
     {
       key: 'clanInfo',
       url: `/api/clan/${clanId}`,
-      defaultValue: {
-        id: '',
-        name: 'Unknown Clan',
-        description: '',
-        memberCount: 0,
-        totalReputation: 0,
-        level: 'Bronze',
-        createdAt: '',
-      },
     },
     {
       key: 'members',
       url: `/api/members/${clanId}`,
-      defaultValue: [],
     },
     {
       key: 'rankings',
       url: `/api/rankings/clan/${clanId}`,
-      defaultValue: {
-        position: 0,
-        totalClans: 0,
-        category: 'General',
-        monthlyRank: 0,
-      },
     },
     {
       key: 'projects',
       url: `/api/clan/${clanId}/projects`,
-      defaultValue: { active: [], completed: 0, totalEarnings: 0 },
     },
     {
       key: 'activities',
       url: `/api/clan/${clanId}/activities?limit=10`,
-      defaultValue: [],
     },
     {
       key: 'invitations',
       url: `/api/clan/${clanId}/invitations`,
-      defaultValue: [],
     },
   ];
 
@@ -182,55 +130,26 @@ export async function loadAdminDashboardData() {
     {
       key: 'systemStats',
       url: '/api/admin/stats/system',
-      defaultValue: {
-        totalUsers: 0,
-        activeUsers: 0,
-        totalGigs: 0,
-        totalClans: 0,
-        totalTransactions: 0,
-        systemUptime: 0,
-      },
     },
     {
       key: 'userAnalytics',
       url: '/api/admin/analytics/users',
-      defaultValue: {
-        newUsers: 0,
-        userGrowth: 0,
-        activeToday: 0,
-        topUserCountries: [],
-      },
     },
     {
       key: 'platformMetrics',
       url: '/api/admin/metrics/platform',
-      defaultValue: {
-        activeGigs: 0,
-        completedGigs: 0,
-        totalRevenue: 0,
-        dailyRevenue: 0,
-        conversionRate: 0,
-        averageOrderValue: 0,
-      },
     },
     {
       key: 'moderationQueue',
       url: '/api/admin/moderation/queue',
-      defaultValue: [],
     },
     {
       key: 'systemHealth',
       url: '/api/health',
-      defaultValue: {
-        status: 'warning',
-        services: [],
-        lastChecked: new Date().toISOString(),
-      },
     },
     {
       key: 'recentActivities',
       url: '/api/admin/activities/recent',
-      defaultValue: [],
     },
   ];
 
@@ -312,7 +231,7 @@ export async function getUnreadNotificationCount(
     const response = await apiClient.get(
       `/api/notifications/unread/${userId}/count`
     );
-    return response.success ? response.data.count : 0;
+    return response.success ? (response.data as { count: number }).count : 0;
   } catch (error) {
     console.error('Failed to get unread notification count:', error);
     return 0;

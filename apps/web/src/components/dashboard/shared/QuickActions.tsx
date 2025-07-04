@@ -42,7 +42,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       onClick={handleClick}
       disabled={disabled}
       className={`
-        group flex flex-col items-center rounded-lg border p-6 transition-all duration-200
+        dashboard-card-padding group flex flex-col items-center rounded-lg border transition-all duration-200
         ${
           disabled
             ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-50'
@@ -53,7 +53,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     >
       <div
         className={`
-        mb-3 text-3xl transition-transform duration-200
+        mb-2 text-3xl transition-transform duration-200
         ${!disabled ? 'group-hover:scale-110' : ''}
       `}
       >
@@ -86,9 +86,9 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   title = 'Quick Actions',
 }) => {
   return (
-    <div className="card-glass p-6">
-      <h3 className="text-heading mb-6 text-lg font-semibold">{title}</h3>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className="card-glass dashboard-card-padding">
+      <h3 className="text-heading mb-mobile text-lg font-semibold">{title}</h3>
+      <div className="dashboard-grid-gap grid grid-cols-2 md:grid-cols-4">
         {actions.map((action, index) => (
           <QuickActionButton key={index} {...action} />
         ))}

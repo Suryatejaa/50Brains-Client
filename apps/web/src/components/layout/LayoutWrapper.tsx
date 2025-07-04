@@ -15,8 +15,8 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
 
-  // Show header ONLY for unauthenticated users (landing, auth pages)
-  const showHeader = !isAuthenticated;
+  // Always show header - it has different content for auth/unauth users
+  const showHeader = true;
 
   // Show bottom navigation for ALL authenticated users on ALL pages
   // This creates a mobile-first experience similar to Instagram/TikTok

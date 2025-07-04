@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import {
   Home,
   Search,
@@ -30,7 +31,8 @@ interface NavigationItem {
 
 export const BottomNavigation: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { getUserType, hasPermission, hasRole } = usePermissions();
+  const { hasPermission, hasRole } = usePermissions();
+  const { currentRole, getUserTypeForRole } = useRoleSwitch();
   const pathname = usePathname();
 
   // Always show bottom nav for authenticated users (mobile-first approach)
@@ -38,7 +40,7 @@ export const BottomNavigation: React.FC = () => {
     return null;
   }
 
-  const userType = getUserType();
+  const userType = getUserTypeForRole(currentRole);
 
   const getNavigationItems = (): NavigationItem[] => {
     // Core navigation that's always visible (like Instagram/TikTok)

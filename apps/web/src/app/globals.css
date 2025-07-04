@@ -2,6 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-first spacing optimizations */
+@layer utilities {
+  /* Mobile-optimized padding */
+  .p-mobile {
+    padding: 0.75rem;
+  }
+  .px-mobile {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .py-mobile {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Mobile-optimized margins */
+  .mb-mobile {
+    margin-bottom: 0.5rem;
+  }
+  .mt-mobile {
+    margin-top: 0.5rem;
+  }
+  .mx-mobile {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+  .my-mobile {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Dashboard specific mobile spacing */
+  .dashboard-card-padding {
+    padding: 0.75rem;
+  }
+  .dashboard-grid-gap {
+    gap: 0.75rem;
+  }
+  .dashboard-section-margin {
+    margin-bottom: 1rem;
+  }
+
+  /* Responsive spacing for desktop */
+  @media (min-width: 768px) {
+    .p-mobile {
+      padding: 1.5rem;
+    }
+    .px-mobile {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    .py-mobile {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .mb-mobile {
+      margin-bottom: 1rem;
+    }
+    .mt-mobile {
+      margin-top: 1rem;
+    }
+    .mx-mobile {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+    .my-mobile {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-card-padding {
+      padding: 1.5rem;
+    }
+    .dashboard-grid-gap {
+      gap: 1.5rem;
+    }
+    .dashboard-section-margin {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-card-padding {
+      padding: 2rem;
+    }
+    .dashboard-grid-gap {
+      gap: 2rem;
+    }
+    .dashboard-section-margin {
+      margin-bottom: 2rem;
+    }
+  }
+}
+
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800&display=swap');
 
 @layer base {
@@ -194,6 +289,21 @@
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Professional Glass Card System - Mobile Optimized */
+.card-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-glass:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 /* Smooth transitions */

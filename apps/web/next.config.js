@@ -12,9 +12,6 @@ const nextConfig = {
     env: {
         NEXT_PUBLIC_CLIENT_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173',
     },
-    server: {
-        port: 5173,
-    },
     webpack: (config) => {
         config.resolve.alias = {
             ...config.resolve.alias,

@@ -1,0 +1,169 @@
+/* Mobile-first spacing optimizations */
+@layer utilities {
+  /* 📱 Mobile-optimized spacing utilities */
+
+  /* Responsive padding - smaller on mobile, larger on desktop */
+  .p-responsive {
+    @apply p-3 md:p-6;
+  }
+
+  .px-responsive {
+    @apply px-3 md:px-6;
+  }
+
+  .py-responsive {
+    @apply py-2 md:py-4;
+  }
+
+  /* Responsive margins - smaller on mobile */
+  .mb-responsive {
+    @apply mb-2 md:mb-4;
+  }
+
+  .mt-responsive {
+    @apply mt-2 md:mt-4;
+  }
+
+  .mx-responsive {
+    @apply mx-2 md:mx-4;
+  }
+
+  .my-responsive {
+    @apply my-2 md:my-4;
+  }
+
+  /* Compact spacing for mobile */
+  .space-y-compact > * + * {
+    @apply mt-2 md:mt-4;
+  }
+
+  .gap-compact {
+    @apply gap-2 md:gap-4;
+  }
+
+  /* Dashboard specific spacing */
+  .dashboard-container {
+    @apply px-3 py-2 md:px-6 md:py-4;
+  }
+
+  .dashboard-section {
+    @apply mb-3 md:mb-6;
+  }
+
+  .dashboard-grid {
+    @apply gap-2 md:gap-4;
+  }
+
+  /* Card spacing optimization */
+  .card-compact {
+    @apply p-3 md:p-4;
+  }
+
+  .card-content {
+    @apply space-y-2 md:space-y-3;
+  }
+
+  /* Button spacing */
+  .btn-spacing {
+    @apply px-3 py-1.5 md:px-4 md:py-2;
+  }
+
+  /* Section headers with minimal spacing */
+  .section-header {
+    @apply mb-2 md:mb-3;
+  }
+
+  /* Remove excessive margin on mobile */
+  .mobile-tight {
+    @apply my-1 md:my-2;
+  }
+
+  /* Tight grid spacing for mobile */
+  .grid-tight {
+    @apply gap-1.5 md:gap-3;
+  }
+
+  /* Profile/Dashboard optimizations */
+  .profile-spacing {
+    @apply space-y-2 md:space-y-4;
+  }
+
+  .metric-spacing {
+    @apply mb-2 md:mb-3;
+  }
+
+  /* Navigation spacing */
+  .nav-spacing {
+    @apply space-x-1 md:space-x-2;
+  }
+}
+
+/* Component-specific optimizations */
+@layer components {
+  /* Optimized card system for mobile */
+  .card-mobile {
+    @apply rounded-lg border border-gray-200 bg-white p-3 shadow-sm 
+           transition-all duration-200 md:p-4;
+  }
+
+  /* Compact header for mobile */
+  .header-mobile {
+    @apply px-3 py-2 md:px-6 md:py-4;
+  }
+
+  /* Dashboard layout optimization */
+  .dashboard-layout {
+    @apply min-h-screen bg-gray-50;
+  }
+
+  .dashboard-content {
+    @apply space-y-3 px-3 py-2 md:space-y-6 md:px-6 md:py-4;
+  }
+
+  /* Mobile-optimized grid */
+  .dashboard-grid-mobile {
+    @apply grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-3;
+  }
+
+  /* Metric cards for mobile */
+  .metric-card-mobile {
+    @apply rounded-lg border border-gray-200 bg-white p-3 shadow-sm 
+           transition-all md:p-4;
+  }
+
+  /* Action buttons for mobile */
+  .action-grid-mobile {
+    @apply grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3 lg:grid-cols-4;
+  }
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  /* Reduce excessive spacing on mobile */
+  .min-h-screen {
+    min-height: calc(100vh - 8rem); /* Account for header + bottom nav */
+  }
+
+  /* Compact profile sections */
+  .profile-section {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Reduce dashboard padding */
+  .dashboard-page {
+    padding: 0.5rem !important;
+  }
+
+  /* Compact forms */
+  .form-section {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Reduce text spacing */
+  .text-section {
+    line-height: 1.4 !important;
+    margin-bottom: 0.5rem !important;
+  }
+}

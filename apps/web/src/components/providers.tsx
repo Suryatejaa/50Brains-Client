@@ -4,9 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '../hooks/useAuth';
+import { RoleSwitchProvider } from '../hooks/useRoleSwitch';
 import { ThemeProvider } from './theme-provider';
 import { APIProvider } from './api-provider';
 import { LayoutWrapper } from './layout/LayoutWrapper';
+import { RouteGuard } from './auth/RouteGuard';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,18 +31,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <APIProvider>
           <AuthProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                },
-              }}
-            />
+            <RoleSwitchProvider>
+              <RouteGuard>
+                <LayoutWrapper>{children}</LayoutWrapper>
+              </RouteGuard>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                  },
+                }}
+              />
+            </RoleSwitchProvider>
           </AuthProvider>
         </APIProvider>
       </ThemeProvider>

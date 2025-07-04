@@ -1,13 +1,10 @@
-'use client';
+// app/profile/page.tsx - SSR Profile Page for Current User
+import { redirect } from 'next/navigation';
+import ProfileClientWrapper from '@/frontend-profile/components/ProfileClientWrapper';
 
-import React from 'react';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import ProfilePage from '@/frontend-profile/components/ProfilePage';
-
-export default function ProfilePageRoute() {
-  return (
-    <ProtectedRoute>
-      <ProfilePage />
-    </ProtectedRoute>
-  );
+// Server Component for current user's profile
+export default function CurrentUserProfilePage() {
+  // For current user's profile, we need authentication
+  // This will be handled by the client wrapper for now
+  return <ProfileClientWrapper />;
 }
