@@ -153,6 +153,9 @@ export const useProfile = (userId?: string) => {
           endpoint = '/api/user/social';
           break;
         case 'roleInfo':
+        case 'influencerRoleInfo':
+        case 'brandRoleInfo':
+        case 'crewRoleInfo':
           endpoint = '/api/user/roles-info';
           break;
         case 'settings':
@@ -169,16 +172,45 @@ export const useProfile = (userId?: string) => {
         console.log('🗑️ Clearing profile cache due to update');
         clearFromCache(userId);
 
+        // Debug the response structure
+        console.log('📊 API Response for section:', section, response.data);
+
         // Update local state with new data
+        let updatedUserData: any = {};
+
+        // Handle different response structures based on endpoint
+        if (section === 'socialMedia' && response.data) {
+          // For social media, the response might be the social data directly
+          // or it might be wrapped in a user object
+          const responseData = response.data as any;
+          if (responseData.user) {
+            updatedUserData = responseData.user;
+          } else {
+            // If response.data contains the social fields directly
+            updatedUserData = responseData;
+          }
+        } else if (response.data) {
+          const responseData = response.data as any;
+          if (responseData.user) {
+            updatedUserData = responseData.user;
+          } else {
+            updatedUserData = responseData;
+          }
+        }
+
+        console.log('🔄 Updating user data with:', updatedUserData);
+
         const updatedProfile = state.profile
           ? {
               ...state.profile,
               user: {
                 ...state.profile.user,
-                ...(response.success ? (response.data as any).user : {}),
+                ...updatedUserData,
               },
             }
           : null;
+
+        console.log('📱 Updated profile:', updatedProfile);
 
         setState((prev) => ({
           ...prev,
@@ -193,7 +225,7 @@ export const useProfile = (userId?: string) => {
         }
 
         // Track profile edit
-        trackProfileEdit(section, Object.keys(data));
+        // trackProfileEdit(section, Object.keys(data));
 
         return { success: true };
       } else {

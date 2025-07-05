@@ -294,12 +294,12 @@
 
 /* Settings Tab */
 .settings-tab {
-  padding: 24px;
+  padding: 2px;
 }
 
 .settings-section {
-  margin-bottom: 32px;
-  padding: 24px;
+  margin-bottom: 12px;
+  padding: 10px;
   background: white;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -314,13 +314,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
   border-bottom: 1px solid #f3f4f6;
 }
 
 .settings-content > * + * {
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .settings-field {
@@ -344,7 +344,7 @@
 }
 
 .settings-edit > * + * {
-  margin-top: 16px;
+  margin-top: 1px;
 }
 
 .settings-edit__actions {

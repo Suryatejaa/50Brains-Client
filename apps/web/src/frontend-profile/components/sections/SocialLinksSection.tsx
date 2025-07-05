@@ -28,8 +28,68 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
     website: user.website || '',
   });
 
+  // Update editData when user data changes or when entering edit mode
+  React.useEffect(() => {
+    // Update the state whenever user data changes, regardless of edit mode
+    console.log('🔄 Updating social links edit data (user data changed):', {
+      instagramHandle: user.instagramHandle,
+      twitterHandle: user.twitterHandle,
+      linkedinHandle: user.linkedinHandle,
+      youtubeHandle: user.youtubeHandle,
+      website: user.website,
+    });
+    setEditData({
+      instagramHandle: user.instagramHandle || '',
+      twitterHandle: user.twitterHandle || '',
+      linkedinHandle: user.linkedinHandle || '',
+      youtubeHandle: user.youtubeHandle || '',
+      website: user.website || '',
+    });
+  }, [
+    user.instagramHandle,
+    user.twitterHandle,
+    user.linkedinHandle,
+    user.youtubeHandle,
+    user.website,
+  ]);
+
+  // Debug user data changes
+  React.useEffect(() => {
+    console.log('👤 User social data changed:', {
+      instagramHandle: user.instagramHandle,
+      twitterHandle: user.twitterHandle,
+      linkedinHandle: user.linkedinHandle,
+      youtubeHandle: user.youtubeHandle,
+      website: user.website,
+    });
+  }, [
+    user.instagramHandle,
+    user.twitterHandle,
+    user.linkedinHandle,
+    user.youtubeHandle,
+    user.website,
+  ]);
+
   const handleSave = async () => {
-    await onSave(editData);
+    console.log('💾 Saving social links data:', editData);
+    try {
+      await onSave(editData);
+      console.log('✅ Social links saved successfully');
+    } catch (error) {
+      console.error('❌ Failed to save social links:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    // Reset edit data to current user data
+    setEditData({
+      instagramHandle: user.instagramHandle || '',
+      twitterHandle: user.twitterHandle || '',
+      linkedinHandle: user.linkedinHandle || '',
+      youtubeHandle: user.youtubeHandle || '',
+      website: user.website || '',
+    });
+    onCancel();
   };
 
   const hasAnySocialLinks =
@@ -112,7 +172,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
               <button onClick={handleSave} className="btn btn--primary">
                 Save
               </button>
-              <button onClick={onCancel} className="btn btn--secondary">
+              <button onClick={handleCancel} className="btn btn--secondary">
                 Cancel
               </button>
             </div>
@@ -153,7 +213,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
                 )}
                 {user.youtubeHandle && (
                   <a
-                    href={`https://youtube.com/${user.youtubeHandle}`}
+                    href={`https://youtube.com/${user.youtubeHandle[0] !== '@' ? '@' : ''}${user.youtubeHandle}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="social-link"

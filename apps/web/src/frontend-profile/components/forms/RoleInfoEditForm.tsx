@@ -18,6 +18,11 @@ const RoleInfoEditForm: React.FC<RoleInfoEditFormProps> = ({
   const [formData, setFormData] = useState(data || {});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Update formData when data prop changes
+  React.useEffect(() => {
+    setFormData(data || {});
+  }, [data]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -27,6 +32,12 @@ const RoleInfoEditForm: React.FC<RoleInfoEditFormProps> = ({
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Reset form data to original data
+    setFormData(data || {});
+    onCancel();
   };
 
   const updateField = (field: string, value: any) => {
@@ -330,7 +341,7 @@ const RoleInfoEditForm: React.FC<RoleInfoEditFormProps> = ({
           {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
         <button
-          onClick={onCancel}
+          onClick={handleCancel}
           disabled={isSaving}
           className="btn btn--secondary"
         >

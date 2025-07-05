@@ -532,20 +532,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      // For cookie-based auth, refresh is handled automatically by the server
-      // We just need to make a request to check if our session is still valid
-      const response = await apiClient.get<{ user: User }>('/api/user/profile');
+      // Call the refresh endpoint using the AuthService
+      const tokenData = await apiClient.auth.refreshToken();
 
-      if (response.success) {
-        // Update user data if session is still valid
-        setUser(response.data.user);
-        return;
-      } else {
-        throw new Error('Session expired');
+      if (tokenData) {
+        // Get updated user data after token refresh
+        const profileResponse = await apiClient.get<{ user: User }>(
+          '/api/user/profile'
+        );
+
+        if (profileResponse.success) {
+          setUser(profileResponse.data.user);
+          console.log('✅ Token refreshed successfully and user data updated');
+          return;
+        }
       }
+
+      throw new Error('Failed to refresh token');
     } catch (error) {
-      // Session expired or refresh failed, logout user
-      console.error('Session refresh failed:', error);
+      // Token refresh failed, logout user
+      console.error('❌ Token refresh failed:', error);
       apiClient.clearAuthTokens();
       setUser(null);
       setError('Session expired. Please sign in again.');

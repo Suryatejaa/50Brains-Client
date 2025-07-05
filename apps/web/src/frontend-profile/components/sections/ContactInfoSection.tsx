@@ -25,8 +25,25 @@ const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
     phone: user.phone || '',
   });
 
+  // Update editData when user data changes or when entering edit mode
+  React.useEffect(() => {
+    setEditData({
+      email: user.email || '',
+      phone: user.phone || '',
+    });
+  }, [user.email, user.phone, isEditing]);
+
   const handleSave = async () => {
     await onSave(editData);
+  };
+
+  const handleCancel = () => {
+    // Reset edit data to current user data
+    setEditData({
+      email: user.email || '',
+      phone: user.phone || '',
+    });
+    onCancel();
   };
 
   return (
@@ -68,7 +85,7 @@ const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
             <button onClick={handleSave} className="btn btn--primary">
               Save
             </button>
-            <button onClick={onCancel} className="btn btn--secondary">
+            <button onClick={handleCancel} className="btn btn--secondary">
               Cancel
             </button>
           </div>

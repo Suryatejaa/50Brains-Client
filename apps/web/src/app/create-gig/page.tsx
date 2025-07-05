@@ -1,41 +1,100 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useGigs } from '@/hooks/useGigs';
+import type { CreateGigData, GigStatus } from '@/types/gig.types';
+
+interface FormData {
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  skillsRequired: string[];
+  experienceLevel?: string;
+  location?: string;
+  isRemote: boolean;
+  deadline?: string;
+  budgetType: 'fixed' | 'hourly' | 'negotiable';
+  budgetMin?: number;
+  budgetMax?: number;
+  maxApplicants?: number;
+  requirements?: string;
+}
 
 export default function CreateGigPage() {
-  const [formData, setFormData] = useState({
+  const router = useRouter();
+  const {
+    createGig,
+    categories,
+    popularSkills,
+    creating,
+    error,
+    loadCategories,
+    loadPopularSkills,
+  } = useGigs();
+
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
     category: '',
     subcategory: '',
-    skills: [] as string[],
+    skillsRequired: [],
     experienceLevel: '',
     location: '',
     isRemote: true,
     deadline: '',
-    budgetType: 'FIXED',
-    budgetMin: '',
-    budgetMax: '',
-    maxApplicants: '',
+    budgetType: 'fixed',
+    budgetMin: 0,
+    budgetMax: 0,
+    maxApplicants: undefined,
     requirements: '',
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDraft, setIsDraft] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Load categories and skills on mount
+  useEffect(() => {
+    loadCategories();
+    loadPopularSkills();
+  }, [loadCategories, loadPopularSkills]);
+
+  const handleSubmit = async (e: React.FormEvent, asDraft = false) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsDraft(asDraft);
 
     try {
-      // TODO: Implement API call
-      console.log('Creating gig:', formData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert('Gig created successfully!');
+      const gigData: CreateGigData = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        skillsRequired: formData.skillsRequired,
+        experienceLevel: formData.experienceLevel,
+        location: formData.location,
+        isRemote: formData.isRemote,
+        deadline: formData.deadline,
+        budgetType: formData.budgetType,
+        budgetMin: formData.budgetMin,
+        budgetMax: formData.budgetMax,
+        requirements: formData.requirements,
+      };
+
+      console.log('Creating gig:', gigData);
+      const gig = await createGig(gigData);
+
+      if (asDraft) {
+        alert('Gig saved as draft successfully!');
+        router.push('/dashboard');
+      } else {
+        alert('Gig published successfully!');
+        router.push('/marketplace');
+      }
     } catch (error) {
       console.error('Error creating gig:', error);
-    } finally {
-      setIsLoading(false);
+      alert(
+        `Failed to ${asDraft ? 'save draft' : 'publish gig'}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -54,10 +113,10 @@ export default function CreateGigPage() {
   };
 
   const addSkill = (skill: string) => {
-    if (skill && !formData.skills.includes(skill)) {
+    if (skill && !formData.skillsRequired.includes(skill)) {
       setFormData((prev) => ({
         ...prev,
-        skills: [...prev.skills, skill],
+        skillsRequired: [...prev.skillsRequired, skill],
       }));
     }
   };
@@ -65,7 +124,9 @@ export default function CreateGigPage() {
   const removeSkill = (skillToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      skills: prev.skills.filter((skill) => skill !== skillToRemove),
+      skillsRequired: prev.skillsRequired.filter(
+        (skill: string) => skill !== skillToRemove
+      ),
     }));
   };
 
@@ -199,7 +260,7 @@ export default function CreateGigPage() {
                       Required Skills
                     </label>
                     <div className="mb-3 flex flex-wrap gap-2">
-                      {formData.skills.map((skill) => (
+                      {formData.skillsRequired.map((skill: string) => (
                         <span
                           key={skill}
                           className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-lg px-3 py-1 text-sm"
@@ -265,7 +326,7 @@ export default function CreateGigPage() {
                       onChange={handleChange}
                     >
                       <option value="">Any level</option>
-                      <option value="BEGINNER">Beginner</option>
+                      <option value="be">Beginner</option>
                       <option value="INTERMEDIATE">Intermediate</option>
                       <option value="EXPERT">Expert</option>
                     </select>
@@ -317,7 +378,7 @@ export default function CreateGigPage() {
                 </h2>
 
                 <div className="space-y-6">
-                  {/* Budget Type */}
+                  {/* Budget Type */}{' '}
                   <div>
                     <label className="text-body mb-3 block text-sm font-medium">
                       Budget Type
@@ -325,17 +386,17 @@ export default function CreateGigPage() {
                     <div className="grid grid-cols-3 gap-3">
                       {[
                         {
-                          value: 'FIXED',
+                          value: 'fixed',
                           label: 'Fixed Price',
                           description: 'One-time payment',
                         },
                         {
-                          value: 'HOURLY',
+                          value: 'hourly',
                           label: 'Hourly Rate',
                           description: 'Pay per hour',
                         },
                         {
-                          value: 'NEGOTIABLE',
+                          value: 'negotiable',
                           label: 'Negotiable',
                           description: 'Discuss with applicants',
                         },
@@ -369,16 +430,15 @@ export default function CreateGigPage() {
                       ))}
                     </div>
                   </div>
-
                   {/* Budget Range */}
-                  {formData.budgetType !== 'NEGOTIABLE' && (
+                  {formData.budgetType !== 'negotiable' && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label
                           htmlFor="budgetMin"
                           className="text-body mb-2 block text-sm font-medium"
                         >
-                          {formData.budgetType === 'HOURLY'
+                          {formData.budgetType === 'hourly'
                             ? 'Min Rate ($/hour)'
                             : 'Min Budget ($)'}
                         </label>
@@ -397,7 +457,7 @@ export default function CreateGigPage() {
                           htmlFor="budgetMax"
                           className="text-body mb-2 block text-sm font-medium"
                         >
-                          {formData.budgetType === 'HOURLY'
+                          {formData.budgetType === 'hourly'
                             ? 'Max Rate ($/hour)'
                             : 'Max Budget ($)'}
                         </label>
@@ -413,7 +473,6 @@ export default function CreateGigPage() {
                       </div>
                     </div>
                   )}
-
                   {/* Deadline */}
                   <div>
                     <label
@@ -431,7 +490,6 @@ export default function CreateGigPage() {
                       onChange={handleChange}
                     />
                   </div>
-
                   {/* Max Applicants */}
                   <div>
                     <label
@@ -481,28 +539,30 @@ export default function CreateGigPage() {
                   <div>
                     <h4 className="text-body text-sm font-medium">Budget</h4>
                     <p className="text-heading">
-                      {formData.budgetType === 'NEGOTIABLE'
+                      {formData.budgetType === 'negotiable'
                         ? 'Negotiable'
                         : formData.budgetMin && formData.budgetMax
                           ? `$${formData.budgetMin} - $${formData.budgetMax}`
                           : 'Not set'}
                     </p>
                   </div>
-                  {formData.skills.length > 0 && (
+                  {formData.skillsRequired.length > 0 && (
                     <div>
                       <h4 className="text-body text-sm font-medium">Skills</h4>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {formData.skills.slice(0, 3).map((skill) => (
-                          <span
-                            key={skill}
-                            className="bg-brand-primary/10 text-brand-primary rounded px-2 py-1 text-xs"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                        {formData.skills.length > 3 && (
+                        {formData.skillsRequired
+                          .slice(0, 3)
+                          .map((skill: string) => (
+                            <span
+                              key={skill}
+                              className="bg-brand-primary/10 text-brand-primary rounded px-2 py-1 text-xs"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        {formData.skillsRequired.length > 3 && (
                           <span className="text-muted text-xs">
-                            +{formData.skills.length - 3} more
+                            +{formData.skillsRequired.length - 3} more
                           </span>
                         )}
                       </div>
@@ -529,10 +589,10 @@ export default function CreateGigPage() {
               <div className="space-y-3">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={creating}
                   className="btn-primary flex w-full items-center justify-center py-3"
                 >
-                  {isLoading ? (
+                  {creating ? (
                     <>
                       <svg
                         className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
@@ -560,7 +620,12 @@ export default function CreateGigPage() {
                     'Publish Gig'
                   )}
                 </button>
-                <button type="button" className="btn-ghost w-full py-3">
+                <button
+                  type="button"
+                  className="btn-ghost w-full py-3"
+                  onClick={(e) => handleSubmit(e, true)}
+                  disabled={creating}
+                >
                   Save as Draft
                 </button>
               </div>

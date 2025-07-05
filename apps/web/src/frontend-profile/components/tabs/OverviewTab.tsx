@@ -107,10 +107,10 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           <div className="overview-tab__role-section">
             <div className="section-header">
               <h3>Influencer Information</h3>
-              {isOwner && editing.section !== 'roleInfo' && (
+              {isOwner && editing.section !== 'influencerRoleInfo' && (
                 <button
                   onClick={() =>
-                    onStartEditing('roleInfo', {
+                    onStartEditing('influencerRoleInfo', {
                       primaryNiche: user.primaryNiche,
                       primaryPlatform: user.primaryPlatform,
                       estimatedFollowers: user.estimatedFollowers,
@@ -124,12 +124,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
               )}
             </div>
             <div className="overview-tab__role-content">
-              {editing.section === 'roleInfo' ? (
+              {editing.section === 'influencerRoleInfo' ? (
                 <RoleInfoEditForm
                   role="INFLUENCER"
                   data={editing.data}
                   onSave={async (data) => {
-                    await onUpdateSection('roleInfo', data);
+                    await onUpdateSection('influencerRoleInfo', data);
                   }}
                   onCancel={onCancelEditing}
                 />
@@ -170,10 +170,10 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           <div className="overview-tab__role-section">
             <div className="section-header">
               <h3>Brand Information</h3>
-              {isOwner && editing.section !== 'roleInfo' && (
+              {isOwner && editing.section !== 'brandRoleInfo' && (
                 <button
                   onClick={() =>
-                    onStartEditing('roleInfo', {
+                    onStartEditing('brandRoleInfo', {
                       companyName: user.companyName,
                       industry: user.industry,
                       companyType: user.companyType,
@@ -189,12 +189,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
               )}
             </div>
             <div className="overview-tab__role-content">
-              {editing.section === 'roleInfo' ? (
+              {editing.section === 'brandRoleInfo' ? (
                 <RoleInfoEditForm
                   role="BRAND"
                   data={editing.data}
                   onSave={async (data) => {
-                    await onUpdateSection('roleInfo', data);
+                    await onUpdateSection('brandRoleInfo', data);
                   }}
                   onCancel={onCancelEditing}
                 />
@@ -236,10 +236,10 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           <div className="overview-tab__role-section">
             <div className="section-header">
               <h3>Crew Information</h3>
-              {isOwner && editing.section !== 'roleInfo' && (
+              {isOwner && editing.section !== 'crewRoleInfo' && (
                 <button
                   onClick={() =>
-                    onStartEditing('roleInfo', {
+                    onStartEditing('crewRoleInfo', {
                       experienceLevel: user.experienceLevel,
                       hourlyRate: user.hourlyRate,
                       availability: user.availability,
@@ -256,12 +256,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
               )}
             </div>
             <div className="overview-tab__role-content">
-              {editing.section === 'roleInfo' ? (
+              {editing.section === 'crewRoleInfo' ? (
                 <RoleInfoEditForm
                   role="CREW"
                   data={editing.data}
                   onSave={async (data) => {
-                    await onUpdateSection('roleInfo', data);
+                    await onUpdateSection('crewRoleInfo', data);
                   }}
                   onCancel={onCancelEditing}
                 />

@@ -1,0 +1,201 @@
+// types/gig.types.ts - Gig service type definitions
+
+export interface Gig {
+  id: string;
+  title: string;
+  description: string;
+  postedById: string;
+  postedByType: 'user' | 'brand';
+  budgetMin?: number;
+  budgetMax?: number;
+  experienceLevel: string;
+  budgetType: 'fixed' | 'hourly' | 'negotiable';
+  roleRequired: string;
+  skillsRequired: string[];
+  isClanAllowed: boolean;
+  location?: string;
+  duration?: string;
+  urgency: 'urgent' | 'normal' | 'flexible';
+  status: GigStatus;
+  category: string;
+  deliverables: string[];
+  requirements?: string;
+  deadline?: string;
+  assignedToId?: string;
+  assignedToType?: 'user' | 'clan';
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  applications?: Application[];
+  submissions?: Submission[];
+}
+
+export interface CreateGigData {
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  skillsRequired: string[];
+  experienceLevel?: string;
+  location?: string;
+  isRemote?: boolean;
+  deadline?: string;
+  budgetType: 'fixed' | 'hourly' | 'negotiable';
+  budgetMin?: number;
+  budgetMax?: number;
+  requirements?: string;
+  deliverables?: string[];
+  urgency?: 'urgent' | 'normal' | 'flexible';
+  isClanAllowed?: boolean;
+}
+
+export interface Application {
+  id: string;
+  gigId: string;
+  applicantId: string;
+  applicantType: 'user' | 'clan';
+  proposal?: string;
+  quotedPrice?: number;
+  estimatedTime?: string;
+  portfolio: string[];
+  status: ApplicationStatus;
+  appliedAt: string;
+  respondedAt?: string;
+  rejectionReason?: string;
+  gig?: Gig;
+  submissions?: Submission[];
+}
+
+export interface CreateApplicationData {
+  gigId: string;
+  proposal?: string;
+  quotedPrice?: number;
+  estimatedTime?: string;
+  portfolio?: string[];
+}
+
+export interface Submission {
+  id: string;
+  gigId: string;
+  applicationId?: string;
+  submittedById: string;
+  submittedByType: 'user' | 'clan';
+  title: string;
+  description?: string;
+  deliverables: string[];
+  notes?: string;
+  status: SubmissionStatus;
+  submittedAt: string;
+  reviewedAt?: string;
+  feedback?: string;
+  rating?: number;
+  gig?: Gig;
+  application?: Application;
+}
+
+export interface CreateSubmissionData {
+  gigId: string;
+  applicationId?: string;
+  title: string;
+  description?: string;
+  deliverables: string[];
+  notes?: string;
+}
+
+export interface GigFilters {
+  category?: string;
+  experienceLevel?: string;
+  budgetType?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  location?: string;
+  isRemote?: boolean;
+  skills?: string[];
+  urgency?: string;
+  postedAfter?: string;
+  sortBy?: 'recent' | 'budget_high' | 'budget_low' | 'deadline';
+  page?: number;
+  limit?: number;
+}
+
+export interface GigStats {
+  totalGigs: number;
+  openGigs: number;
+  inProgressGigs: number;
+  completedGigs: number;
+  totalApplications: number;
+  pendingApplications: number;
+  approvedApplications: number;
+  averageCompletionTime: number;
+  totalEarnings: number;
+}
+
+export interface GigBoostEvent {
+  id: string;
+  gigId: string;
+  boosterId: string;
+  amount: number;
+  duration: number;
+  eventId: string;
+  isActive: boolean;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export enum GigStatus {
+  DRAFT = 'DRAFT',
+  OPEN = 'OPEN',
+  IN_REVIEW = 'IN_REVIEW',
+  ASSIGNED = 'ASSIGNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUBMITTED = 'SUBMITTED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
+}
+
+export enum ApplicationStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  WITHDRAWN = 'WITHDRAWN',
+}
+
+export enum SubmissionStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  REVISION = 'REVISION',
+}
+
+// Category definitions
+export const GIG_CATEGORIES = {
+  'content-creation': 'Content Creation',
+  'video-editing': 'Video Editing',
+  photography: 'Photography',
+  'graphic-design': 'Graphic Design',
+  'social-media': 'Social Media',
+  writing: 'Writing & Copywriting',
+  'web-development': 'Web Development',
+  'mobile-development': 'Mobile Development',
+  marketing: 'Marketing',
+  consulting: 'Consulting',
+} as const;
+
+export const EXPERIENCE_LEVELS = {
+  BEGINNER: 'Beginner',
+  INTERMEDIATE: 'Intermediate',
+  EXPERT: 'Expert',
+} as const;
+
+export const BUDGET_TYPES = {
+  fixed: 'Fixed Price',
+  hourly: 'Hourly Rate',
+  negotiable: 'Negotiable',
+} as const;
+
+export const URGENCY_LEVELS = {
+  urgent: 'Urgent',
+  normal: 'Normal',
+  flexible: 'Flexible',
+} as const;

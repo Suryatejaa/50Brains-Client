@@ -26,8 +26,27 @@ const AboutSection: React.FC<AboutSectionProps> = ({
     website: user.website || '',
   });
 
+  // Update editData when user data changes or when entering edit mode
+  React.useEffect(() => {
+    setEditData({
+      bio: user.bio || '',
+      location: user.location || '',
+      website: user.website || '',
+    });
+  }, [user.bio, user.location, user.website, isEditing]);
+
   const handleSave = async () => {
     await onSave(editData);
+  };
+
+  const handleCancel = () => {
+    // Reset edit data to current user data
+    setEditData({
+      bio: user.bio || '',
+      location: user.location || '',
+      website: user.website || '',
+    });
+    onCancel();
   };
 
   return (
@@ -79,7 +98,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
             <button onClick={handleSave} className="btn btn--primary">
               Save
             </button>
-            <button onClick={onCancel} className="btn btn--secondary">
+            <button onClick={handleCancel} className="btn btn--secondary">
               Cancel
             </button>
           </div>

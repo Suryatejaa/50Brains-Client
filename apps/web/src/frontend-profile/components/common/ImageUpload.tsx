@@ -127,7 +127,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         />
 
         {preview ? (
-          <div className="relative h-full min-h-[200px] w-full">
+          <div
+            className={`relative h-full w-full ${aspectRatio === 'square' ? 'min-h-[120px] sm:min-h-[200px]' : 'min-h-[100px] sm:min-h-[150px]'}`}
+          >
             <img
               src={preview}
               alt="Preview"
@@ -142,9 +144,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             </button>
           </div>
         ) : (
-          <div className="flex min-h-[100px] flex-col items-center justify-center">
+          <div
+            className={`flex flex-col items-center justify-center p-0 ${aspectRatio === 'square' ? 'min-h-[80px] sm:min-h-[100px]' : 'min-h-[60px] sm:min-h-[80px]'}`}
+          >
             <svg
-              className="h-4 w-4 text-gray-400"
+              className="mb-2 h-6 w-6 text-gray-400 sm:h-8 sm:w-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -156,12 +160,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="text-center text-sm text-gray-600">
-              <span className="font-medium">Click to upload</span> or drag and
-              drop
+            <p className="text-center text-xs leading-tight text-gray-600 sm:text-sm">
+              <span className="font-medium">Click to upload</span>
+              <span className="hidden sm:inline"> or drag and drop</span>
             </p>
-            <p className="text-xs text-gray-500">
-              PNG, JPG, GIF up to {maxSize}MB
+            <p className="mt-1 hidden text-xs text-gray-500 sm:block">
+              PNG, JPG up to {maxSize}MB
             </p>
           </div>
         )}

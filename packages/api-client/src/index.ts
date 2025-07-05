@@ -45,6 +45,7 @@ export class APIClient {
   private timeout: number;
   private cache = new Map<string, { data: any; timestamp: number }>();
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private refreshPromise: Promise<void> | null = null; // Prevent multiple refresh calls
 
   constructor(config: APIClientConfig) {
     this.baseURL = config.baseURL;
@@ -105,6 +106,59 @@ export class APIClient {
 
       clearTimeout(timeoutId);
 
+      // Handle 401 Unauthorized - attempt token refresh
+      if (response.status === 401 && endpoint !== '/api/auth/refresh') {
+        console.log('🔄 401 detected, attempting token refresh...');
+
+        try {
+          await this.handleTokenRefresh();
+
+          // Retry the original request with refreshed token
+          console.log('🔄 Retrying original request after token refresh...');
+          const retryResponse = await fetch(url, {
+            ...options,
+            headers: {
+              ...this.getHeaders(),
+              ...options.headers,
+            },
+            credentials: 'include',
+            signal: controller.signal,
+          });
+
+          if (!retryResponse.ok) {
+            const retryError: APIErrorResponse = await retryResponse.json();
+            throw new APIError(
+              retryError.statusCode,
+              retryError.error,
+              retryError.message,
+              retryError.details
+            );
+          }
+
+          const retryData: APISuccessResponse<T> = await retryResponse.json();
+
+          // Update cache for GET requests
+          if (options.method === 'GET' || !options.method) {
+            this.cache.set(endpoint, {
+              data: retryData,
+              timestamp: Date.now(),
+            });
+          }
+
+          return retryData;
+        } catch (refreshError) {
+          console.error('❌ Token refresh failed:', refreshError);
+          // If refresh fails, throw the original 401 error
+          const error: APIErrorResponse = await response.json();
+          throw new APIError(
+            error.statusCode,
+            error.error,
+            error.message,
+            error.details
+          );
+        }
+      }
+
       if (!response.ok) {
         const error: APIErrorResponse = await response.json();
         throw new APIError(
@@ -139,6 +193,52 @@ export class APIClient {
 
       throw new APIError(500, 'NETWORK_ERROR', 'Network error occurred');
     }
+  }
+
+  // Handle token refresh with deduplication
+  private async handleTokenRefresh(): Promise<void> {
+    // If a refresh is already in progress, wait for it
+    if (this.refreshPromise) {
+      console.log('🔄 Token refresh already in progress, waiting...');
+      return this.refreshPromise;
+    }
+
+    // Start a new refresh process
+    this.refreshPromise = this.performTokenRefresh();
+
+    try {
+      await this.refreshPromise;
+      console.log('✅ Token refresh completed successfully');
+    } finally {
+      // Clear the refresh promise
+      this.refreshPromise = null;
+    }
+  }
+
+  // Perform the actual token refresh
+  private async performTokenRefresh(): Promise<void> {
+    console.log('🔄 Calling refresh token endpoint...');
+
+    const refreshResponse = await fetch(`${this.baseURL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      credentials: 'include', // Include cookies with refresh token
+    });
+
+    if (!refreshResponse.ok) {
+      const refreshError = await refreshResponse.json();
+      throw new APIError(
+        refreshResponse.status,
+        refreshError.error || 'REFRESH_FAILED',
+        refreshError.message || 'Token refresh failed'
+      );
+    }
+
+    console.log('✅ Token refresh successful');
+    // The new tokens are automatically set in cookies by the server
   }
 
   async get<T>(
@@ -292,10 +392,8 @@ export class AuthService {
     return response.data;
   }
 
-  async refreshToken(refreshToken: string): Promise<TokenPair> {
-    const response = await this.client.post<TokenPair>('/api/auth/refresh', {
-      refreshToken,
-    });
+  async refreshToken(): Promise<TokenPair> {
+    const response = await this.client.post<TokenPair>('/api/auth/refresh');
     return response.data;
   }
 
