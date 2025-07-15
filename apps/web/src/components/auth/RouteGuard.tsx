@@ -15,7 +15,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   useEffect(() => {
     // Don't redirect during initial loading to prevent flashing
-    if (isLoading) return;
+    if (isLoading) {
+      console.log('🔄 RouteGuard: Still loading, skipping route check');
+      return;
+    }
+
+    console.log(`🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`);
 
     // Define auth pages that authenticated users shouldn't access
     const authPages = ['/login', '/register', '/forgot-password'];
@@ -23,20 +28,29 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     // Define protected pages that require authentication
     const protectedPages = [
       '/dashboard',
-      '/profile',
-      '/marketplace',
-      '/gigs',
-      '/clans',
+      '/profile', 
       '/credits',
+      '/create-gig',
+      '/my-applications',
+      '/my-bids',
+      '/equipment',
+      '/campaigns',
+      '/social-media',
+      '/notifications',
+      '/settings',
+      // Note: '/marketplace', '/clans', '/gigs' are public for browsing
     ];
 
-    // Check if current path is an auth page
-    const isAuthPage = authPages.some((page) => pathname.startsWith(page));
+    // Check if current path is an auth page (exact matches)
+    const isAuthPage = authPages.includes(pathname) || 
+                      authPages.some(page => pathname.startsWith(page + '/'));
 
     // Check if current path is a protected page
     const isProtectedPage = protectedPages.some((page) =>
       pathname.startsWith(page)
     );
+
+    console.log(`🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`);
 
     // If user is authenticated and trying to access auth pages, redirect to dashboard
     if (isAuthenticated && isAuthPage) {
@@ -59,9 +73,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       router.push('/login');
       return;
     }
+
+    console.log('✅ [RouteGuard] Route access allowed');
   }, [isAuthenticated, isLoading, pathname, router]);
 
-  // Don't render anything during loading to prevent flash
+  // Show loading screen during authentication check
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">

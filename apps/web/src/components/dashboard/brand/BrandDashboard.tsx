@@ -73,7 +73,7 @@ export const BrandDashboard: React.FC = () => {
         approved: 0,
         rejected: 0,
       };
-
+      console.log('Gigs Response:', gigsResponse);
       if (
         gigsResponse.status === 'fulfilled' &&
         gigsResponse.value.success &&
@@ -81,16 +81,25 @@ export const BrandDashboard: React.FC = () => {
       ) {
         // Sum up applications from all gigs
         const gigs = gigsResponse.value.data.gigs;
-        applicationsStats.total = gigs.reduce(
-          (sum, gig) => sum + gig.applicationsCount,
-          0
-        );
+        console.log('Gigs array:', gigs);
+        console.log('First gig structure:', gigs[0]);
+
+        applicationsStats.total = gigs.reduce((sum, gig) => {
+          // Handle both possible structures
+          const appCount =
+            gig._count?.applications ||
+            gig.stats?.applicationsCount ||
+            gig.applicationsCount ||
+            0;
+          console.log(`Gig ${gig.id} applications:`, appCount);
+          return sum + appCount;
+        }, 0);
         // Note: We'd need to fetch individual applications to get pending/approved/rejected counts
         // For now, we'll estimate based on accepted vs total
-        applicationsStats.approved = gigs.reduce(
-          (sum, gig) => sum + gig.acceptedCount,
-          0
-        );
+        applicationsStats.approved = gigs.reduce((sum, gig) => {
+          const acceptedCount = gig.acceptedCount || 0;
+          return sum + acceptedCount;
+        }, 0);
         applicationsStats.pending =
           applicationsStats.total - applicationsStats.approved;
       }
@@ -105,8 +114,22 @@ export const BrandDashboard: React.FC = () => {
         gigsStats:
           gigsResponse.status === 'fulfilled' &&
           gigsResponse.value.success &&
-          gigsResponse.value.data?.stats
-            ? gigsResponse.value.data.stats
+          gigsResponse.value.data?.gigs
+            ? gigsResponse.value.data.gigs.reduce(
+                (acc, gig) => {
+                  acc.totalGigs += 1;
+                  if (gig.status === 'ACTIVE') acc.activeGigs += 1;
+                  if (gig.status === 'COMPLETED') acc.completedGigs += 1;
+                  acc.totalBudget += gig.budgetMax;
+                  return acc;
+                },
+                {
+                  totalGigs: 0,
+                  activeGigs: 0,
+                  completedGigs: 0,
+                  totalBudget: 0,
+                }
+              )
             : {
                 totalGigs: 0,
                 activeGigs: 0,
@@ -385,7 +408,12 @@ export const BrandDashboard: React.FC = () => {
                             {gig.description.length > 100 ? '...' : ''}
                           </p>
                           <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
-                            <span>Budget: ₹{gig.budget.toLocaleString()}</span>
+                            <span>
+                              Min-Budget: ₹{gig.budgetMin.toLocaleString()}
+                            </span>
+                            <span>
+                              Max-Budget: ₹{gig.budgetMax.toLocaleString()}
+                            </span>
                             <span>Applications: {gig.applicationsCount}</span>
                             <span>Views: {gig.viewsCount}</span>
                           </div>

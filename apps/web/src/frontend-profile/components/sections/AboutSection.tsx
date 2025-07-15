@@ -1,4 +1,6 @@
 // components/sections/AboutSection.tsx
+'use client';
+
 import React from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';

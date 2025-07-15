@@ -1,7 +1,7 @@
 // app/dashboard/page.tsx - Server Component Dashboard Page
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { DashboardClientRouter } from '@/components/dashboard/DashboardClientRouter';
+import { DashboardRouter } from '@/components/dashboard/DashboardRouter';
 
 export default async function DashboardPage() {
   // Server-side auth check using cookies
@@ -15,5 +15,5 @@ export default async function DashboardPage() {
   }
 
   // Return the client router which will handle user-specific routing
-  return <DashboardClientRouter />;
+  return <DashboardRouter />;
 }

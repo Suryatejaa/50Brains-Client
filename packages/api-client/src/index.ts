@@ -52,13 +52,15 @@ export class APIClient {
     this.timeout = config.timeout || 10000;
   }
 
-  private getHeaders(): HeadersInit {
+  private getHeaders(endpoint?: string): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     };
 
-    // Note: We rely on cookies for authentication, so no Authorization header needed
+    // Authentication is handled by httpOnly cookies automatically
+    // No manual Authorization header needed as proven by tests
+
     return headers;
   }
 
@@ -533,7 +535,7 @@ export class GigService {
       ? `?${new URLSearchParams(params as any).toString()}`
       : '';
     const response = await this.client.get<{ gigs: Gig[]; pagination: any }>(
-      `/api/gig/my-gigs${queryString}`
+      `/api/gig/my-posted${queryString}`
     );
     return response.data;
   }

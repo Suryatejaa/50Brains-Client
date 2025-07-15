@@ -9,23 +9,40 @@ interface FormData {
   title: string;
   description: string;
   category: string;
-  subcategory?: string;
+  roleRequired: string;
   skillsRequired: string[];
-  experienceLevel?: string;
+  experienceLevel: 'beginner' | 'intermediate' | 'expert';
   location?: string;
   isRemote: boolean;
   deadline?: string;
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin?: number;
   budgetMax?: number;
-  maxApplicants?: number;
   requirements?: string;
+  duration?: string;
+  urgency: 'urgent' | 'normal' | 'flexible';
+  deliverables: string[];
+  isClanAllowed: boolean;
+}
+
+interface FormErrors {
+  title?: string;
+  description?: string;
+  category?: string;
+  roleRequired?: string;
+  skillsRequired?: string;
+  budgetMin?: string;
+  budgetMax?: string;
+  budget?: string;
+  deliverables?: string;
+  general?: string;
 }
 
 export default function CreateGigPage() {
   const router = useRouter();
   const {
     createGig,
+    createDraftGig,
     categories,
     popularSkills,
     creating,
@@ -38,19 +55,23 @@ export default function CreateGigPage() {
     title: '',
     description: '',
     category: '',
-    subcategory: '',
+    roleRequired: '', // Keep empty to require selection
     skillsRequired: [],
-    experienceLevel: '',
+    experienceLevel: 'intermediate',
     location: '',
     isRemote: true,
     deadline: '',
     budgetType: 'fixed',
-    budgetMin: 0,
-    budgetMax: 0,
-    maxApplicants: undefined,
+    budgetMin: undefined,
+    budgetMax: undefined,
     requirements: '',
+    duration: '',
+    urgency: 'normal',
+    deliverables: [],
+    isClanAllowed: true,
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isDraft, setIsDraft] = useState(false);
 
   // Load categories and skills on mount
@@ -59,29 +80,112 @@ export default function CreateGigPage() {
     loadPopularSkills();
   }, [loadCategories, loadPopularSkills]);
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Title validation (5-200 characters)
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (formData.title.trim().length < 5) {
+      newErrors.title = 'Title must be at least 5 characters long';
+    } else if (formData.title.trim().length > 200) {
+      newErrors.title = 'Title must not exceed 200 characters';
+    }
+
+    // Description validation (10-2000 characters)
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = 'Description must be at least 10 characters long';
+    } else if (formData.description.trim().length > 2000) {
+      newErrors.description = 'Description must not exceed 2000 characters';
+    }
+
+    // Category validation
+    if (!formData.category.trim()) {
+      newErrors.category = 'Please select a category';
+    }
+
+    // Role required validation
+    if (!formData.roleRequired.trim()) {
+      newErrors.roleRequired = 'Please select a role required';
+    }
+
+    // Skills validation
+    if (formData.skillsRequired.length === 0) {
+      newErrors.skillsRequired = 'Please add at least one required skill';
+    }
+
+    // Budget validation
+    if (formData.budgetType !== 'negotiable') {
+      if (!formData.budgetMin || formData.budgetMin <= 0) {
+        newErrors.budgetMin = 'Please enter a valid minimum budget';
+      }
+      if (
+        formData.budgetMax &&
+        formData.budgetMin &&
+        formData.budgetMax < formData.budgetMin
+      ) {
+        newErrors.budgetMax =
+          'Maximum budget must be greater than minimum budget';
+      }
+    }
+
+    // Deliverables validation
+    if (formData.deliverables.length === 0) {
+      newErrors.deliverables = 'Please add at least one deliverable';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent, asDraft = false) => {
     e.preventDefault();
     setIsDraft(asDraft);
 
+    // Clear previous errors
+    setErrors({});
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       const gigData: CreateGigData = {
-        title: formData.title,
-        description: formData.description,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         category: formData.category,
-        subcategory: formData.subcategory,
+        roleRequired: formData.roleRequired,
         skillsRequired: formData.skillsRequired,
         experienceLevel: formData.experienceLevel,
-        location: formData.location,
-        isRemote: formData.isRemote,
-        deadline: formData.deadline,
+        location: formData.isRemote ? 'remote' : formData.location || undefined,
+        deadline: formData.deadline
+          ? new Date(formData.deadline).toISOString()
+          : undefined,
         budgetType: formData.budgetType,
-        budgetMin: formData.budgetMin,
-        budgetMax: formData.budgetMax,
-        requirements: formData.requirements,
+        budgetMin:
+          formData.budgetMin && formData.budgetMin > 0
+            ? Number(formData.budgetMin)
+            : undefined,
+        budgetMax:
+          formData.budgetMax && formData.budgetMax > 0
+            ? Number(formData.budgetMax)
+            : undefined,
+        requirements: formData.requirements?.trim() || undefined,
+        duration: formData.duration?.trim() || undefined,
+        urgency: formData.urgency,
+        deliverables: formData.deliverables.filter((d) => d.trim()),
+        isClanAllowed: formData.isClanAllowed,
       };
 
       console.log('Creating gig:', gigData);
-      const gig = await createGig(gigData);
+
+      // Use appropriate API call based on draft status
+      const gig = asDraft
+        ? await createDraftGig(gigData)
+        : await createGig(gigData);
 
       if (asDraft) {
         alert('Gig saved as draft successfully!');
@@ -92,9 +196,10 @@ export default function CreateGigPage() {
       }
     } catch (error) {
       console.error('Error creating gig:', error);
-      alert(
-        `Failed to ${asDraft ? 'save draft' : 'publish gig'}: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      setErrors({
+        general:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      });
     }
   };
 
@@ -110,6 +215,14 @@ export default function CreateGigPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+
+    // Clear field error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
   };
 
   const addSkill = (skill: string) => {
@@ -118,6 +231,14 @@ export default function CreateGigPage() {
         ...prev,
         skillsRequired: [...prev.skillsRequired, skill],
       }));
+
+      // Clear skills error when user adds a skill
+      if (errors.skillsRequired) {
+        setErrors((prev) => ({
+          ...prev,
+          skillsRequired: undefined,
+        }));
+      }
     }
   };
 
@@ -126,6 +247,32 @@ export default function CreateGigPage() {
       ...prev,
       skillsRequired: prev.skillsRequired.filter(
         (skill: string) => skill !== skillToRemove
+      ),
+    }));
+  };
+
+  const addDeliverable = (deliverable: string) => {
+    if (deliverable && !formData.deliverables.includes(deliverable)) {
+      setFormData((prev) => ({
+        ...prev,
+        deliverables: [...prev.deliverables, deliverable],
+      }));
+
+      // Clear deliverables error when user adds a deliverable
+      if (errors.deliverables) {
+        setErrors((prev) => ({
+          ...prev,
+          deliverables: undefined,
+        }));
+      }
+    }
+  };
+
+  const removeDeliverable = (deliverableToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      deliverables: prev.deliverables.filter(
+        (deliverable: string) => deliverable !== deliverableToRemove
       ),
     }));
   };
@@ -145,6 +292,15 @@ export default function CreateGigPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-3">
+            {/* General Error Display */}
+            {errors.general && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 lg:col-span-3">
+                <p className="text-sm font-medium text-red-600">
+                  {errors.general}
+                </p>
+              </div>
+            )}
+
             {/* Main Form */}
             <div className="space-y-8 lg:col-span-2">
               {/* Basic Information */}
@@ -167,11 +323,19 @@ export default function CreateGigPage() {
                       name="title"
                       type="text"
                       required
-                      className="input w-full"
+                      className={`input w-full ${errors.title ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                       placeholder="e.g., Instagram Content Creator for Tech Brand"
                       value={formData.title}
                       onChange={handleChange}
                     />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.title}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      {formData.title.length}/200 characters
+                    </p>
                   </div>
 
                   {/* Description */}
@@ -187,14 +351,22 @@ export default function CreateGigPage() {
                       name="description"
                       required
                       rows={6}
-                      className="input w-full"
+                      className={`input w-full ${errors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                       placeholder="Describe your project, requirements, and what you're looking for..."
                       value={formData.description}
                       onChange={handleChange}
                     />
+                    {errors.description && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.description}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      {formData.description.length}/2000 characters
+                    </p>
                   </div>
 
-                  {/* Category & Subcategory */}
+                  {/* Category & Role Required */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label
@@ -207,7 +379,7 @@ export default function CreateGigPage() {
                         id="category"
                         name="category"
                         required
-                        className="input w-full"
+                        className={`input w-full ${errors.category ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                         value={formData.category}
                         onChange={handleChange}
                       >
@@ -220,28 +392,57 @@ export default function CreateGigPage() {
                         <option value="graphic-design">Graphic Design</option>
                         <option value="social-media">Social Media</option>
                         <option value="writing">Writing & Copywriting</option>
+                        <option value="web-development">Web Development</option>
+                        <option value="mobile-development">
+                          Mobile Development
+                        </option>
+                        <option value="marketing">Marketing</option>
+                        <option value="consulting">Consulting</option>
                       </select>
+                      {errors.category && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.category}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label
-                        htmlFor="subcategory"
+                        htmlFor="roleRequired"
                         className="text-body mb-2 block text-sm font-medium"
                       >
-                        Subcategory
+                        Role Required *
                       </label>
                       <select
-                        id="subcategory"
-                        name="subcategory"
-                        className="input w-full"
-                        value={formData.subcategory}
+                        id="roleRequired"
+                        name="roleRequired"
+                        required
+                        className={`input w-full ${errors.roleRequired ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                        value={formData.roleRequired}
                         onChange={handleChange}
                       >
-                        <option value="">Select subcategory</option>
-                        <option value="instagram">Instagram</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="linkedin">LinkedIn</option>
+                        <option value="">Select role</option>
+                        <option value="influencer">Influencer</option>
+                        <option value="content-creator">Content Creator</option>
+                        <option value="video-editor">Video Editor</option>
+                        <option value="photographer">Photographer</option>
+                        <option value="graphic-designer">
+                          Graphic Designer
+                        </option>
+                        <option value="copywriter">Copywriter</option>
+                        <option value="social-media-manager">
+                          Social Media Manager
+                        </option>
+                        <option value="writer">Writer</option>
+                        <option value="designer">Designer</option>
+                        <option value="editor">Editor</option>
+                        <option value="developer">Developer</option>
+                        <option value="marketer">Marketer</option>
                       </select>
+                      {errors.roleRequired && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.roleRequired}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -257,7 +458,7 @@ export default function CreateGigPage() {
                   {/* Skills */}
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
-                      Required Skills
+                      Required Skills *
                     </label>
                     <div className="mb-3 flex flex-wrap gap-2">
                       {formData.skillsRequired.map((skill: string) => (
@@ -279,7 +480,7 @@ export default function CreateGigPage() {
                     <div className="flex space-x-2">
                       <input
                         type="text"
-                        className="input flex-1"
+                        className={`input flex-1 ${errors.skillsRequired ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                         placeholder="Add a skill and press Enter"
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
@@ -290,6 +491,11 @@ export default function CreateGigPage() {
                         }}
                       />
                     </div>
+                    {errors.skillsRequired && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.skillsRequired}
+                      </p>
+                    )}
                     <div className="mt-2 flex flex-wrap gap-2">
                       {[
                         'Instagram Marketing',
@@ -325,10 +531,9 @@ export default function CreateGigPage() {
                       value={formData.experienceLevel}
                       onChange={handleChange}
                     >
-                      <option value="">Any level</option>
-                      <option value="be">Beginner</option>
-                      <option value="INTERMEDIATE">Intermediate</option>
-                      <option value="EXPERT">Expert</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="expert">Expert</option>
                     </select>
                   </div>
 
@@ -367,6 +572,151 @@ export default function CreateGigPage() {
                         />
                       </div>
                     )}
+                  </div>
+
+                  {/* Expected Deliverables */}
+                  <div>
+                    <label className="text-body mb-2 block text-sm font-medium">
+                      Expected Deliverables *
+                    </label>
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {formData.deliverables.map((deliverable: string) => (
+                        <span
+                          key={deliverable}
+                          className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-lg px-3 py-1 text-sm"
+                        >
+                          <span>{deliverable}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                deliverables: prev.deliverables.filter(
+                                  (d: string) => d !== deliverable
+                                ),
+                              }));
+                            }}
+                            className="text-brand-primary/60 hover:text-brand-primary text-lg"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        className={`input flex-1 ${errors.deliverables ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                        placeholder="Add a deliverable and press Enter"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const value = e.currentTarget.value.trim();
+                            if (
+                              value &&
+                              !formData.deliverables.includes(value)
+                            ) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                deliverables: [...prev.deliverables, value],
+                              }));
+                              e.currentTarget.value = '';
+
+                              // Clear deliverables error when user adds a deliverable
+                              if (errors.deliverables) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  deliverables: undefined,
+                                }));
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                    {errors.deliverables && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.deliverables}
+                      </p>
+                    )}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {[
+                        'Final video file',
+                        'Raw footage',
+                        'Social media posts',
+                        'High-res images',
+                        'Written content',
+                        'Source files',
+                      ].map((deliverable) => (
+                        <button
+                          key={deliverable}
+                          type="button"
+                          onClick={() => {
+                            if (!formData.deliverables.includes(deliverable)) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                deliverables: [
+                                  ...prev.deliverables,
+                                  deliverable,
+                                ],
+                              }));
+
+                              // Clear deliverables error when user adds a deliverable
+                              if (errors.deliverables) {
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  deliverables: undefined,
+                                }));
+                              }
+                            }
+                          }}
+                          className="bg-brand-soft border-brand-border text-body hover:bg-brand-light-blue/20 rounded border px-2 py-1 text-xs transition-colors"
+                        >
+                          + {deliverable}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Additional Requirements */}
+                  <div>
+                    <label
+                      htmlFor="requirements"
+                      className="text-body mb-2 block text-sm font-medium"
+                    >
+                      Additional Requirements
+                    </label>
+                    <textarea
+                      id="requirements"
+                      name="requirements"
+                      rows={4}
+                      className="input w-full"
+                      placeholder="Any specific requirements, preferences, or additional details..."
+                      value={formData.requirements}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* Team Options */}
+                  <div>
+                    <div className="mb-3 flex items-center space-x-4">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name="isClanAllowed"
+                          checked={formData.isClanAllowed}
+                          onChange={handleChange}
+                          className="border-brand-border text-brand-primary focus:ring-brand-primary/20 rounded"
+                        />
+                        <span className="text-body ml-2 text-sm">
+                          Allow team/clan applications
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-muted text-xs">
+                      Teams can collaborate to deliver comprehensive solutions
+                      for your project
+                    </p>
                   </div>
                 </div>
               </div>
@@ -439,18 +789,24 @@ export default function CreateGigPage() {
                           className="text-body mb-2 block text-sm font-medium"
                         >
                           {formData.budgetType === 'hourly'
-                            ? 'Min Rate ($/hour)'
-                            : 'Min Budget ($)'}
+                            ? 'Min Rate (₹/hour) *'
+                            : 'Min Budget (₹) *'}
                         </label>
                         <input
                           id="budgetMin"
                           name="budgetMin"
                           type="number"
-                          className="input w-full"
+                          min="1"
+                          className={`input w-full ${errors.budgetMin ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                           placeholder="0"
-                          value={formData.budgetMin}
+                          value={formData.budgetMin || ''}
                           onChange={handleChange}
                         />
+                        {errors.budgetMin && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.budgetMin}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label
@@ -458,18 +814,24 @@ export default function CreateGigPage() {
                           className="text-body mb-2 block text-sm font-medium"
                         >
                           {formData.budgetType === 'hourly'
-                            ? 'Max Rate ($/hour)'
-                            : 'Max Budget ($)'}
+                            ? 'Max Rate (₹/hour)'
+                            : 'Max Budget (₹)'}
                         </label>
                         <input
                           id="budgetMax"
                           name="budgetMax"
                           type="number"
-                          className="input w-full"
+                          min="1"
+                          className={`input w-full ${errors.budgetMax ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                           placeholder="0"
-                          value={formData.budgetMax}
+                          value={formData.budgetMax || ''}
                           onChange={handleChange}
                         />
+                        {errors.budgetMax && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.budgetMax}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -490,27 +852,85 @@ export default function CreateGigPage() {
                       onChange={handleChange}
                     />
                   </div>
-                  {/* Max Applicants */}
+                  {/* Duration */}
                   <div>
                     <label
-                      htmlFor="maxApplicants"
+                      htmlFor="duration"
                       className="text-body mb-2 block text-sm font-medium"
                     >
-                      Maximum Applicants
+                      Project Duration
                     </label>
                     <select
-                      id="maxApplicants"
-                      name="maxApplicants"
+                      id="duration"
+                      name="duration"
                       className="input w-full"
-                      value={formData.maxApplicants}
+                      value={formData.duration}
                       onChange={handleChange}
                     >
-                      <option value="">No limit</option>
-                      <option value="5">5 applicants</option>
-                      <option value="10">10 applicants</option>
-                      <option value="20">20 applicants</option>
-                      <option value="50">50 applicants</option>
+                      <option value="">Select duration</option>
+                      <option value="1 day">1 day</option>
+                      <option value="2 days">2 days</option>
+                      <option value="3 days">3 days</option>
+                      <option value="1 week">1 week</option>
+                      <option value="2 weeks">2 weeks</option>
+                      <option value="3 weeks">3 weeks</option>
+                      <option value="1 month">1 month</option>
+                      <option value="2 months">2 months</option>
+                      <option value="3 months">3 months</option>
+                      <option value="ongoing">Ongoing</option>
                     </select>
+                  </div>
+                  {/* Urgency */}
+                  <div>
+                    <label className="text-body mb-3 block text-sm font-medium">
+                      Project Urgency
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        {
+                          value: 'flexible',
+                          label: 'Flexible',
+                          description: 'No rush',
+                        },
+                        {
+                          value: 'normal',
+                          label: 'Normal',
+                          description: 'Standard timeline',
+                        },
+                        {
+                          value: 'urgent',
+                          label: 'Urgent',
+                          description: 'Need it ASAP',
+                        },
+                      ].map((urgency) => (
+                        <label
+                          key={urgency.value}
+                          className={`
+                            cursor-pointer rounded-lg border p-3 transition-all duration-200
+                            ${
+                              formData.urgency === urgency.value
+                                ? 'border-brand-primary bg-brand-light-blue/20'
+                                : 'border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/10'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="urgency"
+                            value={urgency.value}
+                            checked={formData.urgency === urgency.value}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="text-body text-sm font-medium">
+                            {urgency.label}
+                          </div>
+                          <div className="text-muted text-xs">
+                            {urgency.description}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -534,6 +954,14 @@ export default function CreateGigPage() {
                     <h4 className="text-body text-sm font-medium">Category</h4>
                     <p className="text-muted capitalize">
                       {formData.category || 'Not selected'}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-body text-sm font-medium">
+                      Role Required
+                    </h4>
+                    <p className="text-muted capitalize">
+                      {formData.roleRequired || 'Not selected'}
                     </p>
                   </div>
                   <div>

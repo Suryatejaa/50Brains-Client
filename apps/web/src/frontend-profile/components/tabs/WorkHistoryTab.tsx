@@ -1,4 +1,6 @@
 // components/tabs/WorkHistoryTab.tsx
+'use client';
+
 import React from 'react';
 import { UserProfileData, WorkHistoryData } from '../../types/profile.types';
 

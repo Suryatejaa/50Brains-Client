@@ -12,6 +12,7 @@ import type {
   GigFilters,
   GigStats,
   GigBoostEvent,
+  GigApiResponse,
 } from '@/types/gig.types';
 
 export interface UseGigsState {
@@ -97,9 +98,10 @@ export const useGigs = () => {
     async (filters?: GigFilters) => {
       try {
         updateState({ loading: true, error: null });
-        const result = await GigAPI.getPublicGigs(filters);
+        const result: GigApiResponse = await GigAPI.getAllGigs();
+        console.log('API Response:', result);
         updateState({
-          gigs: result.gigs,
+          gigs: result.gigs || [],
           loading: false,
         });
         return result;
@@ -150,6 +152,7 @@ export const useGigs = () => {
       try {
         updateState({ creating: true, error: null });
         const gig = await GigAPI.createGig(data);
+        console.log('Created gig:', gig);
         updateState({
           currentGig: gig,
           myPostedGigs: [...state.myPostedGigs, gig],
@@ -157,11 +160,31 @@ export const useGigs = () => {
         });
         return gig;
       } catch (error) {
+        console.log(error);
         handleError(error, 'create gig');
         throw error;
       }
     },
     [state.myPostedGigs, updateState, handleError]
+  );
+
+  const createDraftGig = useCallback(
+    async (data: CreateGigData) => {
+      try {
+        updateState({ creating: true, error: null });
+        const gig = await GigAPI.createDraftGig(data);
+        updateState({
+          currentGig: gig,
+          myDraftGigs: [...state.myDraftGigs, gig],
+          creating: false,
+        });
+        return gig;
+      } catch (error) {
+        handleError(error, 'create draft gig');
+        throw error;
+      }
+    },
+    [state.myDraftGigs, updateState, handleError]
   );
 
   const updateGig = useCallback(
@@ -271,46 +294,66 @@ export const useGigs = () => {
     [state.myPostedGigs, updateState, handleError]
   );
 
-  // My Data Loading
-  const loadMyPostedGigs = useCallback(async () => {
+  // My Data Loading - Updated for pagination
+  const loadMyPostedGigs = useCallback(async (options?: {
+    page?: number;
+    limit?: number;
+    status?: string[];
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }) => {
     try {
       updateState({ loading: true, error: null });
-      const gigs = await GigAPI.getMyPostedGigs();
+      const result = await GigAPI.getMyPostedGigs(options);
       updateState({
-        myPostedGigs: gigs,
+        myPostedGigs: result.gigs,
         loading: false,
       });
-      return gigs;
+      return result;
     } catch (error) {
       handleError(error, 'load my posted gigs');
       throw error;
     }
   }, [updateState, handleError]);
 
-  const loadMyDraftGigs = useCallback(async () => {
+  const loadMyDraftGigs = useCallback(async (options?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }) => {
     try {
       updateState({ loading: true, error: null });
-      const gigs = await GigAPI.getMyDraftGigs();
+      const result = await GigAPI.getMyDraftGigs(options);
       updateState({
-        myDraftGigs: gigs,
+        myDraftGigs: result.gigs,
         loading: false,
       });
-      return gigs;
+      return result;
     } catch (error) {
       handleError(error, 'load my draft gigs');
       throw error;
     }
   }, [updateState, handleError]);
 
-  const loadMyApplications = useCallback(async () => {
+  const loadMyApplications = useCallback(async (options?: {
+    page?: number;
+    limit?: number;
+    status?: string[];
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }) => {
     try {
       updateState({ loading: true, error: null });
-      const applications = await GigAPI.getMyApplications();
+      const result = await GigAPI.getMyApplications(options);
       updateState({
-        myApplications: applications,
+        myApplications: result.applications,
         loading: false,
       });
-      return applications;
+      return result;
     } catch (error) {
       handleError(error, 'load my applications');
       throw error;
@@ -682,6 +725,7 @@ export const useGigs = () => {
 
     // Gig management
     createGig,
+    createDraftGig,
     updateGig,
     deleteGig,
     loadGig,

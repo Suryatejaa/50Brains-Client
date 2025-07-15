@@ -1,4 +1,6 @@
 // components/tabs/SettingsTab.tsx
+'use client';
+
 import React, { useState } from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';

@@ -27,8 +27,20 @@ export interface BrandGig {
   id: string;
   title: string;
   description: string;
+  _count: {
+    applications: number;
+    submissions: number;
+  };
+  stats?: {
+    applicationsCount: number;
+    submissionsCount: number;
+    daysOld: number;
+    daysUntilDeadline: number;
+  };
   status: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
   budget: number;
+  budgetMin: number;
+  budgetMax: number;
   budgetType: 'FIXED' | 'HOURLY';
   category: string;
   subcategory?: string;
@@ -141,7 +153,11 @@ class BrandApiClient {
   }> {
     try {
       const response = await apiClient.get('/api/user/profile');
-      return response as { success: boolean; data?: BrandProfile; error?: string };
+      return response as {
+        success: boolean;
+        data?: BrandProfile;
+        error?: string;
+      };
     } catch (error) {
       return { success: false, error: 'Failed to fetch profile' };
     }
@@ -152,7 +168,11 @@ class BrandApiClient {
   ): Promise<{ success: boolean; data?: BrandProfile; error?: string }> {
     try {
       const response = await apiClient.put('/api/user/profile', data);
-      return response as { success: boolean; data?: BrandProfile; error?: string };
+      return response as {
+        success: boolean;
+        data?: BrandProfile;
+        error?: string;
+      };
     } catch (error) {
       return { success: false, error: 'Failed to update profile' };
     }
@@ -195,8 +215,9 @@ class BrandApiClient {
       if (params?.limit) queryParams.append('limit', params.limit.toString());
 
       const response = await apiClient.get(
-        `/api/gig/my/posted?${queryParams.toString()}`
+        `/api/gig/my-posted?${queryParams.toString()}`
       );
+      console.log(response);
       return response as {
         success: boolean;
         data?: {
@@ -347,7 +368,11 @@ class BrandApiClient {
   }> {
     try {
       const response = await apiClient.get('/api/credit/wallet');
-      return response as { success: boolean; data?: BrandWallet; error?: string };
+      return response as {
+        success: boolean;
+        data?: BrandWallet;
+        error?: string;
+      };
     } catch (error) {
       return { success: false, error: 'Failed to fetch wallet' };
     }

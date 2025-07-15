@@ -11,6 +11,7 @@ import type {
   GigFilters,
   GigStats,
   GigBoostEvent,
+  GigApiResponse,
 } from '@/types/gig.types';
 
 // Use the main API gateway instead of direct service connection
@@ -19,9 +20,19 @@ const GIG_API_BASE = '/api/gig';
 export class GigAPI {
   // Gig Management
   static async createGig(data: CreateGigData): Promise<Gig> {
-    const response = await apiClient.post(`${GIG_API_BASE}/`, data);
+    const response = await apiClient.post(`${GIG_API_BASE}`, data);
+    console.log(response);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to create gig');
+    }
+    return response.data as Gig;
+  }
+
+  static async createDraftGig(data: CreateGigData): Promise<Gig> {
+    // Use the dedicated draft endpoint that allows partial data
+    const response = await apiClient.post(`${GIG_API_BASE}/draft`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to create draft gig');
     }
     return response.data as Gig;
   }
@@ -49,13 +60,11 @@ export class GigAPI {
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch gig');
     }
-    return response.data as Gig; 
+    return response.data as Gig;
   }
 
   static async publishGig(gigId: string): Promise<Gig> {
-    const response = await apiClient.patch(
-      `${GIG_API_BASE}/${gigId}/publish`
-    );
+    const response = await apiClient.patch(`${GIG_API_BASE}/${gigId}/publish`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to publish gig');
     }
@@ -63,16 +72,14 @@ export class GigAPI {
   }
 
   static async closeGig(gigId: string): Promise<Gig> {
-    const response = await apiClient.patch(
-      `${GIG_API_BASE}/${gigId}/close`
-    );
+    const response = await apiClient.patch(`${GIG_API_BASE}/${gigId}/close`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to close gig');
     }
     return response.data as Gig;
   }
 
-  // Public Gig Discovery
+  // Public Gig Discovery - Fixed route
   static async getPublicGigs(
     filters?: GigFilters
   ): Promise<{ gigs: Gig[]; total: number; page: number; totalPages: number }> {
@@ -90,7 +97,7 @@ export class GigAPI {
     }
 
     const response = await apiClient.get(
-      `${GIG_API_BASE}/public/gigs?${params.toString()}`
+      `/api/gig/feed?${params.toString()}`
     );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch gigs');
@@ -107,7 +114,7 @@ export class GigAPI {
     query: string,
     filters?: GigFilters
   ): Promise<{ gigs: Gig[]; total: number }> {
-    const params = new URLSearchParams({ q: query });
+    const params = new URLSearchParams({ search: query });
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -121,7 +128,7 @@ export class GigAPI {
     }
 
     const response = await apiClient.get(
-      `${GIG_API_BASE}/public/search?${params.toString()}`
+      `/api/gig/feed?${params.toString()}`
     );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to search gigs');
@@ -130,7 +137,7 @@ export class GigAPI {
   }
 
   static async getFeaturedGigs(): Promise<Gig[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/public/featured`);
+    const response = await apiClient.get(`/api/gig/public/featured`);
     if (!response.success) {
       throw new Error(
         (response as any).error || 'Failed to fetch featured gigs'
@@ -139,21 +146,134 @@ export class GigAPI {
     return response.data as Gig[];
   }
 
-  // My Gigs (Posted)
-  static async getMyPostedGigs(): Promise<Gig[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/my/posted`);
+  // My Gigs (Posted) - Now with pagination support
+  static async getMyPostedGigs(options?: {
+    page?: number;
+    limit?: number;
+    status?: string[];
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }): Promise<{
+    gigs: Gig[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+  }> {
+    const params = new URLSearchParams();
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v));
+          } else {
+            params.append(key, String(value));
+          }
+        }
+      });
+    }
+
+    const response = await apiClient.get(`/api/my/posted?${params.toString()}`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch posted gigs');
     }
-    return response.data as Gig[];
+    return response.data as {
+      gigs: Gig[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+      };
+    };
   }
 
-  static async getMyDraftGigs(): Promise<Gig[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/my/drafts`);
+  static async getMyDraftGigs(options?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }): Promise<{
+    gigs: Gig[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+  }> {
+    const params = new URLSearchParams();
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await apiClient.get(`/api/my/drafts?${params.toString()}`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch draft gigs');
     }
-    return response.data as Gig[];
+    return response.data as {
+      gigs: Gig[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+      };
+    };
+  }
+
+  static async getDraftGig(gigId: string): Promise<Gig> {
+    const response = await apiClient.get(`/api/gig/draft/${gigId}`);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to fetch draft gig');
+    }
+    return response.data as Gig;
+  }
+
+  static async publishDraftGig(gigId: string): Promise<Gig> {
+    const response = await apiClient.post(`/api/gig/draft/${gigId}/publish`);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to publish draft gig');
+    }
+    return response.data as Gig;
+  }
+
+  static async getAllGigs(filters?: GigFilters): Promise<GigApiResponse> {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v));
+          } else {
+            params.append(key, String(value));
+          }
+        }
+      });
+    }
+
+    const response = await apiClient.get(`/api/gig/feed?${params.toString()}`);
+    // console.log(response);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to fetch all gigs');
+    }
+    return response.data as GigApiResponse;
   }
 
   static async getMyGigStats(): Promise<GigStats> {
@@ -164,15 +284,55 @@ export class GigAPI {
     return response.data as GigStats;
   }
 
-  // My Applications
-  static async getMyApplications(): Promise<Application[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/my/applications`);
+  // My Applications - Now with pagination support
+  static async getMyApplications(options?: {
+    page?: number;
+    limit?: number;
+    status?: string[];
+    search?: string;
+    sortBy?: string;
+    sort?: 'asc' | 'desc';
+  }): Promise<{
+    applications: Application[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+  }> {
+    const params = new URLSearchParams();
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v));
+          } else {
+            params.append(key, String(value));
+          }
+        }
+      });
+    }
+
+    const response = await apiClient.get(`/api/my/applications?${params.toString()}`);
     if (!response.success) {
       throw new Error(
         (response as any).error || 'Failed to fetch applications'
       );
     }
-    return response.data as Application[];
+    return response.data as {
+      applications: Application[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+      };
+    };
   }
 
   static async getMyActiveGigs(): Promise<Gig[]> {
@@ -355,10 +515,10 @@ export class GigAPI {
     amount: number,
     duration: number
   ): Promise<GigBoostEvent> {
-    const response = await apiClient.post(
-      `${GIG_API_BASE}/${gigId}/boost`,
-      { amount, duration }
-    );
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/boost`, {
+      amount,
+      duration,
+    });
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to boost gig');
     }
@@ -373,9 +533,9 @@ export class GigAPI {
     return response.data as GigBoostEvent[];
   }
 
-  // Categories and Skills
+  // Categories and Skills - Fixed routes
   static async getCategories(): Promise<string[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/public/categories`);
+    const response = await apiClient.get(`/api/gig/public/categories`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch categories');
     }
@@ -383,7 +543,7 @@ export class GigAPI {
   }
 
   static async getPopularSkills(): Promise<string[]> {
-    const response = await apiClient.get(`${GIG_API_BASE}/public/skills`);
+    const response = await apiClient.get(`/api/gig/public/skills`);
     if (!response.success) {
       throw new Error(
         (response as any).error || 'Failed to fetch popular skills'

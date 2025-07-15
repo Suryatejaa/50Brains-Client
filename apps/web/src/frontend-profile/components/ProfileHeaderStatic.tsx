@@ -147,17 +147,17 @@ const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
               </div>
             ) : (
               <div className="profile-header__public-actions">
-                <button className="profile-header__contact-btn">
+                <div className="profile-header__contact-btn cursor-not-allowed opacity-60">
                   💬 Contact
-                </button>
-                <button className="profile-header__follow-btn">
+                </div>
+                <div className="profile-header__follow-btn cursor-not-allowed opacity-60">
                   ⭐ Follow
-                </button>
+                </div>
               </div>
             )}
-            <button className="profile-header__share-btn">
+            <div className="profile-header__share-btn cursor-not-allowed opacity-60">
               🔗 Share Profile
-            </button>
+            </div>
           </div>
         </div>
       </div>

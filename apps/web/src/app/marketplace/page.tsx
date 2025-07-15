@@ -24,13 +24,12 @@ export default function MarketplacePage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<GigFilters>({
-    category: '',
+    category: [],
     experienceLevel: '',
-    budgetType: '',
+    budgetType: 'fixed',
     budgetMin: undefined,
     budgetMax: undefined,
     location: '',
-    isRemote: undefined,
     sortBy: 'recent',
     page: 1,
     limit: 12,
@@ -68,13 +67,12 @@ export default function MarketplacePage() {
 
   const clearFilters = () => {
     setFilters({
-      category: '',
+      category: [],
       experienceLevel: '',
-      budgetType: '',
+      budgetType: 'fixed',
       budgetMin: undefined,
       budgetMax: undefined,
       location: '',
-      isRemote: undefined,
       sortBy: 'recent',
       page: 1,
       limit: 12,
@@ -86,7 +84,7 @@ export default function MarketplacePage() {
     if (gig.budgetType === 'negotiable') return 'Negotiable';
     if (gig.budgetMin && gig.budgetMax) {
       const prefix = gig.budgetType === 'hourly' ? '/hr' : '';
-      return `$${gig.budgetMin} - $${gig.budgetMax}${prefix}`;
+      return `₹${gig.budgetMin} - ₹${gig.budgetMax}${prefix}`;
     }
     return 'Budget not specified';
   };
@@ -104,6 +102,8 @@ export default function MarketplacePage() {
     if (diffDays <= 7) return `Due in ${diffDays} days`;
     return date.toLocaleDateString();
   };
+
+  console.log(gigs)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -272,20 +272,7 @@ export default function MarketplacePage() {
                           updateFilter('location', e.target.value)
                         }
                         className="input w-full"
-                      />
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={filters.isRemote ?? false}
-                          onChange={(e) =>
-                            updateFilter('isRemote', e.target.checked)
-                          }
-                          className="border-brand-border text-brand-primary focus:ring-brand-primary/20 rounded"
-                        />
-                        <span className="text-body ml-2 text-sm">
-                          Remote only
-                        </span>
-                      </label>
+                      />                     
                     </div>
                   </div>
                 </div>
@@ -497,7 +484,7 @@ export default function MarketplacePage() {
                         <div
                           className={`${index === 0 && activeTab === 'featured' ? 'mb-3' : 'mt-2'}`}
                         >
-                          <span className="btn-primary text-brand-primary group-hover:text-brand-primary/80 inline-block text-sm font-medium">
+                          <span className="btn-primary text-white group-hover:text-white inline-block text-sm font-medium">
                             Apply Now →
                           </span>
                         </div>

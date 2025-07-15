@@ -8,7 +8,7 @@ export interface Gig {
   postedByType: 'user' | 'brand';
   budgetMin?: number;
   budgetMax?: number;
-  experienceLevel: string;
+  experienceLevel?: string;
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   roleRequired: string;
   skillsRequired: string[];
@@ -28,25 +28,31 @@ export interface Gig {
   updatedAt: string;
   applications?: Application[];
   submissions?: Submission[];
+  stats?: {
+    applicationsCount: number;
+    submissionsCount: number;
+    daysOld: number;
+    daysUntilDeadline: number;
+  };
 }
 
 export interface CreateGigData {
   title: string;
   description: string;
   category: string;
-  subcategory?: string;
-  skillsRequired: string[];
-  experienceLevel?: string;
-  location?: string;
-  isRemote?: boolean;
-  deadline?: string;
-  budgetType: 'fixed' | 'hourly' | 'negotiable';
+  roleRequired: string;
   budgetMin?: number;
   budgetMax?: number;
-  requirements?: string;
-  deliverables?: string[];
-  urgency?: 'urgent' | 'normal' | 'flexible';
+  budgetType?: 'fixed' | 'hourly' | 'negotiable';
+  experienceLevel?: 'beginner' | 'intermediate' | 'expert';
+  skillsRequired?: string[];
   isClanAllowed?: boolean;
+  location?: string;
+  duration?: string;
+  urgency?: 'urgent' | 'normal' | 'flexible';
+  deliverables?: string[];
+  requirements?: string;
+  deadline?: string;
 }
 
 export interface Application {
@@ -103,19 +109,43 @@ export interface CreateSubmissionData {
 }
 
 export interface GigFilters {
-  category?: string;
-  experienceLevel?: string;
-  budgetType?: string;
+  category?: string[];
+  roleRequired?: string[];
+  location?: string;
   budgetMin?: number;
   budgetMax?: number;
-  location?: string;
-  isRemote?: boolean;
-  skills?: string[];
-  urgency?: string;
-  postedAfter?: string;
-  sortBy?: 'recent' | 'budget_high' | 'budget_low' | 'deadline';
+  urgency?: string[];
+  status?: string[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+  deadline?: string;
   page?: number;
   limit?: number;
+  experienceLevel?: string;
+  skillsRequired?: string[];
+  isClanAllowed?: boolean;
+  budgetType?: 'fixed' | 'hourly' | 'negotiable';
+}
+
+export interface GigApiResponse {
+  gigs: Gig[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  filters: {
+    category: string[];
+    roleRequired: string[];
+    urgency: string[];
+    status: string[];
+    sortBy: string;
+    sortOrder: string;
+  };
 }
 
 export interface GigStats {

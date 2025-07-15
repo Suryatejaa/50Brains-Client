@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .step { margin: 10px 0; padding: 10px; border-left: 4px solid #007bff; background: #f8f9fa; }
+        .result { margin: 5px 0; padding: 8px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        button { margin: 5px; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        code { background: #e9ecef; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Auth Persistence Debug Test</h1>
+        
+        <div class="step">
+            <h3>Step 1: Check localStorage</h3>
+            <button class="btn-primary" onclick="checkCache()">Check Cache</button>
+            <button class="btn-danger" onclick="clearCache()">Clear Cache</button>
+            <div id="cache-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Set Demo User</h3>
+            <button class="btn-success" onclick="setDemoUser()">Set Demo User in Cache</button>
+            <div id="demo-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Refresh Test</h3>
+            <p>After setting demo user, click "Refresh Page" and see if user persists:</p>
+            <button class="btn-primary" onclick="window.location.reload()">Refresh Page</button>
+            <div id="refresh-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: App Navigation Test</h3>
+            <button class="btn-primary" onclick="goToApp()">Go to Main App</button>
+            <button class="btn-primary" onclick="goToAuthTest()">Go to Auth Test</button>
+            <div id="nav-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Debug Info</h3>
+            <div id="debug-info"></div>
+        </div>
+    </div>
+
+    <script>
+        const CACHE_KEY = '50brains_user_cache';
+        
+        function log(message, type = 'info') {
+            console.log(message);
+            const debugDiv = document.getElementById('debug-info');
+            const timestamp = new Date().toLocaleTimeString();
+            debugDiv.innerHTML = `<div class="${type}">[${timestamp}] ${message}</div>` + debugDiv.innerHTML;
+        }
+
+        function checkCache() {
+            const cached = localStorage.getItem(CACHE_KEY);
+            const result = document.getElementById('cache-result');
+            
+            if (cached) {
+                try {
+                    const data = JSON.parse(cached);
+                    const age = Date.now() - data.timestamp;
+                    const ageHours = Math.round(age / (1000 * 60 * 60) * 100) / 100;
+                    
+                    result.innerHTML = `
+                        <div class="result success">
+                            ✅ Cache Found<br>
+                            <strong>User:</strong> ${data.user.displayName || data.user.firstName} (${data.user.email})<br>
+                            <strong>Role:</strong> ${data.user.role}<br>
+                            <strong>Age:</strong> ${ageHours} hours<br>
+                            <strong>Raw:</strong> <code>${cached.substring(0, 100)}...</code>
+                        </div>
+                    `;
+                    log(`Cache found: ${data.user.email}, age: ${ageHours}h`, 'success');
+                } catch (e) {
+                    result.innerHTML = `<div class="result error">❌ Cache corrupted: ${e.message}</div>`;
+                    log(`Cache corrupted: ${e.message}`, 'error');
+                }
+            } else {
+                result.innerHTML = `<div class="result warning">⚠️ No cache found</div>`;
+                log('No cache found', 'warning');
+            }
+        }
+
+        function clearCache() {
+            localStorage.removeItem(CACHE_KEY);
+            document.getElementById('cache-result').innerHTML = `<div class="result success">✅ Cache cleared</div>`;
+            log('Cache cleared', 'success');
+        }
+
+        function setDemoUser() {
+            const demoUser = {
+                id: 'demo-user-id',
+                email: 'demo@50brains.com',
+                firstName: 'Demo',
+                lastName: 'User',
+                displayName: 'Demo User',
+                role: 'INFLUENCER',
+                status: 'ACTIVE',
+                isEmailVerified: true,
+                createdAt: new Date().toISOString(),
+            };
+
+            const cacheData = {
+                user: demoUser,
+                timestamp: Date.now(),
+            };
+
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+            document.getElementById('demo-result').innerHTML = `
+                <div class="result success">
+                    ✅ Demo user set in cache<br>
+                    <strong>User:</strong> ${demoUser.displayName} (${demoUser.email})<br>
+                    <strong>Role:</strong> ${demoUser.role}
+                </div>
+            `;
+            log(`Demo user set: ${demoUser.email}`, 'success');
+        }
+
+        function goToApp() {
+            window.location.href = '/';
+        }
+
+        function goToAuthTest() {
+            window.location.href = '/auth-test';
+        }
+
+        // Auto-check cache on load
+        window.onload = function() {
+            checkCache();
+            log('Debug page loaded', 'info');
+        };
+    </script>
+</body>
+</html>

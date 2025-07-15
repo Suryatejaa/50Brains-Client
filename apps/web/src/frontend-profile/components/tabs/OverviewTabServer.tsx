@@ -116,8 +116,9 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
         {/* Contact Actions - Only for public profiles */}
         {isPublicView && (
           <div className="contact-actions">
-            <button className="btn btn-primary">💬 Send Message</button>
-            <button className="btn btn-secondary">🤝 Connect</button>
+            <div className="btn btn-primary cursor-not-allowed opacity-60">💬 Send Message</div>
+            <div className="btn btn-secondary cursor-not-allowed opacity-60">🤝 Connect</div>
+            <p className="text-xs text-gray-500 mt-2">Interactive features coming soon</p>
           </div>
         )}
       </div>
