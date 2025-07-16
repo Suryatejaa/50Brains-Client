@@ -182,11 +182,11 @@ export default function InfluencersSearchPage() {
               </p>
             </div>
             <div className="flex space-x-3">
-              <Link href="/my/campaigns" className="btn-secondary">
-                My Campaigns
+              <Link href="/my-gigs" className="btn-secondary">
+                My Gigs
               </Link>
               <Link href="/create-gig" className="btn-primary">
-                Create Campaign
+                Create Gig
               </Link>
             </div>
           </div>

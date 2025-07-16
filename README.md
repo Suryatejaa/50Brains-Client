@@ -1189,7 +1189,7 @@ const DynamicNavigation: React.FC = () => {
     if (userType === 'brand') {
       baseItems.push(
         { path: '/gigs/create', label: 'Create Campaign', icon: '➕' },
-        { path: '/my/campaigns', label: 'My Campaigns', icon: '📢' },
+        { path: '/my-gigs', label: 'My Gigs', icon: '📢' },
         { path: '/influencers', label: 'Find Influencers', icon: '🔍' },
         { path: '/analytics', label: 'Analytics', icon: '📊' }
       );

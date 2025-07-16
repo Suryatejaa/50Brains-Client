@@ -66,7 +66,7 @@ export default function AnalyticsPage() {
         apiClient.get(`/api/my/applications/stats`)
       ] : [
         apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
-        apiClient.get('/api/my/campaigns/stats'),
+        apiClient.get('/api/my-gigs/stats'),
         apiClient.get('/api/analytics/spending')
       ];
 
@@ -426,8 +426,8 @@ export default function AnalyticsPage() {
                     <Link href="/create-gig" className="btn-secondary text-center">
                       ➕ Create New Campaign
                     </Link>
-                    <Link href={"/my/campaigns" as any} className="btn-secondary text-center">
-                      📢 Manage Campaigns
+                    <Link href={"/my-gigs" as any} className="btn-secondary text-center">
+                      📢 Manage Gigs
                     </Link>
                     <Link href={"/influencers/search" as any} className="btn-secondary text-center">
                       🔍 Find Influencers

@@ -64,9 +64,9 @@ This document contains a comprehensive audit of all missing pages referenced thr
 ### **2. Campaign Management**
 | Page | Route | Description | Referenced From |
 |------|-------|-------------|-----------------|
-| My Campaigns | `/my/campaigns` | Creator's campaigns | Analytics |
-| Campaign Applications | `/campaigns/${id}/applications` | Applications for campaign | MyCampaigns |
-| Campaign Edit | `/campaigns/${id}/edit` | Edit campaign | MyCampaigns |
+| My Gigs | `/my-gigs` | Creator's gigs | Analytics |
+| Gig Applications | `/gigs/${id}/applications` | Applications for gig | MyGigs |
+| Gig Edit | `/gigs/${id}/edit` | Edit gig | MyGigs |
 
 ### **3. User Discovery**
 | Page | Route | Description | Referenced From |
@@ -128,7 +128,7 @@ This document contains a comprehensive audit of all missing pages referenced thr
 
 2. **Analytics & Reporting**
    - `/analytics` - Advanced analytics
-   - `/my/campaigns` - Campaign tracking
+   - `/my-gigs` - Campaign tracking
 
 ---
 

@@ -74,7 +74,7 @@ export const DynamicNavigation: React.FC = () => {
           icon: '➕',
           permission: 'gig.create',
         },
-        { path: '/my/campaigns', label: 'My Campaigns', icon: '📢' },
+        { path: '/my-gigs', label: 'My Gigs', icon: '📢' },
         {
           path: '/influencers/search',
           label: 'Find Influencers',

@@ -170,10 +170,10 @@ export const BrandDashboard: React.FC = () => {
       permission: 'gig.create',
     },
     {
-      href: '/my/campaigns',
+      href: '/my-gigs',
       icon: '📢',
-      label: 'My Campaigns',
-      description: 'Manage campaigns',
+      label: 'My Gigs',
+      description: 'Manage gigs',
     },
     {
       href: '/influencers/search',

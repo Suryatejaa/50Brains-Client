@@ -69,7 +69,7 @@ export async function loadBrandDashboardData(userId: string) {
   const endpoints = [
     {
       key: 'campaigns',
-      url: '/api/my/campaigns/summary',
+      url: '/api/my-gigs/summary',
     },
     {
       key: 'applications',
