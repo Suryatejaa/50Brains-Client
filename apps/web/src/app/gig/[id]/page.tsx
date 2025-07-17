@@ -56,6 +56,8 @@ interface Application {
   coverLetter: string;
   portfolio: { title: string; url: string }[];
   proposedRate?: number;
+  estimatedTime?: string;
+  applicantType: 'user' | 'clan';
 }
 
 export default function GigDetailsPage() {
@@ -66,13 +68,23 @@ export default function GigDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [alreadyAppliedMessage, setAlreadyAppliedMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<{type: 'success' | 'error' | 'warning', message: string} | null>(null);
   const [application, setApplication] = useState<Application>({
     coverLetter: '',
     portfolio: [],
-    proposedRate: undefined
+    proposedRate: undefined,
+    estimatedTime: '',
+    applicantType: 'user'
   });
 
   const gigId = params.id as string;
+
+  // Show toast notification
+  const showToast = (type: 'success' | 'error' | 'warning', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 5000); // Auto-hide after 5 seconds
+  };
 
   // Helper function to navigate back
   const goBack = () => {
@@ -95,7 +107,15 @@ export default function GigDetailsPage() {
       const response = await apiClient.get(`/api/gig/${gigId}`);
       
       if (response.success && response.data) {
-        setGig(response.data as Gig);
+        const gigData = response.data as Gig;
+        console.log('🎯 Loaded gig data:', {
+          id: gigData.id,
+          title: gigData.title,
+          isApplied: gigData.isApplied,
+          status: gigData.status,
+          applicationCount: gigData._count?.applications
+        });
+        setGig(gigData);
       } else {
         // Go back to previous page or fallback to marketplace
         goBack();
@@ -115,22 +135,111 @@ export default function GigDetailsPage() {
       return;
     }
 
+    if (!user) {
+      showToast('error', 'User information not available. Please refresh and try again.');
+      return;
+    }
+
     try {
       setIsApplying(true);
-      const response = await apiClient.post(`/api/gig/${gigId}/apply`, {
-        coverLetter: application.coverLetter,
-        portfolio: application.portfolio,
-        proposedRate: application.proposedRate
-      });
+      
+      // Validate required fields
+      if (!application.coverLetter.trim()) {
+        showToast('warning', 'Please enter a cover letter');
+        return;
+      }
+      
+      if (!application.estimatedTime) {
+        showToast('warning', 'Please select an estimated time to complete');
+        return;
+      }
+      
+      // Validate gig ID format (should be a valid ID)
+      if (!gigId || typeof gigId !== 'string' || gigId.length < 10) {
+        showToast('error', 'Invalid gig ID. Please refresh the page and try again.');
+        return;
+      }
+      
+      // Convert portfolio to string array format expected by backend
+      const portfolioUrls = application.portfolio.map(item => item.url).filter(url => url.trim());
+      
+      // Prepare application data
+      const applicationData = {
+        proposal: application.coverLetter.trim(),
+        portfolio: portfolioUrls,
+        quotedPrice: application.proposedRate || 0,
+        estimatedTime: application.estimatedTime,
+        applicantType: application.applicantType
+      };
+      
+      console.log('🚀 Sending application data:', applicationData);
+      console.log('🔑 User info:', { id: user.id, email: user.email });
+      console.log('🎯 Gig ID:', gigId);
+      
+      const response = await apiClient.post(`/api/gig/${gigId}/apply`, applicationData);
+
+      console.log('✅ Application response:', response);
 
       if (response.success) {
         // Refresh gig data to update application status
         await loadGigDetails();
         setShowApplicationForm(false);
-        setApplication({ coverLetter: '', portfolio: [], proposedRate: undefined });
+        setApplication({ 
+          coverLetter: '', 
+          portfolio: [], 
+          proposedRate: undefined,
+          estimatedTime: '',
+          applicantType: 'user'
+        });
+        
+        // Show success message
+        showToast('success', '✅ Application submitted successfully! The brand will review your application soon.');
       }
-    } catch (error) {
-      console.error('Failed to apply to gig:', error);
+    } catch (error: any) {
+      console.error('❌ Failed to apply to gig:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        statusCode: error.statusCode,
+        error: error.error,
+        details: error.details
+      });
+      console.error('❌ Gig ID:', gigId);
+      
+      // Determine the most appropriate error message
+      let userMessage = 'Failed to submit application. Please try again.';
+      
+      if (error.error) {
+        // Backend provided a specific error message
+        userMessage = error.error;
+      } else if (error.message) {
+        userMessage = error.message;
+      } else if (error.details) {
+        userMessage = error.details;
+      }
+      
+      // Special handling for common errors
+      if (userMessage.toLowerCase().includes('already applied')) {
+        userMessage = 'You have already applied to this gig. Check your applications in the "My Applications" section.';
+        setAlreadyAppliedMessage('You have already applied to this gig');
+        showToast('warning', userMessage);
+        // Also refresh the gig data to update the UI state
+        await loadGigDetails();
+      } else if (userMessage.toLowerCase().includes('not authenticated')) {
+        userMessage = 'Please log in again to apply for this gig.';
+        showToast('error', userMessage);
+        router.push('/login');
+      } else if (userMessage.toLowerCase().includes('maximum applications')) {
+        userMessage = 'This gig has reached its maximum number of applications.';
+        showToast('warning', userMessage);
+      } else if (userMessage.toLowerCase().includes('gig not found')) {
+        userMessage = 'This gig is no longer available.';
+        showToast('error', userMessage);
+      } else if (userMessage.toLowerCase().includes('validation')) {
+        userMessage = 'Please check all required fields and try again.';
+        showToast('warning', userMessage);
+      } else {
+        showToast('error', userMessage);
+      }
     } finally {
       setIsApplying(false);
     }
@@ -222,6 +331,26 @@ export default function GigDetailsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Already Applied Banner */}
+          {(gig.isApplied || alreadyAppliedMessage) && (
+            <div className="lg:col-span-3 mb-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="text-2xl">✅</div>
+                  <div>
+                    <p className="font-semibold text-green-800">Application Submitted</p>
+                    <p className="text-sm text-green-600">
+                      {alreadyAppliedMessage || 'You have already applied to this gig. The brand will review your application soon.'}
+                    </p>
+                  </div>
+                </div>
+                <Link href="/my/applications" className="btn-secondary">
+                  View My Applications
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Gig Header */}
@@ -494,8 +623,8 @@ export default function GigDetailsPage() {
         {/* Application Form Modal */}
         {showApplicationForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+            <div className="bg-white max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="p-4">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Apply to: {gig.title}</h2>
                   <button 
@@ -527,7 +656,7 @@ export default function GigDetailsPage() {
                       Proposed Rate (optional)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-2 text-gray-500">₹</span>
                       <input
                         type="number"
                         value={application.proposedRate || ''}
@@ -540,8 +669,48 @@ export default function GigDetailsPage() {
                       />
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      Budget: ${gig.budgetMin?.toLocaleString()}{gig.budgetMax && gig.budgetMax !== gig.budgetMin ? ` - $${gig.budgetMax?.toLocaleString()}` : ''} ({gig.budgetType})
+                      Budget: ₹{gig.budgetMin?.toLocaleString()}{gig.budgetMax && gig.budgetMax !== gig.budgetMin ? ` - ₹${gig.budgetMax?.toLocaleString()}` : ''} ({gig.budgetType})
                     </p>
+                  </div>
+
+                  {/* Estimated Time */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Estimated Time to Complete *
+                    </label>
+                    <select
+                      value={application.estimatedTime}
+                      onChange={(e) => setApplication(prev => ({ ...prev, estimatedTime: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Select estimated time</option>
+                      <option value="1-3 days">1-3 days</option>
+                      <option value="4-7 days">4-7 days</option>
+                      <option value="1-2 weeks">1-2 weeks</option>
+                      <option value="2-4 weeks">2-4 weeks</option>
+                      <option value="1-2 months">1-2 months</option>
+                      <option value="2+ months">2+ months</option>
+                    </select>
+                  </div>
+
+                  {/* Application Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Application Type
+                    </label>
+                    <select
+                      value={application.applicantType}
+                      onChange={(e) => setApplication(prev => ({ ...prev, applicantType: e.target.value as 'user' | 'clan' }))}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="user">Individual Application</option>
+                      {gig.isClanAllowed && <option value="clan">Team/Clan Application</option>}
+                    </select>
+                    {!gig.isClanAllowed && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        This gig only accepts individual applications
+                      </p>
+                    )}
                   </div>
 
                   {/* Portfolio */}
@@ -596,7 +765,7 @@ export default function GigDetailsPage() {
                     </button>
                     <button
                       onClick={handleApply}
-                      disabled={!application.coverLetter.trim() || isApplying}
+                      disabled={!application.coverLetter.trim() || !application.estimatedTime || isApplying}
                       className="flex-1 btn-primary disabled:opacity-50"
                     >
                       {isApplying ? 'Applying...' : 'Submit Application'}
@@ -608,6 +777,32 @@ export default function GigDetailsPage() {
           </div>
         )}
       </div>
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 max-w-md">
+          <div className={`p-4 rounded-lg shadow-lg border-l-4 ${
+            toast.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
+            toast.type === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
+            'bg-red-50 border-red-500 text-red-800'
+          }`}>
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-2">
+                <div className="text-lg">
+                  {toast.type === 'success' ? '✅' : toast.type === 'warning' ? '⚠️' : '❌'}
+                </div>
+                <p className="text-sm font-medium">{toast.message}</p>
+              </div>
+              <button 
+                onClick={() => setToast(null)}
+                className="text-gray-400 hover:text-gray-600 ml-2"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
