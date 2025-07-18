@@ -134,9 +134,9 @@ export default function AboutPage() {
             </div>
 
             {/* Stats Section */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-16">
               {stats.map((stat, index) => (
-                <div key={index} className="card-glass p-6 text-center">
+                <div key={index} className="card-glass p-3 text-center">
                   <div className="text-3xl mb-2">{stat.icon}</div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
                   <div className="text-sm text-gray-600">{stat.label}</div>
@@ -276,7 +276,7 @@ export default function AboutPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
                   {teamMembers.map((member) => (
-                    <div key={member.id} className="card-glass p-6">
+                    <div key={member.id} className="card-glass p-3">
                       <div className="flex items-start space-x-4">
                         <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                           {member.name.split(' ').map(n => n[0]).join('')}
@@ -329,9 +329,9 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {values.map((value, index) => (
-                    <div key={index} className="card-glass p-6 text-center">
+                    <div key={index} className="card-glass p-3 text-center">
                       <div className="text-4xl mb-4">{value.icon}</div>
                       <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
                       <p className="text-gray-600">{value.description}</p>
@@ -370,7 +370,7 @@ export default function AboutPage() {
                 </div>
 
                 {/* Open Positions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {[
                     {
                       title: 'Senior Full Stack Developer',
@@ -401,7 +401,7 @@ export default function AboutPage() {
                       description: 'Improve our matching algorithms and user recommendations.'
                     }
                   ].map((job, index) => (
-                    <div key={index} className="card-glass p-6">
+                    <div key={index} className="card-glass p-3">
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
@@ -423,7 +423,7 @@ export default function AboutPage() {
                 {/* Benefits */}
                 <div className="card-glass p-8">
                   <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Why Work With Us?</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div className="text-center">
                       <div className="text-3xl mb-2">🏠</div>
                       <h4 className="font-semibold text-gray-900 mb-1">Remote First</h4>

@@ -272,7 +272,7 @@ export default function CreditsPurchasePage() {
                     <div
                       key={pkg.id}
                       onClick={() => setSelectedPackage(pkg)}
-                      className={`card-glass p-6 cursor-pointer transition-all hover:shadow-lg ${
+                      className={`card-glass p-3 cursor-pointer transition-all hover:shadow-lg ${
                         selectedPackage?.id === pkg.id
                           ? 'ring-2 ring-brand-primary bg-blue-50'
                           : ''
@@ -330,7 +330,7 @@ export default function CreditsPurchasePage() {
 
               {/* Payment & Checkout */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-6 sticky top-24">
+                <div className="card-glass p-3 sticky top-24">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">
                     Payment Method
                   </h2>
@@ -437,7 +437,7 @@ export default function CreditsPurchasePage() {
                 What You Can Do With Credits
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">🚀</span>

@@ -308,7 +308,7 @@ export default function NotificationsPage() {
             {loading ? (
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="card-glass p-6 animate-pulse">
+                  <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="flex items-start space-x-4">
                       <div className="w-4 h-4 bg-gray-200 rounded"></div>
                       <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
@@ -381,7 +381,7 @@ export default function NotificationsPage() {
                       !notification.isRead ? 'bg-blue-50' : ''
                     } hover:shadow-md transition-shadow`}
                   >
-                    <div className="p-6">
+                    <div className="p-3">
                       <div className="flex items-start space-x-4">
                         {/* Checkbox */}
                         <input

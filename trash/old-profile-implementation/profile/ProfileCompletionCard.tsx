@@ -41,7 +41,7 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
   };
 
   return (
-    <div className="card-glass p-6 border-l-4 border-[#6BC5F2]">
+    <div className="card-glass p-3 border-l-4 border-[#6BC5F2]">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">

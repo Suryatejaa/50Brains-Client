@@ -185,7 +185,7 @@ const moderationQueue = await apiClient.get('/api/admin/moderation/queue');
 ```typescript
 function CustomDashboardSection() {
   return (
-    <div className="card-glass p-6">
+    <div className="card-glass p-3">
       <h3 className="text-heading text-lg font-semibold mb-6">
         📈 Custom Section
       </h3>
@@ -278,7 +278,7 @@ function RealtimeDashboard() {
 // Using Chart.js or similar
 function PerformanceChart({ data }: { data: any }) {
   return (
-    <div className="card-glass p-6">
+    <div className="card-glass p-3">
       <h3 className="text-heading text-lg font-semibold mb-6">
         📈 Performance Analytics
       </h3>

@@ -142,9 +142,9 @@ export default function SocialMediaPage() {
           <div className="space-y-8">
             {/* Analytics Overview */}
             {analytics && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-6">📊 Analytics Overview</h2>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600">{analytics.totalFollowers.toLocaleString()}</div>
                     <div className="text-gray-600">Total Followers</div>
@@ -166,7 +166,7 @@ export default function SocialMediaPage() {
             )}
 
             {/* Connected Accounts */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-6">🔗 Connected Accounts</h2>
               
               {socialAccounts.length > 0 ? (
@@ -208,7 +208,7 @@ export default function SocialMediaPage() {
             </div>
 
             {/* Available Platforms */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-6">➕ Connect New Platform</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {platforms.map((platform) => {
@@ -240,7 +240,7 @@ export default function SocialMediaPage() {
             </div>
 
             {/* Help Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-2">💡 Why Connect Social Media?</h3>
               <ul className="text-blue-800 space-y-1">
                 <li>• Showcase your audience size and engagement to brands</li>

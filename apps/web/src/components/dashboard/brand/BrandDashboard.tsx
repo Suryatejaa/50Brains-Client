@@ -62,7 +62,7 @@ export const BrandDashboard: React.FC = () => {
       const [profileResponse, gigsResponse, walletResponse] =
         await Promise.allSettled([
           brandApiClient.getProfile(),
-          brandApiClient.getMyGigs({ limit: 5 }),
+          brandApiClient.getMyGigs(),
           brandApiClient.getWallet(),
         ]);
 
@@ -73,29 +73,29 @@ export const BrandDashboard: React.FC = () => {
         approved: 0,
         rejected: 0,
       };
-      console.log('Gigs Response:', gigsResponse);
+      // console.log('Gigs Response:', gigsResponse);
       if (
         gigsResponse.status === 'fulfilled' &&
-        gigsResponse.value.success &&
+        gigsResponse.value.success && 
         gigsResponse.value.data?.gigs
       ) {
         // Sum up applications from all gigs
         const gigs = gigsResponse.value.data.gigs;
-        console.log('Gigs array:', gigs);
+        // console.log('Gigs array:', gigs);
         console.log('First gig structure:', gigs[0]);
 
         applicationsStats.total = gigs.reduce((sum, gig) => {
-          // Handle both possible structures
+
           const appCount =
             gig._count?.applications ||
             gig.stats?.applicationsCount ||
             gig.applicationsCount ||
             0;
-          console.log(`Gig ${gig.id} applications:`, appCount);
+          // console.log(`Gig ${gig.id} applications:`, appCount);
           return sum + appCount;
         }, 0);
-        // Note: We'd need to fetch individual applications to get pending/approved/rejected counts
-        // For now, we'll estimate based on accepted vs total
+       
+        
         applicationsStats.approved = gigs.reduce((sum, gig) => {
           const acceptedCount = gig.acceptedCount || 0;
           return sum + acceptedCount;
@@ -108,7 +108,7 @@ export const BrandDashboard: React.FC = () => {
         profile:
           profileResponse.status === 'fulfilled' &&
           profileResponse.value.success
-            ? profileResponse.value.data || null
+            ? (profileResponse.value.data as any)?.user || null
             : null,
 
         gigsStats:
@@ -149,6 +149,13 @@ export const BrandDashboard: React.FC = () => {
           gigsResponse.value.success &&
           gigsResponse.value.data?.gigs
             ? gigsResponse.value.data.gigs
+                .sort((a, b) => {
+                  // Use updatedAt if available, fallback to createdAt
+                  const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+                  const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+                  return dateB - dateA; // Most recent first
+                })
+                .slice(0, 2) // Only show latest 3 gigs
             : [],
       };
 
@@ -219,7 +226,7 @@ export const BrandDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">⚠️</span>
@@ -237,7 +244,7 @@ export const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
       <div className="mx-auto max-w-7xl">
         <DashboardHeader
           title={`Welcome back, ${dashboardData.profile?.companyName || 'Brand'}`}
@@ -245,7 +252,7 @@ export const BrandDashboard: React.FC = () => {
         />
 
         {/* Key Metrics */}
-        <div className="mb-3 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
+        <div className="mb-2 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-3 lg:grid-cols-4">
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
@@ -280,11 +287,11 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="mb-3 grid grid-cols-1 gap-3 md:mb-6 md:gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:mb-4 md:gap-3 lg:grid-cols-3">
           {/* Profile Completion Widget */}
           <div className="lg:col-span-1">
-            <div className="card-glass p-6">
-              <h3 className="text-heading mb-4 text-lg font-semibold">
+            <div className="card-glass p-3">
+              <h3 className="text-heading text-lg font-semibold">
                 🏢 Company Overview
               </h3>
 
@@ -298,10 +305,10 @@ export const BrandDashboard: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <div className="text-heading font-semibold">
-                      {dashboardData.profile.companyName}
+                      {dashboardData.profile.companyName || `${dashboardData.profile.firstName} ${dashboardData.profile.lastName}`}
                     </div>
                     <div className="text-muted text-sm">
-                      {dashboardData.profile.industry}
+                      {dashboardData.profile.industry || 'Industry not specified'}
                     </div>
                   </div>
 
@@ -312,22 +319,38 @@ export const BrandDashboard: React.FC = () => {
                   )}
 
                   <div className="flex items-center space-x-4 text-sm">
-                    <span
-                      className={`flex items-center space-x-1 ${
-                        dashboardData.profile.isVerified
-                          ? 'text-green-600'
-                          : 'text-gray-500'
-                      }`}
-                    >
-                      <span>
-                        {dashboardData.profile.isVerified ? '✓' : '⚠'}
-                      </span>
-                      <span>
-                        {dashboardData.profile.isVerified
-                          ? 'Verified'
-                          : 'Unverified'}
-                      </span>
+                    <span className="flex items-center space-x-1">
+                      <span>📍</span>
+                      <span>{dashboardData.profile.location || 'Location not specified'}</span>
                     </span>
+                    {dashboardData.profile.website && (
+                      <span className="flex items-center space-x-1">
+                        <span>🌐</span>
+                        <a 
+                          href={dashboardData.profile.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Website
+                        </a>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-4 text-sm">
+                    <span className={`flex items-center space-x-1 ${
+                      dashboardData.profile.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                      <span>{dashboardData.profile.status === 'ACTIVE' ? '✓' : '⚠'}</span>
+                      <span>{dashboardData.profile.status === 'ACTIVE' ? 'Active' : 'Inactive'}</span>
+                    </span>
+                    {dashboardData.profile.emailVerified && (
+                      <span className="flex items-center space-x-1 text-blue-600">
+                        <span>✓</span>
+                        <span>Email Verified</span>
+                      </span>
+                    )}
                   </div>
 
                   {dashboardData.profile.analytics && (
@@ -368,34 +391,37 @@ export const BrandDashboard: React.FC = () => {
 
           {/* Recent Gigs */}
           <div className="lg:col-span-2">
-            <div className="card-glass p-6">
-              <div className="mb-4 flex items-center justify-between">
+            <div className="sm:mb-2 md:mb-2 mb-2 card-glass p-2">
+              <div className="flex items-center justify-between">
                 <h3 className="text-heading text-lg font-semibold">
                   📝 Recent Gigs
                 </h3>
-                <button
-                  onClick={() => (window.location.href = '/create-gig')}
-                  className="btn-primary text-sm"
-                >
-                  Create New
-                </button>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">Latest 3</span>
+                  <button
+                    onClick={() => (window.location.href = '/create-gig')}
+                    className="btn-primary text-sm"
+                  >
+                    Create New
+                  </button>
+                </div>
               </div>
 
               {loading ? (
-                <div className="animate-pulse space-y-4">
+                <div className="animate-pulse space-y-2">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="border-b border-gray-200 pb-4">
+                    <div key={i} className="border-b border-gray-200 pb-2">
                       <div className="mb-2 h-4 w-3/4 rounded bg-gray-300"></div>
                       <div className="h-3 w-1/2 rounded bg-gray-300"></div>
                     </div>
                   ))}
                 </div>
               ) : dashboardData.recentGigs.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {dashboardData.recentGigs.map((gig) => (
                     <div
                       key={gig.id}
-                      className="cursor-pointer rounded border-b border-gray-200 p-2 pb-4 last:border-b-0 hover:bg-gray-50"
+                      className="cursor-pointer rounded border-b border-gray-200 p-2 pb-2 last:border-b-0 hover:bg-gray-50"
                       onClick={() => (window.location.href = `/gig/${gig.id}`)}
                     >
                       <div className="flex items-start justify-between">
@@ -416,6 +442,9 @@ export const BrandDashboard: React.FC = () => {
                             </span>
                             <span>Applications: {gig.applicationsCount}</span>
                             <span>Views: {gig.viewsCount}</span>
+                            <span>
+                              Updated: {new Date(gig.updatedAt || gig.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                         <span
@@ -433,13 +462,13 @@ export const BrandDashboard: React.FC = () => {
                     </div>
                   ))}
 
-                  <div className="pt-4 text-center">
-                    <button
+                  <div className="text-right">
+                    <p
                       onClick={() => (window.location.href = '/my-gigs')}
-                      className="btn-secondary text-sm"
+                      className="text-sm cursor-pointer text-blue-600 hover:underline"
                     >
                       View All Gigs
-                    </button>
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -458,10 +487,12 @@ export const BrandDashboard: React.FC = () => {
           </div>
         </div>
 
+        <QuickActionsGrid actions={quickActions} title="Brand Tools" />
+
         {/* Performance and Applications Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mb-2 mt-2 grid grid-cols-1 gap-3 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
                 📊 Gig Performance
               </h3>
@@ -472,7 +503,7 @@ export const BrandDashboard: React.FC = () => {
                   <div className="h-32 rounded bg-gray-300"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
                       {dashboardData.gigsStats.completedGigs}
@@ -503,8 +534,8 @@ export const BrandDashboard: React.FC = () => {
           </div>
 
           {/* Recent Applications */}
-          <div className="card-glass p-6">
-            <h3 className="text-heading mb-6 text-lg font-semibold">
+          <div className="card-glass p-3">
+            <h3 className="text-heading mb-2 text-lg font-semibold">
               📨 Recent Applications
             </h3>
 
@@ -521,7 +552,7 @@ export const BrandDashboard: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {dashboardData.applications.total > 0 ? (
                   <>
                     <div className="grid grid-cols-3 gap-4 text-center">
@@ -547,17 +578,17 @@ export const BrandDashboard: React.FC = () => {
 
                     <div className="border-t pt-4">
                       <div className="text-center">
-                        <div className="text-heading mb-2 text-2xl font-bold">
+                        <div className="text-heading mb-2 text-2xl">
                           {dashboardData.applications.total}
                         </div>
-                        <div className="text-muted mb-4 text-sm">
+                        <div className="text-muted mb-2 text-sm">
                           Total Applications Received
                         </div>
                         <button
                           onClick={() =>
                             (window.location.href = '/applications')
                           }
-                          className="btn-primary w-full"
+                          className="btn-primary w-full font-medium"
                         >
                           Review Applications
                         </button>
@@ -565,7 +596,7 @@ export const BrandDashboard: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="py-8 text-center">
+                  <div className="py-2 text-center">
                     <span className="mb-2 block text-4xl">📨</span>
                     <p className="text-muted mb-4">
                       No applications received yet
@@ -584,8 +615,8 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Analytics & Budget */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="card-glass p-6">
+        <div className="mb-2 grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               📈 Gig Analytics
             </h3>
@@ -623,11 +654,11 @@ export const BrandDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-body">Company Rating</span>
+                  <span className="text-body">Company Status</span>
                   <span className="text-heading font-semibold">
-                    {dashboardData.profile?.isVerified
-                      ? 'Verified ✓'
-                      : 'Not Verified'}
+                    {dashboardData.profile?.status === 'ACTIVE'
+                      ? 'Active ✓'
+                      : 'Inactive'}
                   </span>
                 </div>
 
@@ -643,7 +674,7 @@ export const BrandDashboard: React.FC = () => {
             )}
           </div>
 
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               💰 Wallet Management
             </h3>
@@ -698,13 +729,13 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Performance Overview */}
-        <div className="mb-8">
-          <div className="card-glass p-6">
+        <div className="mb-2">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               📈 Performance Overview
             </h3>
 
-            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <div className="text-center">
                 <div className="text-heading text-2xl font-bold">
                   {dashboardData.gigsStats.completedGigs}
@@ -734,7 +765,7 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <QuickActionsGrid actions={quickActions} title="Brand Tools" />
+        {/* <QuickActionsGrid actions={quickActions} title="Brand Tools" /> */}
       </div>
     </div>
   );

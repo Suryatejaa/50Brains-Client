@@ -1168,7 +1168,7 @@ interface DesignSystemRules {
 const COMPONENT_PATTERNS = {
   // Glass Card Pattern
   card: `
-    <div className="bg-white/60 backdrop-blur-md border border-brand-border rounded-lg p-6
+    <div className="bg-white/60 backdrop-blur-md border border-brand-border rounded-lg p-3
                     hover:shadow-md hover:bg-brand-light-blue/20 transition-all duration-200">
       <h3 className="text-brand-text-main font-semibold mb-2">Card Title</h3>
       <p className="text-brand-text-muted">Card content with muted text</p>
@@ -1182,7 +1182,7 @@ const COMPONENT_PATTERNS = {
   // Modal Pattern
   modal: `
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm">
-      <div className="bg-white/90 backdrop-blur-md border border-brand-border rounded-xl p-6 m-4">
+      <div className="bg-white/90 backdrop-blur-md border border-brand-border rounded-xl p-3 m-4">
         Modal content with frosted glass effect
       </div>
     </div>
@@ -1214,7 +1214,7 @@ interface GigCardProps {
 
 export const GigCard: React.FC<GigCardProps> = ({ gig }) => {
   return (
-    <div className="group card-glass p-6 hover:bg-brand-light-blue/10 transition-all duration-300">
+    <div className="group card-glass p-3 hover:bg-brand-light-blue/10 transition-all duration-300">
       {/* Header with Badge */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -1284,7 +1284,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 
   return (
     <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="modal-content max-w-md w-full p-6 animate-slide-in">
+      <div className="modal-content max-w-md w-full p-3 animate-slide-in">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-heading text-xl font-semibold">{title}</h2>
@@ -1446,7 +1446,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
         className="bg-brand-glass border-brand-border fixed left-0 top-16 
                         h-[calc(100vh-4rem)] w-64 border-r backdrop-blur-md"
       >
-        <nav className="space-y-2 p-6">
+        <nav className="space-y-2 p-3">
           <a
             href="#"
             className="text-body hover:bg-brand-light-blue/30 flex items-center space-x-3 
@@ -1975,7 +1975,7 @@ class APIClient {
 // Compound Component Pattern for Complex UI
 export const GigCard = {
   Root: ({ children, gig }: { children: React.ReactNode; gig: Gig }) => (
-    <div className="bg-white rounded-lg shadow-md p-6">{children}</div>
+    <div className="bg-white rounded-lg shadow-md p-3">{children}</div>
   ),
   Header: ({ gig }: { gig: Gig }) => (
     <div className="flex justify-between items-start mb-4">

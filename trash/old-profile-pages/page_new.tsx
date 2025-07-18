@@ -238,7 +238,7 @@ export default function EnhancedProfilePage() {
   if (error && !profileData) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="mx-auto max-w-md p-6 text-center">
+        <div className="mx-auto max-w-md p-3 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
           <h2 className="mb-2 text-xl font-semibold text-gray-900">
             Failed to Load Profile

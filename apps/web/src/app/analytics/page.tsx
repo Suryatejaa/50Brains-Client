@@ -180,8 +180,8 @@ export default function AnalyticsPage() {
         ) : analytics ? (
           <div className="space-y-8">
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="card-glass p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Profile Views</p>
@@ -198,7 +198,7 @@ export default function AnalyticsPage() {
 
               {userType === 'creator' ? (
                 <>
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Applications</p>
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
 
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Followers</p>
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
 
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Earnings</p>
@@ -245,7 +245,7 @@ export default function AnalyticsPage() {
                 </>
               ) : (
                 <>
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
@@ -260,7 +260,7 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
 
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Total Spent</p>
@@ -275,7 +275,7 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
 
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Success Rate</p>
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
             {userType === 'creator' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Social Media Performance */}
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">📱 Social Media Performance</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Application Success */}
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">📈 Application Success</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
@@ -357,7 +357,7 @@ export default function AnalyticsPage() {
             {userType === 'brand' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Campaign Performance */}
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">📊 Campaign Performance</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
@@ -379,7 +379,7 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* ROI Analysis */}
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">💹 ROI Analysis</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
@@ -406,7 +406,7 @@ export default function AnalyticsPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {userType === 'creator' ? (

@@ -288,8 +288,8 @@ export default function EquipmentPage() {
 
             {/* Stats Cards */}
             {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-                <div className="card-glass p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 mb-8">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <span className="text-xl">📦</span>
@@ -303,7 +303,7 @@ export default function EquipmentPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-green-100 rounded-lg">
                       <span className="text-xl">💰</span>
@@ -317,7 +317,7 @@ export default function EquipmentPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-emerald-100 rounded-lg">
                       <span className="text-xl">✅</span>
@@ -331,7 +331,7 @@ export default function EquipmentPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-purple-100 rounded-lg">
                       <span className="text-xl">📂</span>
@@ -345,7 +345,7 @@ export default function EquipmentPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-orange-100 rounded-lg">
                       <span className="text-xl">📅</span>
@@ -359,7 +359,7 @@ export default function EquipmentPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center">
                     <div className="p-2 bg-red-100 rounded-lg">
                       <span className="text-xl">🔧</span>
@@ -427,9 +427,9 @@ export default function EquipmentPage() {
 
             {/* Equipment Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="card-glass p-6 animate-pulse">
+                  <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -462,9 +462,9 @@ export default function EquipmentPage() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredEquipment.map((item) => (
-                  <div key={item.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                  <div key={item.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                     {/* Equipment Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
@@ -580,7 +580,7 @@ export default function EquipmentPage() {
             {/* Add/Edit Equipment Modal */}
             {showAddModal && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="bg-white rounded-lg p-3 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-900">
                       {editingItem ? 'Edit Equipment' : 'Add New Equipment'}
@@ -801,7 +801,7 @@ export default function EquipmentPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link href={"/my-bids" as any} className="btn-secondary text-center">

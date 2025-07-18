@@ -4,23 +4,60 @@ import { apiClient } from './api-client';
 export interface BrandProfile {
   id: string;
   email: string;
-  roles: string;
+  roles: string[];
   firstName: string;
   lastName: string;
-  companyName: string;
-  industry: string;
-  companyType: string;
+  username: string;
+  companyName?: string;
+  industry?: string;
+  companyType?: string;
+  companyWebsite?: string;
   website?: string;
   bio?: string;
   location?: string;
   targetAudience?: string[];
-  profileViews: number;
-  isVerified: boolean;
+  profileViews?: number;
+  profilePicture?: string;
+  coverImage?: string;
+  phone?: string;
+  isActive: boolean;
+  isBanned: boolean;
+  status: string;
+  emailVerified: boolean;
+  twoFactorEnabled: boolean;
+  primaryPlatform?: string;
+  instagramHandle?: string;
+  youtubeHandle?: string;
+  twitterHandle?: string;
+  linkedinHandle?: string;
+  primaryNiche?: string;
+  contentCategories?: string[];
+  specializations?: string[];
+  crewSkills?: string[];
+  experienceLevel?: string;
+  hourlyRate?: number;
+  workStyle?: string;
+  availability?: string;
+  designationTitle?: string;
+  portfolioUrl?: string;
+  equipmentOwned?: string[];
+  estimatedFollowers?: number;
+  marketingBudget?: string;
+  campaignTypes?: string[];
+  gstNumber?: string;
   analytics?: {
     profileScore: number;
     completionPercentage: number;
   };
   createdAt: string;
+  updatedAt: string;
+  lastActiveAt: string;
+  lastLoginAt?: string;
+  emailVerifiedAt?: string;
+  bannedAt?: string;
+  bannedBy?: string;
+  banReason?: string;
+  banExpiresAt?: string;
 }
 
 export interface BrandGig {
@@ -56,6 +93,7 @@ export interface BrandGig {
   acceptedCount: number;
   viewsCount: number;
   createdAt: string;
+  updatedAt?: string; // Optional since it might not always be present
 }
 
 export interface GigApplication {
@@ -159,6 +197,7 @@ class BrandApiClient {
         error?: string;
       };
     } catch (error) {
+      console.error('Failed to fetch profile:', error);
       return { success: false, error: 'Failed to fetch profile' };
     }
   }
@@ -217,7 +256,7 @@ class BrandApiClient {
       const response = await apiClient.get(
         `/api/gig/my-posted?${queryParams.toString()}`
       );
-      console.log(response);
+      // console.log(response);
       return response as {
         success: boolean;
         data?: {

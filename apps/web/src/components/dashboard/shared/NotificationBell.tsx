@@ -163,7 +163,7 @@ export const NotificationBell: React.FC = () => {
                 </p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-6 text-center">
+              <div className="p-3 text-center">
                 <span className="text-4xl">📭</span>
                 <p className="text-muted mt-2">No notifications yet</p>
               </div>

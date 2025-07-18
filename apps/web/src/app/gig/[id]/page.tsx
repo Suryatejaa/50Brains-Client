@@ -424,7 +424,7 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Description */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-4">📝 Description</h2>
               <div className="prose max-w-none">
                 <p className="text-gray-700 whitespace-pre-wrap">{gig.description}</p>
@@ -432,7 +432,7 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Requirements */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-4">✅ Requirements</h2>
               
               {/* General Requirements */}
@@ -518,7 +518,7 @@ export default function GigDetailsPage() {
 
             {/* Deliverables */}
             {gig.deliverables && gig.deliverables.length > 0 && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-4">🎯 Deliverables</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                   {gig.deliverables.map((deliverable, index) => (
@@ -532,7 +532,7 @@ export default function GigDetailsPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Application Status */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">Application Status</h3>
               
               {!isAuthenticated ? (
@@ -582,7 +582,7 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Brand Info */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">About the Brand</h3>
               <div className="flex items-center space-x-3 mb-4">
                 {gig.brand?.logo && (
@@ -608,7 +608,7 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Similar Gigs */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">Similar Gigs</h3>
               <div className="space-y-3">
                 <Link href="/marketplace" className="block p-3 border rounded hover:bg-gray-50">

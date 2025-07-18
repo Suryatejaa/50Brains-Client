@@ -192,7 +192,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                 <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   <div className="lg:col-span-2">
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
                       <div className="space-y-2">
                         <div className="h-4 bg-gray-200 rounded w-full"></div>
@@ -202,7 +202,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                     </div>
                   </div>
                   <div className="lg:col-span-1">
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
                       <div className="space-y-4">
                         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -264,7 +264,7 @@ export default function ClanDetailPage({ params }: PageProps) {
             </nav>
 
             {/* Header */}
-            <div className="card-glass p-6 mb-8">
+            <div className="card-glass p-3 mb-8">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
@@ -400,7 +400,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
                     {/* About */}
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">About This Clan</h3>
                       <p className="text-gray-700 whitespace-pre-line">
                         {clan.longDescription || clan.description}
@@ -408,7 +408,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                     </div>
 
                     {/* Skills */}
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills & Expertise</h3>
                       <div className="flex flex-wrap gap-2">
                         {clan.skills.map((skill) => (
@@ -420,7 +420,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                     </div>
 
                     {/* Recent Projects */}
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Projects</h3>
                       {clan.recentProjects.length === 0 ? (
                         <p className="text-gray-600">No recent projects</p>
@@ -466,7 +466,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                 )}
 
                 {activeTab === 'members' && (
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Members</h3>
                     <div className="space-y-4">
                       {clan.members.map((member) => (
@@ -536,7 +536,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                 )}
 
                 {activeTab === 'projects' && (
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">All Projects</h3>
                     {clan.recentProjects.length === 0 ? (
                       <div className="text-center py-8">
@@ -626,7 +626,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                 )}
 
                 {activeTab === 'requirements' && (
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Joining Requirements</h3>
                     {clan.requirements.length === 0 ? (
                       <p className="text-gray-600">No specific requirements</p>
@@ -648,7 +648,7 @@ export default function ClanDetailPage({ params }: PageProps) {
               <div className="lg:col-span-1">
                 <div className="space-y-6">
                   {/* Clan Leader */}
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Leader</h3>
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-semibold">
@@ -676,7 +676,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="card-glass p-6">
+                  <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -707,7 +707,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                   {clan.userMembership?.status === 'member' && 
                    (clan.owner.id === user?.id || clan.members.find(m => m.id === user?.id)?.isAdmin) && 
                    clan.joinRequests && clan.joinRequests > 0 && (
-                    <div className="card-glass p-6">
+                    <div className="card-glass p-3">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Pending Requests</h3>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-brand-primary mb-2">

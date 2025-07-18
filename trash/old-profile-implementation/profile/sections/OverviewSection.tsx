@@ -14,7 +14,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
   return (
     <div className="space-y-6">
       {/* Bio Section */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
+      <div className="rounded-xl border bg-white p-3 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-gray-900">About</h3>
         {isEditing ? (
           <textarea
@@ -32,7 +32,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
       </div>
 
       {/* Skills Section */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
+      <div className="rounded-xl border bg-white p-3 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-gray-900">
           Skills & Expertise
         </h3>
@@ -101,7 +101,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
       />
 
       {/* Contact Information */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
+      <div className="rounded-xl border bg-white p-3 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-gray-900">
           Contact Information
         </h3>

@@ -21,7 +21,7 @@ export const DashboardRouter: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="card-glass p-3 text-center md:p-6">
+        <div className="card-glass p-3 text-center md:p-3">
           <div className="border-brand-primary mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent md:mb-4 md:h-8 md:w-8"></div>
           <p className="text-muted text-sm md:text-base">
             Loading your dashboard...
@@ -142,7 +142,7 @@ export const DashboardRouter: React.FC = () => {
 
       // Default user dashboard (basic functionality)
       return (
-        <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+        <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
           {/* <RoleSwitchDebugger /> */}
           {showRoleDebugInfo && (
             <div className="mb-2 rounded-md border border-yellow-300 bg-yellow-100 px-2 py-1 text-sm text-yellow-800 md:mb-4 md:px-4 md:py-2">
@@ -151,7 +151,7 @@ export const DashboardRouter: React.FC = () => {
             </div>
           )}
           <div className="mx-auto max-w-7xl">
-            <div className="card-glass p-3 text-center md:p-6">
+            <div className="card-glass p-3 text-center md:p-3">
               <span className="mb-2 block text-3xl md:mb-4 md:text-4xl">
                 👋
               </span>

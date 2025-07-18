@@ -80,7 +80,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
 
   return (
     <div
-      className={`reputation-display rounded-lg border border-gray-200 bg-white p-6 ${className}`}
+      className={`reputation-display rounded-lg border border-gray-200 bg-white p-3 ${className}`}
     >
       {/* Header - Tier and Score */}
       <div className="mb-4 flex items-center justify-between">

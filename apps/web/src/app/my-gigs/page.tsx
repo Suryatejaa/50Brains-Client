@@ -320,7 +320,7 @@ export default function MyGigsPage() {
                         </Link>
                         <span> | </span>
                         <Link
-                          href={`/gig/${gig.id}/applications` as any}
+                          href={`/gig/${gig.id}/applications`}
                           className="btn-primary-sm"
                         >
                           Applications ({gig._count.applications})

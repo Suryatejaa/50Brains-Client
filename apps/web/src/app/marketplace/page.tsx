@@ -131,7 +131,7 @@ export default function MarketplacePage() {
           <div className="mb-8">
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="mb-4">
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="grid gap-4 md:grid-cols-4">
                   {/* Search */}
                   <div className="md:col-span-2">
@@ -183,7 +183,7 @@ export default function MarketplacePage() {
 
             {/* Advanced Filters Panel */}
             {showFilters && (
-              <div className="card-glass mb-4 p-6">
+              <div className="card-glass mb-4 p-3">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-heading text-lg font-semibold">
                     Advanced Filters
@@ -365,12 +365,12 @@ export default function MarketplacePage() {
 
           {/* Gigs Grid */}
           {!loading && gigs.length > 0 && (
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 lg:grid-cols-2">
               {gigs.map((gig, index) => (
                 <Link
                   key={gig.id}
                   href={`/gig/${gig.id}` as any}
-                  className={`card-glass group block p-6 transition-all duration-200 hover:shadow-lg ${
+                  className={`card-glass group block p-3 transition-all duration-200 hover:shadow-lg ${
                     index === 0 && activeTab === 'featured'
                       ? 'border-brand-primary/30 bg-brand-light-blue/5 border-2 lg:col-span-2'
                       : ''
@@ -405,7 +405,7 @@ export default function MarketplacePage() {
                   </div>
 
                   <div
-                    className={`grid gap-6 ${index === 0 && activeTab === 'featured' ? 'md:grid-cols-3' : ''}`}
+                    className={`grid gap-3 ${index === 0 && activeTab === 'featured' ? 'md:grid-cols-3' : ''}`}
                   >
                     <div
                       className={

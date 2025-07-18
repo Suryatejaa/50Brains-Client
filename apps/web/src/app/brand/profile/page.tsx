@@ -203,7 +203,7 @@ export default function BrandProfilePage() {
           {/* Main Profile */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-4">🏢 Basic Information</h2>
               
               {!isEditing ? (
@@ -365,7 +365,7 @@ export default function BrandProfilePage() {
             </div>
 
             {/* Social Media */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">📱 Social Media</h2>
                 {isEditing && (
@@ -454,7 +454,7 @@ export default function BrandProfilePage() {
           <div className="space-y-6">
             {/* Profile Statistics */}
             {profile?.stats && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h3 className="text-lg font-semibold mb-4">📊 Profile Statistics</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -489,7 +489,7 @@ export default function BrandProfilePage() {
             )}
 
             {/* Profile Status */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">✅ Profile Status</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -516,7 +516,7 @@ export default function BrandProfilePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">🚀 Quick Actions</h3>
               <div className="space-y-3">
                 <Link href="/create-gig" className="btn-secondary w-full text-center">

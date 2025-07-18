@@ -235,8 +235,8 @@ export default function ReceivedApplicationsPage() {
           <div className="space-y-8">
             {/* Statistics */}
             {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <div className="card-glass p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Applications</p>
@@ -248,7 +248,7 @@ export default function ReceivedApplicationsPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Pending Review</p>
@@ -260,7 +260,7 @@ export default function ReceivedApplicationsPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Accepted</p>
@@ -272,7 +272,7 @@ export default function ReceivedApplicationsPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Avg Quality Score</p>
@@ -286,7 +286,7 @@ export default function ReceivedApplicationsPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Avg Response Time</p>
@@ -301,7 +301,7 @@ export default function ReceivedApplicationsPage() {
             )}
 
             {/* Applications List */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-6">📋 Applications</h2>
 
               {applications.length > 0 ? (
@@ -309,7 +309,7 @@ export default function ReceivedApplicationsPage() {
                   {applications.map((application) => (
                     <div
                       key={application.id}
-                      className={`border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors cursor-pointer ${
+                      className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer ${
                         selectedApplication === application.id ? 'border-blue-500 bg-blue-50' : ''
                       }`}
                       onClick={() => setSelectedApplication(selectedApplication === application.id ? null : application.id)}

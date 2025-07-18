@@ -42,7 +42,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       onClick={handleClick}
       disabled={disabled}
       className={`
-        dashboard-card-padding group flex flex-col items-center rounded-lg border transition-all duration-200
+        dashboard-card-padding group flex flex-col items-center border transition-all duration-200
         ${
           disabled
             ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-50'

@@ -25,7 +25,7 @@ export default function ClansPage() {
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {/* Active Clan */}
-              <div className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-6">
+              <div className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-3">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
@@ -57,7 +57,7 @@ export default function ClansPage() {
               </div>
 
               {/* Member Clan */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="bg-brand-light-blue/20 flex h-12 w-12 items-center justify-center rounded-lg">
@@ -87,7 +87,7 @@ export default function ClansPage() {
               </div>
 
               {/* Create New Clan Card */}
-              <div className="card-glass border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/5 cursor-pointer border-2 border-dashed p-6 transition-all duration-200">
+              <div className="card-glass border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/5 cursor-pointer border-2 border-dashed p-3 transition-all duration-200">
                 <div className="text-center">
                   <div className="bg-brand-light-blue/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
                     <span className="text-xl">➕</span>
@@ -129,11 +129,11 @@ export default function ClansPage() {
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 lg:grid-cols-2">
               {[1, 2, 3, 4, 5, 6].map((clan) => (
                 <div
                   key={clan}
-                  className="card-glass hover:bg-brand-light-blue/5 p-6 transition-all duration-200"
+                  className="card-glass hover:bg-brand-light-blue/5 p-3 transition-all duration-200"
                 >
                   <div className="mb-4 flex items-start space-x-4">
                     <div className="from-brand-primary/20 to-brand-light-blue/20 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br">
@@ -251,7 +251,7 @@ export default function ClansPage() {
               Collaborate with talented creators, share resources, and take on
               bigger projects together
             </p>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-3">
               {[
                 {
                   icon: '🤝',

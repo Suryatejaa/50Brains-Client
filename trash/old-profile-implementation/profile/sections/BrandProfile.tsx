@@ -8,7 +8,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
   onUpdate,
 }) => {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-xl border bg-white p-3 shadow-sm">
       <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
         <Briefcase className="mr-2 h-5 w-5 text-blue-500" />
         Brand Profile

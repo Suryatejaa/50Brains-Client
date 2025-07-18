@@ -185,7 +185,7 @@ export default function ClansBrowsePage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Filters Sidebar */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-6 sticky top-24">
+                <div className="card-glass p-3 sticky top-24">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Filter Clans
                   </h3>
@@ -346,9 +346,9 @@ export default function ClansBrowsePage() {
 
                 {/* Clans Grid */}
                 {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="card-glass p-6 animate-pulse">
+                      <div key={i} className="card-glass p-3 animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                         <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
                         <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -394,9 +394,9 @@ export default function ClansBrowsePage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {clans.map((clan) => (
-                      <div key={clan.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                      <div key={clan.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                         {/* Header */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">

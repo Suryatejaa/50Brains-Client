@@ -304,7 +304,7 @@ export default function CreateGigPage() {
             {/* Main Form */}
             <div className="space-y-8 lg:col-span-2">
               {/* Basic Information */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Basic Information
                 </h2>
@@ -449,7 +449,7 @@ export default function CreateGigPage() {
               </div>
 
               {/* Requirements */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Requirements
                 </h2>
@@ -722,7 +722,7 @@ export default function CreateGigPage() {
               </div>
 
               {/* Budget & Timeline */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Budget & Timeline
                 </h2>
@@ -939,7 +939,7 @@ export default function CreateGigPage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Preview */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h3 className="text-heading mb-4 text-lg font-semibold">
                   Preview
                 </h3>
@@ -1000,7 +1000,7 @@ export default function CreateGigPage() {
               </div>
 
               {/* Tips */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h3 className="text-heading mb-4 text-lg font-semibold">
                   💡 Tips for Success
                 </h3>

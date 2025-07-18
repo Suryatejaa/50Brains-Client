@@ -40,7 +40,7 @@ export default function AuthTestPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow p-3">
         <h1 className="text-2xl font-bold mb-6 text-center">Auth Test Page</h1>
         
         <div className="mb-6 p-4 bg-gray-100 rounded">

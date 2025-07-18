@@ -147,7 +147,7 @@ export default function InfluencersPage() {
             </div>
 
             {/* Search and Filters */}
-            <div className="mb-8 card-glass p-6">
+            <div className="mb-8 card-glass p-3">
               <form onSubmit={handleSearch} className="space-y-4">
                 <div className="flex gap-4">
                   <input
@@ -257,9 +257,9 @@ export default function InfluencersPage() {
 
             {/* Influencers Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Array.from({ length: 6 }, (_, i) => (
-                  <div key={i} className="card-glass p-6 animate-pulse">
+                  <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="flex items-center space-x-4 mb-4">
                       <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
                       <div className="flex-1">
@@ -296,9 +296,9 @@ export default function InfluencersPage() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {influencers.map((influencer) => (
-                  <div key={influencer.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                  <div key={influencer.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                     {/* Header */}
                     <div className="flex items-start space-x-4 mb-4">
                       <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">

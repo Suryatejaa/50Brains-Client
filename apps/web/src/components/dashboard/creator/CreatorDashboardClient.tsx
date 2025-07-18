@@ -192,7 +192,7 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">⚠️</span>

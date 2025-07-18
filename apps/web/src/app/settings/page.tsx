@@ -242,13 +242,13 @@ export default function SettingsPage() {
 
               {/* Content */}
               <div className="lg:w-3/4">
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   {/* General Settings */}
                   {activeTab === 'general' && (
                     <div className="space-y-6">
                       <h2 className="text-xl font-semibold text-gray-900">General Preferences</h2>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Language

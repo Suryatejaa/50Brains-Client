@@ -117,7 +117,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-lg">
+      <div className="rounded-lg bg-white p-3 shadow-lg">
         <div className="text-center">
           <span className="mb-4 block text-4xl">⚠️</span>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
@@ -252,7 +252,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
         ) : (
           <div className="divide-y">
             {filteredGigs.map((gig) => (
-              <div key={gig.id} className="p-6 hover:bg-gray-50">
+              <div key={gig.id} className="p-3 hover:bg-gray-50">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex items-center space-x-3">

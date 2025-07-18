@@ -153,12 +153,12 @@ export default function ProfileEditPage() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Information */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Basic Information
                 </h2>
                 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
                       First Name *
@@ -218,12 +218,12 @@ export default function ProfileEditPage() {
               </div>
 
               {/* Social Links */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Social Media & Website
                 </h2>
                 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
                       Website
@@ -297,7 +297,7 @@ export default function ProfileEditPage() {
               </div>
 
               {/* Skills */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-heading mb-6 text-xl font-semibold">
                   Skills & Expertise
                 </h2>

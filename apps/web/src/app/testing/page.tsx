@@ -128,8 +128,8 @@ export default function TestingPage() {
             </div>
 
             {/* Implementation Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="card-glass p-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Pages</p>
@@ -139,7 +139,7 @@ export default function TestingPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">High Priority</p>
@@ -150,7 +150,7 @@ export default function TestingPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Medium Priority</p>
@@ -161,7 +161,7 @@ export default function TestingPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Categories</p>
@@ -175,8 +175,8 @@ export default function TestingPage() {
 
             {/* Test Results Summary */}
             {testResults.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="card-glass p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Passed Tests</p>
@@ -186,7 +186,7 @@ export default function TestingPage() {
                   </div>
                 </div>
                 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Failed Tests</p>
@@ -196,7 +196,7 @@ export default function TestingPage() {
                   </div>
                 </div>
                 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Avg Load Time</p>
@@ -211,7 +211,7 @@ export default function TestingPage() {
             )}
 
             {/* Controls */}
-            <div className="card-glass p-6 mb-8">
+            <div className="card-glass p-3 mb-8">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                 <div className="flex flex-wrap gap-4">
                   {/* Category Filter */}
@@ -255,7 +255,7 @@ export default function TestingPage() {
             {/* Pages List */}
             <div className="space-y-6">
               {/* Implementation Status */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   📋 Implementation Status ({filteredPages.length} pages)
                 </h2>
@@ -307,7 +307,7 @@ export default function TestingPage() {
               </div>
 
               {/* Implementation Progress */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   📈 Implementation Progress
                 </h2>
@@ -346,12 +346,12 @@ export default function TestingPage() {
               </div>
 
               {/* Next Steps */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   🎯 Next Steps & Optimization
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">🔧 Performance Optimization</h3>
                     <ul className="space-y-2 text-sm text-gray-600">

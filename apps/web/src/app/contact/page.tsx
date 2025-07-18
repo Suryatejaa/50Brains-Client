@@ -168,7 +168,7 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Contact Information */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-6 mb-6">
+                <div className="card-glass p-3 mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Get in Touch
                   </h3>
@@ -207,7 +207,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Quick Links */}
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Quick Help
                   </h3>

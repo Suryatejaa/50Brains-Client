@@ -73,20 +73,20 @@ export function Features() {
         </div>
 
         {/* 🔮 Additional Feature Highlights */}
-        <div className="mt-20 grid gap-6 md:grid-cols-3">
-          <div className="card-soft p-6 text-center">
+        <div className="mt-20 grid gap-3 md:grid-cols-3">
+          <div className="card-soft p-3 text-center">
             <div className="text-brand-primary mb-2 text-2xl font-bold">
               50K+
             </div>
             <div className="text-muted text-sm">Active Creators</div>
           </div>
-          <div className="card-soft p-6 text-center">
+          <div className="card-soft p-3 text-center">
             <div className="text-brand-primary mb-2 text-2xl font-bold">
               $10M+
             </div>
             <div className="text-muted text-sm">Creator Earnings</div>
           </div>
-          <div className="card-soft p-6 text-center">
+          <div className="card-soft p-3 text-center">
             <div className="text-brand-primary mb-2 text-2xl font-bold">
               99.9%
             </div>

@@ -225,8 +225,8 @@ export default function ApplicationsPage() {
             ) : (
               <div className="space-y-4">
                 {filteredApplications.map((application) => (
-                  <div key={application.id} className="card-glass p-6">
-                    <div className="flex flex-col lg:flex-row gap-6">
+                  <div key={application.id} className="card-glass p-3">
+                    <div className="flex flex-col lg:flex-row gap-3">
                       {/* Applicant Info */}
                       <div className="flex items-start space-x-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">

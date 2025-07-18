@@ -277,10 +277,10 @@ export function GigsTab({ userRole }: GigsTabProps) {
             ) : (
               <div className="space-y-4">
                 {myPostedGigs.map((gig) => (
-                  <div key={gig.id} className="card-glass p-6">
+                  <div key={gig.id} className="card-glass p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="mb-2 flex items-center space-x-2">
+                        <div className="mb-2 flex items-center space-x-1">
                           <h4 className="text-lg font-semibold">{gig.title}</h4>
                           <span
                             className={`rounded px-2 py-1 text-xs font-medium ${getStatusColor(gig.status)}`}
@@ -354,7 +354,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
                 {myDraftGigs.map((gig) => (
                   <div
                     key={gig.id}
-                    className="card-glass border-l-4 border-yellow-400 p-6"
+                    className="card-glass border-l-4 border-yellow-400 p-3"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -424,7 +424,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
               ) : (
                 <div className="space-y-4">
                   {myApplications.map((application) => (
-                    <div key={application.id} className="card-glass p-6">
+                    <div key={application.id} className="card-glass p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="mb-2 flex items-center space-x-2">
@@ -497,7 +497,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
                 {myActiveGigs.map((gig) => (
                   <div
                     key={gig.id}
-                    className="card-glass border-l-4 border-blue-400 p-6"
+                    className="card-glass border-l-4 border-blue-400 p-3"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -551,7 +551,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
                 {myCompletedGigs.map((gig) => (
                   <div
                     key={gig.id}
-                    className="card-glass border-l-4 border-green-400 p-6"
+                    className="card-glass border-l-4 border-green-400 p-3"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

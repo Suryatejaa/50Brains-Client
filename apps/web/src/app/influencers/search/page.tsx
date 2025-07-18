@@ -197,7 +197,7 @@ export default function InfluencersSearchPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <div className="lg:w-80">
-            <div className="card-glass p-6 sticky top-8">
+            <div className="card-glass p-3 sticky top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Filters</h2>
                 <button 
@@ -367,9 +367,9 @@ export default function InfluencersSearchPage() {
 
             {/* Results */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="card-glass p-6 animate-pulse">
+                  <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4"></div>
                     <div className="h-4 bg-gray-300 rounded mb-2"></div>
                     <div className="h-3 bg-gray-300 rounded mb-4"></div>
@@ -392,9 +392,9 @@ export default function InfluencersSearchPage() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {creators.map((creator) => (
-                  <div key={creator.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                  <div key={creator.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                     {/* Creator Header */}
                     <div className="text-center mb-4">
                       <div className="relative inline-block">

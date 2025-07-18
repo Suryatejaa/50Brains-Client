@@ -11,9 +11,9 @@ export const InfluencerDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
         <div className="flex min-h-screen items-center justify-center">
-          <div className="card-glass p-3 text-center md:p-6">
+          <div className="card-glass p-3 text-center md:p-3">
             <div className="border-brand-primary mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent md:mb-4 md:h-8 md:w-8"></div>
             <p className="text-muted text-sm md:text-base">
               Loading your influencer dashboard...
@@ -26,9 +26,9 @@ export const InfluencerDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+      <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
         <div className="mx-auto max-w-7xl">
-          <div className="card-glass p-3 text-center md:p-6">
+          <div className="card-glass p-3 text-center md:p-3">
             <div className="mb-2 text-3xl md:mb-4 md:text-4xl">⚠️</div>
             <h2 className="text-heading mb-1 text-lg font-semibold md:mb-2 md:text-xl">
               Dashboard Error
@@ -49,7 +49,7 @@ export const InfluencerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-6">
+    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-4 md:mb-6">
@@ -153,7 +153,7 @@ export const InfluencerDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:gap-3 lg:grid-cols-3">
           {/* Left Column - Content & Campaigns */}
           <div className="space-y-4 md:space-y-6 lg:col-span-2">
             {/* Content Performance */}

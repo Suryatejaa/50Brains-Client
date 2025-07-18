@@ -71,7 +71,7 @@ const ReputationCard: React.FC<ReputationCardProps> = ({
         reputation-card 
         ${tierStyle.bg} 
         ${tierStyle.border} 
-        rounded-xl border p-6 
+        rounded-xl border p-3 
         ${hasInteraction ? 'cursor-pointer transition-shadow hover:shadow-md' : ''}
         ${className}
       `}

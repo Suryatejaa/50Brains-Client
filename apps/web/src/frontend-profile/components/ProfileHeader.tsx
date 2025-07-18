@@ -93,7 +93,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* Profile Content */}
       <div className="profile-header__content">
-        <div className="profile-header__main flex flex-col gap-6 lg:flex-row">
+        <div className="profile-header__main flex flex-col gap-3 lg:flex-row">
           {/* Profile Picture */}
           <div className="profile-header__avatar flex-shrink-0 lg:order-1">
             {isEditing ? (

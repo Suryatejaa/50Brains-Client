@@ -204,7 +204,7 @@ export const CreditsManagement: React.FC = () => {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-lg">
+      <div className="rounded-lg bg-white p-3 shadow-lg">
         <div className="text-center">
           <span className="mb-4 block text-4xl">⚠️</span>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
@@ -230,8 +230,8 @@ export const CreditsManagement: React.FC = () => {
       </div>
 
       {/* Wallet Overview */}
-      <div className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 p-3 text-white">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="text-center">
             <div className="text-3xl font-bold">
               {loading ? '...' : `₹${wallet?.balance.toLocaleString() || 0}`}
@@ -281,12 +281,12 @@ export const CreditsManagement: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
+      <div className="rounded-lg border bg-white p-3 shadow-sm">
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Wallet Overview</h3>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-4">
                 <h4 className="font-medium text-gray-900">Quick Actions</h4>
                 <div className="space-y-2">
@@ -330,7 +330,7 @@ export const CreditsManagement: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Purchase Credits</h3>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -404,7 +404,7 @@ export const CreditsManagement: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Boost Your Campaigns</h3>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {BOOST_OPTIONS.map((boost) => (
                 <div
                   key={boost.id}

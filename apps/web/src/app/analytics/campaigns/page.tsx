@@ -196,8 +196,8 @@ export default function CampaignAnalyticsPage() {
           <div className="space-y-8">
             {/* Summary Statistics */}
             {summary && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="card-glass p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
@@ -212,7 +212,7 @@ export default function CampaignAnalyticsPage() {
                   </p>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Spent</p>
@@ -227,7 +227,7 @@ export default function CampaignAnalyticsPage() {
                   </p>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Applications</p>
@@ -242,7 +242,7 @@ export default function CampaignAnalyticsPage() {
                   </p>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Average ROI</p>
@@ -260,7 +260,7 @@ export default function CampaignAnalyticsPage() {
             )}
 
             {/* Campaign List */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">📊 Campaign Performance</h2>
                 <Link href="/create-gig" className="btn-primary">
@@ -273,7 +273,7 @@ export default function CampaignAnalyticsPage() {
                   {campaigns.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className={`border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors cursor-pointer ${
+                      className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer ${
                         selectedCampaign === campaign.id ? 'border-blue-500 bg-blue-50' : ''
                       }`}
                       onClick={() => setSelectedCampaign(selectedCampaign === campaign.id ? null : campaign.id)}
@@ -440,9 +440,9 @@ export default function CampaignAnalyticsPage() {
 
             {/* Performance Insights */}
             {campaigns.length > 0 && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-4">💡 Performance Insights</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h3 className="font-semibold text-blue-900 mb-2">🎯 Top Performing Campaign</h3>
                     <p className="text-sm text-blue-800">

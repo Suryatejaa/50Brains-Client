@@ -195,7 +195,7 @@ const MARKETING_BUDGETS = [
 // Enhanced Analytics Component
 const ProfileAnalytics = ({ analytics }: { analytics: UserAnalytics }) => {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-xl border bg-white p-3 shadow-sm">
       <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
         <BarChart3 className="mr-2 h-5 w-5 text-blue-500" />
         Profile Analytics
@@ -774,7 +774,7 @@ export default function EnhancedProfilePage() {
             {/* Left Column - Main Content */}
             <div className="space-y-6 lg:col-span-2">
               {/* Bio Section */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   About
                 </h3>
@@ -794,7 +794,7 @@ export default function EnhancedProfilePage() {
               </div>
 
               {/* Skills Section */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Skills & Expertise
                 </h3>
@@ -853,7 +853,7 @@ export default function EnhancedProfilePage() {
 
               {/* Role-Based Sections */}
               {userRoles.includes(UserRole.INFLUENCER) && (
-                <div className="rounded-xl border bg-white p-6 shadow-sm">
+                <div className="rounded-xl border bg-white p-3 shadow-sm">
                   <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
                     <TrendingUp className="mr-2 h-5 w-5 text-purple-500" />
                     Influencer Profile
@@ -1044,7 +1044,7 @@ export default function EnhancedProfilePage() {
               )}
 
               {userRoles.includes(UserRole.BRAND) && (
-                <div className="rounded-xl border bg-white p-6 shadow-sm">
+                <div className="rounded-xl border bg-white p-3 shadow-sm">
                   <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
                     <Building className="mr-2 h-5 w-5 text-blue-500" />
                     Brand Profile
@@ -1157,7 +1157,7 @@ export default function EnhancedProfilePage() {
               )}
 
               {userRoles.includes(UserRole.CREW) && (
-                <div className="rounded-xl border bg-white p-6 shadow-sm">
+                <div className="rounded-xl border bg-white p-3 shadow-sm">
                   <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
                     <Users2 className="mr-2 h-5 w-5 text-green-500" />
                     Crew Profile
@@ -1299,7 +1299,7 @@ export default function EnhancedProfilePage() {
               )}
 
               {/* Contact Information */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Contact Information
                 </h3>
@@ -1417,7 +1417,7 @@ export default function EnhancedProfilePage() {
               </div>
 
               {/* Social Media Handles */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Social Media Profiles
                 </h3>
@@ -1463,7 +1463,7 @@ export default function EnhancedProfilePage() {
               {analytics && <ProfileAnalytics analytics={analytics} />}
 
               {/* Verification Status */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Verification Status
                 </h3>
@@ -1494,7 +1494,7 @@ export default function EnhancedProfilePage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <div className="rounded-xl border bg-white p-3 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Quick Actions
                 </h3>

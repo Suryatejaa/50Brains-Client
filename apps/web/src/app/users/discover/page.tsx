@@ -227,7 +227,7 @@ export default function UsersDiscoveryPage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Filters Sidebar */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-6 sticky top-24">
+                <div className="card-glass p-3 sticky top-24">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Filter Talent
                   </h3>
@@ -469,9 +469,9 @@ export default function UsersDiscoveryPage() {
 
                 {/* Users Grid */}
                 {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="card-glass p-6 animate-pulse">
+                      <div key={i} className="card-glass p-3 animate-pulse">
                         <div className="flex items-center space-x-3 mb-4">
                           <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                           <div className="flex-1">
@@ -521,9 +521,9 @@ export default function UsersDiscoveryPage() {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {users.map((user) => (
-                      <div key={user.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                      <div key={user.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                         {/* Header */}
                         <div className="flex items-start space-x-3 mb-4">
                           <div className="relative">

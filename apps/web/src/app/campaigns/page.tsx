@@ -269,8 +269,8 @@ export default function CampaignsPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="card-glass p-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
@@ -280,7 +280,7 @@ export default function CampaignsPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Active Campaigns</p>
@@ -290,7 +290,7 @@ export default function CampaignsPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Budget</p>
@@ -300,7 +300,7 @@ export default function CampaignsPage() {
                 </div>
               </div>
               
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Spent</p>
@@ -312,7 +312,7 @@ export default function CampaignsPage() {
             </div>
 
             {/* Filters and Controls */}
-            <div className="card-glass p-6 mb-8">
+            <div className="card-glass p-3 mb-8">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                 <div className="flex flex-wrap gap-4">
                   {/* Search */}
@@ -398,9 +398,9 @@ export default function CampaignsPage() {
 
             {/* Campaigns */}
             {loading ? (
-              <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+              <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3' : 'space-y-4'}>
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="card-glass p-6 animate-pulse">
+                  <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -432,9 +432,9 @@ export default function CampaignsPage() {
                 </div>
               </div>
             ) : view === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {campaigns.map((campaign) => (
-                  <div key={campaign.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                  <div key={campaign.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-2">
@@ -564,7 +564,7 @@ export default function CampaignsPage() {
               /* List View */
               <div className="space-y-4">
                 {campaigns.map((campaign) => (
-                  <div key={campaign.id} className="card-glass p-6">
+                  <div key={campaign.id} className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <span className="text-2xl">{getTypeIcon(campaign.type)}</span>

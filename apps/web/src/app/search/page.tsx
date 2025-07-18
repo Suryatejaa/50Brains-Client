@@ -112,7 +112,7 @@ export default function SearchPage() {
   };
 
   const renderGigResult = (result: SearchResult) => (
-    <div key={result.id} className="card-glass p-6">
+    <div key={result.id} className="card-glass p-3">
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
@@ -173,7 +173,7 @@ export default function SearchPage() {
   );
 
   const renderUserResult = (result: SearchResult) => (
-    <div key={result.id} className="card-glass p-6">
+    <div key={result.id} className="card-glass p-3">
       <div className="flex items-start space-x-4">
         <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
           {result.profilePicture ? (

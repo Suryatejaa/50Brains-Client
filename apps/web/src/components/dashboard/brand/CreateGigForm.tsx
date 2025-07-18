@@ -176,7 +176,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-lg">
+    <div className="mx-auto max-w-4xl rounded-lg bg-white p-3 shadow-lg">
       <div className="mb-6">
         <h2 className="mb-2 text-2xl font-bold text-gray-900">
           Create New Gig
@@ -194,7 +194,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Gig Title *
@@ -251,7 +251,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
         </div>
 
         {/* Budget */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Budget *
@@ -312,7 +312,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
         </div>
 
         {/* Deadlines */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Application Deadline

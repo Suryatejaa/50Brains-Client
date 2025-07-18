@@ -215,7 +215,7 @@ export default function PortfolioPage() {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredItems.map((item) => (
                   <div key={item.id} className="card-glass overflow-hidden">
                     {/* Media */}
@@ -358,7 +358,7 @@ export default function PortfolioPage() {
 
             {/* Portfolio Tips */}
             {portfolioItems.length === 0 && (
-              <div className="mt-8 card-glass p-6">
+              <div className="mt-8 card-glass p-3">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   💡 Portfolio Tips
                 </h3>

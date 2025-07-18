@@ -186,7 +186,7 @@ export default function GigsBrowsePage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Filters Sidebar */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-6 sticky top-24">
+                <div className="card-glass p-3 sticky top-24">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Filter Gigs
                   </h3>
@@ -351,7 +351,7 @@ export default function GigsBrowsePage() {
                 {loading ? (
                   <div className="space-y-4">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="card-glass p-6 animate-pulse">
+                      <div key={i} className="card-glass p-3 animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                         <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
                         <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -396,7 +396,7 @@ export default function GigsBrowsePage() {
                 ) : (
                   <div className="space-y-4">
                     {gigs.map((gig) => (
-                      <div key={gig.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+                      <div key={gig.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                           <div className="flex-1">
                             {/* Header */}

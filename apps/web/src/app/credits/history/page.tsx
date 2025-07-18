@@ -210,8 +210,8 @@ export default function CreditsHistoryPage() {
           <div className="space-y-8">
             {/* Credit Summary */}
             {summary && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <div className="card-glass p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Current Balance</p>
@@ -232,7 +232,7 @@ export default function CreditsHistoryPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Earned</p>
@@ -244,7 +244,7 @@ export default function CreditsHistoryPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Spent</p>
@@ -256,7 +256,7 @@ export default function CreditsHistoryPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Withdrawn</p>
@@ -268,7 +268,7 @@ export default function CreditsHistoryPage() {
                   </div>
                 </div>
 
-                <div className="card-glass p-6">
+                <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Pending Amount</p>
@@ -284,7 +284,7 @@ export default function CreditsHistoryPage() {
 
             {/* Monthly Breakdown Chart */}
             {summary && summary.monthlyBreakdown.length > 0 && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-4">📊 Monthly Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                   {summary.monthlyBreakdown.slice(0, 6).map((month, index) => (
@@ -317,7 +317,7 @@ export default function CreditsHistoryPage() {
             )}
 
             {/* Transactions List */}
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h2 className="text-xl font-semibold mb-6">📝 Transaction History</h2>
 
               {transactions.length > 0 ? (
@@ -469,7 +469,7 @@ export default function CreditsHistoryPage() {
 
             {/* Transaction Type Breakdown */}
             {summary && summary.typeBreakdown.length > 0 && (
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-4">📈 Transaction Type Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {summary.typeBreakdown.map((typeData, index) => (
@@ -491,7 +491,7 @@ export default function CreditsHistoryPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {userType === 'creator' ? (

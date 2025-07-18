@@ -15,7 +15,7 @@ export default function CreditsPage() {
         </div>
 
         {/* Current Balance */}
-        <div className="card-glass mb-8 p-6 text-center">
+        <div className="card-glass mb-8 p-3 text-center">
           <div className="mb-4 text-4xl">💎</div>
           <h2 className="text-heading mb-2 text-2xl font-bold">
             Current Balance
@@ -38,7 +38,7 @@ export default function CreditsPage() {
 
             <div className="space-y-4">
               {/* Profile Boost */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
                   <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
                     <span className="text-xl">👤</span>
@@ -70,7 +70,7 @@ export default function CreditsPage() {
               </div>
 
               {/* Gig Boost */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
                   <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
                     <span className="text-xl">💼</span>
@@ -102,7 +102,7 @@ export default function CreditsPage() {
               </div>
 
               {/* Clan Boost */}
-              <div className="card-glass p-6">
+              <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
                   <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
                     <span className="text-xl">👥</span>
@@ -304,7 +304,7 @@ export default function CreditsPage() {
           <h2 className="text-heading mb-4 text-2xl font-bold">
             How Credits Work
           </h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-3">
             {[
               {
                 icon: '💰',

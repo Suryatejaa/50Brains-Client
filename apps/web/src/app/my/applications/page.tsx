@@ -120,27 +120,27 @@ export default function MyApplicationsPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card-glass p-6 text-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
+          <div className="card-glass p-3 text-center">
             <div className="text-3xl font-bold text-blue-600">{stats.total}</div>
             <div className="text-gray-600">Total Applications</div>
           </div>
-          <div className="card-glass p-6 text-center">
+          <div className="card-glass p-3 text-center">
             <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
             <div className="text-gray-600">Under Review</div>
           </div>
-          <div className="card-glass p-6 text-center">
+          <div className="card-glass p-3 text-center">
             <div className="text-3xl font-bold text-green-600">{stats.accepted}</div>
             <div className="text-gray-600">Accepted</div>
           </div>
-          <div className="card-glass p-6 text-center">
+          <div className="card-glass p-3 text-center">
             <div className="text-3xl font-bold text-purple-600">{stats.completed}</div>
             <div className="text-gray-600">Completed</div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="card-glass p-6 mb-8">
+        <div className="card-glass p-3 mb-8">
           <div className="flex flex-wrap gap-2">
             {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED'].map((status) => (
               <button
@@ -186,7 +186,7 @@ export default function MyApplicationsPage() {
               const isWithdrawable = application.status === 'PENDING';
               
               return (
-                <div key={application.id} className="card-glass p-6">
+                <div key={application.id} className="card-glass p-3">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">
@@ -209,7 +209,7 @@ export default function MyApplicationsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Budget</label>
                       <div className="text-lg font-semibold text-green-600">
@@ -295,7 +295,7 @@ export default function MyApplicationsPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">💡 Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/marketplace" className="btn-secondary text-center">

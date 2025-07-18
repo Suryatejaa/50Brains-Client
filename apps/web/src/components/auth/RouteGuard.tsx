@@ -38,7 +38,22 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       '/social-media',
       '/notifications',
       '/settings',
+      '/my-gigs',
+      '/applications',
+      '/brand',
+      '/crew',
+      '/influencer',
+      '/clan',
       // Note: '/marketplace', '/clans', '/gigs' are public for browsing
+    ];
+
+    // Define protected route patterns (for dynamic routes)
+    const protectedPatterns = [
+      /^\/gig\/[^\/]+\/applications$/, // /gig/[id]/applications
+      /^\/gig\/[^\/]+\/submissions$/, // /gig/[id]/submissions
+      /^\/user\/[^\/]+\/edit$/, // /user/[id]/edit
+      /^\/brand\/[^\/]+\/edit$/, // /brand/[id]/edit
+      /^\/clan\/[^\/]+\/manage$/, // /clan/[id]/manage
     ];
 
     // Check if current path is an auth page (exact matches)
@@ -48,7 +63,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     // Check if current path is a protected page
     const isProtectedPage = protectedPages.some((page) =>
       pathname.startsWith(page)
-    );
+    ) || protectedPatterns.some((pattern) => pattern.test(pathname));
 
     console.log(`🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`);
 

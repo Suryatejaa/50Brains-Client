@@ -83,7 +83,7 @@ export const AdminDashboard: React.FC = () => {
     !hasPermission('system.configure')
   ) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">🚫</span>
@@ -253,7 +253,7 @@ export const AdminDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">⚠️</span>
@@ -297,7 +297,7 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3">
       <div className="mx-auto max-w-7xl">
         <DashboardHeader
           title="Admin Dashboard"
@@ -323,7 +323,7 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {/* Key Metrics */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="Total Users"
             value={dashboardData?.systemStats?.totalUsers || 0}
@@ -357,7 +357,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* System Status */}
-        <div className="card-glass mb-8 p-6">
+        <div className="card-glass mb-8 p-3">
           <h3 className="text-heading mb-6 text-lg font-semibold">
             🔧 System Status
           </h3>
@@ -419,10 +419,10 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Dashboard Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* Platform Analytics */}
           <div className="lg:col-span-2">
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
                 📊 Platform Analytics
               </h3>
@@ -433,7 +433,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="h-32 rounded bg-gray-300"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
                       {dashboardData?.systemStats?.activeUsers || 0}
@@ -464,7 +464,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Moderation Queue */}
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               ⚠️ Priority Reports
             </h3>
@@ -537,8 +537,8 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Recent Activities & User Analytics */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="card-glass p-6">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               🔄 Recent System Activities
             </h3>
@@ -572,7 +572,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               👥 User Analytics
             </h3>

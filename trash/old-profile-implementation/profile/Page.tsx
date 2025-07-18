@@ -229,7 +229,7 @@ const RoleBasedProfileSections = ({
     <div className="space-y-6">
       {/* Influencer-Specific Section */}
       {hasInfluencerRole && (
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border bg-white p-3 shadow-sm">
           <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
             <TrendingUp className="mr-2 h-5 w-5 text-purple-500" />
             Influencer Profile
@@ -607,7 +607,7 @@ const RoleBasedProfileSections = ({
 
       {/* Brand-Specific Section */}
       {hasBrandRole && (
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border bg-white p-3 shadow-sm">
           <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
             <Briefcase className="mr-2 h-5 w-5 text-blue-500" />
             Brand Profile
@@ -746,7 +746,7 @@ const RoleBasedProfileSections = ({
 
       {/* Crew-Specific Section */}
       {hasCrewRole && (
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="rounded-xl border bg-white p-3 shadow-sm">
           <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
             <Users className="mr-2 h-5 w-5 text-green-500" />
             Crew Profile
@@ -896,7 +896,7 @@ const ProfileAnalytics = ({
 }) => {
   if (!analytics) {
     return (
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
+      <div className="rounded-xl border bg-white p-3 shadow-sm">
         <h3 className="mb-4 font-semibold">Performance Analytics</h3>
         <p className="text-muted-foreground">Analytics data not available</p>
       </div>
@@ -905,7 +905,7 @@ const ProfileAnalytics = ({
   if (!analytics) return null;
 
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-xl border bg-white p-3 shadow-sm">
       <h3 className="mb-4 flex items-center text-lg font-semibold text-gray-900">
         <TrendingUp className="mr-2 h-5 w-5 text-purple-500" />
         Profile Analytics
@@ -1146,7 +1146,7 @@ export default function EnhancedProfilePage() {
   if (error && !profileData) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="mx-auto max-w-md p-6 text-center">
+        <div className="mx-auto max-w-md p-3 text-center">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
           <h2 className="mb-2 text-xl font-semibold text-gray-900">
             Failed to Load Profile
@@ -1429,7 +1429,7 @@ export default function EnhancedProfilePage() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Bio Section */}
-            <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <div className="rounded-xl border bg-white p-3 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-gray-900">
                 About
               </h3>
@@ -1449,7 +1449,7 @@ export default function EnhancedProfilePage() {
             </div>
 
             {/* Skills Section */}
-            <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <div className="rounded-xl border bg-white p-3 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-gray-900">
                 Skills & Expertise
               </h3>
@@ -1518,7 +1518,7 @@ export default function EnhancedProfilePage() {
             />
 
             {/* Contact Information */}
-            <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <div className="rounded-xl border bg-white p-3 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-gray-900">
                 Contact Information
               </h3>

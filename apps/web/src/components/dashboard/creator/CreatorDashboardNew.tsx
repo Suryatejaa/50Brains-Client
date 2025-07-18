@@ -175,7 +175,7 @@ export const CreatorDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">⚠️</span>
@@ -193,7 +193,7 @@ export const CreatorDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3">
       <div className="mx-auto max-w-7xl">
         <DashboardHeader
           title="Creator Dashboard"
@@ -201,7 +201,7 @@ export const CreatorDashboard: React.FC = () => {
         />
 
         {/* Key Metrics */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="Total Followers"
             value={dashboardData?.socialMedia?.totalFollowers || 0}
@@ -233,7 +233,7 @@ export const CreatorDashboard: React.FC = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* Reputation Card */}
           <div className="lg:col-span-1">
             <Suspense
@@ -254,7 +254,7 @@ export const CreatorDashboard: React.FC = () => {
 
           {/* Performance Overview */}
           <div className="lg:col-span-2">
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
                 📈 Performance Overview
               </h3>
@@ -265,7 +265,7 @@ export const CreatorDashboard: React.FC = () => {
                   <div className="h-32 rounded bg-gray-300"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
                       {dashboardData?.gigs?.completedGigs || 0}
@@ -297,7 +297,7 @@ export const CreatorDashboard: React.FC = () => {
         </div>
 
         {/* Secondary Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* Profile Completion Widget */}
           <div className="lg:col-span-1">
             <ProfileCompletionWidget />
@@ -305,7 +305,7 @@ export const CreatorDashboard: React.FC = () => {
 
           {/* Social Media Growth */}
           <div className="lg:col-span-2">
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
                 📱 Social Media Growth
               </h3>
@@ -376,12 +376,12 @@ export const CreatorDashboard: React.FC = () => {
 
         {/* Goals & Progress */}
         <div className="mb-8">
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               🎯 Goals & Progress
             </h3>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
               <div>
                 <div className="mb-1 flex justify-between text-sm">
                   <span className="text-body">Monthly Gig Goal</span>

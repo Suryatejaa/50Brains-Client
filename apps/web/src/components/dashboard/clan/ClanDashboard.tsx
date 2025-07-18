@@ -223,7 +223,7 @@ export const ClanDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-3">
         <div className="mx-auto max-w-7xl">
           <div className="card-glass p-8 text-center">
             <span className="mb-4 block text-4xl">👥</span>
@@ -252,7 +252,7 @@ export const ClanDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3">
       <div className="mx-auto max-w-7xl">
         <DashboardHeader
           title={`${clanData?.clanInfo?.name || 'Clan'} Dashboard`}
@@ -260,7 +260,7 @@ export const ClanDashboard: React.FC = () => {
         />
 
         {/* Clan Overview */}
-        <div className="card-glass mb-8 p-6">
+        <div className="card-glass mb-8 p-3">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-heading text-xl font-bold">
@@ -280,7 +280,7 @@ export const ClanDashboard: React.FC = () => {
         </div>
 
         {/* Key Metrics */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="Total Members"
             value={clanData?.members?.length || 0}
@@ -315,9 +315,9 @@ export const ClanDashboard: React.FC = () => {
         </div>
 
         {/* Dashboard Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* Member Management */}
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               👥 Active Members
             </h3>
@@ -397,7 +397,7 @@ export const ClanDashboard: React.FC = () => {
           </div>
 
           {/* Active Projects */}
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               🚀 Active Projects
             </h3>
@@ -452,7 +452,7 @@ export const ClanDashboard: React.FC = () => {
           </div>
 
           {/* Recent Activities */}
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               ⚡ Recent Activities
             </h3>
@@ -505,8 +505,8 @@ export const ClanDashboard: React.FC = () => {
         </div>
 
         {/* Clan Performance & Invitations */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="card-glass p-6">
+        <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               📊 Clan Performance
             </h3>
@@ -543,7 +543,7 @@ export const ClanDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="card-glass p-6">
+          <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
               💌 Pending Invitations
             </h3>

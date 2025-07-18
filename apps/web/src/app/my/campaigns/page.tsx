@@ -182,28 +182,28 @@ export default function MyCampaignsPage() {
 
         {/* Stats Overview */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-            <div className="card-glass p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 mb-8">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Total Campaigns</div>
               <div className="text-2xl font-bold text-gray-900">{stats.totalCampaigns}</div>
             </div>
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Active</div>
               <div className="text-2xl font-bold text-green-600">{stats.activeCampaigns}</div>
             </div>
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Completed</div>
               <div className="text-2xl font-bold text-blue-600">{stats.completedCampaigns}</div>
             </div>
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Total Spent</div>
               <div className="text-2xl font-bold text-gray-900">${stats.totalSpent.toLocaleString()}</div>
             </div>
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Applications</div>
               <div className="text-2xl font-bold text-gray-900">{stats.totalApplications}</div>
             </div>
-            <div className="card-glass p-6">
+            <div className="card-glass p-3">
               <div className="text-sm font-medium text-gray-500">Avg ROI</div>
               <div className="text-2xl font-bold text-green-600">{stats.averageROI.toFixed(1)}%</div>
             </div>
@@ -211,7 +211,7 @@ export default function MyCampaignsPage() {
         )}
 
         {/* Filters and Sort */}
-        <div className="card-glass p-6 mb-8">
+        <div className="card-glass p-3 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             {/* Status Filter */}
             <div className="flex space-x-2">
@@ -269,7 +269,7 @@ export default function MyCampaignsPage() {
         ) : (
           <div className="space-y-6">
             {filteredCampaigns.map((campaign) => (
-              <div key={campaign.id} className="card-glass p-6 hover:shadow-lg transition-shadow">
+              <div key={campaign.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
@@ -407,7 +407,7 @@ export default function MyCampaignsPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="mt-12 card-glass p-6">
+        <div className="mt-12 card-glass p-3">
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/create-gig" className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
