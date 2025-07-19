@@ -35,7 +35,11 @@ interface Application {
   acceptedAt?: string;
   rejectedAt?: string;
   rejectionReason?: string;
-  applicant: Applicant;
+  respondedAt?: string;
+  _count?: {
+    submissions: number;
+  };
+  // Note: applicant data is not included in the API response
 }
 
 interface Gig {
@@ -148,10 +152,26 @@ export default function GigApplicationsPage() {
 
       // Handle applications response
       if (applicationsResponse.status === 'fulfilled' && applicationsResponse.value.success) {
-        const applicationsData = (applicationsResponse.value.data as { applications: Application[] })?.applications || [];
-        console.log('✅ Applications data received successfully:', applicationsData);
-        console.log('📊 Number of applications found:', applicationsData.length);
-        setApplications(applicationsData);
+        const applicationsData = applicationsResponse.value.data as any;
+        console.log('✅ Raw applications response data:', applicationsData);
+        console.log('✅ Type of applicationsData:', typeof applicationsData);
+        console.log('✅ Keys in applicationsData:', Object.keys(applicationsData || {}));
+        
+        // Try different possible structures
+        let extractedApplications = [];
+        if (applicationsData?.applications) {
+          extractedApplications = applicationsData.applications;
+          console.log('✅ Found applications in data.applications:', extractedApplications);
+        } else if (Array.isArray(applicationsData)) {
+          extractedApplications = applicationsData;
+          console.log('✅ Found applications as direct array:', extractedApplications);
+        } else {
+          console.log('⚠️ No applications found in expected locations');
+        }
+        
+        console.log('✅ Final extracted applications:', extractedApplications);
+        console.log('📊 Number of applications found:', extractedApplications.length);
+        setApplications(extractedApplications);
       } else {
         console.error('❌ Failed to load applications - Response details:', {
           status: applicationsResponse.status,
@@ -382,39 +402,21 @@ export default function GigApplicationsPage() {
               <div key={application.id} className="card-glass p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4">
-                    {application.applicant.profilePicture ? (
-                      <img
-                        src={application.applicant.profilePicture}
-                        alt={`${application.applicant.firstName} ${application.applicant.lastName}`}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <span className="text-gray-500 font-medium">
-                          {application.applicant.firstName.charAt(0)}{application.applicant.lastName.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-gray-500 font-medium">
+                        {application.applicantId.slice(-2).toUpperCase()}
+                      </span>
+                    </div>
                     <div>
                       <h3 className="font-semibold text-lg">
-                        {application.applicant.firstName} {application.applicant.lastName}
+                        Applicant {application.applicantId.slice(-8)}
                       </h3>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        {application.applicant.primaryPlatform && (
-                          <span>Platform: {application.applicant.primaryPlatform}</span>
-                        )}
-                        {application.applicant.primaryNiche && (
-                          <span>Niche: {application.applicant.primaryNiche}</span>
-                        )}
-                        {application.applicant.location && (
-                          <span>📍 {application.applicant.location}</span>
+                        <span>Type: {application.applicantType}</span>
+                        {application.estimatedTime && (
+                          <span>Timeline: {application.estimatedTime}</span>
                         )}
                       </div>
-                      {application.applicant.experienceLevel && (
-                        <span className="inline-block mt-1 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                          {application.applicant.experienceLevel}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <div className="text-right">
@@ -451,12 +453,6 @@ export default function GigApplicationsPage() {
                           <span className="text-gray-600">Application Type:</span>
                           <span className="font-medium capitalize">{application.applicantType}</span>
                         </div>
-                        {application.applicant.followers && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Followers:</span>
-                            <span className="font-medium">{application.applicant.followers.toLocaleString()}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>

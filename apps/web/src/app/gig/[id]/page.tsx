@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -64,6 +65,7 @@ export default function GigDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
+  const { currentRole, getUserTypeForRole } = useRoleSwitch();
   const [gig, setGig] = useState<Gig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
@@ -79,6 +81,10 @@ export default function GigDetailsPage() {
   });
 
   const gigId = params.id as string;
+  const userType = getUserTypeForRole(currentRole);
+
+  // Check if current user owns this gig (is the brand who posted it)
+  const isOwner = isAuthenticated && userType === 'brand' && (gig?.brand?.id === user?.id || gig?.postedById === user?.id);
 
   // Show toast notification
   const showToast = (type: 'success' | 'error' | 'warning', message: string) => {
@@ -101,10 +107,41 @@ export default function GigDetailsPage() {
     }
   }, [gigId]);
 
-  const loadGigDetails = async () => {
+  // Refresh data when the page becomes visible (user returns from edit)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && gigId) {
+        console.log('🔄 Page became visible, refreshing gig data');
+        loadGigDetails(true); // Force refresh when page becomes visible
+      }
+    };
+
+    const handleFocus = () => {
+      if (gigId) {
+        console.log('🔄 Window focused, refreshing gig data');
+        loadGigDetails(true); // Force refresh when window is focused
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [gigId]);
+
+  const loadGigDetails = async (forceRefresh = false) => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(`/api/gig/${gigId}`);
+      
+      // Add cache busting parameter for force refresh
+      const url = forceRefresh 
+        ? `/api/gig/${gigId}?_t=${Date.now()}`
+        : `/api/gig/${gigId}`;
+      
+      const response = await apiClient.get(url);
       
       if (response.success && response.data) {
         const gigData = response.data as Gig;
@@ -113,7 +150,9 @@ export default function GigDetailsPage() {
           title: gigData.title,
           isApplied: gigData.isApplied,
           status: gigData.status,
-          applicationCount: gigData._count?.applications
+          applicationCount: gigData._count?.applications,
+          updatedAt: gigData.updatedAt,
+          forceRefresh
         });
         setGig(gigData);
       } else {
@@ -306,13 +345,41 @@ export default function GigDetailsPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            <button 
-              onClick={goBack}
-              className="btn-secondary"
-            >
-              ← Back
-            </button>
             <div className="flex items-center space-x-3">
+              <button 
+                onClick={goBack}
+                className="btn-secondary"
+              >
+                ← Back
+              </button>
+              <button 
+                onClick={() => loadGigDetails(true)}
+                className="btn-secondary text-sm"
+                disabled={isLoading}
+                title="Refresh gig data"
+              >
+                {isLoading ? '🔄' : '↻'} Refresh
+              </button>
+            </div>
+            <div className="flex items-center space-x-3">
+              {/* Owner Actions */}
+              {isOwner && (
+                <div className="flex items-center space-x-2">
+                  <Link 
+                    href={`/gig/${gigId}/edit`} 
+                    className="btn-secondary"
+                  >
+                    ✏️ Edit Gig
+                  </Link>
+                  <Link 
+                    href={`/gig/${gigId}/applications`} 
+                    className="btn-primary"
+                  >
+                    📋 View Applications ({gig._count?.applications || 0})
+                  </Link>
+                </div>
+              )}
+              
               {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' && (
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   gig.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
@@ -325,6 +392,11 @@ export default function GigDetailsPage() {
               )}
               <div className="text-sm text-gray-500">
                 Posted {new Date(gig.createdAt).toLocaleDateString()}
+                {gig.updatedAt !== gig.createdAt && (
+                  <div className="text-xs">
+                    Updated {new Date(gig.updatedAt).toLocaleDateString()}
+                  </div>
+                )}
               </div>
             </div>
           </div>
