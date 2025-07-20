@@ -397,7 +397,7 @@ export const BrandDashboard: React.FC = () => {
                   📝 Recent Gigs
                 </h3>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">Latest 3</span>
+                  <span className="text-xs text-gray-500">Latest 2</span>
                   <button
                     onClick={() => (window.location.href = '/create-gig')}
                     className="btn-primary text-sm"

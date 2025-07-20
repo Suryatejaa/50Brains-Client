@@ -36,6 +36,7 @@ interface Gig {
   skillsRequired: string[];
   tags: string[];
   urgency: string;
+  applicationCount: number;
   _count: {
     applications: number;
     submissions: number;
@@ -92,17 +93,115 @@ export default function GigDetailsPage() {
     setTimeout(() => setToast(null), 5000); // Auto-hide after 5 seconds
   };
 
-  // Helper function to navigate back
+  // Helper function to navigate back intelligently
   const goBack = () => {
-    if (window.history.length > 1) {
+    // Get the referrer to understand where user came from
+    const referrer = document.referrer;
+    const currentUrl = window.location.href;
+    
+    console.log('🔙 Navigation debug:', {
+      referrer,
+      currentUrl,
+      gigId,
+      sessionReferrer: sessionStorage.getItem(`gig-${gigId}-referrer`)
+    });
+    
+    // Check if user came from edit page - skip back to original source
+    if (referrer && referrer.includes(`/gig/${gigId}/edit`)) {
+      // User came from edit page, try to get the original referrer
+      const originalReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
+      
+      if (originalReferrer && originalReferrer !== currentUrl) {
+        console.log('🔙 Going back to original referrer:', originalReferrer);
+        window.location.href = originalReferrer;
+        return;
+      } else {
+        // No original referrer stored, go to my-gigs if user is brand owner
+        if (isOwner) {
+          console.log('🔙 Going to my-gigs (owner, no original referrer)');
+          router.push('/my-gigs');
+          return;
+        }
+      }
+    }
+    
+    // Check if user came from my-gigs page
+    if (referrer && referrer.includes('/my-gigs')) {
+      console.log('🔙 Going back to my-gigs');
+      router.push('/my-gigs');
+      return;
+    }
+    
+    // Check if user came from another gig page (common when browsing gigs)
+    if (referrer && referrer.includes('/gig/') && !referrer.includes(`/gig/${gigId}`)) {
+      // User came from another gig, try to go to my-gigs if they're the owner
+      if (isOwner) {
+        console.log('🔙 Going to my-gigs (came from other gig, is owner)');
+        router.push('/my-gigs');
+        return;
+      }
+    }
+    
+    // Check if user came from dashboard
+    if (referrer && referrer.includes('/dashboard')) {
+      // If they're viewing their own gig, take them to my-gigs instead of dashboard
+      if (isOwner) {
+        console.log('🔙 Going to my-gigs (came from dashboard, is owner)');
+        router.push('/my-gigs');
+        return;
+      } else {
+        console.log('🔙 Going back to dashboard');
+        router.push('/dashboard');
+        return;
+      }
+    }
+    
+    // Default cases based on user type and ownership
+    if (isOwner) {
+      // If user owns this gig, they probably want to go to my-gigs
+      console.log('🔙 Going to my-gigs (default for owner)');
+      router.push('/my-gigs');
+    } else if (window.history.length > 1) {
+      // For non-owners, try normal back navigation
+      console.log('🔙 Using browser back');
       router.back();
     } else {
+      // Fallback to marketplace for non-owners
+      console.log('🔙 Going to marketplace (fallback)');
       router.push('/marketplace');
     }
   };
 
   useEffect(() => {
     if (gigId) {
+      // Store the original referrer if this is the first visit to this gig (not from edit page)
+      const referrer = document.referrer;
+      const currentReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
+      
+      console.log('📍 Storing referrer debug:', {
+        referrer,
+        currentReferrer,
+        gigId,
+        isEditPage: referrer?.includes(`/gig/${gigId}/edit`)
+      });
+      
+      // Only store referrer if:
+      // 1. No referrer is already stored
+      // 2. The referrer is not the edit page for this gig
+      // 3. The referrer is not another gig page (to avoid gig-hopping confusion)
+      // 4. The referrer is a meaningful source page
+      if (!currentReferrer && referrer && 
+          !referrer.includes(`/gig/${gigId}/edit`) && 
+          !referrer.includes('/gig/') && // Don't store other gig pages
+          (referrer.includes('/my-gigs') || 
+           referrer.includes('/dashboard') || 
+           referrer.includes('/marketplace') ||
+           referrer.includes('/search'))) {
+        
+        console.log('📍 Storing referrer:', referrer);
+        sessionStorage.setItem(`gig-${gigId}-referrer`, referrer);
+      }
+      
       loadGigDetails();
     }
   }, [gigId]);
@@ -123,12 +222,19 @@ export default function GigDetailsPage() {
       }
     };
 
+    const handleUnload = () => {
+      // Clean up session storage on page unload
+      sessionStorage.removeItem(`gig-${gigId}-referrer`);
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener('beforeunload', handleUnload);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('beforeunload', handleUnload);
     };
   }, [gigId]);
 
@@ -166,6 +272,21 @@ export default function GigDetailsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePublishDraft = () => {
+    if (!gig || gig.status !== 'DRAFT') {
+      showToast('error', 'Only draft gigs can be published');
+      return;
+    }
+
+    // Set a flag in session storage to indicate we want to publish after editing
+    sessionStorage.setItem('publishDraftIntent', 'true');
+    
+    console.log('🚀 Redirecting to edit page for draft completion before publishing:', gigId);
+    
+    // Navigate to edit page with publish intent
+    router.push(`/gig/${gigId}/edit?publish=true`);
   };
 
   const handleApply = async () => {
@@ -336,8 +457,11 @@ export default function GigDetailsPage() {
     );
   }
 
-  const canApply = isAuthenticated && !gig.isApplied && (gig.status === 'OPEN' || gig.status === 'ACTIVE') && 
-                  (!gig.maxApplications || gig._count.applications < gig.maxApplications);
+  const canApply = isAuthenticated && !gig.isApplied && 
+                  (gig.status === 'OPEN' || gig.status === 'ACTIVE') && 
+                  (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
+
+  console.log('🔍 Gig details:', gig);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -365,31 +489,49 @@ export default function GigDetailsPage() {
               {/* Owner Actions */}
               {isOwner && (
                 <div className="flex items-center space-x-2">
+                  {/* Publish Draft Button - only show for DRAFT status */}
+                  {gig.status === 'DRAFT' && (
+                    <button
+                      onClick={handlePublishDraft}
+                      className="btn-primary"
+                      title="Review and complete your draft gig before publishing"
+                    >
+                      � Complete & Publish
+                    </button>
+                  )}
+                  
                   <Link 
                     href={`/gig/${gigId}/edit`} 
                     className="btn-secondary"
                   >
                     ✏️ Edit Gig
                   </Link>
-                  <Link 
-                    href={`/gig/${gigId}/applications`} 
-                    className="btn-primary"
-                  >
-                    📋 View Applications ({gig._count?.applications || 0})
-                  </Link>
+                  
+                  {/* Only show applications link for published gigs */}
+                  {gig.status !== 'DRAFT' && (
+                    <Link 
+                      href={`/gig/${gigId}/applications`} 
+                      className="btn-primary"
+                    >
+                      📋 View Applications ({gig._count?.applications || 0})
+                    </Link>
+                  )}
                 </div>
               )}
               
+              {/* Status Badge */}
               {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' && (
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   gig.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                   gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
                   gig.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
+                  gig.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>
-                  {gig.status}
+                  {gig.status === 'DRAFT' ? '📝 DRAFT' : gig.status}
                 </span>
               )}
+              
               <div className="text-sm text-gray-500">
                 Posted {new Date(gig.createdAt).toLocaleDateString()}
                 {gig.updatedAt !== gig.createdAt && (
@@ -403,6 +545,34 @@ export default function GigDetailsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Draft Notice */}
+          {gig.status === 'DRAFT' && (
+            <div className="lg:col-span-3 mb-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="text-2xl">📝</div>
+                  <div>
+                    <p className="font-semibold text-yellow-800">Draft Gig</p>
+                    <p className="text-sm text-yellow-600">
+                      {isOwner 
+                        ? 'This gig is still in draft mode. Complete and publish it to make it live and start accepting applications.'
+                        : 'This gig is currently in draft mode and not accepting applications.'
+                      }
+                    </p>
+                  </div>
+                </div>
+                {isOwner && (
+                  <button
+                    onClick={handlePublishDraft}
+                    className="btn-primary"
+                  >
+                    � Complete & Publish
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Already Applied Banner */}
           {(gig.isApplied || alreadyAppliedMessage) && (
             <div className="lg:col-span-3 mb-4">
@@ -613,6 +783,25 @@ export default function GigDetailsPage() {
                   <Link href="/login" className="btn-primary w-full">
                     Sign In
                   </Link>
+                </div>
+              ) : gig.status === 'DRAFT' ? (
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📝</div>
+                  <p className="font-semibold text-gray-600 mb-2">Draft Mode</p>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {isOwner 
+                      ? 'Complete and publish this gig to start accepting applications'
+                      : 'This gig is not yet published and not accepting applications'
+                    }
+                  </p>
+                  {isOwner && (
+                    <button
+                      onClick={handlePublishDraft}
+                      className="btn-primary w-full"
+                    >
+                      � Complete & Publish
+                    </button>
+                  )}
                 </div>
               ) : gig.isApplied ? (
                 <div className="text-center">

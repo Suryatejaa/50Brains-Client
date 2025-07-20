@@ -70,6 +70,7 @@ export default function MyGigsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'DRAFT' | 'COMPLETED'>('ALL');
+  const [refreshMessage, setRefreshMessage] = useState<string | null>(null);
 
   // Redirect if not authenticated or not a brand
   useEffect(() => {
@@ -78,27 +79,74 @@ export default function MyGigsPage() {
     }
   }, [isAuthenticated, isLoading, user, router]);
 
+  // Check for refresh flag and URL parameters on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
+      
+      if (shouldRefresh) {
+        console.log('🔄 Detected refresh flag, will force refresh gigs data');
+        setRefreshMessage('✅ Gig published successfully! Updating your gigs list...');
+        
+        // Clear the refresh flag
+        sessionStorage.removeItem('refresh-my-gigs');
+        // Clear URL parameter
+        if (urlParams.get('refresh')) {
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+        
+        // Clear the message after 5 seconds
+        setTimeout(() => setRefreshMessage(null), 5000);
+      }
+    }
+  }, []);
+
   // Load gigs
   useEffect(() => {
     if (user?.roles?.includes('BRAND')) {
-      loadGigs();
+      // Check if we need to force refresh
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldForceRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
+      
+      loadGigs(!!shouldForceRefresh);
     }
   }, [user]);
 
-  const loadGigs = async () => {
+  const loadGigs = async (forceRefresh = false) => {
     try {
       setLoading(true);
-      const response = await apiClient.get<GigsResponse>('/api/gig/my-posted');
-      console.log('Fetched gigs:', response.data);
+      
+      // Add cache busting parameter for force refresh
+      const url = forceRefresh 
+        ? `/api/gig/my-posted?_t=${Date.now()}`
+        : '/api/gig/my-posted';
+        
+      const response = await apiClient.get<GigsResponse>(url);
+      console.log('Fetched gigs:', response.data, forceRefresh ? '(force refresh)' : '(cached)');
+      
       if (response.success) {
         // The API returns {gigs: Array, pagination: Object}
         if (response.data && Array.isArray(response.data.gigs)) {
           setGigs(response.data.gigs);
           const statuses = response.data.gigs.map(g => g.status).filter(Boolean);
           console.log('Gig statuses found:', Array.from(new Set(statuses)));
+          
+          // Update refresh message if this was a force refresh
+          if (forceRefresh && refreshMessage) {
+            setRefreshMessage('✅ Gigs list updated successfully!');
+            setTimeout(() => setRefreshMessage(null), 3000);
+          }
         } else if (Array.isArray(response.data)) {
           // Fallback if API returns array directly
           setGigs(response.data as Gig[]);
+          
+          // Update refresh message if this was a force refresh
+          if (forceRefresh && refreshMessage) {
+            setRefreshMessage('✅ Gigs list updated successfully!');
+            setTimeout(() => setRefreshMessage(null), 3000);
+          }
         } else {
           setGigs([]);
         }
@@ -199,13 +247,30 @@ export default function MyGigsPage() {
                 </p>
               </div>
 
-              <Link
-                href="/create-gig"
-                className="btn-primary mt-4 sm:mt-0"
-              >
-                + Create New Gig
-              </Link>
+              <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+                <button
+                  onClick={() => loadGigs(true)}
+                  disabled={loading}
+                  className="btn-secondary"
+                  title="Refresh gigs data"
+                >
+                  {loading ? '🔄' : '↻'} Refresh
+                </button>
+                <Link
+                  href="/create-gig"
+                  className="btn-primary"
+                >
+                  + Create New Gig
+                </Link>
+              </div>
             </div>
+
+            {/* Success Message */}
+            {refreshMessage && (
+              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+                <p className="text-green-600">{refreshMessage}</p>
+              </div>
+            )}
 
             {/* Error Message */}
             {error && (
