@@ -339,7 +339,7 @@ export default function ClansBrowsePage() {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                     <p className="text-red-600">❌ {error}</p>
                   </div>
                 )}
@@ -359,7 +359,7 @@ export default function ClansBrowsePage() {
                 ) : clans.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
-                      <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                         <span className="text-2xl">👥</span>
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -422,7 +422,7 @@ export default function ClansBrowsePage() {
                         </p>
                         
                         {/* Stats */}
-                        <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-none">
                           <div className="text-center">
                             <p className="text-lg font-bold text-gray-900">{clan.size}/{clan.maxMembers}</p>
                             <p className="text-xs text-gray-600">Members</p>
@@ -474,12 +474,12 @@ export default function ClansBrowsePage() {
                         <div className="flex items-center space-x-2 mb-4">
                           <div className="flex -space-x-2">
                             {clan.members.slice(0, 3).map((member, index) => (
-                              <div key={member.id} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                              <div key={member.id} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                                 {member.profilePicture ? (
                                   <img 
                                     src={member.profilePicture} 
                                     alt="Member" 
-                                    className="w-8 h-8 rounded-full object-cover"
+                                    className="w-8 h-8 rounded-none object-cover"
                                   />
                                 ) : (
                                   (member.firstName || 'U')[0]?.toUpperCase()
@@ -487,7 +487,7 @@ export default function ClansBrowsePage() {
                               </div>
                             ))}
                             {clan.members.length > 3 && (
-                              <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                              <div className="w-8 h-8 bg-gray-400 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                                 +{clan.members.length - 3}
                               </div>
                             )}

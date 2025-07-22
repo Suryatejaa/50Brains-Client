@@ -61,7 +61,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
         className={`reputation-display-compact flex items-center gap-3 ${className}`}
       >
         <div
-          className={`rounded-full border px-3 py-1 text-sm font-medium ${getTierColor(reputation.tier)}`}
+          className={`rounded-none border px-3 py-1 text-sm font-medium ${getTierColor(reputation.tier)}`}
         >
           <span className="mr-1">{getTierIcon(reputation.tier)}</span>
           {reputation.tier}
@@ -80,13 +80,13 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
 
   return (
     <div
-      className={`reputation-display rounded-lg border border-gray-200 bg-white p-3 ${className}`}
+      className={`reputation-display rounded-none border border-gray-200 bg-white p-3 ${className}`}
     >
       {/* Header - Tier and Score */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={`rounded-lg border px-4 py-2 font-semibold ${getTierColor(reputation.tier)}`}
+            className={`rounded-none border px-4 py-2 font-semibold ${getTierColor(reputation.tier)}`}
           >
             <span className="mr-2 text-lg">{getTierIcon(reputation.tier)}</span>
             {reputation.tier} TIER
@@ -102,13 +102,13 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
 
       {/* Score Breakdown */}
       <div className="mb-6 grid grid-cols-2 gap-4">
-        <div className="rounded-lg bg-blue-50 p-3">
+        <div className="rounded-none bg-blue-50 p-3">
           <div className="text-lg font-semibold text-blue-600">
             {reputation.baseScore.toLocaleString()}
           </div>
           <div className="text-sm text-blue-500">Base Score</div>
         </div>
-        <div className="rounded-lg bg-green-50 p-3">
+        <div className="rounded-none bg-green-50 p-3">
           <div className="text-lg font-semibold text-green-600">
             +{reputation.bonusScore.toLocaleString()}
           </div>
@@ -119,13 +119,13 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
       {/* Rankings */}
       {showRanking && (
         <div className="mb-6 grid grid-cols-2 gap-4">
-          <div className="rounded-lg bg-gray-50 p-3 text-center">
+          <div className="rounded-none bg-gray-50 p-3 text-center">
             <div className="text-xl font-bold text-gray-900">
               #{reputation.ranking.global.rank}
             </div>
             <div className="text-sm text-gray-600">Global Rank</div>
           </div>
-          <div className="rounded-lg bg-gray-50 p-3 text-center">
+          <div className="rounded-none bg-gray-50 p-3 text-center">
             <div className="text-xl font-bold text-gray-900">
               #{reputation.ranking.tier.rank}
             </div>
@@ -142,7 +142,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
             {reputation.badges.map((badge, index) => (
               <span
                 key={index}
-                className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
+                className="rounded-none bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
               >
                 🏅 {badge}
               </span>

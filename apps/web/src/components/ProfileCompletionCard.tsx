@@ -66,9 +66,9 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
 
       {/* Progress Bar */}
       <div className="mb-6">
-        <div className="h-3 w-full rounded-full bg-gray-200">
+        <div className="h-3 w-full rounded-none bg-gray-200">
           <div
-            className={`h-3 rounded-full transition-all duration-500 ${getProgressColor(completion.completionPercentage)}`}
+            className={`h-3 rounded-none transition-all duration-500 ${getProgressColor(completion.completionPercentage)}`}
             style={{ width: `${completion.completionPercentage}%` }}
           ></div>
         </div>
@@ -82,7 +82,7 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
             <div
               key={section.id}
               onClick={() => onSectionClick(section.id)}
-              className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
+              className="flex cursor-pointer items-center justify-between rounded-none bg-gray-50 p-3 transition-colors hover:bg-gray-100"
             >
               <div className="flex items-center gap-3">
                 {section.completed ? (
@@ -106,7 +106,7 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
 
       {/* Next Step CTA */}
       {!completion.isProfileComplete && completion.nextStep !== 'complete' && (
-        <div className="rounded-lg bg-gradient-to-r from-[#6BC5F2] to-[#9F7AEA] p-4 text-white">
+        <div className="rounded-none bg-gradient-to-r from-[#6BC5F2] to-[#9F7AEA] p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
               <div className="mb-1 font-semibold">Next Step</div>
@@ -117,7 +117,7 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
             </div>
             <button
               onClick={() => onSectionClick(completion.nextStep)}
-              className="rounded-lg bg-white bg-opacity-20 px-4 py-2 font-medium transition-colors hover:bg-opacity-30"
+              className="rounded-none bg-white bg-opacity-20 px-4 py-2 font-medium transition-colors hover:bg-opacity-30"
             >
               Continue
             </button>
@@ -127,7 +127,7 @@ export const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
 
       {/* Completion Benefits */}
       {completion.completionPercentage < 80 && (
-        <div className="mt-4 rounded-lg bg-blue-50 p-4">
+        <div className="mt-4 rounded-none bg-blue-50 p-4">
           <div className="text-sm text-blue-800">
             <strong>Complete your profile to unlock:</strong>
             <ul className="mt-2 space-y-1 text-blue-700">

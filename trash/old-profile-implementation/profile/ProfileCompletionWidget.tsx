@@ -68,10 +68,10 @@ export function ProfileCompletionWidget({
   if (isLoading) {
     return (
       <div
-        className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${className}`}
+        className={`rounded-none border border-gray-200 bg-white p-4 shadow-sm ${className}`}
       >
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
+          <div className="h-8 w-8 animate-pulse rounded-none bg-gray-200" />
           <div className="flex-1">
             <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />
             <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200" />
@@ -85,7 +85,7 @@ export function ProfileCompletionWidget({
   if (error) {
     return (
       <div
-        className={`rounded-lg border border-red-200 bg-red-50 p-4 ${className}`}
+        className={`rounded-none border border-red-200 bg-red-50 p-4 ${className}`}
       >
         <div className="flex items-center space-x-3">
           <AlertCircle className="h-8 w-8 text-red-600" />
@@ -104,7 +104,7 @@ export function ProfileCompletionWidget({
   if (!user) {
     return (
       <div
-        className={`rounded-lg border border-gray-200 bg-gray-50 p-4 ${className}`}
+        className={`rounded-none border border-gray-200 bg-gray-50 p-4 ${className}`}
       >
         <div className="flex items-center space-x-3">
           <User className="h-8 w-8 text-gray-400" />
@@ -133,7 +133,7 @@ export function ProfileCompletionWidget({
   if (completionPercentage === 100) {
     return (
       <div
-        className={`rounded-lg border border-green-200 bg-green-50 p-4 ${className}`}
+        className={`rounded-none border border-green-200 bg-green-50 p-4 ${className}`}
       >
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
@@ -154,7 +154,7 @@ export function ProfileCompletionWidget({
 
   return (
     <div
-      className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${className}`}
+      className={`rounded-none border border-gray-200 bg-white p-4 shadow-sm ${className}`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
@@ -192,7 +192,7 @@ export function ProfileCompletionWidget({
           <span>Progress</span>
           <span>{completionPercentage}% Complete</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+        <div className="h-2 overflow-hidden rounded-none bg-gray-200">
           <div
             className={`h-full transition-all duration-500 ${getProgressBarColor(completionPercentage)}`}
             style={{ width: `${completionPercentage}%` }}
@@ -204,7 +204,7 @@ export function ProfileCompletionWidget({
       <div className="mt-4">
         <button
           onClick={() => router.push('/profile' as any)}
-          className="flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+          className="flex w-full items-center justify-center space-x-2 rounded-none bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
         >
           <User className="h-4 w-4" />
           <span>Update Profile</span>

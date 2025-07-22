@@ -84,11 +84,11 @@ export default function MyGigsPage() {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const shouldRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
-      
+
       if (shouldRefresh) {
         console.log('🔄 Detected refresh flag, will force refresh gigs data');
         setRefreshMessage('✅ Gig published successfully! Updating your gigs list...');
-        
+
         // Clear the refresh flag
         sessionStorage.removeItem('refresh-my-gigs');
         // Clear URL parameter
@@ -96,7 +96,7 @@ export default function MyGigsPage() {
           const newUrl = window.location.pathname;
           window.history.replaceState({}, '', newUrl);
         }
-        
+
         // Clear the message after 5 seconds
         setTimeout(() => setRefreshMessage(null), 5000);
       }
@@ -109,7 +109,7 @@ export default function MyGigsPage() {
       // Check if we need to force refresh
       const urlParams = new URLSearchParams(window.location.search);
       const shouldForceRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
-      
+
       loadGigs(!!shouldForceRefresh);
     }
   }, [user]);
@@ -117,22 +117,22 @@ export default function MyGigsPage() {
   const loadGigs = async (forceRefresh = false) => {
     try {
       setLoading(true);
-      
+
       // Add cache busting parameter for force refresh
-      const url = forceRefresh 
+      const url = forceRefresh
         ? `/api/gig/my-posted?_t=${Date.now()}`
         : '/api/gig/my-posted';
-        
+
       const response = await apiClient.get<GigsResponse>(url);
       console.log('Fetched gigs:', response.data, forceRefresh ? '(force refresh)' : '(cached)');
-      
+
       if (response.success) {
         // The API returns {gigs: Array, pagination: Object}
         if (response.data && Array.isArray(response.data.gigs)) {
           setGigs(response.data.gigs);
           const statuses = response.data.gigs.map(g => g.status).filter(Boolean);
           console.log('Gig statuses found:', Array.from(new Set(statuses)));
-          
+
           // Update refresh message if this was a force refresh
           if (forceRefresh && refreshMessage) {
             setRefreshMessage('✅ Gigs list updated successfully!');
@@ -141,7 +141,7 @@ export default function MyGigsPage() {
         } else if (Array.isArray(response.data)) {
           // Fallback if API returns array directly
           setGigs(response.data as Gig[]);
-          
+
           // Update refresh message if this was a force refresh
           if (forceRefresh && refreshMessage) {
             setRefreshMessage('✅ Gigs list updated successfully!');
@@ -165,7 +165,7 @@ export default function MyGigsPage() {
       const response = await apiClient.put(`/api/gig/${gigId}/status`, {
         status: newStatus,
       });
-
+      console.log(`Gig ${gigId} status updated to ${newStatus}`, response);
       if (response.success) {
         setGigs(prev => prev.map(gig =>
           gig.id === gigId ? { ...gig, status: newStatus as any } : gig
@@ -174,7 +174,7 @@ export default function MyGigsPage() {
         alert('Failed to update gig status');
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to update gig status');
+      alert(error || 'Failed to update gig status');
     }
   };
 
@@ -233,7 +233,7 @@ export default function MyGigsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
+      <div className="page-container min-h-screen">
         <div className="content-container py-8">
           <div className="mx-auto max-w-6xl">
             {/* Header */}
@@ -267,14 +267,14 @@ export default function MyGigsPage() {
 
             {/* Success Message */}
             {refreshMessage && (
-              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="mb-6 rounded-none border border-green-200 bg-green-50 p-4">
                 <p className="text-green-600">{refreshMessage}</p>
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -285,7 +285,7 @@ export default function MyGigsPage() {
                 <button
                   key={status}
                   onClick={() => setFilter(status as any)}
-                  className={`px-1 py-1 rounded-md text-sm font-medium transition-colors ${filter === status
+                  className={`px-1 py-1 rounded-none text-sm font-medium transition-colors ${filter === status
                     ? 'bg-brand-primary text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                     }`}
@@ -305,7 +305,7 @@ export default function MyGigsPage() {
             ) : filteredGigs.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📋</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -340,7 +340,7 @@ export default function MyGigsPage() {
                           </h3>
                           {gig.status && (
                             <>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[gig.status] || 'bg-gray-100 text-gray-700'}`}>
+                              <span className={`px-2 py-1 rounded-none text-xs font-medium ${statusColors[gig.status] || 'bg-gray-100 text-gray-700'}`}>
                                 {gig.status.replace('_', ' ')}
                               </span>
                             </>

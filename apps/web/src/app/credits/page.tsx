@@ -40,7 +40,7 @@ export default function CreditsPage() {
               {/* Profile Boost */}
               <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
+                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-none">
                     <span className="text-xl">👤</span>
                   </div>
                   <div className="flex-1">
@@ -52,15 +52,15 @@ export default function CreditsPage() {
                       recommendations
                     </p>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">24h</div>
                         <div className="text-muted text-sm">10 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">48h</div>
                         <div className="text-muted text-sm">15 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">7 days</div>
                         <div className="text-muted text-sm">45 credits</div>
                       </div>
@@ -72,7 +72,7 @@ export default function CreditsPage() {
               {/* Gig Boost */}
               <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
+                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-none">
                     <span className="text-xl">💼</span>
                   </div>
                   <div className="flex-1">
@@ -84,15 +84,15 @@ export default function CreditsPage() {
                       placement
                     </p>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">24h</div>
                         <div className="text-muted text-sm">15 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">48h</div>
                         <div className="text-muted text-sm">25 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">7 days</div>
                         <div className="text-muted text-sm">60 credits</div>
                       </div>
@@ -104,7 +104,7 @@ export default function CreditsPage() {
               {/* Clan Boost */}
               <div className="card-glass p-3">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
+                  <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-none">
                     <span className="text-xl">👥</span>
                   </div>
                   <div className="flex-1">
@@ -116,15 +116,15 @@ export default function CreditsPage() {
                       your team
                     </p>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">24h</div>
                         <div className="text-muted text-sm">20 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">48h</div>
                         <div className="text-muted text-sm">35 credits</div>
                       </div>
-                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-lg border p-3 text-center">
+                      <div className="border-brand-border hover:border-brand-primary cursor-pointer rounded-none border p-3 text-center">
                         <div className="text-heading font-semibold">7 days</div>
                         <div className="text-muted text-sm">80 credits</div>
                       </div>
@@ -162,7 +162,7 @@ export default function CreditsPage() {
                   >
                     {package_.popular && (
                       <div className="mb-2 text-center">
-                        <span className="bg-brand-primary rounded-full px-3 py-1 text-sm font-medium text-white">
+                        <span className="bg-brand-primary rounded-none px-3 py-1 text-sm font-medium text-white">
                           Most Popular
                         </span>
                       </div>
@@ -206,7 +206,7 @@ export default function CreditsPage() {
                 <div className="card-glass p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="bg-brand-primary/20 flex h-8 w-8 items-center justify-center rounded-lg">
+                      <div className="bg-brand-primary/20 flex h-8 w-8 items-center justify-center rounded-none">
                         <span>👤</span>
                       </div>
                       <div>
@@ -218,8 +218,8 @@ export default function CreditsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="bg-brand-border h-2 w-16 rounded-full">
-                      <div className="bg-brand-primary h-2 w-3/4 rounded-full"></div>
+                    <div className="bg-brand-border h-2 w-16 rounded-none">
+                      <div className="bg-brand-primary h-2 w-3/4 rounded-none"></div>
                     </div>
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function CreditsPage() {
                       <div className="flex items-center space-x-3">
                         <div
                           className={`
-                            flex h-8 w-8 items-center justify-center rounded-lg
+                            flex h-8 w-8 items-center justify-center rounded-none
                             ${
                               transaction.type === 'purchase'
                                 ? 'bg-success/20 text-success'

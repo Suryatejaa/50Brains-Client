@@ -391,7 +391,7 @@ export default function CampaignsPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -411,7 +411,7 @@ export default function CampaignsPage() {
             ) : campaigns.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📊</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -468,9 +468,9 @@ export default function CampaignsPage() {
                         </span>
                       </div>
                       
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-none h-2">
                         <div 
-                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all" 
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-none transition-all" 
                           style={{ width: `${Math.min(100, (campaign.budget.spent / campaign.budget.total) * 100)}%` }}
                         ></div>
                       </div>
@@ -484,7 +484,7 @@ export default function CampaignsPage() {
                     </div>
                     
                     {/* Performance */}
-                    <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg text-sm">
+                    <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-none text-sm">
                       <div className="text-center">
                         <p className="font-bold text-gray-900">{campaign.performance.applications}</p>
                         <p className="text-xs text-gray-600">Applications</p>
@@ -500,12 +500,12 @@ export default function CampaignsPage() {
                       <div className="flex items-center space-x-2 mb-4">
                         <div className="flex -space-x-2">
                           {campaign.collaborators.slice(0, 3).map((collaborator) => (
-                            <div key={collaborator.id} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                            <div key={collaborator.id} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                               {collaborator.profilePicture ? (
                                 <img 
                                   src={collaborator.profilePicture} 
                                   alt="Collaborator" 
-                                  className="w-8 h-8 rounded-full object-cover"
+                                  className="w-8 h-8 rounded-none object-cover"
                                 />
                               ) : (
                                 collaborator.name[0]?.toUpperCase()
@@ -513,7 +513,7 @@ export default function CampaignsPage() {
                             </div>
                           ))}
                           {campaign.collaborators.length > 3 && (
-                            <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                            <div className="w-8 h-8 bg-gray-400 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                               +{campaign.collaborators.length - 3}
                             </div>
                           )}

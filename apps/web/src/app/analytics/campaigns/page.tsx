@@ -163,7 +163,7 @@ export default function CampaignAnalyticsPage() {
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -173,7 +173,7 @@ export default function CampaignAnalyticsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="date">Sort by Date</option>
                 <option value="performance">Sort by Performance</option>
@@ -203,7 +203,7 @@ export default function CampaignAnalyticsPage() {
                       <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
                       <p className="text-2xl font-bold text-gray-900">{summary.totalCampaigns}</p>
                     </div>
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-none flex items-center justify-center">
                       📢
                     </div>
                   </div>
@@ -218,7 +218,7 @@ export default function CampaignAnalyticsPage() {
                       <p className="text-sm font-medium text-gray-600">Total Spent</p>
                       <p className="text-2xl font-bold text-gray-900">${summary.totalSpent.toLocaleString()}</p>
                     </div>
-                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-red-100 rounded-none flex items-center justify-center">
                       💳
                     </div>
                   </div>
@@ -233,7 +233,7 @@ export default function CampaignAnalyticsPage() {
                       <p className="text-sm font-medium text-gray-600">Total Applications</p>
                       <p className="text-2xl font-bold text-gray-900">{summary.totalApplications}</p>
                     </div>
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-yellow-100 rounded-none flex items-center justify-center">
                       📝
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export default function CampaignAnalyticsPage() {
                       <p className="text-sm font-medium text-gray-600">Average ROI</p>
                       <p className="text-2xl font-bold text-gray-900">{summary.averageROI.toFixed(1)}%</p>
                     </div>
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
                       📈
                     </div>
                   </div>
@@ -273,7 +273,7 @@ export default function CampaignAnalyticsPage() {
                   {campaigns.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer ${
+                      className={`border border-gray-200 rounded-none p-3 hover:border-blue-300 transition-colors cursor-pointer ${
                         selectedCampaign === campaign.id ? 'border-blue-500 bg-blue-50' : ''
                       }`}
                       onClick={() => setSelectedCampaign(selectedCampaign === campaign.id ? null : campaign.id)}
@@ -282,7 +282,7 @@ export default function CampaignAnalyticsPage() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900">{campaign.title}</h3>
-                            <span className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(campaign.status)}`}>
+                            <span className={`px-2 py-1 rounded-none text-sm font-medium ${getStatusColor(campaign.status)}`}>
                               {campaign.status}
                             </span>
                           </div>
@@ -443,7 +443,7 @@ export default function CampaignAnalyticsPage() {
               <div className="card-glass p-3">
                 <h2 className="text-xl font-semibold mb-4">💡 Performance Insights</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
                     <h3 className="font-semibold text-blue-900 mb-2">🎯 Top Performing Campaign</h3>
                     <p className="text-sm text-blue-800">
                       {campaigns.length > 0 && 
@@ -453,7 +453,7 @@ export default function CampaignAnalyticsPage() {
                       }
                     </p>
                   </div>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="bg-green-50 border border-green-200 rounded-none p-4">
                     <h3 className="font-semibold text-green-900 mb-2">💰 Best ROI Campaign</h3>
                     <p className="text-sm text-green-800">
                       {campaigns.length > 0 && 
@@ -463,7 +463,7 @@ export default function CampaignAnalyticsPage() {
                       }
                     </p>
                   </div>
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <div className="bg-purple-50 border border-purple-200 rounded-none p-4">
                     <h3 className="font-semibold text-purple-900 mb-2">📝 Most Applications</h3>
                     <p className="text-sm text-purple-800">
                       {campaigns.length > 0 && 

@@ -206,13 +206,13 @@ export default function SettingsPage() {
 
             {/* Success/Error Messages */}
             {success && (
-              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="mb-6 rounded-none border border-green-200 bg-green-50 p-4">
                 <p className="text-green-600">✅ {success}</p>
               </div>
             )}
 
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
-                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-none text-left transition-colors ${
                           activeTab === tab.id
                             ? 'bg-brand-primary text-white'
                             : 'text-gray-600 hover:bg-gray-50'
@@ -423,7 +423,7 @@ export default function SettingsPage() {
                     <div className="space-y-6">
                       <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
                       
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="bg-gray-50 p-4 rounded-none">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium text-gray-900">Two-Factor Authentication</h3>
@@ -434,7 +434,7 @@ export default function SettingsPage() {
                           <button
                             onClick={enableTwoFactor}
                             disabled={security.twoFactorEnabled}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                            className={`px-4 py-2 rounded-none text-sm font-medium ${
                               security.twoFactorEnabled
                                 ? 'bg-green-100 text-green-700 cursor-not-allowed'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -445,7 +445,7 @@ export default function SettingsPage() {
                         </div>
                       </div>
 
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="bg-gray-50 p-4 rounded-none">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium text-gray-900">Password</h3>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                         </div>
                       </div>
 
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="bg-gray-50 p-4 rounded-none">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium text-gray-900">Active Sessions</h3>
@@ -483,7 +483,7 @@ export default function SettingsPage() {
                     <div className="space-y-6">
                       <h2 className="text-xl font-semibold text-gray-900">Account Management</h2>
                       
-                      <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="bg-gray-50 p-4 rounded-none">
                         <h3 className="font-medium text-gray-900 mb-2">Account Information</h3>
                         <div className="space-y-2 text-sm text-gray-600">
                           <p><strong>Email:</strong> {user?.email}</p>
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                         </div>
                       </div>
 
-                      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-none">
                         <h3 className="font-medium text-yellow-900 mb-2">Danger Zone</h3>
                         <p className="text-sm text-yellow-700 mb-4">
                           These actions cannot be undone. Please proceed with caution.

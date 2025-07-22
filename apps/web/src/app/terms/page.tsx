@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-700 mb-4">
                     When you create an account with us, you must provide information that is accurate, complete, and current at all times. You are responsible for safeguarding the password and for all activities that occur under your account.
                   </p>
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                  <div className="bg-amber-50 border border-amber-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-amber-800 mb-2">Account Responsibilities:</h4>
                     <ul className="list-disc list-inside text-amber-700 space-y-1">
                       <li>Maintain accurate and up-to-date information</li>
@@ -82,7 +82,7 @@ export default function TermsOfServicePage() {
                     You agree not to use the Service to:
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="bg-red-50 border border-red-200 rounded-none p-4">
                       <h4 className="font-semibold text-red-800 mb-2">Prohibited Activities:</h4>
                       <ul className="list-disc list-inside text-red-700 space-y-1 text-sm">
                         <li>Upload harmful or malicious content</li>
@@ -92,7 +92,7 @@ export default function TermsOfServicePage() {
                         <li>Spam or send unsolicited messages</li>
                       </ul>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="bg-green-50 border border-green-200 rounded-none p-4">
                       <h4 className="font-semibold text-green-800 mb-2">Expected Behavior:</h4>
                       <ul className="list-disc list-inside text-green-700 space-y-1 text-sm">
                         <li>Treat all users with respect</li>
@@ -113,7 +113,7 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-700 mb-4">
                     50BraIns operates on a credit-based system. All payments must be made in advance through our secure payment gateway.
                   </p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-blue-800 mb-2">Payment Policy:</h4>
                     <ul className="list-disc list-inside text-blue-700 space-y-1">
                       <li>Credits are non-refundable except as required by law</li>
@@ -133,7 +133,7 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-700 mb-4">
                     The Service and its original content, features and functionality are and will remain the exclusive property of 50BraIns and its licensors. Users retain ownership of content they create and upload.
                   </p>
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                  <div className="bg-purple-50 border border-purple-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-purple-800 mb-2">Content Rights:</h4>
                     <p className="text-purple-700 text-sm">
                       By uploading content, you grant 50BraIns a non-exclusive, worldwide, royalty-free license to use, display, and distribute your content solely for the purpose of operating and promoting the Service.
@@ -177,7 +177,7 @@ export default function TermsOfServicePage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                     9. Disclaimer
                   </h2>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4 mb-4">
                     <p className="text-gray-700 text-sm">
                       THE INFORMATION ON THIS WEBSITE IS PROVIDED ON AN "AS IS" BASIS. TO THE FULLEST EXTENT PERMITTED BY LAW, 50BRAINS EXCLUDES ALL REPRESENTATIONS, WARRANTIES, CONDITIONS OR OTHER TERMS WHICH, BUT FOR THIS LEGAL NOTICE, MIGHT HAVE EFFECT IN RELATION TO THIS WEBSITE.
                     </p>
@@ -212,7 +212,7 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-700 mb-4">
                     We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect.
                   </p>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-none p-4">
                     <p className="text-yellow-700 text-sm">
                       <strong>Important:</strong> What constitutes a material change will be determined at our sole discretion. Your continued use of the Service after we post any modifications to the Terms constitutes acceptance of those changes.
                     </p>
@@ -227,7 +227,7 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-700 mb-4">
                     If you have any questions about these Terms of Service, please contact us:
                   </p>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4">
                     <div className="space-y-2 text-sm text-gray-700">
                       <div><strong>Email:</strong> legal@50brains.com</div>
                       <div><strong>Support:</strong> support@50brains.com</div>

@@ -294,7 +294,7 @@ export default function CreateGigPage() {
           <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-3">
             {/* General Error Display */}
             {errors.general && (
-              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 lg:col-span-3">
+              <div className="mb-4 rounded-none border border-red-200 bg-red-50 p-4 lg:col-span-3">
                 <p className="text-sm font-medium text-red-600">
                   {errors.general}
                 </p>
@@ -464,7 +464,7 @@ export default function CreateGigPage() {
                       {formData.skillsRequired.map((skill: string) => (
                         <span
                           key={skill}
-                          className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-lg px-3 py-1 text-sm"
+                          className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-none px-3 py-1 text-sm"
                         >
                           <span>{skill}</span>
                           <button
@@ -583,7 +583,7 @@ export default function CreateGigPage() {
                       {formData.deliverables.map((deliverable: string) => (
                         <span
                           key={deliverable}
-                          className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-lg px-3 py-1 text-sm"
+                          className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-none px-3 py-1 text-sm"
                         >
                           <span>{deliverable}</span>
                           <button
@@ -754,7 +754,7 @@ export default function CreateGigPage() {
                         <label
                           key={type.value}
                           className={`
-                            cursor-pointer rounded-lg border p-4 transition-all duration-200
+                            cursor-pointer rounded-none border p-4 transition-all duration-200
                             ${
                               formData.budgetType === type.value
                                 ? 'border-brand-primary bg-brand-light-blue/20'
@@ -906,7 +906,7 @@ export default function CreateGigPage() {
                         <label
                           key={urgency.value}
                           className={`
-                            cursor-pointer rounded-lg border p-3 transition-all duration-200
+                            cursor-pointer rounded-none border p-3 transition-all duration-200
                             ${
                               formData.urgency === urgency.value
                                 ? 'border-brand-primary bg-brand-light-blue/20'

@@ -236,7 +236,7 @@ export default function EquipmentPage() {
             <div className="mx-auto max-w-4xl text-center">
               <div className="card-glass p-8">
                 <div className="mb-6">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📹</span>
                   </div>
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -291,7 +291,7 @@ export default function EquipmentPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 mb-8">
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+                    <div className="p-2 bg-blue-100 rounded-none">
                       <span className="text-xl">📦</span>
                     </div>
                     <div className="ml-4">
@@ -305,7 +305,7 @@ export default function EquipmentPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
+                    <div className="p-2 bg-green-100 rounded-none">
                       <span className="text-xl">💰</span>
                     </div>
                     <div className="ml-4">
@@ -319,7 +319,7 @@ export default function EquipmentPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-emerald-100 rounded-lg">
+                    <div className="p-2 bg-emerald-100 rounded-none">
                       <span className="text-xl">✅</span>
                     </div>
                     <div className="ml-4">
@@ -333,7 +333,7 @@ export default function EquipmentPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-purple-100 rounded-lg">
+                    <div className="p-2 bg-purple-100 rounded-none">
                       <span className="text-xl">📂</span>
                     </div>
                     <div className="ml-4">
@@ -347,7 +347,7 @@ export default function EquipmentPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-orange-100 rounded-lg">
+                    <div className="p-2 bg-orange-100 rounded-none">
                       <span className="text-xl">📅</span>
                     </div>
                     <div className="ml-4">
@@ -361,7 +361,7 @@ export default function EquipmentPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-red-100 rounded-lg">
+                    <div className="p-2 bg-red-100 rounded-none">
                       <span className="text-xl">🔧</span>
                     </div>
                     <div className="ml-4">
@@ -380,7 +380,7 @@ export default function EquipmentPage() {
               <div className="flex flex-wrap gap-2 mb-4 sm:mb-0">
                 <button
                   onClick={() => setFilter('all')}
-                  className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+                  className={`px-4 py-2 text-sm rounded-none border transition-colors ${
                     filter === 'all'
                       ? 'bg-brand-primary text-white border-brand-primary'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -392,7 +392,7 @@ export default function EquipmentPage() {
                   <button
                     key={category}
                     onClick={() => setFilter(category)}
-                    className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+                    className={`px-4 py-2 text-sm rounded-none border transition-colors ${
                       filter === category
                         ? 'bg-brand-primary text-white border-brand-primary'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -420,7 +420,7 @@ export default function EquipmentPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -440,7 +440,7 @@ export default function EquipmentPage() {
             ) : filteredEquipment.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📹</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -580,7 +580,7 @@ export default function EquipmentPage() {
             {/* Add/Edit Equipment Modal */}
             {showAddModal && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-lg p-3 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="bg-white rounded-none p-3 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-900">
                       {editingItem ? 'Edit Equipment' : 'Add New Equipment'}
@@ -801,7 +801,7 @@ export default function EquipmentPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-none p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link href={"/my-bids" as any} className="btn-secondary text-center">

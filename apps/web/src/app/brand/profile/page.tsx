@@ -213,10 +213,10 @@ export default function BrandProfilePage() {
                       <img
                         src={profile.logo}
                         alt={profile.name}
-                        className="w-16 h-16 rounded-lg object-cover"
+                        className="w-16 h-16 rounded-none object-cover"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-gray-200 rounded-none flex items-center justify-center">
                         🏢
                       </div>
                     )}
@@ -274,7 +274,7 @@ export default function BrandProfilePage() {
                       type="text"
                       value={editForm.name || ''}
                       onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   
@@ -286,7 +286,7 @@ export default function BrandProfilePage() {
                       <select
                         value={editForm.industry || ''}
                         onChange={(e) => setEditForm(prev => ({ ...prev, industry: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Industry</option>
                         <option value="Technology">Technology</option>
@@ -309,7 +309,7 @@ export default function BrandProfilePage() {
                       <select
                         value={editForm.companySize || ''}
                         onChange={(e) => setEditForm(prev => ({ ...prev, companySize: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Size</option>
                         <option value="1-10">1-10 employees</option>
@@ -330,7 +330,7 @@ export default function BrandProfilePage() {
                         type="text"
                         value={editForm.location || ''}
                         onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="e.g., San Francisco, CA"
                       />
                     </div>
@@ -342,7 +342,7 @@ export default function BrandProfilePage() {
                         type="url"
                         value={editForm.website || ''}
                         onChange={(e) => setEditForm(prev => ({ ...prev, website: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://example.com"
                       />
                     </div>
@@ -356,7 +356,7 @@ export default function BrandProfilePage() {
                       value={editForm.description || ''}
                       onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Tell us about your brand..."
                     />
                   </div>
@@ -382,7 +382,7 @@ export default function BrandProfilePage() {
                 <div className="space-y-3">
                   {profile?.socialMedia && profile.socialMedia.length > 0 ? (
                     profile.socialMedia.map((social, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-none">
                         <div className="flex items-center space-x-3">
                           <span className="font-medium">{social.platform}</span>
                           <span className="text-gray-600">@{social.handle}</span>
@@ -404,11 +404,11 @@ export default function BrandProfilePage() {
               ) : (
                 <div className="space-y-3">
                   {editForm.socialMedia?.map((social, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-gray-200 rounded-lg">
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-gray-200 rounded-none">
                       <select
                         value={social.platform}
                         onChange={(e) => updateSocialMedia(index, 'platform', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Platform</option>
                         <option value="Instagram">Instagram</option>
@@ -423,7 +423,7 @@ export default function BrandProfilePage() {
                         placeholder="Handle"
                         value={social.handle}
                         onChange={(e) => updateSocialMedia(index, 'handle', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <div className="flex space-x-2">
                         <input
@@ -431,11 +431,11 @@ export default function BrandProfilePage() {
                           placeholder="Profile URL"
                           value={social.url}
                           onChange={(e) => updateSocialMedia(index, 'url', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <button
                           onClick={() => removeSocialMedia(index)}
-                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-none"
                         >
                           🗑️
                         </button>

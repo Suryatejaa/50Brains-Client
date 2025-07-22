@@ -151,7 +151,7 @@ export default function MyBidsPage() {
             <div className="mx-auto max-w-4xl text-center">
               <div className="card-glass p-8">
                 <div className="mb-6">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📋</span>
                   </div>
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -203,7 +203,7 @@ export default function MyBidsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+                    <div className="p-2 bg-blue-100 rounded-none">
                       <span className="text-xl">📋</span>
                     </div>
                     <div className="ml-4">
@@ -217,7 +217,7 @@ export default function MyBidsPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-yellow-100 rounded-lg">
+                    <div className="p-2 bg-yellow-100 rounded-none">
                       <span className="text-xl">⏳</span>
                     </div>
                     <div className="ml-4">
@@ -231,7 +231,7 @@ export default function MyBidsPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
+                    <div className="p-2 bg-green-100 rounded-none">
                       <span className="text-xl">✅</span>
                     </div>
                     <div className="ml-4">
@@ -245,7 +245,7 @@ export default function MyBidsPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-purple-100 rounded-lg">
+                    <div className="p-2 bg-purple-100 rounded-none">
                       <span className="text-xl">📈</span>
                     </div>
                     <div className="ml-4">
@@ -259,7 +259,7 @@ export default function MyBidsPage() {
 
                 <div className="card-glass p-3">
                   <div className="flex items-center">
-                    <div className="p-2 bg-emerald-100 rounded-lg">
+                    <div className="p-2 bg-emerald-100 rounded-none">
                       <span className="text-xl">💰</span>
                     </div>
                     <div className="ml-4">
@@ -285,7 +285,7 @@ export default function MyBidsPage() {
                   <button
                     key={filterOption.key}
                     onClick={() => setFilter(filterOption.key)}
-                    className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+                    className={`px-4 py-2 text-sm rounded-none border transition-colors ${
                       filter === filterOption.key
                         ? 'bg-brand-primary text-white border-brand-primary'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -312,7 +312,7 @@ export default function MyBidsPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -332,7 +332,7 @@ export default function MyBidsPage() {
             ) : filteredBids.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📋</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -404,7 +404,7 @@ export default function MyBidsPage() {
                         
                         {/* Message Preview */}
                         {bid.message && (
-                          <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                          <div className="bg-gray-50 rounded-none p-3 mb-3">
                             <p className="text-sm text-gray-700 line-clamp-2">
                               <span className="font-medium">Your message:</span> {bid.message}
                             </p>
@@ -481,7 +481,7 @@ export default function MyBidsPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-none p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link href={"/marketplace" as any} className="btn-secondary text-center">

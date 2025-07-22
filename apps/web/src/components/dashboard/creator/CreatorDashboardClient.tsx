@@ -416,9 +416,9 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
                     {dashboardData?.gigs?.completedGigs || 0} / 5
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-gray-200">
+                <div className="h-2 w-full rounded-none bg-gray-200">
                   <div
-                    className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                    className="h-2 rounded-none bg-gradient-to-r from-blue-500 to-purple-500"
                     style={{
                       width: `${Math.min(100, ((dashboardData?.gigs?.completedGigs || 0) / 5) * 100)}%`,
                     }}
@@ -433,9 +433,9 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
                     {dashboardData?.portfolio?.totalItems || 0} / 10
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-gray-200">
+                <div className="h-2 w-full rounded-none bg-gray-200">
                   <div
-                    className="h-2 rounded-full bg-yellow-500"
+                    className="h-2 rounded-none bg-yellow-500"
                     style={{
                       width: `${Math.min(100, ((dashboardData?.portfolio?.totalItems || 0) / 10) * 100)}%`,
                     }}
@@ -450,9 +450,9 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
                     {dashboardData?.socialMedia?.totalAccounts || 0} / 5
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-gray-200">
+                <div className="h-2 w-full rounded-none bg-gray-200">
                   <div
-                    className="h-2 rounded-full bg-green-500"
+                    className="h-2 rounded-none bg-green-500"
                     style={{
                       width: `${Math.min(100, ((dashboardData?.socialMedia?.totalAccounts || 0) / 5) * 100)}%`,
                     }}

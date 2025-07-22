@@ -265,7 +265,7 @@ export default function TestingPage() {
                     const testResult = testResults.find(r => r.page === page.name);
                     
                     return (
-                      <div key={page.path} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div key={page.path} className="border border-gray-200 rounded-none p-4 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-2">
                           <div>
                             <h3 className="font-medium text-gray-900">{page.name}</h3>
@@ -318,8 +318,8 @@ export default function TestingPage() {
                       <span className="text-sm font-medium text-gray-700">Phase 1: High Priority Pages</span>
                       <span className="text-sm text-gray-600">11/11 (100%)</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-green-500 h-3 rounded-full w-full"></div>
+                    <div className="w-full bg-gray-200 rounded-none h-3">
+                      <div className="bg-green-500 h-3 rounded-none w-full"></div>
                     </div>
                   </div>
                   
@@ -328,8 +328,8 @@ export default function TestingPage() {
                       <span className="text-sm font-medium text-gray-700">Phase 2: Medium Priority Pages</span>
                       <span className="text-sm text-gray-600">5/5 (100%)</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-blue-500 h-3 rounded-full w-full"></div>
+                    <div className="w-full bg-gray-200 rounded-none h-3">
+                      <div className="bg-blue-500 h-3 rounded-none w-full"></div>
                     </div>
                   </div>
                   
@@ -338,8 +338,8 @@ export default function TestingPage() {
                       <span className="text-sm font-medium text-gray-700">Overall Implementation</span>
                       <span className="text-sm text-gray-600">16/16 (100%)</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full w-full"></div>
+                    <div className="w-full bg-gray-200 rounded-none h-3">
+                      <div className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-none w-full"></div>
                     </div>
                   </div>
                 </div>

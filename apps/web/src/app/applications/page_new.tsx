@@ -183,7 +183,7 @@ export default function ApplicationsPage() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="ALL">All Applications</option>
                 <option value="PENDING">Pending</option>
@@ -195,15 +195,15 @@ export default function ApplicationsPage() {
             
             <div className="flex items-center space-x-4 text-sm">
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-yellow-100 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
                 <span>Pending: {applications.filter(a => a.status === 'PENDING').length}</span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-100 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-100 rounded-none"></div>
                 <span>Accepted: {applications.filter(a => a.status === 'ACCEPTED').length}</span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-100 rounded-full"></div>
+                <div className="w-3 h-3 bg-red-100 rounded-none"></div>
                 <span>Rejected: {applications.filter(a => a.status === 'REJECTED').length}</span>
               </span>
             </div>
@@ -217,7 +217,7 @@ export default function ApplicationsPage() {
               <div key={application.id} className="card-glass p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
                       <span className="text-gray-500 font-medium">
                         {getApplicantName(application.applicantId)[0]?.toUpperCase() || 'A'}
                       </span>
@@ -233,7 +233,7 @@ export default function ApplicationsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[application.status]}`}>
+                    <span className={`px-3 py-1 rounded-none text-sm font-medium ${statusColors[application.status]}`}>
                       {application.status}
                     </span>
                     <p className="text-sm text-gray-500 mt-1">
@@ -243,7 +243,7 @@ export default function ApplicationsPage() {
                 </div>
 
                 {/* Gig Details */}
-                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                <div className="bg-gray-50 p-4 rounded-none mb-4">
                   <h4 className="font-semibold mb-2">Gig: {application.gig.title}</h4>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                     <span>Category: {application.gig.category}</span>
@@ -257,7 +257,7 @@ export default function ApplicationsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
                     <h4 className="font-semibold mb-2">Proposal</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-none whitespace-pre-wrap">
                       {application.proposal}
                     </p>
                   </div>
@@ -306,7 +306,7 @@ export default function ApplicationsPage() {
                 {application.status === 'REJECTED' && application.rejectionReason && (
                   <div className="mb-6">
                     <h4 className="font-semibold mb-2 text-red-600">Rejection Reason</h4>
-                    <p className="text-gray-700 bg-red-50 p-3 rounded-lg">
+                    <p className="text-gray-700 bg-red-50 p-3 rounded-none">
                       {application.rejectionReason}
                     </p>
                   </div>

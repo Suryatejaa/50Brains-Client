@@ -36,7 +36,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {/* First row - Core metrics */}
-        <div className="rounded-lg bg-blue-50 p-4">
+        <div className="rounded-none bg-blue-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-600">Profile Views</p>
@@ -51,7 +51,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-green-50 p-4">
+        <div className="rounded-none bg-green-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-green-600">Connections</p>
@@ -66,7 +66,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-purple-50 p-4">
+        <div className="rounded-none bg-purple-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-purple-600">
@@ -83,7 +83,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-yellow-50 p-4">
+        <div className="rounded-none bg-yellow-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-yellow-600">Rating</p>
@@ -99,7 +99,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
         </div>
 
         {/* Second row - Advanced metrics */}
-        <div className="rounded-lg bg-indigo-50 p-4">
+        <div className="rounded-none bg-indigo-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-indigo-600">Earnings</p>
@@ -114,7 +114,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-teal-50 p-4">
+        <div className="rounded-none bg-teal-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-teal-600">Active Gigs</p>
@@ -129,7 +129,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-pink-50 p-4">
+        <div className="rounded-none bg-pink-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-pink-600">Retention</p>
@@ -144,7 +144,7 @@ export const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({
           </p>
         </div>
 
-        <div className="rounded-lg bg-orange-50 p-4">
+        <div className="rounded-none bg-orange-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-orange-600">

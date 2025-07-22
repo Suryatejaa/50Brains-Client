@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
         <div className="flex min-h-screen items-center justify-center py-12">
           <div className="w-full max-w-md">
             <div className="card-glass p-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-green-100">
                 <svg
                   className="h-8 w-8 text-green-600"
                   fill="none"
@@ -116,7 +116,7 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="card-glass space-y-6 p-8">
             {/* Error Message */}
             {error && (
-              <div className="bg-error/10 border-error/20 text-error rounded-lg border px-4 py-3 text-sm">
+              <div className="bg-error/10 border-error/20 text-error rounded-none border px-4 py-3 text-sm">
                 {error}
               </div>
             )}

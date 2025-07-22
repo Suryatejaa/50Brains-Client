@@ -35,7 +35,7 @@ export function HowItWorks() {
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
-              <div className="bg-primary-600 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white">
+              <div className="bg-primary-600 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none text-xl font-bold text-white">
                 {step.number}
               </div>
               <h3 className="mb-2 text-xl font-semibold text-gray-900">

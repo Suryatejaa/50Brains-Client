@@ -10,7 +10,7 @@ export function Hero() {
       <div className="content-container section-spacing">
         <div className="text-center">
           {/* 🧠 Hero Badge */}
-          <div className="border-brand-border bg-brand-glass text-brand-text-muted mb-6 inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium backdrop-blur-md">
+          <div className="border-brand-border bg-brand-glass text-brand-text-muted mb-6 inline-flex items-center rounded-none border px-4 py-2 text-sm font-medium backdrop-blur-md">
             ✨ Where Creativity Meets Opportunity
           </div>
 

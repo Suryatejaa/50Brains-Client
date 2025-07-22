@@ -86,7 +86,7 @@ app/profile/settings/page.tsx → /profile/settings
 .bg-brand-primary   /* Brand blue background */
 .text-brand-text-main /* Main text color */
 .border-brand-border /* Border color */
-.rounded-lg         /* Large border radius */
+.rounded-none         /* Large border radius */
 .px-4 py-2          /* Padding: 1rem horizontal, 0.5rem vertical */
 .flex items-center  /* Flexbox with center alignment */
 ```

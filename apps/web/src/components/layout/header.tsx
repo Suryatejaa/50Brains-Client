@@ -34,7 +34,7 @@ export function Header() {
               >
                 <span className="text-xl">🔔</span>
                 {/* Notification badge - you can add logic to show count */}
-                {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">3</span> */}
+                {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-none w-5 h-5 flex items-center justify-center text-xs">3</span> */}
               </Link>
 
               {/* User Avatar & Dropdown */}
@@ -60,7 +60,7 @@ export function Header() {
                       className="fixed inset-0 z-10"
                       onClick={() => setIsUserMenuOpen(false)}
                     />
-                    <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg">
+                    <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-md border border-gray-200 bg-white shadow-lg">
                       <div className="p-2">
                         {/* User Info Header */}
                         <div className="mb-2 border-b border-gray-200 px-3 py-3">
@@ -76,7 +76,7 @@ export function Header() {
                         <Link
                           href="/profile"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
                           <span>👤</span>
                           <span>Profile</span>
@@ -85,7 +85,7 @@ export function Header() {
                         <Link
                           href="/credits"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
                           <span>💰</span>
                           <span>Credits</span>
@@ -94,7 +94,7 @@ export function Header() {
                         <Link
                           href="/dashboard"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
                           <span>🏠</span>
                           <span>Dashboard</span>
@@ -108,7 +108,7 @@ export function Header() {
                             logout();
                             setIsUserMenuOpen(false);
                           }}
-                          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-red-600 transition-colors duration-200 hover:bg-red-50"
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-red-600 transition-colors duration-200 hover:bg-red-50"
                         >
                           <span>🚪</span>
                           <span>Sign Out</span>
@@ -150,7 +150,7 @@ export function Header() {
             <div className="md:hidden">
               <div className="border-brand-border bg-brand-glass space-y-1 border-t px-2 pb-3 pt-2 backdrop-blur-md">
                 <div className="border-brand-border mb-2 flex items-center border-b px-3 py-3">
-                  <div className="bg-brand-light-blue/20 mr-3 flex h-10 w-10 items-center justify-center rounded-full">
+                  <div className="bg-brand-light-blue/20 mr-3 flex h-10 w-10 items-center justify-center rounded-none">
                     <span className="text-lg font-medium">
                       {user?.firstName?.charAt(0) ||
                         user?.email?.charAt(0) ||
@@ -174,7 +174,7 @@ export function Header() {
 
                 <Link
                   href="/credits"
-                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
+                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Credits
@@ -184,7 +184,7 @@ export function Header() {
                     logout();
                     setIsMenuOpen(false);
                   }}
-                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 w-full rounded-lg px-3 py-2 text-left transition-all duration-200"
+                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 w-full rounded-none px-3 py-2 text-left transition-all duration-200"
                 >
                   Sign Out
                 </button>
@@ -247,21 +247,21 @@ export function Header() {
             <div className="border-brand-border bg-brand-glass space-y-1 border-t px-2 pb-3 pt-2 backdrop-blur-md">
               <Link
                 href="/marketplace"
-                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
+                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Marketplace
               </Link>
               <Link
                 href="/clans"
-                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
+                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Clans
               </Link>
               <Link
                 href="/create-gig"
-                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-lg px-3 py-2 transition-all duration-200"
+                className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Create Gig

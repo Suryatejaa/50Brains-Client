@@ -533,7 +533,7 @@ export default function EditGigPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="card-glass p-8 text-center">
-          <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-none mx-auto mb-4"></div>
           <p>Loading gig...</p>
         </div>
       </div>
@@ -584,13 +584,13 @@ export default function EditGigPage() {
             </div>
 
             {error && (
-              <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-none">
                 {error}
               </div>
             )}
 
             {shouldPublish && (
-              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-none p-4">
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">Ready to Publish?</h3>
                 <p className="text-blue-700">
                   Please review and complete your gig details before publishing. 
@@ -613,7 +613,7 @@ export default function EditGigPage() {
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         errors.title ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="e.g., Create Instagram content for fashion brand"
@@ -634,7 +634,7 @@ export default function EditGigPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => handleInputChange('description', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         errors.description ? 'border-red-500' : 'border-gray-300'
                       }`}
                       rows={6}
@@ -657,7 +657,7 @@ export default function EditGigPage() {
                       <select
                         value={formData.category}
                         onChange={(e) => handleInputChange('category', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                           errors.category ? 'border-red-500' : 'border-gray-300'
                         }`}
                       >
@@ -682,7 +682,7 @@ export default function EditGigPage() {
                       <select
                         value={formData.roleRequired}
                         onChange={(e) => handleInputChange('roleRequired', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                           errors.roleRequired ? 'border-red-500' : 'border-gray-300'
                         }`}
                       >
@@ -709,7 +709,7 @@ export default function EditGigPage() {
                       <select
                         value={formData.experienceLevel}
                         onChange={(e) => handleInputChange('experienceLevel', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {experienceLevels.map(level => (
                           <option key={level} value={level}>
@@ -726,7 +726,7 @@ export default function EditGigPage() {
                       <select
                         value={formData.urgency}
                         onChange={(e) => handleInputChange('urgency', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {urgencyLevels.map(level => (
                           <option key={level} value={level}>
@@ -745,7 +745,7 @@ export default function EditGigPage() {
                       type="date"
                       value={formData.deadline}
                       onChange={(e) => handleInputChange('deadline', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
@@ -779,7 +779,7 @@ export default function EditGigPage() {
                         type="text"
                         value={formData.location}
                         onChange={(e) => handleInputChange('location', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="e.g., Mumbai, Delhi, Bangalore"
                       />
                     </div>
@@ -798,7 +798,7 @@ export default function EditGigPage() {
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {['fixed', 'hourly', 'negotiable'].map(type => (
-                        <label key={type} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={type} className="flex items-center p-3 border rounded-none cursor-pointer hover:bg-gray-50">
                           <input
                             type="radio"
                             name="budgetType"
@@ -826,7 +826,7 @@ export default function EditGigPage() {
                           type="number"
                           value={formData.budgetMin || ''}
                           onChange={(e) => handleInputChange('budgetMin', Number(e.target.value) || undefined)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                             errors.budgetMin ? 'border-red-500' : 'border-gray-300'
                           }`}
                           min="1"
@@ -844,7 +844,7 @@ export default function EditGigPage() {
                           type="number"
                           value={formData.budgetMax || ''}
                           onChange={(e) => handleInputChange('budgetMax', Number(e.target.value) || undefined)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                             errors.budgetMax ? 'border-red-500' : 'border-gray-300'
                           }`}
                           min="1"
@@ -875,7 +875,7 @@ export default function EditGigPage() {
                             type="text"
                             value={skill}
                             onChange={(e) => updateTag('skillsRequired', index, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Content Writing, Photo Editing, Social Media"
                           />
                           <button
@@ -918,7 +918,7 @@ export default function EditGigPage() {
                             type="text"
                             value={deliverable}
                             onChange={(e) => updateTag('deliverables', index, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Final logo files, Source files, Brand guidelines"
                           />
                           <button
@@ -957,7 +957,7 @@ export default function EditGigPage() {
                     <select
                       value={formData.duration || ''}
                       onChange={(e) => handleInputChange('duration', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select duration</option>
                       <option value="1 day">1 day</option>
@@ -979,7 +979,7 @@ export default function EditGigPage() {
                       type="text"
                       value={formData.campaignDuration || ''}
                       onChange={(e) => handleInputChange('campaignDuration', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., 3 months, ongoing, 6 weeks"
                     />
                     <p className="mt-1 text-sm text-gray-500">
@@ -995,7 +995,7 @@ export default function EditGigPage() {
                       type="number"
                       value={formData.maxApplications || ''}
                       onChange={(e) => handleInputChange('maxApplications', Number(e.target.value) || undefined)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       min="1"
                       placeholder="Leave empty for unlimited"
                     />
@@ -1008,7 +1008,7 @@ export default function EditGigPage() {
                     <textarea
                       value={formData.requirements || ''}
                       onChange={(e) => handleInputChange('requirements', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={3}
                       placeholder="Any additional requirements or notes for applicants..."
                     />
@@ -1032,7 +1032,7 @@ export default function EditGigPage() {
                             type="text"
                             value={platform}
                             onChange={(e) => updateTag('platformRequirements', index, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Instagram, YouTube, TikTok, LinkedIn"
                           />
                           <button
@@ -1072,7 +1072,7 @@ export default function EditGigPage() {
                             type="text"
                             value={req.platform}
                             onChange={(e) => updateFollowerRequirement(index, 'platform', e.target.value)}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Platform (e.g., Instagram)"
                           />
                           <div className="flex items-center space-x-2">
@@ -1080,7 +1080,7 @@ export default function EditGigPage() {
                               type="number"
                               value={req.minFollowers}
                               onChange={(e) => updateFollowerRequirement(index, 'minFollowers', Number(e.target.value))}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Min followers"
                               min="0"
                             />
@@ -1122,7 +1122,7 @@ export default function EditGigPage() {
                             type="text"
                             value={location}
                             onChange={(e) => updateTag('locationRequirements', index, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Mumbai, Delhi, India, Global"
                           />
                           <button
@@ -1165,7 +1165,7 @@ export default function EditGigPage() {
                             type="text"
                             value={tag}
                             onChange={(e) => updateTag('tags', index, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., urgent, startup, remote"
                           />
                           <button

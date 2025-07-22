@@ -64,7 +64,7 @@ const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
               {user.roles?.map((role: string) => (
                 <span
                   key={role}
-                  className="bg-primary-100 text-primary-700 rounded-lg px-3 py-1 text-sm font-medium"
+                  className="bg-primary-100 text-primary-700 rounded-none px-3 py-1 text-sm font-medium"
                 >
                   {role}
                 </span>

@@ -106,7 +106,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
             <button
               key={role}
               onClick={() => switchRole(role)}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 rounded-none px-3 py-2 text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? 'bg-brand-primary text-white shadow-sm'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -125,7 +125,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+        className="flex items-center gap-2 rounded-none border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-50"
       >
         <CurrentIcon className="h-4 w-4" />
         <span>{currentRoleConfig.label}</span>
@@ -140,7 +140,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg">
+          <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-none border border-gray-200 bg-white shadow-lg">
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
                 Switch Dashboard
@@ -157,7 +157,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
                       switchRole(role);
                       setIsOpen(false);
                     }}
-                    className={`flex w-full items-start gap-3 rounded-md px-3 py-3 text-left transition-colors duration-200 ${
+                    className={`flex w-full items-start gap-3 rounded-none px-3 py-3 text-left transition-colors duration-200 ${
                       isActive
                         ? 'bg-brand-primary/10 text-brand-primary'
                         : 'text-gray-700 hover:bg-gray-50'

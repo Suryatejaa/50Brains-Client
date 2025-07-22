@@ -24,7 +24,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
               type="text"
               value={profile.companyName || ''}
               onChange={(e) => onUpdate('companyName', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter company name"
             />
           ) : (
@@ -42,7 +42,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.industry || ''}
               onChange={(e) => onUpdate('industry', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select industry</option>
               <option value="technology">Technology</option>
@@ -71,7 +71,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.companyType || ''}
               onChange={(e) => onUpdate('companyType', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select type</option>
               <option value="STARTUP">Startup</option>
@@ -95,7 +95,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.companySize || ''}
               onChange={(e) => onUpdate('companySize', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select size</option>
               <option value="1-10">1-10 employees</option>
@@ -120,7 +120,7 @@ export const BrandProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.marketingBudget || ''}
               onChange={(e) => onUpdate('marketingBudget', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select budget range</option>
               <option value="UNDER_10K">Under $10,000</option>

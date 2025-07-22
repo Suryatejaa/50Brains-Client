@@ -227,7 +227,7 @@ export default function EnhancedProfilePage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-none border-4 border-blue-500 border-t-transparent"></div>
           <p className="text-gray-600">Loading your enhanced profile...</p>
         </div>
       </div>
@@ -246,7 +246,7 @@ export default function EnhancedProfilePage() {
           <p className="mb-4 text-gray-600">{error}</p>
           <button
             onClick={fetchAllProfileData}
-            className="rounded-lg bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
+            className="rounded-none bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
           >
             Try Again
           </button>
@@ -273,7 +273,7 @@ export default function EnhancedProfilePage() {
       {/* Debug Tool - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
         <div className="px-6 pt-6">
-          <div className="rounded-lg border bg-gray-100 p-4">
+          <div className="rounded-none border bg-gray-100 p-4">
             <h4 className="mb-2 font-semibold text-gray-700">Debug Info</h4>
             <div className="space-y-1 text-sm text-gray-600">
               <p>User ID: {user?.id}</p>
@@ -326,7 +326,7 @@ export default function EnhancedProfilePage() {
 
       {/* Error display */}
       {error && (
-        <div className="fixed bottom-4 right-4 rounded-lg bg-red-500 px-6 py-3 text-white shadow-lg">
+        <div className="fixed bottom-4 right-4 rounded-none bg-red-500 px-6 py-3 text-white shadow-lg">
           <div className="flex items-center">
             <AlertCircle className="mr-2 h-5 w-5" />
             {error}

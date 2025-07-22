@@ -174,9 +174,9 @@ export default function SocialMediaPage() {
                   {socialAccounts.map((account) => {
                     const platform = platforms.find(p => p.id === account.platform);
                     return (
-                      <div key={account.id} className="border rounded-lg p-4 flex items-center justify-between">
+                      <div key={account.id} className="border rounded-none p-4 flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className={`w-10 h-10 ${platform?.color} rounded-full flex items-center justify-center text-white text-lg`}>
+                          <div className={`w-10 h-10 ${platform?.color} rounded-none flex items-center justify-center text-white text-lg`}>
                             {platform?.icon}
                           </div>
                           <div>
@@ -220,13 +220,13 @@ export default function SocialMediaPage() {
                       key={platform.id}
                       onClick={() => !isConnected && connectPlatform(platform.id)}
                       disabled={isConnected || isConnectingThis}
-                      className={`p-4 rounded-lg border-2 border-dashed text-center transition-all ${
+                      className={`p-4 rounded-none border-2 border-dashed text-center transition-all ${
                         isConnected 
                           ? 'border-green-300 bg-green-50 cursor-not-allowed' 
                           : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
                       }`}
                     >
-                      <div className={`w-12 h-12 ${platform.color} rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2`}>
+                      <div className={`w-12 h-12 ${platform.color} rounded-none flex items-center justify-center text-white text-xl mx-auto mb-2`}>
                         {isConnectingThis ? '⏳' : platform.icon}
                       </div>
                       <div className="font-medium">{platform.name}</div>
@@ -240,7 +240,7 @@ export default function SocialMediaPage() {
             </div>
 
             {/* Help Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-2">💡 Why Connect Social Media?</h3>
               <ul className="text-blue-800 space-y-1">
                 <li>• Showcase your audience size and engagement to brands</li>

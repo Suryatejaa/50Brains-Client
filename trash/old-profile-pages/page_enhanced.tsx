@@ -202,25 +202,25 @@ const ProfileAnalytics = ({ analytics }: { analytics: UserAnalytics }) => {
       </h3>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-lg bg-blue-50 p-3 text-center">
+        <div className="rounded-none bg-blue-50 p-3 text-center">
           <div className="text-2xl font-bold text-blue-600">
             {analytics.profileViews}
           </div>
           <div className="text-sm text-gray-600">Profile Views</div>
         </div>
-        <div className="rounded-lg bg-green-50 p-3 text-center">
+        <div className="rounded-none bg-green-50 p-3 text-center">
           <div className="text-2xl font-bold text-green-600">
             {analytics.searchAppearances}
           </div>
           <div className="text-sm text-gray-600">Search Results</div>
         </div>
-        <div className="rounded-lg bg-purple-50 p-3 text-center">
+        <div className="rounded-none bg-purple-50 p-3 text-center">
           <div className="text-2xl font-bold text-purple-600">
             {analytics.profileViewsThisMonth}
           </div>
           <div className="text-sm text-gray-600">Views This Month</div>
         </div>
-        <div className="rounded-lg bg-orange-50 p-3 text-center">
+        <div className="rounded-none bg-orange-50 p-3 text-center">
           <div className="text-2xl font-bold text-orange-600">
             {analytics.messagingStats.responseRate}%
           </div>
@@ -230,19 +230,19 @@ const ProfileAnalytics = ({ analytics }: { analytics: UserAnalytics }) => {
 
       {analytics.gigStats.totalCompleted > 0 && (
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-lg bg-yellow-50 p-3 text-center">
+          <div className="rounded-none bg-yellow-50 p-3 text-center">
             <div className="text-xl font-bold text-yellow-600">
               {analytics.applicationsSent}
             </div>
             <div className="text-sm text-gray-600">Gig Applications</div>
           </div>
-          <div className="rounded-lg bg-indigo-50 p-3 text-center">
+          <div className="rounded-none bg-indigo-50 p-3 text-center">
             <div className="text-xl font-bold text-indigo-600">
               {analytics.gigStats.successRate}%
             </div>
             <div className="text-sm text-gray-600">Success Rate</div>
           </div>
-          <div className="rounded-lg bg-pink-50 p-3 text-center">
+          <div className="rounded-none bg-pink-50 p-3 text-center">
             <div className="text-xl font-bold text-pink-600">
               {analytics.gigStats.averageRating}/5
             </div>
@@ -275,7 +275,7 @@ const RoleSelector = ({
           return (
             <span
               key={role}
-              className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-${roleInfo.color}-100 text-${roleInfo.color}-800`}
+              className={`inline-flex items-center rounded-none px-3 py-1 text-sm font-medium bg-${roleInfo.color}-100 text-${roleInfo.color}-800`}
             >
               <IconComponent className="mr-1 h-4 w-4" />
               {roleInfo.label}
@@ -296,14 +296,14 @@ const RoleSelector = ({
           <div
             key={role.value}
             onClick={() => onRoleToggle(role.value)}
-            className={`flex cursor-pointer items-center rounded-lg border p-3 transition-all ${
+            className={`flex cursor-pointer items-center rounded-none border p-3 transition-all ${
               isSelected
                 ? `border-${role.color}-300 bg-${role.color}-50`
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
             <div
-              className={`mr-3 rounded-lg p-2 ${
+              className={`mr-3 rounded-none p-2 ${
                 isSelected ? `bg-${role.color}-100` : 'bg-gray-100'
               }`}
             >
@@ -550,7 +550,7 @@ export default function EnhancedProfilePage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-none border-4 border-blue-500 border-t-transparent"></div>
           <p className="text-gray-600">Loading your profile...</p>
         </div>
       </div>
@@ -590,7 +590,7 @@ export default function EnhancedProfilePage() {
               />
             )}
             {isEditing && (
-              <button className="absolute right-4 top-4 rounded-lg bg-black bg-opacity-50 p-2 text-white hover:bg-opacity-70">
+              <button className="absolute right-4 top-4 rounded-none bg-black bg-opacity-50 p-2 text-white hover:bg-opacity-70">
                 <Camera className="h-5 w-5" />
               </button>
             )}
@@ -601,7 +601,7 @@ export default function EnhancedProfilePage() {
             <div className="flex flex-col md:flex-row md:items-end md:space-x-6">
               {/* Profile Picture */}
               <div className="relative -mt-16 mb-4 md:mb-0">
-                <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-gray-200 shadow-lg">
+                <div className="h-32 w-32 overflow-hidden rounded-none border-4 border-white bg-gray-200 shadow-lg">
                   {profileData.profilePicture ? (
                     <img
                       src={profileData.profilePicture}
@@ -615,7 +615,7 @@ export default function EnhancedProfilePage() {
                   )}
                 </div>
                 {isEditing && (
-                  <button className="absolute bottom-2 right-2 rounded-full bg-blue-500 p-2 text-white hover:bg-blue-600">
+                  <button className="absolute bottom-2 right-2 rounded-none bg-blue-500 p-2 text-white hover:bg-blue-600">
                     <Camera className="h-4 w-4" />
                   </button>
                 )}
@@ -695,10 +695,10 @@ export default function EnhancedProfilePage() {
                         <button
                           onClick={handleSaveProfile}
                           disabled={isSaving}
-                          className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                          className="flex items-center rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
                         >
                           {isSaving ? (
-                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-none border-2 border-white border-t-transparent" />
                           ) : (
                             <Save className="mr-2 h-4 w-4" />
                           )}
@@ -706,7 +706,7 @@ export default function EnhancedProfilePage() {
                         </button>
                         <button
                           onClick={() => setIsEditing(false)}
-                          className="flex items-center rounded-lg bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+                          className="flex items-center rounded-none bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
                         >
                           <X className="mr-2 h-4 w-4" />
                           Cancel
@@ -716,12 +716,12 @@ export default function EnhancedProfilePage() {
                       <>
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                          className="flex items-center rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                         >
                           <Edit3 className="mr-2 h-4 w-4" />
                           Edit Profile
                         </button>
-                        <button className="flex items-center rounded-lg bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">
+                        <button className="flex items-center rounded-none bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">
                           <Share2 className="mr-2 h-4 w-4" />
                           Share
                         </button>
@@ -783,7 +783,7 @@ export default function EnhancedProfilePage() {
                     value={profileData.bio || ''}
                     onChange={(e) => updateProfileField('bio', e.target.value)}
                     rows={4}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Tell others about yourself, your expertise, and what makes you unique..."
                   />
                 ) : (
@@ -804,7 +804,7 @@ export default function EnhancedProfilePage() {
                       {(profileData.skills || []).map((skill, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                          className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                         >
                           {skill}
                           <button
@@ -822,12 +822,12 @@ export default function EnhancedProfilePage() {
                         value={newSkill}
                         onChange={(e) => setNewSkill(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                        className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Add a skill"
                       />
                       <button
                         onClick={addSkill}
-                        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                        className="rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                       >
                         Add
                       </button>
@@ -838,7 +838,7 @@ export default function EnhancedProfilePage() {
                     {(profileData.skills || []).map((skill, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                        className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                       >
                         {skill}
                       </span>
@@ -870,7 +870,7 @@ export default function EnhancedProfilePage() {
                           onChange={(e) =>
                             updateProfileField('primaryNiche', e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select a niche</option>
                           {CONTENT_CATEGORIES.map((category) => (
@@ -902,7 +902,7 @@ export default function EnhancedProfilePage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select platform</option>
                           {SOCIAL_PLATFORMS.map((platform) => (
@@ -943,7 +943,7 @@ export default function EnhancedProfilePage() {
                                     updated
                                   );
                                 }}
-                                className={`rounded-full px-3 py-1 text-sm ${
+                                className={`rounded-none px-3 py-1 text-sm ${
                                   isSelected
                                     ? 'border border-purple-300 bg-purple-100 text-purple-800'
                                     : 'border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -960,7 +960,7 @@ export default function EnhancedProfilePage() {
                             (category, index) => (
                               <span
                                 key={index}
-                                className="rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800"
+                                className="rounded-none bg-purple-100 px-3 py-1 text-sm text-purple-800"
                               >
                                 {category}
                               </span>
@@ -1062,7 +1062,7 @@ export default function EnhancedProfilePage() {
                           onChange={(e) =>
                             updateProfileField('companyName', e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Enter company name"
                         />
                       ) : (
@@ -1082,7 +1082,7 @@ export default function EnhancedProfilePage() {
                           onChange={(e) =>
                             updateProfileField('industry', e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select industry</option>
                           {INDUSTRIES.map((industry) => (
@@ -1108,7 +1108,7 @@ export default function EnhancedProfilePage() {
                           onChange={(e) =>
                             updateProfileField('companySize', e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select size</option>
                           {COMPANY_SIZES.map((size) => (
@@ -1137,7 +1137,7 @@ export default function EnhancedProfilePage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select budget range</option>
                           {MARKETING_BUDGETS.map((budget) => (
@@ -1177,7 +1177,7 @@ export default function EnhancedProfilePage() {
                               e.target.value
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select level</option>
                           <option value="ENTRY">Entry Level</option>
@@ -1202,7 +1202,7 @@ export default function EnhancedProfilePage() {
                           onChange={(e) =>
                             updateProfileField('availability', e.target.value)
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select availability</option>
                           <option value="FULL_TIME">Full Time</option>
@@ -1231,7 +1231,7 @@ export default function EnhancedProfilePage() {
                               parseInt(e.target.value) || 0
                             )
                           }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Enter hourly rate"
                         />
                       ) : (
@@ -1264,7 +1264,7 @@ export default function EnhancedProfilePage() {
                                     : [...current, skill];
                                   updateProfileField('crewSkills', updated);
                                 }}
-                                className={`rounded-full px-3 py-1 text-sm ${
+                                className={`rounded-none px-3 py-1 text-sm ${
                                   isSelected
                                     ? 'border border-green-300 bg-green-100 text-green-800'
                                     : 'border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1281,7 +1281,7 @@ export default function EnhancedProfilePage() {
                             (skill, index) => (
                               <span
                                 key={index}
-                                className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                                className="rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                               >
                                 {skill}
                               </span>
@@ -1315,7 +1315,7 @@ export default function EnhancedProfilePage() {
                         onChange={(e) =>
                           updateProfileField('phone', e.target.value)
                         }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter phone number"
                       />
                     ) : (
@@ -1337,7 +1337,7 @@ export default function EnhancedProfilePage() {
                         onChange={(e) =>
                           updateProfileField('website', e.target.value)
                         }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter website URL"
                       />
                     ) : (
@@ -1370,7 +1370,7 @@ export default function EnhancedProfilePage() {
                         onChange={(e) =>
                           updateProfileField('location', e.target.value)
                         }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter location"
                       />
                     ) : (
@@ -1391,7 +1391,7 @@ export default function EnhancedProfilePage() {
                         onChange={(e) =>
                           updateProfileField('timezone', e.target.value)
                         }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select timezone</option>
                         <option value="UTC">UTC</option>
@@ -1441,7 +1441,7 @@ export default function EnhancedProfilePage() {
                             onChange={(e) =>
                               updateProfileField(handleKey, e.target.value)
                             }
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder={`@${platform.key}handle`}
                           />
                         ) : (
@@ -1499,21 +1499,21 @@ export default function EnhancedProfilePage() {
                   Quick Actions
                 </h3>
                 <div className="space-y-2">
-                  <button className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-3 text-left hover:bg-gray-50">
+                  <button className="flex w-full items-center justify-between rounded-none border border-gray-200 p-3 text-left hover:bg-gray-50">
                     <div className="flex items-center">
                       <Download className="mr-3 h-4 w-4 text-gray-500" />
                       <span className="text-sm">Download Profile PDF</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-gray-400" />
                   </button>
-                  <button className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-3 text-left hover:bg-gray-50">
+                  <button className="flex w-full items-center justify-between rounded-none border border-gray-200 p-3 text-left hover:bg-gray-50">
                     <div className="flex items-center">
                       <ExternalLink className="mr-3 h-4 w-4 text-gray-500" />
                       <span className="text-sm">View Public Profile</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-gray-400" />
                   </button>
-                  <button className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-3 text-left hover:bg-gray-50">
+                  <button className="flex w-full items-center justify-between rounded-none border border-gray-200 p-3 text-left hover:bg-gray-50">
                     <div className="flex items-center">
                       <Share2 className="mr-3 h-4 w-4 text-gray-500" />
                       <span className="text-sm">Share Profile Link</span>
@@ -1570,7 +1570,7 @@ export default function EnhancedProfilePage() {
 
       {/* Error Toast */}
       {error && (
-        <div className="fixed bottom-4 right-4 rounded-lg bg-red-500 px-6 py-3 text-white shadow-lg">
+        <div className="fixed bottom-4 right-4 rounded-none bg-red-500 px-6 py-3 text-white shadow-lg">
           <div className="flex items-center">
             <AlertCircle className="mr-2 h-5 w-5" />
             {error}

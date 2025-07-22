@@ -323,7 +323,7 @@ export default function UsersDiscoveryPage() {
                     </button>
                     
                     {showSkillsFilter && (
-                      <div className="mt-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                      <div className="mt-2 max-h-48 overflow-y-auto border border-gray-200 rounded-none p-2">
                         {skillCategories.map((skill) => (
                           <label key={skill} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
                             <input
@@ -462,7 +462,7 @@ export default function UsersDiscoveryPage() {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                     <p className="text-red-600">❌ {error}</p>
                   </div>
                 )}
@@ -584,7 +584,7 @@ export default function UsersDiscoveryPage() {
                         )}
                         
                         {/* Stats */}
-                        <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg text-sm">
+                        <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-none text-sm">
                           <div className="text-center">
                             <p className="font-bold text-gray-900">{user.completedProjects}</p>
                             <p className="text-xs text-gray-600">Projects</p>
@@ -663,7 +663,7 @@ export default function UsersDiscoveryPage() {
                             <p className="text-sm font-medium text-gray-700 mb-2">Recent Work</p>
                             <div className="flex space-x-2">
                               {user.portfolio.slice(0, 3).map((item) => (
-                                <div key={item.id} className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
+                                <div key={item.id} className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
                                   {item.image ? (
                                     <img 
                                       src={item.image} 

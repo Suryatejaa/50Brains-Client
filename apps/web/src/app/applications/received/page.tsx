@@ -202,7 +202,7 @@ export default function ReceivedApplicationsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Applications</option>
                 <option value="PENDING">Pending Review</option>
@@ -213,7 +213,7 @@ export default function ReceivedApplicationsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="date">Sort by Date</option>
                 <option value="quality">Sort by Quality Score</option>
@@ -242,7 +242,7 @@ export default function ReceivedApplicationsPage() {
                       <p className="text-sm font-medium text-gray-600">Total Applications</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                     </div>
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-none flex items-center justify-center">
                       📝
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function ReceivedApplicationsPage() {
                       <p className="text-sm font-medium text-gray-600">Pending Review</p>
                       <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
                     </div>
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-yellow-100 rounded-none flex items-center justify-center">
                       ⏳
                     </div>
                   </div>
@@ -266,7 +266,7 @@ export default function ReceivedApplicationsPage() {
                       <p className="text-sm font-medium text-gray-600">Accepted</p>
                       <p className="text-2xl font-bold text-green-600">{stats.accepted}</p>
                     </div>
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
                       ✅
                     </div>
                   </div>
@@ -280,7 +280,7 @@ export default function ReceivedApplicationsPage() {
                         {stats.averageQualityScore.toFixed(0)}/100
                       </p>
                     </div>
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
                       📊
                     </div>
                   </div>
@@ -292,7 +292,7 @@ export default function ReceivedApplicationsPage() {
                       <p className="text-sm font-medium text-gray-600">Avg Response Time</p>
                       <p className="text-2xl font-bold text-gray-900">{Math.round(stats.averageResponseTime)}h</p>
                     </div>
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-orange-100 rounded-none flex items-center justify-center">
                       ⚡
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export default function ReceivedApplicationsPage() {
                   {applications.map((application) => (
                     <div
                       key={application.id}
-                      className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer ${
+                      className={`border border-gray-200 rounded-none p-3 hover:border-blue-300 transition-colors cursor-pointer ${
                         selectedApplication === application.id ? 'border-blue-500 bg-blue-50' : ''
                       }`}
                       onClick={() => setSelectedApplication(selectedApplication === application.id ? null : application.id)}
@@ -317,7 +317,7 @@ export default function ReceivedApplicationsPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4 flex-1">
                           {/* Applicant Avatar */}
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                          <div className="w-12 h-12 rounded-none overflow-hidden bg-gray-200 flex-shrink-0">
                             {application.applicant.avatar ? (
                               <img
                                 src={application.applicant.avatar}
@@ -399,7 +399,7 @@ export default function ReceivedApplicationsPage() {
                             {/* Cover Letter */}
                             <div>
                               <h4 className="text-lg font-semibold mb-3">💌 Cover Letter</h4>
-                              <div className="bg-gray-50 p-4 rounded-lg">
+                              <div className="bg-gray-50 p-4 rounded-none">
                                 <p className="text-gray-700 whitespace-pre-wrap">{application.coverLetter}</p>
                               </div>
                             </div>
@@ -455,7 +455,7 @@ export default function ReceivedApplicationsPage() {
                               <h4 className="text-lg font-semibold mb-3">📁 Portfolio</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {application.portfolio.map((item, index) => (
-                                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                                  <div key={index} className="bg-gray-50 p-4 rounded-none">
                                     <h5 className="font-semibold mb-2">{item.title}</h5>
                                     {item.description && (
                                       <p className="text-gray-600 text-sm mb-2">{item.description}</p>

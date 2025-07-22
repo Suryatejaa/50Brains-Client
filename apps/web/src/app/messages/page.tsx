@@ -227,7 +227,7 @@ export default function MessagesPage() {
                     {conversations.length === 0 ? (
                       <div className="p-4 text-center">
                         <div className="mb-4">
-                          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                          <div className="mx-auto mb-4 h-12 w-12 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                             <span className="text-xl">💬</span>
                           </div>
                           <p className="text-gray-600 text-sm">No conversations yet</p>
@@ -256,7 +256,7 @@ export default function MessagesPage() {
                                 )}
                               </div>
                               {conversation.isOnline && (
-                                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-lg border-2 border-white"></div>
                               )}
                             </div>
                             
@@ -277,7 +277,7 @@ export default function MessagesPage() {
                                   {conversation.lastMessage || 'No messages yet'}
                                 </p>
                                 {conversation.unreadCount > 0 && (
-                                  <span className="ml-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                                  <span className="ml-2 bg-blue-600 text-white text-xs rounded-none px-2 py-1 min-w-[20px] text-center">
                                     {conversation.unreadCount}
                                   </span>
                                 )}
@@ -297,12 +297,12 @@ export default function MessagesPage() {
                       {/* Chat Header */}
                       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold">
                             {getActiveConversationData()?.participantAvatar ? (
                               <img 
                                 src={getActiveConversationData()?.participantAvatar} 
                                 alt="Avatar" 
-                                className="w-10 h-10 rounded-full object-cover"
+                                className="w-10 h-10 rounded-none object-cover"
                               />
                             ) : (
                               getActiveConversationData()?.participantName[0]?.toUpperCase() || 'U'
@@ -334,7 +334,7 @@ export default function MessagesPage() {
                             className={`flex ${message.senderId === user?.id ? 'justify-end' : 'justify-start'}`}
                           >
                             <div
-                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-none ${
                                 message.senderId === user?.id
                                   ? 'bg-blue-600 text-white'
                                   : 'bg-gray-200 text-gray-900'
@@ -377,7 +377,7 @@ export default function MessagesPage() {
                     /* No Conversation Selected */
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                           <span className="text-2xl">💬</span>
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -404,7 +404,7 @@ export default function MessagesPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mt-4 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}

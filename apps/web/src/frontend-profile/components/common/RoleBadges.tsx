@@ -36,7 +36,7 @@ const RoleBadges: React.FC<RoleBadgesProps> = ({ roles, className = '' }) => {
       {roles.map((role, index) => (
         <span
           key={index}
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getRoleColor(
+          className={`inline-flex items-center rounded-none border px-2.5 py-0.5 text-xs font-medium ${getRoleColor(
             role
           )}`}
         >

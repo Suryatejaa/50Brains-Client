@@ -56,7 +56,7 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-none border-4 border-white border-t-transparent"></div>
       </div>
     );
   }
@@ -195,7 +195,7 @@ export default function LoginPage() {
               >
                 {isSubmitting ? (
                   <div className="flex items-center">
-                    <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    <div className="mr-3 h-5 w-5 animate-spin rounded-none border-2 border-white border-t-transparent"></div>
                     Signing in...
                   </div>
                 ) : (

@@ -67,7 +67,7 @@ export function Features() {
               </p>
 
               {/* ✨ Hover Effect Indicator */}
-              <div className="bg-brand-primary mt-6 h-1 w-0 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className="bg-brand-primary mt-6 h-1 w-0 rounded-none transition-all duration-300 group-hover:w-full"></div>
             </div>
           ))}
         </div>

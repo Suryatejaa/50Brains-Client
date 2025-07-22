@@ -66,7 +66,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
           value={localValue}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="w-full rounded-none border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
           rows={rows}
           maxLength={maxLength}
           required={required}
@@ -77,7 +77,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
           value={localValue}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="w-full rounded-none border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
           maxLength={maxLength}
           required={required}
         />

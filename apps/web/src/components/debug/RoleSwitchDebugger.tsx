@@ -30,7 +30,7 @@ export const RoleSwitchDebugger: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 max-w-sm rounded-lg bg-black bg-opacity-80 p-4 text-sm text-white">
+    <div className="fixed bottom-4 left-4 z-50 max-w-sm rounded-none bg-black bg-opacity-80 p-4 text-sm text-white">
       <div className="mb-2 font-bold">🎭 Role Switch Debug</div>
       <div>Render Count: {renderCount} (disabled)</div>
       <div>Current Role: {currentRole}</div>

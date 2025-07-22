@@ -53,7 +53,7 @@ Looking at `apps/web/src/components/layout/header.tsx`:
         className="fixed inset-0 z-10"
         onClick={() => setIsUserMenuOpen(false)}
       />
-      <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg">
+      <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-none border border-gray-200 bg-white shadow-lg">
         <div className="p-2">
           {/* User Info Header */}
           <div className="mb-2 border-b border-gray-200 px-3 py-3">

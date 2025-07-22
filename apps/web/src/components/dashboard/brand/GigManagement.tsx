@@ -117,7 +117,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-3 shadow-lg">
+      <div className="rounded-none bg-white p-3 shadow-lg">
         <div className="text-center">
           <span className="mb-4 block text-4xl">⚠️</span>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
@@ -152,7 +152,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg border bg-white p-4 shadow-sm">
+      <div className="rounded-none border bg-white p-4 shadow-sm">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -164,7 +164,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Search gigs..."
             />
           </div>
@@ -181,7 +181,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
                   status: e.target.value as any,
                 }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Status</option>
               <option value="ACTIVE">Active</option>
@@ -200,7 +200,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, category: e.target.value }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Categories</option>
               <option value="Fashion & Beauty">Fashion & Beauty</option>
@@ -219,7 +219,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
           <div className="flex items-end">
             <button
               onClick={loadGigs}
-              className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+              className="w-full rounded-none bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
             >
               Refresh
             </button>
@@ -228,7 +228,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
       </div>
 
       {/* Gigs List */}
-      <div className="rounded-lg border bg-white shadow-sm">
+      <div className="rounded-none border bg-white shadow-sm">
         {loading ? (
           <div className="p-8 text-center">
             <LoadingSpinner />
@@ -260,7 +260,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
                         {gig.title}
                       </h3>
                       <span
-                        className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(gig.status)}`}
+                        className={`rounded-none px-2 py-1 text-xs font-medium ${getStatusColor(gig.status)}`}
                       >
                         {gig.status}
                       </span>

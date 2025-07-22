@@ -21,7 +21,7 @@ export const RoleManager: React.FC<RoleManagerProps> = ({
             {userRoles.map((role) => (
               <div key={role} className="group relative">
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                  className={`inline-flex items-center rounded-none px-3 py-1 text-sm font-medium ${
                     role === 'INFLUENCER'
                       ? 'bg-purple-100 text-purple-800'
                       : role === 'BRAND'
@@ -54,7 +54,7 @@ export const RoleManager: React.FC<RoleManagerProps> = ({
           <div className="flex items-center">
             <div className="relative flex-1">
               <select
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => {
                   if (e.target.value && !userRoles.includes(e.target.value)) {
                     const updatedRoles = [...userRoles, e.target.value];
@@ -84,7 +84,7 @@ export const RoleManager: React.FC<RoleManagerProps> = ({
           {userRoles.map((role) => (
             <span
               key={role}
-              className={`rounded-full px-3 py-1 text-sm font-medium ${
+              className={`rounded-none px-3 py-1 text-sm font-medium ${
                 role === 'INFLUENCER'
                   ? 'bg-purple-100 text-purple-800'
                   : role === 'BRAND'

@@ -174,7 +174,7 @@ export default function CreditsHistoryPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Transactions</option>
                 <option value="EARNED">Earnings</option>
@@ -186,7 +186,7 @@ export default function CreditsHistoryPage() {
               <select
                 value={timeFilter}
                 onChange={(e) => setTimeFilter(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Time</option>
                 <option value="week">Last Week</option>
@@ -203,7 +203,7 @@ export default function CreditsHistoryPage() {
 
         {isLoading ? (
           <div className="card-glass p-8 text-center">
-            <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-none mx-auto mb-4"></div>
             <p>Loading your credits history...</p>
           </div>
         ) : (
@@ -217,7 +217,7 @@ export default function CreditsHistoryPage() {
                       <p className="text-sm font-medium text-gray-600">Current Balance</p>
                       <p className="text-2xl font-bold text-green-600">${summary.currentBalance.toFixed(2)}</p>
                     </div>
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
                       💰
                     </div>
                   </div>
@@ -238,7 +238,7 @@ export default function CreditsHistoryPage() {
                       <p className="text-sm font-medium text-gray-600">Total Earned</p>
                       <p className="text-2xl font-bold text-blue-600">${summary.totalEarned.toFixed(2)}</p>
                     </div>
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-none flex items-center justify-center">
                       📈
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export default function CreditsHistoryPage() {
                       <p className="text-sm font-medium text-gray-600">Total Spent</p>
                       <p className="text-2xl font-bold text-red-600">${summary.totalSpent.toFixed(2)}</p>
                     </div>
-                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-red-100 rounded-none flex items-center justify-center">
                       💳
                     </div>
                   </div>
@@ -262,7 +262,7 @@ export default function CreditsHistoryPage() {
                       <p className="text-sm font-medium text-gray-600">Total Withdrawn</p>
                       <p className="text-2xl font-bold text-purple-600">${summary.totalWithdrawn.toFixed(2)}</p>
                     </div>
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
                       🏦
                     </div>
                   </div>
@@ -274,7 +274,7 @@ export default function CreditsHistoryPage() {
                       <p className="text-sm font-medium text-gray-600">Pending Amount</p>
                       <p className="text-2xl font-bold text-yellow-600">${summary.pendingAmount.toFixed(2)}</p>
                     </div>
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-yellow-100 rounded-none flex items-center justify-center">
                       ⏳
                     </div>
                   </div>
@@ -288,7 +288,7 @@ export default function CreditsHistoryPage() {
                 <h2 className="text-xl font-semibold mb-4">📊 Monthly Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                   {summary.monthlyBreakdown.slice(0, 6).map((month, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                    <div key={index} className="bg-gray-50 p-4 rounded-none">
                       <h3 className="font-semibold text-gray-900 mb-2">{month.month}</h3>
                       <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
@@ -325,11 +325,11 @@ export default function CreditsHistoryPage() {
                   {transactions.map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                      className="border border-gray-200 rounded-none p-4 hover:border-blue-300 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-lg">
+                          <div className="w-10 h-10 bg-gray-100 rounded-none flex items-center justify-center text-lg">
                             {getTransactionTypeIcon(transaction.type)}
                           </div>
                           
@@ -473,7 +473,7 @@ export default function CreditsHistoryPage() {
                 <h2 className="text-xl font-semibold mb-4">📈 Transaction Type Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {summary.typeBreakdown.map((typeData, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                    <div key={index} className="bg-gray-50 p-4 rounded-none">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <span className="text-lg">{getTransactionTypeIcon(typeData.type)}</span>
@@ -491,7 +491,7 @@ export default function CreditsHistoryPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
               <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {userType === 'creator' ? (

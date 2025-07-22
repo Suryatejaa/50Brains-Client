@@ -40,7 +40,7 @@ const CacheIndicator: React.FC<CacheIndicatorProps> = ({
   if (!isValid || !cacheInfo) {
     return (
       <div
-        className={`${className} rounded-lg border border-red-300 bg-red-100 px-3 py-2 text-xs`}
+        className={`${className} rounded-none border border-red-300 bg-red-100 px-3 py-2 text-xs`}
       >
         <div className="font-medium text-red-700">❌ No Cache</div>
       </div>
@@ -52,7 +52,7 @@ const CacheIndicator: React.FC<CacheIndicatorProps> = ({
 
   return (
     <div
-      className={`${className} rounded-lg border border-green-300 bg-green-100 px-3 py-2 text-xs`}
+      className={`${className} rounded-none border border-green-300 bg-green-100 px-3 py-2 text-xs`}
     >
       <div className="font-medium text-green-700">✅ Cached Data</div>
       <div className="text-green-600">Age: {ageSeconds}s</div>

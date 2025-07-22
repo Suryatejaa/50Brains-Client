@@ -326,7 +326,7 @@ export const ClanDashboard: React.FC = () => {
               <div className="animate-pulse space-y-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center space-x-3">
-                    <div className="h-8 w-8 rounded-full bg-gray-300"></div>
+                    <div className="h-8 w-8 rounded-none bg-gray-300"></div>
                     <div className="flex-1">
                       <div className="mb-1 h-3 w-3/4 rounded bg-gray-300"></div>
                       <div className="h-2 w-1/2 rounded bg-gray-300"></div>
@@ -342,12 +342,12 @@ export const ClanDashboard: React.FC = () => {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-500">
                         {member.avatar ? (
                           <img
                             src={member.avatar}
                             alt={member.name}
-                            className="h-full w-full rounded-full object-cover"
+                            className="h-full w-full rounded-none object-cover"
                           />
                         ) : (
                           <span className="text-xs font-semibold text-white">
@@ -416,7 +416,7 @@ export const ClanDashboard: React.FC = () => {
                 {clanData?.projects?.active?.map((project) => (
                   <div
                     key={project.id}
-                    className="rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+                    className="rounded-none border border-gray-200 p-4 transition-colors hover:bg-gray-50"
                   >
                     <h4 className="text-body mb-2 font-medium">
                       {project.title}

@@ -227,7 +227,7 @@ export default function ClanDetailPage({ params }: PageProps) {
             <div className="mx-auto max-w-6xl">
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-red-100 flex items-center justify-center">
                     <span className="text-2xl">❌</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -272,7 +272,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                       {clan.name}
                     </h1>
                     {!clan.isPublic && (
-                      <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-none text-sm font-medium">
                         Private
                       </span>
                     )}
@@ -293,19 +293,19 @@ export default function ClanDetailPage({ params }: PageProps) {
                   
                   {/* Stats Row */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-center p-3 bg-gray-50 rounded-none">
                       <p className="text-2xl font-bold text-gray-900">{clan.size}/{clan.maxMembers}</p>
                       <p className="text-sm text-gray-600">Members</p>
                     </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-center p-3 bg-gray-50 rounded-none">
                       <p className="text-2xl font-bold text-green-600">{formatEarnings(clan.stats.totalEarnings)}</p>
                       <p className="text-sm text-gray-600">Total Earnings</p>
                     </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-center p-3 bg-gray-50 rounded-none">
                       <p className="text-2xl font-bold text-blue-600">{clan.stats.completedProjects}</p>
                       <p className="text-sm text-gray-600">Completed Projects</p>
                     </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-center p-3 bg-gray-50 rounded-none">
                       <div className="flex justify-center mb-1">
                         {renderStars(clan.stats.averageRating)}
                       </div>
@@ -412,7 +412,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills & Expertise</h3>
                       <div className="flex flex-wrap gap-2">
                         {clan.skills.map((skill) => (
-                          <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                          <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-none text-sm">
                             {skill}
                           </span>
                         ))}
@@ -427,7 +427,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                       ) : (
                         <div className="space-y-4">
                           {clan.recentProjects.map((project) => (
-                            <div key={project.id} className="border border-gray-200 rounded-lg p-4">
+                            <div key={project.id} className="border border-gray-200 rounded-none p-4">
                               <div className="flex items-start justify-between mb-2">
                                 <h4 className="font-medium text-gray-900">{project.title}</h4>
                                 <span className={getStatusBadge(project.status)}>
@@ -449,9 +449,9 @@ export default function ClanDetailPage({ params }: PageProps) {
                               
                               {project.status === 'active' && (
                                 <div className="mt-2">
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div className="w-full bg-gray-200 rounded-none h-2">
                                     <div 
-                                      className="bg-blue-600 h-2 rounded-full transition-all" 
+                                      className="bg-blue-600 h-2 rounded-none transition-all" 
                                       style={{ width: `${project.completionPercentage}%` }}
                                     ></div>
                                   </div>
@@ -470,13 +470,13 @@ export default function ClanDetailPage({ params }: PageProps) {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Members</h3>
                     <div className="space-y-4">
                       {clan.members.map((member) => (
-                        <div key={member.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        <div key={member.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-none">
+                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold">
                             {member.profilePicture ? (
                               <img 
                                 src={member.profilePicture} 
                                 alt="Member" 
-                                className="w-12 h-12 rounded-full object-cover"
+                                className="w-12 h-12 rounded-none object-cover"
                               />
                             ) : (
                               (member.firstName || member.displayName || 'U')[0]?.toUpperCase()
@@ -540,7 +540,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">All Projects</h3>
                     {clan.recentProjects.length === 0 ? (
                       <div className="text-center py-8">
-                        <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
+                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
                           <span className="text-2xl">📋</span>
                         </div>
                         <h4 className="text-lg font-medium text-gray-900 mb-2">No Projects Yet</h4>
@@ -551,7 +551,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                     ) : (
                       <div className="space-y-4">
                         {clan.recentProjects.map((project) => (
-                          <div key={project.id} className="border border-gray-200 rounded-lg p-4">
+                          <div key={project.id} className="border border-gray-200 rounded-none p-4">
                             <div className="flex items-start justify-between mb-3">
                               <h4 className="text-lg font-medium text-gray-900">{project.title}</h4>
                               <span className={getStatusBadge(project.status)}>
@@ -580,9 +580,9 @@ export default function ClanDetailPage({ params }: PageProps) {
                             
                             {project.status === 'active' && (
                               <div className="mb-3">
-                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div className="w-full bg-gray-200 rounded-none h-3">
                                   <div 
-                                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all" 
+                                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-none transition-all" 
                                     style={{ width: `${project.completionPercentage}%` }}
                                   ></div>
                                 </div>
@@ -594,12 +594,12 @@ export default function ClanDetailPage({ params }: PageProps) {
                                 {project.membersInvolved.slice(0, 5).map((memberId, index) => {
                                   const member = clan.members.find(m => m.id === memberId);
                                   return (
-                                    <div key={memberId} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                                    <div key={memberId} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                                       {member?.profilePicture ? (
                                         <img 
                                           src={member.profilePicture} 
                                           alt="Member" 
-                                          className="w-8 h-8 rounded-full object-cover"
+                                          className="w-8 h-8 rounded-none object-cover"
                                         />
                                       ) : (
                                         (member?.firstName || 'U')[0]?.toUpperCase()
@@ -608,7 +608,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                                   );
                                 })}
                                 {project.membersInvolved.length > 5 && (
-                                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
+                                  <div className="w-8 h-8 bg-gray-400 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                                     +{project.membersInvolved.length - 5}
                                   </div>
                                 )}
@@ -651,12 +651,12 @@ export default function ClanDetailPage({ params }: PageProps) {
                   <div className="card-glass p-3">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Leader</h3>
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-none flex items-center justify-center text-white font-semibold">
                         {clan.owner.profilePicture ? (
                           <img 
                             src={clan.owner.profilePicture} 
                             alt="Owner" 
-                            className="w-12 h-12 rounded-full object-cover"
+                            className="w-12 h-12 rounded-none object-cover"
                           />
                         ) : (
                           (clan.owner.firstName || clan.owner.displayName || 'U')[0]?.toUpperCase()

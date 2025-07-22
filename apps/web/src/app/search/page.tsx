@@ -175,12 +175,12 @@ export default function SearchPage() {
   const renderUserResult = (result: SearchResult) => (
     <div key={result.id} className="card-glass p-3">
       <div className="flex items-start space-x-4">
-        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold text-lg">
           {result.profilePicture ? (
             <img 
               src={result.profilePicture} 
               alt="Profile" 
-              className="w-16 h-16 rounded-full object-cover"
+              className="w-16 h-16 rounded-none object-cover"
             />
           ) : (
             result.name?.[0]?.toUpperCase() || 'U'
@@ -319,7 +319,7 @@ export default function SearchPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -344,7 +344,7 @@ export default function SearchPage() {
                 {results.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
-                      <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                         <span className="text-2xl">🔍</span>
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -366,7 +366,7 @@ export default function SearchPage() {
             ) : (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">🔍</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -378,19 +378,19 @@ export default function SearchPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">💼</div>
                     <h4 className="font-medium text-gray-900">Find Gigs</h4>
                     <p className="text-sm text-gray-600">Browse available projects and campaigns</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">👥</div>
                     <h4 className="font-medium text-gray-900">Find Talent</h4>
                     <p className="text-sm text-gray-600">Discover influencers and crew members</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">🎯</div>
                     <h4 className="font-medium text-gray-900">Smart Filters</h4>
                     <p className="text-sm text-gray-600">Use advanced filters to find exactly what you need</p>

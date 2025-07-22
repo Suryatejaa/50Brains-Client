@@ -24,7 +24,7 @@ export function PageDebugger({
       {/* Debug Panel Toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-brand-primary hover:bg-brand-primary/90 fixed right-4 top-4 z-50 rounded-lg px-3 py-2 text-sm font-medium text-white shadow-lg transition-all"
+        className="bg-brand-primary hover:bg-brand-primary/90 fixed right-4 top-4 z-50 rounded-none px-3 py-2 text-sm font-medium text-white shadow-lg transition-all"
         title="Toggle Debug Panel"
       >
         🐛 Debug
@@ -32,7 +32,7 @@ export function PageDebugger({
 
       {/* Debug Panel */}
       {isOpen && (
-        <div className="border-brand-border fixed right-4 top-16 z-40 max-h-96 w-80 overflow-y-auto rounded-lg border bg-white p-4 shadow-lg">
+        <div className="border-brand-border fixed right-4 top-16 z-40 max-h-96 w-80 overflow-y-auto rounded-none border bg-white p-4 shadow-lg">
           <div className="space-y-3">
             <div className="border-b pb-2">
               <h3 className="text-brand-text-main font-semibold">

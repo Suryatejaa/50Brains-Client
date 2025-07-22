@@ -21,7 +21,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
             value={user.bio || ''}
             onChange={(e) => onUpdate('bio', e.target.value)}
             rows={4}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Tell others about yourself, your expertise, and what makes you unique..."
           />
         ) : (
@@ -42,7 +42,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
               {(user.skills || []).map((skill: string, index: number) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                  className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                 >
                   {skill}
                   <button
@@ -72,7 +72,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
                   e.currentTarget.value = '';
                 }
               }}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         ) : (
@@ -80,7 +80,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
             {(user.skills || []).map((skill: string, index: number) => (
               <span
                 key={index}
-                className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
               >
                 {skill}
               </span>
@@ -115,7 +115,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
                 type="tel"
                 value={user.phone || ''}
                 onChange={(e) => onUpdate('phone', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter phone number"
               />
             ) : (
@@ -135,7 +135,7 @@ export const OverviewSection: React.FC<ProfileComponentProps> = ({
                 type="url"
                 value={user.website || ''}
                 onChange={(e) => onUpdate('website', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter website URL"
               />
             ) : (

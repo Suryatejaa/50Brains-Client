@@ -318,10 +318,10 @@ export default function MarketplacePage() {
             )}
 
             {/* Tabs */}
-            <div className="flex space-x-1 rounded-lg bg-white p-1">
+            <div className="flex space-x-1 rounded-none bg-white p-1">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === 'all'
                     ? 'bg-brand-primary text-white'
                     : 'text-gray-600 hover:text-gray-900'
@@ -331,7 +331,7 @@ export default function MarketplacePage() {
               </button>
               <button
                 onClick={() => setActiveTab('featured')}
-                className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === 'featured'
                     ? 'bg-brand-primary text-white'
                     : 'text-gray-600 hover:text-gray-900'
@@ -344,7 +344,7 @@ export default function MarketplacePage() {
 
           {/* Error State */}
           {error && (
-            <div className="mb-8 rounded-lg bg-red-50 p-4 text-red-700">
+            <div className="mb-8 rounded-none bg-red-50 p-4 text-red-700">
               <p>Error loading gigs: {error}</p>
               <button
                 onClick={() => loadPublicGigs(filters)}
@@ -546,7 +546,7 @@ export default function MarketplacePage() {
           <div className="fixed bottom-6 right-6">
             <Link
               href="/create-gig"
-              className="bg-brand-primary hover:bg-brand-primary/90 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-colors"
+              className="bg-brand-primary hover:bg-brand-primary/90 flex h-14 w-14 items-center justify-center rounded-none text-white shadow-lg transition-colors"
               title="Create New Gig"
             >
               <svg

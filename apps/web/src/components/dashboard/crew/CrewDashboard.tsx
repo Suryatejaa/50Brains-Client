@@ -52,7 +52,7 @@ export const CrewDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-2 md:mb-2">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-heading text-xl font-bold md:text-2xl">
@@ -75,7 +75,7 @@ export const CrewDashboard: React.FC = () => {
         </div>
 
         {/* Key Metrics Row */}
-        <div className="mb-4 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
+        <div className="mb-2 grid grid-cols-2 gap-2 md:mb-2 md:grid-cols-2 md:gap-2 lg:grid-cols-4">
           <div className="card-glass p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -142,18 +142,18 @@ export const CrewDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-4 md:gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:gap-3 lg:grid-cols-3">
           {/* Left Column - Projects & Performance */}
-          <div className="space-y-4 md:space-y-6 lg:col-span-2">
+          <div className="space-y-2 md:space-y-6 lg:col-span-2">
             {/* Project Performance */}
             <div className="card-glass p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between md:mb-4">
+              <div className="mb-2 flex items-center justify-between md:mb-2">
                 <h3 className="text-heading text-lg font-semibold">
                   Project Performance
                 </h3>
                 <div className="text-xl">📊</div>
               </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
                 <div className="text-center">
                   <p className="text-muted text-xs md:text-sm">Completed</p>
                   <p className="text-heading text-lg font-semibold">
@@ -175,7 +175,7 @@ export const CrewDashboard: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <div className="mt-3 rounded-lg bg-green-50 p-2 md:mt-4">
+              <div className="mt-3 rounded-none bg-green-50 p-2 md:mt-4">
                 <p className="text-xs text-green-800 md:text-sm">
                   🏆 Repeat Clients:{' '}
                   {data?.businessMetrics?.repeatClientPercentage || 0}% • Avg
@@ -198,7 +198,7 @@ export const CrewDashboard: React.FC = () => {
                   {data.recentProjects.map((project) => (
                     <div
                       key={project.id}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-2 md:p-3"
+                      className="flex items-center justify-between rounded-none bg-gray-50 p-2 md:p-3"
                     >
                       <div className="flex-1">
                         <p className="text-heading text-sm font-medium md:text-base">
@@ -210,9 +210,9 @@ export const CrewDashboard: React.FC = () => {
                         </p>
                         {project.completion > 0 && (
                           <div className="mt-1">
-                            <div className="h-1.5 rounded-full bg-gray-200">
+                            <div className="h-1.5 rounded-none bg-gray-200">
                               <div
-                                className="bg-brand-primary h-1.5 rounded-full transition-all duration-300"
+                                className="bg-brand-primary h-1.5 rounded-none transition-all duration-300"
                                 style={{ width: `${project.completion}%` }}
                               ></div>
                             </div>
@@ -227,7 +227,7 @@ export const CrewDashboard: React.FC = () => {
                           ${project.budget.toLocaleString()}
                         </p>
                         <span
-                          className={`inline-block rounded-full px-2 py-1 text-xs ${
+                          className={`inline-block rounded-none px-2 py-1 text-xs ${
                             project.status === 'COMPLETED'
                               ? 'bg-green-100 text-green-800'
                               : project.status === 'ACTIVE'
@@ -259,7 +259,7 @@ export const CrewDashboard: React.FC = () => {
                   {data.clientHistory.slice(0, 5).map((client) => (
                     <div
                       key={client.id}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-2 md:p-3"
+                      className="flex items-center justify-between rounded-none bg-gray-50 p-2 md:p-3"
                     >
                       <div>
                         <p className="text-heading text-sm font-medium md:text-base">
@@ -289,10 +289,10 @@ export const CrewDashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Skills & Business */}
-          <div className="space-y-4 md:space-y-6">
+          <div className="space-y-3 md:space-y-2">
             {/* Skills Overview */}
             <div className="card-glass p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between md:mb-4">
+              <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Skills</h3>
                 <div className="text-xl">🛠️</div>
               </div>
@@ -339,7 +339,7 @@ export const CrewDashboard: React.FC = () => {
                         (spec: string, index: number) => (
                           <span
                             key={index}
-                            className="bg-brand-primary/10 text-brand-primary rounded-full px-2 py-1 text-xs"
+                            className="bg-brand-primary/10 text-brand-primary rounded-none px-2 py-1 text-xs"
                           >
                             {spec}
                           </span>
@@ -352,7 +352,7 @@ export const CrewDashboard: React.FC = () => {
 
             {/* Business Metrics */}
             <div className="card-glass p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between md:mb-4">
+              <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Business</h3>
                 <div className="text-xl">📈</div>
               </div>
@@ -389,7 +389,7 @@ export const CrewDashboard: React.FC = () => {
             {/* Equipment Portfolio */}
             {data?.equipmentPortfolio && data.equipmentPortfolio.length > 0 && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Equipment
                   </h3>
@@ -399,7 +399,7 @@ export const CrewDashboard: React.FC = () => {
                   {data.equipmentPortfolio.map((category, index) => (
                     <div
                       key={index}
-                      className="rounded-lg bg-gray-50 p-2 md:p-3"
+                      className="rounded-none bg-gray-50 p-2 md:p-3"
                     >
                       <div className="mb-2 flex items-center justify-between">
                         <h4 className="text-heading text-sm font-medium">
@@ -415,13 +415,13 @@ export const CrewDashboard: React.FC = () => {
                           .map((item: string, itemIndex: number) => (
                             <span
                               key={itemIndex}
-                              className="rounded-full bg-white px-2 py-1 text-xs text-gray-700"
+                              className="rounded-none bg-white px-2 py-1 text-xs text-gray-700"
                             >
                               {item}
                             </span>
                           ))}
                         {category.items.length > 3 && (
-                          <span className="text-muted rounded-full px-2 py-1 text-xs">
+                          <span className="text-muted rounded-none px-2 py-1 text-xs">
                             +{category.items.length - 3} more
                           </span>
                         )}
@@ -435,7 +435,7 @@ export const CrewDashboard: React.FC = () => {
             {/* Opportunities */}
             {data?.opportunities && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Opportunities
                   </h3>

@@ -61,7 +61,7 @@ export const DashboardRouter: React.FC = () => {
         return (
           <div>
             {showRoleDebugInfo && (
-              <div className="mb-2 rounded-md border border-pink-300 bg-pink-100 px-2 py-1 text-sm text-pink-800 md:mb-4 md:px-4 md:py-2">
+              <div className="mb-2 rounded-none border border-pink-300 bg-pink-100 px-2 py-1 text-sm text-pink-800 md:mb-4 md:px-4 md:py-2">
                 🎨 Influencer Dashboard Active | Role: {currentRole} |
                 Available: {availableRoles.join(', ')}
               </div>
@@ -73,7 +73,7 @@ export const DashboardRouter: React.FC = () => {
         return (
           <div>
             {showRoleDebugInfo && (
-              <div className="mb-2 rounded-md border border-orange-300 bg-orange-100 px-2 py-1 text-sm text-orange-800 md:mb-4 md:px-4 md:py-2">
+              <div className="mb-2 rounded-none border border-orange-300 bg-orange-100 px-2 py-1 text-sm text-orange-800 md:mb-4 md:px-4 md:py-2">
                 🎬 Crew Dashboard Active | Role: {currentRole} | Available:{' '}
                 {availableRoles.join(', ')}
               </div>
@@ -86,7 +86,7 @@ export const DashboardRouter: React.FC = () => {
         return (
           <div>
             {showRoleDebugInfo && (
-              <div className="mb-2 rounded-md border border-purple-300 bg-purple-100 px-2 py-1 text-sm text-purple-800 md:mb-4 md:px-4 md:py-2">
+              <div className="mb-2 rounded-none border border-purple-300 bg-purple-100 px-2 py-1 text-sm text-purple-800 md:mb-4 md:px-4 md:py-2">
                 🎨 Creator Dashboard Active | Role: {currentRole} | Available:{' '}
                 {availableRoles.join(', ')}
               </div>
@@ -101,7 +101,7 @@ export const DashboardRouter: React.FC = () => {
         <div>
           {/* <RoleSwitchDebugger /> */}
           {showRoleDebugInfo && (
-            <div className="mb-2 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-sm text-blue-800 md:mb-4 md:px-4 md:py-2">
+            <div className="mb-2 rounded-none border border-blue-300 bg-blue-100 px-2 py-1 text-sm text-blue-800 md:mb-4 md:px-4 md:py-2">
               🏢 Brand Dashboard Active | Role: {currentRole} | Available:{' '}
               {availableRoles.join(', ')}
             </div>
@@ -115,7 +115,7 @@ export const DashboardRouter: React.FC = () => {
       return (
         <div>
           {showRoleDebugInfo && (
-            <div className="mb-2 rounded-md border border-red-300 bg-red-100 px-2 py-1 text-sm text-red-800 md:mb-4 md:px-4 md:py-2">
+            <div className="mb-2 rounded-none border border-red-300 bg-red-100 px-2 py-1 text-sm text-red-800 md:mb-4 md:px-4 md:py-2">
               ⚡ Admin Dashboard Active | Role: {currentRole} | Available:{' '}
               {availableRoles.join(', ')}
             </div>
@@ -130,7 +130,7 @@ export const DashboardRouter: React.FC = () => {
         return (
           <div>
             {showRoleDebugInfo && (
-              <div className="mb-2 rounded-md border border-green-300 bg-green-100 px-2 py-1 text-sm text-green-800 md:mb-4 md:px-4 md:py-2">
+              <div className="mb-2 rounded-none border border-green-300 bg-green-100 px-2 py-1 text-sm text-green-800 md:mb-4 md:px-4 md:py-2">
                 👥 Clan Dashboard Active | Role: {currentRole} | Available:{' '}
                 {availableRoles.join(', ')}
               </div>
@@ -145,7 +145,7 @@ export const DashboardRouter: React.FC = () => {
         <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
           {/* <RoleSwitchDebugger /> */}
           {showRoleDebugInfo && (
-            <div className="mb-2 rounded-md border border-yellow-300 bg-yellow-100 px-2 py-1 text-sm text-yellow-800 md:mb-4 md:px-4 md:py-2">
+            <div className="mb-2 rounded-none border border-yellow-300 bg-yellow-100 px-2 py-1 text-sm text-yellow-800 md:mb-4 md:px-4 md:py-2">
               🚀 Default Dashboard Active | Role: {currentRole} | Available:{' '}
               {availableRoles.join(', ')}
             </div>

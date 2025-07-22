@@ -23,7 +23,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.experienceLevel || ''}
               onChange={(e) => onUpdate('experienceLevel', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select level</option>
               <option value="ENTRY">Entry Level</option>
@@ -46,7 +46,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.availability || ''}
               onChange={(e) => onUpdate('availability', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select availability</option>
               <option value="FULL_TIME">Full Time</option>
@@ -72,7 +72,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
               onChange={(e) =>
                 onUpdate('hourlyRate', parseInt(e.target.value) || 0)
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter hourly rate"
             />
           ) : (
@@ -96,7 +96,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
                   (skill: string, index: number) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                      className="inline-flex items-center rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                     >
                       {skill}
                       <button
@@ -127,7 +127,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
                     e.currentTarget.value = '';
                   }
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           ) : (
@@ -136,7 +136,7 @@ export const CrewProfile: React.FC<ProfileComponentProps> = ({
                 (skill: string, index: number) => (
                   <span
                     key={index}
-                    className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                    className="inline-flex items-center rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                   >
                     {skill}
                   </span>

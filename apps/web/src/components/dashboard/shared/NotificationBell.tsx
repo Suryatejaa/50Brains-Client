@@ -127,19 +127,19 @@ export const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100"
+        className="relative rounded-none p-2 transition-colors duration-200 hover:bg-gray-100"
         title="Notifications"
       >
         <span className="text-xl">🔔</span>
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-none bg-red-500 text-xs font-medium text-white">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 max-h-96 w-80 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 max-h-96 w-80 overflow-hidden rounded-none border border-gray-200 bg-white shadow-lg">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
             <h3 className="text-heading font-semibold">Notifications</h3>
@@ -157,7 +157,7 @@ export const NotificationBell: React.FC = () => {
           <div className="max-h-64 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center">
-                <div className="mx-auto h-6 w-6 animate-spin rounded-full border-b-2 border-gray-900"></div>
+                <div className="mx-auto h-6 w-6 animate-spin rounded-none border-b-2 border-gray-900"></div>
                 <p className="text-muted mt-2 text-sm">
                   Loading notifications...
                 </p>
@@ -205,7 +205,7 @@ export const NotificationBell: React.FC = () => {
                       </p>
                     </div>
                     {!notification.isRead && (
-                      <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                      <div className="h-2 w-2 rounded-none bg-blue-500"></div>
                     )}
                   </div>
                 </div>

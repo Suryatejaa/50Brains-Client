@@ -244,7 +244,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.primaryNiche || ''}
                   onChange={(e) => onUpdate('primaryNiche', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select a niche</option>
                   <option value="lifestyle">Lifestyle</option>
@@ -273,7 +273,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.primaryPlatform || ''}
                   onChange={(e) => onUpdate('primaryPlatform', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select platform</option>
                   <option value="instagram">Instagram</option>
@@ -302,7 +302,7 @@ const RoleBasedProfileSections = ({
                       (category, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                          className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                         >
                           {category}
                           <button
@@ -333,7 +333,7 @@ const RoleBasedProfileSections = ({
                         e.currentTarget.value = '';
                       }
                     }}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               ) : (
@@ -341,7 +341,7 @@ const RoleBasedProfileSections = ({
                   {(profile.contentCategories || []).map((category, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                      className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                     >
                       {category}
                     </span>
@@ -366,7 +366,7 @@ const RoleBasedProfileSections = ({
                       ([platform, count]) => (
                         <div
                           key={platform}
-                          className="rounded-lg bg-gray-50 p-3 text-center"
+                          className="rounded-none bg-gray-50 p-3 text-center"
                         >
                           <div className="text-sm capitalize text-gray-600">
                             {platform}
@@ -476,7 +476,7 @@ const RoleBasedProfileSections = ({
                         (location, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800"
+                            className="inline-flex items-center rounded-none bg-purple-100 px-3 py-1 text-sm text-purple-800"
                           >
                             {location}
                             <button
@@ -520,7 +520,7 @@ const RoleBasedProfileSections = ({
                           e.currentTarget.value = '';
                         }
                       }}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -579,7 +579,7 @@ const RoleBasedProfileSections = ({
                             (location, index) => (
                               <span
                                 key={index}
-                                className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800"
+                                className="inline-flex items-center rounded-none bg-purple-100 px-3 py-1 text-sm text-purple-800"
                               >
                                 {location}
                               </span>
@@ -623,7 +623,7 @@ const RoleBasedProfileSections = ({
                   type="text"
                   value={profile.companyName || ''}
                   onChange={(e) => onUpdate('companyName', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter company name"
                 />
               ) : (
@@ -641,7 +641,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.industry || ''}
                   onChange={(e) => onUpdate('industry', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select industry</option>
                   <option value="technology">Technology</option>
@@ -670,7 +670,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.companyType || ''}
                   onChange={(e) => onUpdate('companyType', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select type</option>
                   <option value="STARTUP">Startup</option>
@@ -694,7 +694,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.companySize || ''}
                   onChange={(e) => onUpdate('companySize', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select size</option>
                   <option value="1-10">1-10 employees</option>
@@ -719,7 +719,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.marketingBudget || ''}
                   onChange={(e) => onUpdate('marketingBudget', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select budget range</option>
                   <option value="UNDER_10K">Under $10,000</option>
@@ -761,7 +761,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.experienceLevel || ''}
                   onChange={(e) => onUpdate('experienceLevel', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select level</option>
                   <option value="ENTRY">Entry Level</option>
@@ -784,7 +784,7 @@ const RoleBasedProfileSections = ({
                 <select
                   value={profile.availability || ''}
                   onChange={(e) => onUpdate('availability', e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select availability</option>
                   <option value="FULL_TIME">Full Time</option>
@@ -810,7 +810,7 @@ const RoleBasedProfileSections = ({
                   onChange={(e) =>
                     onUpdate('hourlyRate', parseInt(e.target.value) || 0)
                   }
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter hourly rate"
                 />
               ) : (
@@ -833,7 +833,7 @@ const RoleBasedProfileSections = ({
                     {(profile.crewSkills || []).map((skill, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                        className="inline-flex items-center rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                       >
                         {skill}
                         <button
@@ -863,7 +863,7 @@ const RoleBasedProfileSections = ({
                         e.currentTarget.value = '';
                       }
                     }}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               ) : (
@@ -871,7 +871,7 @@ const RoleBasedProfileSections = ({
                   {(profile.crewSkills || []).map((skill, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                      className="inline-flex items-center rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                     >
                       {skill}
                     </span>
@@ -912,25 +912,25 @@ const ProfileAnalytics = ({
       </h3>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="rounded-lg bg-blue-50 p-4 text-center">
+        <div className="rounded-none bg-blue-50 p-4 text-center">
           <div className="text-2xl font-bold text-blue-600">
             {analytics.profileViews || 0}
           </div>
           <div className="text-sm text-gray-600">Profile Views</div>
         </div>
-        <div className="rounded-lg bg-green-50 p-4 text-center">
+        <div className="rounded-none bg-green-50 p-4 text-center">
           <div className="text-2xl font-bold text-green-600">
             {analytics.searchAppearances || 0}
           </div>
           <div className="text-sm text-gray-600">Search Results</div>
         </div>
-        <div className="rounded-lg bg-purple-50 p-4 text-center">
+        <div className="rounded-none bg-purple-50 p-4 text-center">
           <div className="text-2xl font-bold text-purple-600">
             {analytics.gigApplications || 0}
           </div>
           <div className="text-sm text-gray-600">Applications</div>
         </div>
-        <div className="rounded-lg bg-yellow-50 p-4 text-center">
+        <div className="rounded-none bg-yellow-50 p-4 text-center">
           <div className="text-2xl font-bold text-yellow-600">
             {analytics.averageRating?.toFixed(1) || '0.0'}
           </div>
@@ -1135,7 +1135,7 @@ export default function EnhancedProfilePage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-none border-4 border-blue-500 border-t-transparent"></div>
           <p className="text-gray-600">Loading your enhanced profile...</p>
         </div>
       </div>
@@ -1154,7 +1154,7 @@ export default function EnhancedProfilePage() {
           <p className="mb-4 text-gray-600">{error}</p>
           <button
             onClick={fetchAllProfileData}
-            className="rounded-lg bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
+            className="rounded-none bg-blue-500 px-6 py-2 text-white transition-colors hover:bg-blue-600"
           >
             Try Again
           </button>
@@ -1183,7 +1183,7 @@ export default function EnhancedProfilePage() {
       {/* Debug Tool - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
         <div className="px-6 pt-6">
-          <div className="rounded-lg border bg-gray-100 p-4">
+          <div className="rounded-none border bg-gray-100 p-4">
             <h4 className="mb-2 font-semibold text-gray-700">Debug Info</h4>
             <div className="space-y-1 text-sm text-gray-600">
               <p>User ID: {user?.id}</p>
@@ -1214,7 +1214,7 @@ export default function EnhancedProfilePage() {
         )}
 
         {isEditing && (
-          <button className="absolute bottom-4 right-4 flex items-center space-x-2 rounded-lg bg-black/50 px-4 py-2 text-white transition-colors hover:bg-black/60">
+          <button className="absolute bottom-4 right-4 flex items-center space-x-2 rounded-none bg-black/50 px-4 py-2 text-white transition-colors hover:bg-black/60">
             <Upload className="h-4 w-4" />
             <span>Change Cover</span>
           </button>
@@ -1222,13 +1222,13 @@ export default function EnhancedProfilePage() {
 
         {/* Profile completion overlay */}
         {completionPercentage < 100 && (
-          <div className="absolute left-4 top-4 rounded-lg bg-black/50 px-4 py-2 text-white">
+          <div className="absolute left-4 top-4 rounded-none bg-black/50 px-4 py-2 text-white">
             <div className="text-sm">
               Profile {completionPercentage}% complete
             </div>
-            <div className="mt-1 h-1 w-32 rounded-full bg-white/30">
+            <div className="mt-1 h-1 w-32 rounded-none bg-white/30">
               <div
-                className="h-1 rounded-full bg-white transition-all duration-300"
+                className="h-1 rounded-none bg-white transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -1241,7 +1241,7 @@ export default function EnhancedProfilePage() {
         <div className="relative -mt-20 flex flex-col items-center sm:flex-row sm:items-end sm:space-x-6">
           {/* Enhanced Profile Picture */}
           <div className="relative">
-            <div className="h-40 w-40 overflow-hidden rounded-full border-4 border-white bg-gray-200 shadow-lg">
+            <div className="h-40 w-40 overflow-hidden rounded-none border-4 border-white bg-gray-200 shadow-lg">
               {profileData.profilePicture ? (
                 <img
                   src={profileData.profilePicture}
@@ -1257,13 +1257,13 @@ export default function EnhancedProfilePage() {
 
             {/* Verification Badge */}
             {isVerified && (
-              <div className="absolute -bottom-2 -right-2 rounded-full bg-green-500 p-2 text-white">
+              <div className="absolute -bottom-2 -right-2 rounded-none bg-green-500 p-2 text-white">
                 <CheckCircle className="h-5 w-5" />
               </div>
             )}
 
             {isEditing && (
-              <button className="absolute bottom-2 right-2 rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600">
+              <button className="absolute bottom-2 right-2 rounded-none bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600">
                 <Camera className="h-5 w-5" />
               </button>
             )}
@@ -1287,7 +1287,7 @@ export default function EnhancedProfilePage() {
                   {userRoles.map((role) => (
                     <span
                       key={role}
-                      className={`rounded-full px-3 py-1 text-sm font-medium ${
+                      className={`rounded-none px-3 py-1 text-sm font-medium ${
                         role === 'INFLUENCER'
                           ? 'bg-purple-100 text-purple-800'
                           : role === 'BRAND'
@@ -1335,14 +1335,14 @@ export default function EnhancedProfilePage() {
                     <button
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="flex items-center space-x-2 rounded-lg bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:opacity-50"
+                      className="flex items-center space-x-2 rounded-none bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
                       <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="flex items-center space-x-2 rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
+                      className="flex items-center space-x-2 rounded-none bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
                     >
                       <X className="h-4 w-4" />
                       <span>Cancel</span>
@@ -1351,7 +1351,7 @@ export default function EnhancedProfilePage() {
                 ) : (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center space-x-2 rounded-lg bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+                    className="flex items-center space-x-2 rounded-none bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
                   >
                     <Edit3 className="h-4 w-4" />
                     <span>Edit Profile</span>
@@ -1364,7 +1364,7 @@ export default function EnhancedProfilePage() {
 
         {/* Profile Completion Suggestions */}
         {incompleteSections.length > 0 && (
-          <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="mt-6 rounded-none border border-amber-200 bg-amber-50 p-4">
             <div className="flex items-start">
               <Info className="mr-3 mt-0.5 h-5 w-5 text-amber-600" />
               <div className="flex-1">
@@ -1438,7 +1438,7 @@ export default function EnhancedProfilePage() {
                   value={profileData.bio || ''}
                   onChange={(e) => updateProfileField('bio', e.target.value)}
                   rows={4}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Tell others about yourself, your expertise, and what makes you unique..."
                 />
               ) : (
@@ -1459,7 +1459,7 @@ export default function EnhancedProfilePage() {
                     {(profileData.skills || []).map((skill, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                        className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                       >
                         {skill}
                         <button
@@ -1489,7 +1489,7 @@ export default function EnhancedProfilePage() {
                         e.currentTarget.value = '';
                       }
                     }}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               ) : (
@@ -1497,7 +1497,7 @@ export default function EnhancedProfilePage() {
                   {(profileData.skills || []).map((skill, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                      className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                     >
                       {skill}
                     </span>
@@ -1534,7 +1534,7 @@ export default function EnhancedProfilePage() {
                       onChange={(e) =>
                         updateProfileField('phone', e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter phone number"
                     />
                   ) : (
@@ -1556,7 +1556,7 @@ export default function EnhancedProfilePage() {
                       onChange={(e) =>
                         updateProfileField('website', e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter website URL"
                     />
                   ) : (
@@ -1603,7 +1603,7 @@ export default function EnhancedProfilePage() {
       </div>
 
       {error && (
-        <div className="fixed bottom-4 right-4 rounded-lg bg-red-500 px-6 py-3 text-white shadow-lg">
+        <div className="fixed bottom-4 right-4 rounded-none bg-red-500 px-6 py-3 text-white shadow-lg">
           <div className="flex items-center">
             <AlertCircle className="mr-2 h-5 w-5" />
             {error}

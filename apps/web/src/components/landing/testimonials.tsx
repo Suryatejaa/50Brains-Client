@@ -42,7 +42,7 @@ export function Testimonials() {
                 "{testimonial.content}"
               </p>
               <div className="flex items-center">
-                <div className="bg-primary-600 mr-4 flex h-12 w-12 items-center justify-center rounded-full font-semibold text-white">
+                <div className="bg-primary-600 mr-4 flex h-12 w-12 items-center justify-center rounded-none font-semibold text-white">
                   {testimonial.avatar}
                 </div>
                 <div>

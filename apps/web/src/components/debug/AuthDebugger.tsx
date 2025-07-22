@@ -65,7 +65,7 @@ export function AuthDebugger() {
   };
 
   return (
-    <div className="mb-6 rounded-lg border-2 border-yellow-200 bg-yellow-50 p-4">
+    <div className="mb-6 rounded-none border-2 border-yellow-200 bg-yellow-50 p-4">
       <div className="mb-4 flex items-center space-x-2">
         <AlertCircle className="h-5 w-5 text-yellow-600" />
         <h3 className="text-lg font-semibold text-yellow-800">

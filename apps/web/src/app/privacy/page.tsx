@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
                       <h4 className="font-semibold text-blue-800 mb-2">Personal Information:</h4>
                       <ul className="list-disc list-inside text-blue-700 space-y-1 text-sm">
                         <li>Name, email address, phone number</li>
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
                         <li>Payment and billing information</li>
                       </ul>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="bg-green-50 border border-green-200 rounded-none p-4">
                       <h4 className="font-semibold text-green-800 mb-2">Automatic Information:</h4>
                       <ul className="list-disc list-inside text-green-700 space-y-1 text-sm">
                         <li>Device information and IP address</li>
@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
                     We use the information we collect to provide, maintain, and improve our services, process transactions, and communicate with you.
                   </p>
                   
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                  <div className="bg-purple-50 border border-purple-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-purple-800 mb-2">Primary Uses:</h4>
                     <ul className="list-disc list-inside text-purple-700 space-y-1">
                       <li>Provide and operate the 50BraIns platform</li>
@@ -90,21 +90,21 @@ export default function PrivacyPolicyPage() {
                   </p>
                   
                   <div className="space-y-4">
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="bg-amber-50 border border-amber-200 rounded-none p-4">
                       <h4 className="font-semibold text-amber-800 mb-2">With Other Users:</h4>
                       <p className="text-amber-700 text-sm">
                         Your profile information, portfolio, and public activity may be visible to other platform users to facilitate connections and collaborations.
                       </p>
                     </div>
                     
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="bg-red-50 border border-red-200 rounded-none p-4">
                       <h4 className="font-semibold text-red-800 mb-2">Service Providers:</h4>
                       <p className="text-red-700 text-sm">
                         We work with third-party service providers who help us operate our platform, process payments, send emails, and provide customer support.
                       </p>
                     </div>
                     
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-none p-4">
                       <h4 className="font-semibold text-gray-800 mb-2">Legal Requirements:</h4>
                       <p className="text-gray-700 text-sm">
                         We may disclose information when required by law, to respond to legal requests, or to protect our rights and the safety of our users.
@@ -122,7 +122,7 @@ export default function PrivacyPolicyPage() {
                     We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
                   </p>
                   
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <div className="bg-green-50 border border-green-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-green-800 mb-2">Security Measures:</h4>
                     <ul className="list-disc list-inside text-green-700 space-y-1">
                       <li>Encryption of data in transit and at rest</li>
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
                     </ul>
                   </div>
                   
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-none p-4">
                     <p className="text-yellow-700 text-sm">
                       <strong>Important:</strong> While we strive to protect your information, no method of transmission over the internet or electronic storage is 100% secure. We cannot guarantee absolute security.
                     </p>
@@ -151,24 +151,24 @@ export default function PrivacyPolicyPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div className="space-y-3">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
                         <h4 className="font-semibold text-blue-800 text-sm mb-1">Access & Update</h4>
                         <p className="text-blue-700 text-xs">Review and update your profile information through your account settings.</p>
                       </div>
                       
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <div className="bg-purple-50 border border-purple-200 rounded-none p-3">
                         <h4 className="font-semibold text-purple-800 text-sm mb-1">Delete Account</h4>
                         <p className="text-purple-700 text-xs">Request deletion of your account and associated data.</p>
                       </div>
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <div className="bg-orange-50 border border-orange-200 rounded-none p-3">
                         <h4 className="font-semibold text-orange-800 text-sm mb-1">Data Portability</h4>
                         <p className="text-orange-700 text-xs">Request a copy of your data in a machine-readable format.</p>
                       </div>
                       
-                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-3">
+                      <div className="bg-pink-50 border border-pink-200 rounded-none p-3">
                         <h4 className="font-semibold text-pink-800 text-sm mb-1">Marketing Preferences</h4>
                         <p className="text-pink-700 text-xs">Opt-out of marketing communications at any time.</p>
                       </div>
@@ -185,7 +185,7 @@ export default function PrivacyPolicyPage() {
                     We use cookies and similar technologies to enhance your experience, analyze usage patterns, and provide personalized content.
                   </p>
                   
-                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-none p-4 mb-4">
                     <h4 className="font-semibold text-indigo-800 mb-2">Types of Cookies:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                       <div>
@@ -217,7 +217,7 @@ export default function PrivacyPolicyPage() {
                     We retain your personal information for as long as necessary to provide our services, comply with legal obligations, resolve disputes, and enforce our agreements.
                   </p>
                   
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4">
                     <h4 className="font-semibold text-gray-800 mb-2">Retention Periods:</h4>
                     <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
                       <li><strong>Active Accounts:</strong> Data retained while your account is active</li>
@@ -233,7 +233,7 @@ export default function PrivacyPolicyPage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
                     8. Children's Privacy
                   </h2>
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="bg-red-50 border border-red-200 rounded-none p-4">
                     <p className="text-red-700">
                       <strong>Age Restriction:</strong> Our platform is intended for users who are at least 18 years old. We do not knowingly collect personal information from children under 18. If we become aware that we have collected personal information from a child under 18, we will take steps to delete such information.
                     </p>
@@ -248,7 +248,7 @@ export default function PrivacyPolicyPage() {
                   <p className="text-gray-700 mb-4">
                     If you have any questions about this Privacy Policy or our data practices, please contact us:
                   </p>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-none p-4">
                     <div className="space-y-2 text-sm text-gray-700">
                       <div><strong>Privacy Officer:</strong> privacy@50brains.com</div>
                       <div><strong>General Support:</strong> support@50brains.com</div>

@@ -1134,8 +1134,8 @@ const TAILWIND_THEME = {
 // ✅ Component Design Patterns
 interface DesignSystemRules {
   cards: {
-    base: 'bg-white shadow-soft border border-brand-border rounded-lg';
-    glass: 'bg-brand-glass backdrop-blur-md border border-brand-border rounded-lg';
+    base: 'bg-white shadow-soft border border-brand-border rounded-none';
+    glass: 'bg-brand-glass backdrop-blur-md border border-brand-border rounded-none';
     hover: 'hover:shadow-md hover:bg-brand-light-blue/20 transition-all duration-200';
   };
 
@@ -1168,11 +1168,11 @@ interface DesignSystemRules {
 const COMPONENT_PATTERNS = {
   // Glass Card Pattern
   card: `
-    <div className="bg-white/60 backdrop-blur-md border border-brand-border rounded-lg p-3
+    <div className="bg-white/60 backdrop-blur-md border border-brand-border rounded-none p-3
                     hover:shadow-md hover:bg-brand-light-blue/20 transition-all duration-200">
       <h3 className="text-brand-text-main font-semibold mb-2">Card Title</h3>
       <p className="text-brand-text-muted">Card content with muted text</p>
-      <button className="mt-4 bg-brand-primary text-white px-4 py-2 rounded-lg
+      <button className="mt-4 bg-brand-primary text-white px-4 py-2 rounded-none
                         hover:bg-brand-primary/90 transition-colors">
         Action
       </button>
@@ -1191,7 +1191,7 @@ const COMPONENT_PATTERNS = {
   // Input Pattern
   input: `
     <input className="w-full bg-brand-glass backdrop-blur-sm border border-brand-border
-                     rounded-lg px-4 py-3 text-brand-text-main placeholder:text-brand-text-muted
+                     rounded-none px-4 py-3 text-brand-text-main placeholder:text-brand-text-muted
                      focus:border-brand-primary focus:ring-2 focus:ring-brand-light-blue
                      transition-all duration-200"
            placeholder="Enter text..." />
@@ -1224,7 +1224,7 @@ export const GigCard: React.FC<GigCardProps> = ({ gig }) => {
           <p className="text-muted text-sm">by {gig.posterName} • {gig.timePosted}</p>
         </div>
         {gig.isUrgent && (
-          <span className="bg-error/10 text-error px-2 py-1 rounded-full text-xs font-medium border border-error/20">
+          <span className="bg-error/10 text-error px-2 py-1 rounded-none text-xs font-medium border border-error/20">
             Urgent
           </span>
         )}
@@ -1240,7 +1240,7 @@ export const GigCard: React.FC<GigCardProps> = ({ gig }) => {
         {gig.skills.slice(0, 3).map((skill) => (
           <span
             key={skill}
-            className="bg-brand-soft border border-brand-border px-2 py-1 rounded-lg text-xs text-muted"
+            className="bg-brand-soft border border-brand-border px-2 py-1 rounded-none text-xs text-muted"
           >
             {skill}
           </span>
@@ -1261,7 +1261,7 @@ export const GigCard: React.FC<GigCardProps> = ({ gig }) => {
       </div>
 
       {/* Hover Effect Line */}
-      <div className="h-0.5 w-0 bg-brand-primary mt-4 transition-all duration-300 group-hover:w-full rounded-full"></div>
+      <div className="h-0.5 w-0 bg-brand-primary mt-4 transition-all duration-300 group-hover:w-full rounded-none"></div>
     </div>
   );
 };
@@ -1413,7 +1413,7 @@ export const ReputationBadge: React.FC<ReputationBadgeProps> = ({
       <div className={`
         ${sizeClasses[size]}
         bg-brand-glass backdrop-blur-md border border-brand-border
-        rounded-full flex items-center justify-center
+        rounded-none flex items-center justify-center
         group-hover:scale-110 transition-all duration-300
         reputation-${tier}
       `}>
@@ -1450,7 +1450,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           <a
             href="#"
             className="text-body hover:bg-brand-light-blue/30 flex items-center space-x-3 
-                               rounded-lg p-3 transition-all"
+                               rounded-none p-3 transition-all"
           >
             <span>🏠</span>
             <span>Dashboard</span>
@@ -1458,7 +1458,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           <a
             href="#"
             className="text-body hover:bg-brand-light-blue/30 flex items-center space-x-3 
-                               rounded-lg p-3 transition-all"
+                               rounded-none p-3 transition-all"
           >
             <span>💼</span>
             <span>My Gigs</span>
@@ -1466,7 +1466,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           <a
             href="#"
             className="text-body hover:bg-brand-light-blue/30 flex items-center space-x-3 
-                               rounded-lg p-3 transition-all"
+                               rounded-none p-3 transition-all"
           >
             <span>👥</span>
             <span>My Clans</span>
@@ -1474,7 +1474,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           <a
             href="#"
             className="text-accent bg-brand-light-blue/20 flex items-center space-x-3 
-                               rounded-lg p-3 transition-all"
+                               rounded-none p-3 transition-all"
           >
             <span>💎</span>
             <span>Credits</span>
@@ -1514,7 +1514,7 @@ export const LandingSection: React.FC = () => {
               className="card-glass hover:bg-brand-light-blue/10 group p-8 text-center"
             >
               <div
-                className="bg-brand-primary/10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full 
+                className="bg-brand-primary/10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-none 
                             transition-transform group-hover:scale-110"
               >
                 <span className="text-2xl">✨</span>
@@ -1975,7 +1975,7 @@ class APIClient {
 // Compound Component Pattern for Complex UI
 export const GigCard = {
   Root: ({ children, gig }: { children: React.ReactNode; gig: Gig }) => (
-    <div className="bg-white rounded-lg shadow-md p-3">{children}</div>
+    <div className="bg-white rounded-none shadow-md p-3">{children}</div>
   ),
   Header: ({ gig }: { gig: Gig }) => (
     <div className="flex justify-between items-start mb-4">
@@ -2118,7 +2118,7 @@ const OptimizedImage = ({
       priority={priority}
       placeholder="blur"
       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-      className="rounded-lg"
+      className="rounded-none"
     />
   );
 };
@@ -2246,7 +2246,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       onClick={onPress}
       disabled={disabled}
-      className={`px-4 py-2 rounded-lg ${
+      className={`px-4 py-2 rounded-none ${
         variant === 'primary'
           ? 'bg-blue-500 text-white'
           : 'bg-gray-200 text-gray-800'
@@ -2270,7 +2270,7 @@ export const Button: React.FC<ButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      className={`px-4 py-2 rounded-lg ${
+      className={`px-4 py-2 rounded-none ${
         variant === 'primary'
           ? 'bg-blue-500'
           : 'bg-gray-200'

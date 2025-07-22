@@ -204,7 +204,7 @@ export const CreditsManagement: React.FC = () => {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-3 shadow-lg">
+      <div className="rounded-none bg-white p-3 shadow-lg">
         <div className="text-center">
           <span className="mb-4 block text-4xl">⚠️</span>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
@@ -230,7 +230,7 @@ export const CreditsManagement: React.FC = () => {
       </div>
 
       {/* Wallet Overview */}
-      <div className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 p-3 text-white">
+      <div className="rounded-none bg-gradient-to-r from-blue-600 to-purple-600 p-3 text-white">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="text-center">
             <div className="text-3xl font-bold">
@@ -281,7 +281,7 @@ export const CreditsManagement: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="rounded-lg border bg-white p-3 shadow-sm">
+      <div className="rounded-none border bg-white p-3 shadow-sm">
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Wallet Overview</h3>
@@ -342,7 +342,7 @@ export const CreditsManagement: React.FC = () => {
                     step="100"
                     value={purchaseAmount}
                     onChange={(e) => setPurchaseAmount(Number(e.target.value))}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -370,7 +370,7 @@ export const CreditsManagement: React.FC = () => {
                 </button>
               </div>
 
-              <div className="rounded-lg bg-gray-50 p-4">
+              <div className="rounded-none bg-gray-50 p-4">
                 <h4 className="mb-3 font-medium text-gray-900">
                   Payment Summary
                 </h4>
@@ -408,7 +408,7 @@ export const CreditsManagement: React.FC = () => {
               {BOOST_OPTIONS.map((boost) => (
                 <div
                   key={boost.id}
-                  className="rounded-lg border p-4 transition-shadow hover:shadow-md"
+                  className="rounded-none border p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="mb-3 flex items-start justify-between">
                     <h4 className="font-semibold text-gray-900">
@@ -479,7 +479,7 @@ export const CreditsManagement: React.FC = () => {
                 {transactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between rounded-lg border p-4"
+                    className="flex items-center justify-between rounded-none border p-4"
                   >
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">

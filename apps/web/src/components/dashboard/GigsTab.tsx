@@ -141,7 +141,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="border-brand-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
+        <div className="border-brand-primary h-6 w-6 animate-spin rounded-none border-2 border-t-transparent"></div>
         <span className="ml-2 text-gray-600">Loading gigs...</span>
       </div>
     );
@@ -149,7 +149,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 p-4 text-red-700">
+      <div className="rounded-none bg-red-50 p-4 text-red-700">
         <p>Error loading gigs: {error}</p>
       </div>
     );
@@ -188,12 +188,12 @@ export function GigsTab({ userRole }: GigsTabProps) {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">
+      <div className="flex space-x-1 rounded-none bg-gray-100 p-1">
         {userRole === 'BRAND' && (
           <>
             <button
               onClick={() => setActiveSubTab('posted')}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
                 activeSubTab === 'posted'
                   ? 'text-brand-primary bg-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -203,7 +203,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
             </button>
             <button
               onClick={() => setActiveSubTab('drafts')}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
                 activeSubTab === 'drafts'
                   ? 'text-brand-primary bg-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -217,7 +217,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
         {(userRole === 'INFLUENCER' || userRole === 'CREW') && (
           <button
             onClick={() => setActiveSubTab('applications')}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
               activeSubTab === 'applications'
                 ? 'text-brand-primary bg-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -229,7 +229,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
 
         <button
           onClick={() => setActiveSubTab('active')}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
             activeSubTab === 'active'
               ? 'text-brand-primary bg-white shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
@@ -239,7 +239,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
         </button>
         <button
           onClick={() => setActiveSubTab('completed')}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
             activeSubTab === 'completed'
               ? 'text-brand-primary bg-white shadow-sm'
               : 'text-gray-600 hover:text-gray-900'

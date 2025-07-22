@@ -255,7 +255,7 @@ export default function CreditsPurchasePage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -280,7 +280,7 @@ export default function CreditsPurchasePage() {
                     >
                       {pkg.popular && (
                         <div className="text-center mb-2">
-                          <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                          <span className="bg-purple-500 text-white px-3 py-1 rounded-none text-xs font-medium">
                             Most Popular
                           </span>
                         </div>
@@ -340,7 +340,7 @@ export default function CreditsPurchasePage() {
                       <div
                         key={method.id}
                         onClick={() => setSelectedPayment(method)}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        className={`p-4 border rounded-none cursor-pointer transition-all ${
                           selectedPayment?.id === method.id
                             ? 'border-brand-primary bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
@@ -356,7 +356,7 @@ export default function CreditsPurchasePage() {
                               {method.fees}
                             </div>
                           </div>
-                          <div className={`w-4 h-4 rounded-full border-2 ${
+                          <div className={`w-4 h-4 rounded-none border-2 ${
                             selectedPayment?.id === method.id
                               ? 'border-brand-primary bg-brand-primary'
                               : 'border-gray-300'
@@ -439,7 +439,7 @@ export default function CreditsPurchasePage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-none flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">🚀</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">Boost Profile</h3>
@@ -447,7 +447,7 @@ export default function CreditsPurchasePage() {
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-none flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">📢</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">Promote Gigs</h3>
@@ -455,7 +455,7 @@ export default function CreditsPurchasePage() {
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-purple-100 rounded-none flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">👥</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">Clan Support</h3>
@@ -463,7 +463,7 @@ export default function CreditsPurchasePage() {
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-yellow-100 rounded-none flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl">⭐</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">Premium Features</h3>

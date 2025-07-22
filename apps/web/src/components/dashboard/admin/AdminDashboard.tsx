@@ -391,11 +391,11 @@ export const AdminDashboard: React.FC = () => {
             {dashboardData?.systemHealth?.services?.map((service, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                className="flex items-center justify-between rounded-none border border-gray-200 p-3"
               >
                 <div className="flex items-center space-x-3">
                   <div
-                    className={`h-3 w-3 rounded-full ${getServiceStatusColor(service.status)}`}
+                    className={`h-3 w-3 rounded-none ${getServiceStatusColor(service.status)}`}
                   ></div>
                   <span className="text-body text-sm font-medium">
                     {service.name}
@@ -483,7 +483,7 @@ export const AdminDashboard: React.FC = () => {
                 {dashboardData?.moderationQueue?.slice(0, 5).map((report) => (
                   <div
                     key={report.id}
-                    className="rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+                    className="rounded-none border border-gray-200 p-3 transition-colors hover:bg-gray-50"
                   >
                     <div className="mb-2 flex items-start justify-between">
                       <h4 className="text-body text-sm font-medium">

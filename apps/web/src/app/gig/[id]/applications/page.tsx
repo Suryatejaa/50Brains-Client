@@ -25,7 +25,7 @@ interface Application {
   id: string;
   gigId: string;
   applicantId: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED';
   proposal: string;
   quotedPrice: number;
   estimatedTime: string;
@@ -97,8 +97,8 @@ export default function GigApplicationsPage() {
 
   const loadGigAndApplications = async () => {
     try {
+      console.log('🔄 Starting loadGigAndApplications for gigId:', gigId);
       setIsLoading(true);
-      console.log('Loading gig details for ID:', gigId);
       
       // Load gig details and applications in parallel
       const [gigResponse, applicationsResponse] = await Promise.allSettled([
@@ -106,46 +106,27 @@ export default function GigApplicationsPage() {
         apiClient.get(`/api/gig/${gigId}/applications`)
       ]);
 
-      console.log('Gig response:', gigResponse);
-      console.log('Applications response:', applicationsResponse);
+      console.log('📡 API responses received - Gig:', gigResponse.status, 'Applications:', applicationsResponse.status);
 
       // Handle gig response
       if (gigResponse.status === 'fulfilled' && gigResponse.value.success) {
         const gigData = gigResponse.value.data;
-        console.log('✅ Gig data received successfully:', gigData);
+        console.log('✅ Gig data received successfully');
         
         // Check if user owns this gig
-        const gigDetails = gigData as any; // Use any to access brand.id
-        console.log('🔍 Checking gig:', gigDetails);
-        
-        // The API response has brand.id instead of postedById
+        const gigDetails = gigData as any;
         const gigOwnerId = gigDetails.brand?.id || gigDetails.postedById;
-        console.log('🔍 Ownership check - Gig owner ID:', gigOwnerId, 'Current user ID:', user?.id);
-        console.log('🔍 Ownership check - Types:', typeof gigOwnerId, typeof user?.id);
-        console.log('🔍 Ownership check - Strict equality:', gigOwnerId === user?.id);
-        console.log('🔍 Current role context:', {
-          currentRole,
-          userType,
-          userRoles: user?.roles,
-          userRole: user?.role
-        });
         
         if (gigOwnerId !== user?.id) {
-          console.log('❌ Ownership check failed - User does not own this gig, redirecting to my-gigs');
+          console.log('❌ Ownership check failed - Redirecting to my-gigs');
           router.push('/my-gigs');
           return;
         }
         
         console.log('✅ Ownership check passed - Setting gig data');
         setGig(gigData as Gig);
-        console.log('✅ Gig set successfully');
       } else {
-        console.error('❌ Failed to load gig - Response details:', {
-          status: gigResponse.status,
-          success: gigResponse.status === 'fulfilled' ? gigResponse.value.success : 'N/A',
-          error: gigResponse.status === 'fulfilled' ? gigResponse.value : gigResponse.reason
-        });
-        console.log('❌ Redirecting to my-gigs due to gig load failure');
+        console.error('❌ Failed to load gig:', gigResponse.status === 'fulfilled' ? gigResponse.value : gigResponse.reason);
         router.push('/my-gigs');
         return;
       }
@@ -153,42 +134,30 @@ export default function GigApplicationsPage() {
       // Handle applications response
       if (applicationsResponse.status === 'fulfilled' && applicationsResponse.value.success) {
         const applicationsData = applicationsResponse.value.data as any;
-        console.log('✅ Raw applications response data:', applicationsData);
-        console.log('✅ Type of applicationsData:', typeof applicationsData);
-        console.log('✅ Keys in applicationsData:', Object.keys(applicationsData || {}));
+        console.log('📊 Applications data structure:', Object.keys(applicationsData || {}));
         
         // Try different possible structures
         let extractedApplications = [];
         if (applicationsData?.applications) {
           extractedApplications = applicationsData.applications;
-          console.log('✅ Found applications in data.applications:', extractedApplications);
         } else if (Array.isArray(applicationsData)) {
           extractedApplications = applicationsData;
-          console.log('✅ Found applications as direct array:', extractedApplications);
-        } else {
-          console.log('⚠️ No applications found in expected locations');
         }
         
-        console.log('✅ Final extracted applications:', extractedApplications);
-        console.log('📊 Number of applications found:', extractedApplications.length);
+        console.log('✅ Setting', extractedApplications.length, 'applications');
         setApplications(extractedApplications);
       } else {
-        console.error('❌ Failed to load applications - Response details:', {
-          status: applicationsResponse.status,
-          success: applicationsResponse.status === 'fulfilled' ? applicationsResponse.value.success : 'N/A',
-          error: applicationsResponse.status === 'fulfilled' ? applicationsResponse.value : applicationsResponse.reason
-        });
+        console.error('❌ Failed to load applications:', applicationsResponse.status === 'fulfilled' ? applicationsResponse.value : applicationsResponse.reason);
         // Still allow page to load even if applications fail
-        console.log('⚠️ Setting empty applications array and continuing');
         setApplications([]);
       }
 
-      console.log('🎉 Load process completed successfully - Page should now render');
+      console.log('🎉 loadGigAndApplications completed successfully');
       
     } catch (error) {
-      console.error('💥 Exception caught in loadGigAndApplications:', error);
-      console.log('❌ Redirecting to my-gigs due to exception');
-      router.push('/my-gigs');
+      console.error('💥 Exception in loadGigAndApplications:', error);
+      // Don't redirect on refresh errors, just log them
+      setApplications([]);
     } finally {
       console.log('🏁 Setting isLoading to false');
       setIsLoading(false);
@@ -199,18 +168,25 @@ export default function GigApplicationsPage() {
     if (!confirm('Are you sure you want to accept this application?')) return;
     
     try {
+      console.log('Accepting application:', applicationId);
       setProcessingApplicationId(applicationId);
       
-      const response = await apiClient.post(`/api/gig/applications/${applicationId}/accept`, {
-        notes: 'Application accepted'
+      const response = await apiClient.post(`/api/gig/applications/${applicationId}/approve`, {
+        notes: 'Application approved'
       });
 
       if (response.success) {
-        await loadGigAndApplications(); // Reload to get updated data
+        console.log('Application accepted successfully, refreshing data...');
+        // Reload applications to get fresh data from server
+        await loadGigAndApplications();
+        console.log('Data refreshed successfully');
         alert('Application accepted successfully!');
+      } else {
+        console.error('Failed to accept application:', response);
+        alert('Failed to accept application. Please try again.');
       }
     } catch (error) {
-      console.error('Failed to accept application:', error);
+      console.error('Error accepting application:', error);
       alert('Failed to accept application. Please try again.');
     } finally {
       setProcessingApplicationId(null);
@@ -221,6 +197,7 @@ export default function GigApplicationsPage() {
     if (!rejectApplicationId || !rejectionReason.trim()) return;
     
     try {
+      console.log('Rejecting application:', rejectApplicationId);
       setProcessingApplicationId(rejectApplicationId);
       
       const response = await apiClient.post(`/api/gig/applications/${rejectApplicationId}/reject`, {
@@ -229,14 +206,20 @@ export default function GigApplicationsPage() {
       });
 
       if (response.success) {
-        await loadGigAndApplications(); // Reload to get updated data
+        console.log('Application rejected successfully, refreshing data...');
+        // Reload applications to get fresh data from server
+        await loadGigAndApplications();
         setShowRejectModal(false);
         setRejectApplicationId(null);
         setRejectionReason('');
+        console.log('Data refreshed successfully');
         alert('Application rejected successfully.');
+      } else {
+        console.error('Failed to reject application:', response);
+        alert('Failed to reject application. Please try again.');
       }
     } catch (error) {
-      console.error('Failed to reject application:', error);
+      console.error('Error rejecting application:', error);
       alert('Failed to reject application. Please try again.');
     } finally {
       setProcessingApplicationId(null);
@@ -256,7 +239,7 @@ export default function GigApplicationsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-      case 'ACCEPTED': return 'bg-green-100 text-green-800';
+      case 'APPROVED': return 'bg-green-100 text-green-800';
       case 'REJECTED': return 'bg-red-100 text-red-800';
       case 'WITHDRAWN': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -328,6 +311,13 @@ export default function GigApplicationsPage() {
               <p className="text-gray-600">Manage applications for your gig</p>
             </div>
             <div className="flex items-center space-x-3">
+              <button
+                onClick={loadGigAndApplications}
+                className="btn-secondary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+              </button>
               <Link href="/my-gigs" className="btn-secondary">
                 ← Back to My Gigs
               </Link>
@@ -351,7 +341,7 @@ export default function GigApplicationsPage() {
                 {gig.deadline && <span>Deadline: {new Date(gig.deadline).toLocaleDateString()}</span>}
               </div>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+            <span className={`px-3 py-1 rounded-none text-sm font-medium ${
               gig.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
               gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
               'bg-gray-100 text-gray-800'
@@ -369,26 +359,26 @@ export default function GigApplicationsPage() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Applications</option>
                 <option value="pending">Pending</option>
-                <option value="accepted">Accepted</option>
+                <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
             </div>
             
             <div className="flex items-center space-x-4 text-sm">
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-yellow-100 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
                 <span>Pending: {applications.filter(a => a.status === 'PENDING').length}</span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-100 rounded-full"></div>
-                <span>Accepted: {applications.filter(a => a.status === 'ACCEPTED').length}</span>
+                <div className="w-3 h-3 bg-green-100 rounded-none"></div>
+                <span>Approved: {applications.filter(a => a.status === 'APPROVED').length}</span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-100 rounded-full"></div>
+                <div className="w-3 h-3 bg-red-100 rounded-none"></div>
                 <span>Rejected: {applications.filter(a => a.status === 'REJECTED').length}</span>
               </span>
             </div>
@@ -402,7 +392,7 @@ export default function GigApplicationsPage() {
               <div key={application.id} className="card-glass p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
                       <span className="text-gray-500 font-medium">
                         {application.applicantId.slice(-2).toUpperCase()}
                       </span>
@@ -420,7 +410,7 @@ export default function GigApplicationsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}>
+                    <span className={`px-3 py-1 rounded-none text-sm font-medium ${getStatusColor(application.status)}`}>
                       {application.status}
                     </span>
                     <p className="text-sm text-gray-500 mt-1">
@@ -433,7 +423,7 @@ export default function GigApplicationsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
                     <h4 className="font-semibold mb-2">Proposal</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-none whitespace-pre-wrap">
                       {application.proposal}
                     </p>
                   </div>
@@ -482,7 +472,7 @@ export default function GigApplicationsPage() {
                 {application.status === 'REJECTED' && application.rejectionReason && (
                   <div className="mb-6">
                     <h4 className="font-semibold mb-2 text-red-600">Rejection Reason</h4>
-                    <p className="text-gray-700 bg-red-50 p-3 rounded-lg">
+                    <p className="text-gray-700 bg-red-50 p-3 rounded-none">
                       {application.rejectionReason}
                     </p>
                   </div>
@@ -528,7 +518,7 @@ export default function GigApplicationsPage() {
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="bg-white rounded-none max-w-md w-full p-6">
               <h2 className="text-xl font-bold mb-4">Reject Application</h2>
               <p className="text-gray-600 mb-4">
                 Please provide a reason for rejecting this application:
@@ -537,7 +527,7 @@ export default function GigApplicationsPage() {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Reason for rejection..."
               />
               <div className="flex space-x-3 mt-6">

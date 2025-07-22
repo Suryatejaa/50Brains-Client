@@ -219,7 +219,7 @@ export default function MyCampaignsPage() {
                 <button
                   key={status}
                   onClick={() => setFilter(status)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-none text-sm font-medium transition-colors ${
                     filter === status
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -236,7 +236,7 @@ export default function MyCampaignsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="border border-gray-300 rounded-none px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -274,7 +274,7 @@ export default function MyCampaignsPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-xl font-semibold text-gray-900">{campaign.title}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
+                      <span className={`px-2 py-1 rounded-none text-xs font-medium ${getStatusColor(campaign.status)}`}>
                         {campaign.status}
                       </span>
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
@@ -410,17 +410,17 @@ export default function MyCampaignsPage() {
         <div className="mt-12 card-glass p-3">
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link href="/create-gig" className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+            <Link href="/create-gig" className="p-4 border-2 border-dashed border-gray-300 rounded-none hover:border-blue-500 hover:bg-blue-50 transition-colors">
               <div className="text-2xl mb-2">📝</div>
               <div className="font-medium">Create New Campaign</div>
               <div className="text-sm text-gray-600">Start a new influencer campaign</div>
             </Link>
-            <Link href="/influencers/search" className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+            <Link href="/influencers/search" className="p-4 border-2 border-dashed border-gray-300 rounded-none hover:border-blue-500 hover:bg-blue-50 transition-colors">
               <div className="text-2xl mb-2">🔍</div>
               <div className="font-medium">Find Influencers</div>
               <div className="text-sm text-gray-600">Browse our creator marketplace</div>
             </Link>
-            <Link href="/analytics" className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+            <Link href="/analytics" className="p-4 border-2 border-dashed border-gray-300 rounded-none hover:border-blue-500 hover:bg-blue-50 transition-colors">
               <div className="text-2xl mb-2">📊</div>
               <div className="font-medium">View Analytics</div>
               <div className="text-sm text-gray-600">Track your campaign performance</div>

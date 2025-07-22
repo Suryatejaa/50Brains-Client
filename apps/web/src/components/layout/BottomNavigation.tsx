@@ -162,7 +162,7 @@ export const BottomNavigation: React.FC = () => {
                 {item.label}
               </span>
               {active && (
-                <div className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full bg-[#247eab]"></div>
+                <div className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-none bg-[#247eab]"></div>
               )}
             </Link>
           );

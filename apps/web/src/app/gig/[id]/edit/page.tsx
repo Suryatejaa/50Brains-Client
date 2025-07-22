@@ -733,59 +733,59 @@ export default function EditGigPage() {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-none">
             <div className="whitespace-pre-line">{error}</div>
           </div>
         )}
 
         {shouldPublish && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-none p-4">
             <h3 className="text-lg font-semibold text-blue-900 mb-3">Publishing Checklist</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.title && formData.title.trim().length >= 5 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.title && formData.title.trim().length >= 5 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.title && formData.title.trim().length >= 5 ? 'text-green-700' : 'text-gray-600'}>
                   Title (5+ characters) {formData.title ? `- ${formData.title.trim().length}/200` : ''}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.description && formData.description.trim().length >= 10 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.description && formData.description.trim().length >= 10 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.description && formData.description.trim().length >= 10 ? 'text-green-700' : 'text-gray-600'}>
                   Description (10+ characters) {formData.description ? `- ${formData.description.trim().length}/2000` : ''}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.category ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.category ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.category ? 'text-green-700' : 'text-gray-600'}>
                   Category selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.roleRequired ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.roleRequired ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.roleRequired ? 'text-green-700' : 'text-gray-600'}>
                   Role required selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.skillsRequired.filter(skill => skill && skill.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.skillsRequired.filter(skill => skill && skill.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.skillsRequired.filter(skill => skill && skill.trim()).length > 0 ? 'text-green-700' : 'text-gray-600'}>
                   At least one skill required ({formData.skillsRequired.filter(skill => skill && skill.trim()).length} added)
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.deliverables.filter(d => d && d.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.deliverables.filter(d => d && d.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.deliverables.filter(d => d && d.trim()).length > 0 ? 'text-green-700' : 'text-gray-600'}>
                   At least one deliverable ({formData.deliverables.filter(d => d && d.trim()).length} added)
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.experienceLevel ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.experienceLevel ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.experienceLevel ? 'text-green-700' : 'text-gray-600'}>
                   Experience level selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-full ${formData.duration && formData.duration.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                <span className={`w-4 h-4 rounded-none ${formData.duration && formData.duration.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                 <span className={formData.duration && formData.duration.trim() ? 'text-green-700' : 'text-gray-600'}>
                   Project duration selected
                 </span>
@@ -793,13 +793,13 @@ export default function EditGigPage() {
               {formData.budgetType !== 'negotiable' && (
                 <>
                   <div className="flex items-center space-x-2">
-                    <span className={`w-4 h-4 rounded-full ${formData.budgetMin && formData.budgetMin > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                    <span className={`w-4 h-4 rounded-none ${formData.budgetMin && formData.budgetMin > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                     <span className={formData.budgetMin && formData.budgetMin > 0 ? 'text-green-700' : 'text-gray-600'}>
                       Minimum budget set
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`w-4 h-4 rounded-full ${formData.budgetMax && formData.budgetMax > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                    <span className={`w-4 h-4 rounded-none ${formData.budgetMax && formData.budgetMax > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                     <span className={formData.budgetMax && formData.budgetMax > 0 ? 'text-green-700' : 'text-gray-600'}>
                       Maximum budget set
                     </span>
@@ -824,7 +824,7 @@ export default function EditGigPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     formErrors.title ? 'border-red-500' : 'border-gray-300'
                   }`}
                   required
@@ -847,7 +847,7 @@ export default function EditGigPage() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     formErrors.description ? 'border-red-500' : 'border-gray-300'
                   }`}
                   rows={shouldPublish ? 6 : 4}
@@ -872,7 +872,7 @@ export default function EditGigPage() {
                   <select
                     value={formData.category}
                     onChange={(e) => handleInputChange('category', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.category ? 'border-red-500' : 'border-gray-300'
                     }`}
                     required
@@ -902,7 +902,7 @@ export default function EditGigPage() {
                     type="date"
                     value={formData.deadline}
                     onChange={(e) => handleInputChange('deadline', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -929,7 +929,7 @@ export default function EditGigPage() {
                       type="text"
                       value={formData.location}
                       onChange={(e) => handleInputChange('location', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., San Francisco, CA"
                     />
                   </div>
@@ -944,7 +944,7 @@ export default function EditGigPage() {
                 <select
                   value={formData.duration}
                   onChange={(e) => handleInputChange('duration', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select duration</option>
                   <option value="1 day">1 day</option>
@@ -974,7 +974,7 @@ export default function EditGigPage() {
                 <select
                   value={formData.budgetType}
                   onChange={(e) => handleInputChange('budgetType', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 >
                   <option value="fixed">Fixed Project Budget</option>
@@ -993,7 +993,7 @@ export default function EditGigPage() {
                       type="number"
                       value={formData.budgetMin}
                       onChange={(e) => handleInputChange('budgetMin', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         formErrors.budgetMin ? 'border-red-500' : 'border-gray-300'
                       }`}
                       min="0"
@@ -1011,7 +1011,7 @@ export default function EditGigPage() {
                       type="number"
                       value={formData.budgetMax}
                       onChange={(e) => handleInputChange('budgetMax', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         formErrors.budgetMax ? 'border-red-500' : 'border-gray-300'
                       }`}
                       min="0"
@@ -1039,7 +1039,7 @@ export default function EditGigPage() {
                   <select
                     value={formData.roleRequired}
                     onChange={(e) => handleInputChange('roleRequired', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.roleRequired ? 'border-red-500' : 'border-gray-300'
                     }`}
                     required
@@ -1070,7 +1070,7 @@ export default function EditGigPage() {
                   <select
                     value={formData.experienceLevel}
                     onChange={(e) => handleInputChange('experienceLevel', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Any experience level</option>
                     {experienceLevels.map(level => (
@@ -1090,7 +1090,7 @@ export default function EditGigPage() {
                   <select
                     value={formData.urgency}
                     onChange={(e) => handleInputChange('urgency', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     {urgencyLevels.map(level => (
                       <option key={level} value={level}>
@@ -1108,7 +1108,7 @@ export default function EditGigPage() {
                     type="number"
                     value={formData.maxApplications || ''}
                     onChange={(e) => handleInputChange('maxApplications', e.target.value ? Number(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     min="1"
                     placeholder="Leave empty for unlimited"
                   />
@@ -1122,7 +1122,7 @@ export default function EditGigPage() {
                 <textarea
                   value={formData.requirements}
                   onChange={(e) => handleInputChange('requirements', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
                   placeholder="Any additional requirements or notes for applicants..."
                 />
@@ -1145,7 +1145,7 @@ export default function EditGigPage() {
                       type="text"
                       value={skill}
                       onChange={(e) => handleArrayChange('skillsRequired', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Content Writing, Photo Editing, Social Media"
                     />
                     {formData.skillsRequired.length > 1 && (
@@ -1185,7 +1185,7 @@ export default function EditGigPage() {
                       type="text"
                       value={deliverable}
                       onChange={(e) => handleArrayChange('deliverables', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Final logo files, Source files, Brand guidelines"
                     />
                     {formData.deliverables.length > 1 && (
@@ -1225,7 +1225,7 @@ export default function EditGigPage() {
                       type="text"
                       value={tag}
                       onChange={(e) => handleArrayChange('tags', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., urgent, startup, remote"
                     />
                     {formData.tags.length >= 1 && (
@@ -1263,7 +1263,7 @@ export default function EditGigPage() {
                   type="text"
                   value={formData.campaignDuration || ''}
                   onChange={(e) => handleInputChange('campaignDuration', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., 3 months, ongoing, 6 weeks"
                 />
                 <p className="mt-1 text-sm text-gray-500">
@@ -1288,7 +1288,7 @@ export default function EditGigPage() {
                       type="text"
                       value={platform}
                       onChange={(e) => handleArrayChange('platformRequirements', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Instagram, YouTube, TikTok, LinkedIn"
                     />
                     <button
@@ -1326,7 +1326,7 @@ export default function EditGigPage() {
                       type="text"
                       value={req.platform}
                       onChange={(e) => handleFollowerRequirementChange(index, 'platform', e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Platform (e.g., Instagram)"
                     />
                     <div className="flex items-center space-x-2">
@@ -1334,7 +1334,7 @@ export default function EditGigPage() {
                         type="number"
                         value={req.minFollowers}
                         onChange={(e) => handleFollowerRequirementChange(index, 'minFollowers', Number(e.target.value))}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Min followers"
                         min="0"
                       />
@@ -1374,7 +1374,7 @@ export default function EditGigPage() {
                       type="text"
                       value={location}
                       onChange={(e) => handleArrayChange('locationRequirements', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Mumbai, Delhi, India, Global"
                     />
                     <button
@@ -1424,7 +1424,7 @@ export default function EditGigPage() {
           {shouldPublish ? (
             // Show publish flow buttons when coming from publish intent
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">Ready to Publish?</h3>
                 <p className="text-blue-700 mb-3">
                   Please review and complete your gig details before publishing. 

@@ -23,7 +23,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.primaryNiche || ''}
               onChange={(e) => onUpdate('primaryNiche', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a niche</option>
               <option value="lifestyle">Lifestyle</option>
@@ -52,7 +52,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
             <select
               value={profile.primaryPlatform || ''}
               onChange={(e) => onUpdate('primaryPlatform', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select platform</option>
               <option value="instagram">Instagram</option>
@@ -81,7 +81,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
                   (category: string, index: number) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                      className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                     >
                       {category}
                       <button
@@ -112,7 +112,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
                     e.currentTarget.value = '';
                   }
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           ) : (
@@ -121,7 +121,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
                 (category: string, index: number) => (
                   <span
                     key={index}
-                    className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                    className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                   >
                     {category}
                   </span>
@@ -147,7 +147,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
                   ([platform, count]) => (
                     <div
                       key={platform}
-                      className="rounded-lg bg-gray-50 p-3 text-center"
+                      className="rounded-none bg-gray-50 p-3 text-center"
                     >
                       <div className="text-sm capitalize text-gray-600">
                         {platform}

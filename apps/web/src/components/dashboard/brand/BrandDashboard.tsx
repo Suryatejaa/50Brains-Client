@@ -190,7 +190,7 @@ export const BrandDashboard: React.FC = () => {
       permission: 'influencer.search',
     },
     {
-      href: '/applications/received',
+      href: '/applications',
       icon: '📨',
       label: 'Applications',
       description: 'Review applications',
@@ -252,7 +252,7 @@ export const BrandDashboard: React.FC = () => {
         />
 
         {/* Key Metrics */}
-        <div className="mb-2 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-3 lg:grid-cols-4">
+        <div className="mb-2 mt-2 grid grid-cols-2 gap-1 md:mb-2 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
@@ -287,7 +287,7 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 gap-3 md:mb-4 md:gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:mb-1 md:gap-2 lg:grid-cols-3">
           {/* Profile Completion Widget */}
           <div className="lg:col-span-1">
             <div className="card-glass p-3">
@@ -354,14 +354,14 @@ export const BrandDashboard: React.FC = () => {
                   </div>
 
                   {dashboardData.profile.analytics && (
-                    <div className="mt-4 rounded-lg bg-gray-50 p-3">
+                    <div className="mt-4 rounded-none bg-gray-50 p-3">
                       <div className="text-sm font-medium text-gray-700">
                         Profile Completion
                       </div>
                       <div className="mt-1 flex items-center">
-                        <div className="h-2 flex-1 rounded-full bg-gray-200">
+                        <div className="h-2 flex-1 rounded-none bg-gray-200">
                           <div
-                            className="h-2 rounded-full bg-blue-500"
+                            className="h-2 rounded-none bg-blue-500"
                             style={{
                               width: `${dashboardData.profile.analytics.completionPercentage}%`,
                             }}
@@ -411,8 +411,8 @@ export const BrandDashboard: React.FC = () => {
                 <div className="animate-pulse space-y-2">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="border-b border-gray-200 pb-2">
-                      <div className="mb-2 h-4 w-3/4 rounded bg-gray-300"></div>
-                      <div className="h-3 w-1/2 rounded bg-gray-300"></div>
+                      <div className="mb-2 h-4 w-3/4 rounded-full bg-gray-300"></div>
+                      <div className="h-3 w-1/2 rounded-full bg-gray-300"></div>
                     </div>
                   ))}
                 </div>
@@ -421,7 +421,7 @@ export const BrandDashboard: React.FC = () => {
                   {dashboardData.recentGigs.map((gig) => (
                     <div
                       key={gig.id}
-                      className="cursor-pointer rounded border-b border-gray-200 p-2 pb-2 last:border-b-0 hover:bg-gray-50"
+                      className="cursor-pointer rounded-none border-b border-gray-200 p-2 pb-2 last:border-b-0 hover:bg-gray-50"
                       onClick={() => (window.location.href = `/gig/${gig.id}`)}
                     >
                       <div className="flex items-start justify-between">
@@ -448,7 +448,7 @@ export const BrandDashboard: React.FC = () => {
                           </div>
                         </div>
                         <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                          className={`rounded-none px-2 py-1 text-xs font-medium ${
                             gig.status === 'ACTIVE'
                               ? 'bg-green-100 text-green-800'
                               : gig.status === 'COMPLETED'
@@ -545,8 +545,8 @@ export const BrandDashboard: React.FC = () => {
                   <div key={i} className="flex items-center space-x-3">
                     <div className="h-8 w-8 rounded-full bg-gray-300"></div>
                     <div className="flex-1">
-                      <div className="mb-1 h-3 w-3/4 rounded bg-gray-300"></div>
-                      <div className="h-2 w-1/2 rounded bg-gray-300"></div>
+                      <div className="mb-1 h-3 w-3/4 rounded-full bg-gray-300"></div>
+                      <div className="h-2 w-1/2 rounded-full bg-gray-300"></div>
                     </div>
                   </div>
                 ))}

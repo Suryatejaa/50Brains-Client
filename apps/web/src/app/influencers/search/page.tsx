@@ -217,7 +217,7 @@ export default function InfluencersSearchPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Search by name, username, or keyword..."
                 />
               </div>
@@ -230,7 +230,7 @@ export default function InfluencersSearchPage() {
                 <select
                   value={filters.category}
                   onChange={(e) => updateFilter('category', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Categories</option>
                   {categories.map(category => (
@@ -269,14 +269,14 @@ export default function InfluencersSearchPage() {
                     type="number"
                     value={filters.minFollowers || ''}
                     onChange={(e) => updateFilter('minFollowers', Number(e.target.value))}
-                    className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="border border-gray-300 rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Min"
                   />
                   <input
                     type="number"
                     value={filters.maxFollowers || ''}
                     onChange={(e) => updateFilter('maxFollowers', Number(e.target.value))}
-                    className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="border border-gray-300 rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Max"
                   />
                 </div>
@@ -291,7 +291,7 @@ export default function InfluencersSearchPage() {
                   type="number"
                   value={filters.minEngagement || ''}
                   onChange={(e) => updateFilter('minEngagement', Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., 3.5"
                   step="0.1"
                 />
@@ -306,7 +306,7 @@ export default function InfluencersSearchPage() {
                   type="number"
                   value={filters.maxRate || ''}
                   onChange={(e) => updateFilter('maxRate', Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Budget limit"
                 />
               </div>
@@ -320,7 +320,7 @@ export default function InfluencersSearchPage() {
                   type="text"
                   value={filters.location}
                   onChange={(e) => updateFilter('location', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="City, Country"
                 />
               </div>
@@ -333,7 +333,7 @@ export default function InfluencersSearchPage() {
                 <select
                   value={filters.availability}
                   onChange={(e) => updateFilter('availability', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="all">All Creators</option>
                   <option value="available">Available Now</option>
@@ -355,7 +355,7 @@ export default function InfluencersSearchPage() {
                 <select
                   value={filters.sortBy}
                   onChange={(e) => updateFilter('sortBy', e.target.value)}
-                  className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="border border-gray-300 rounded-none px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="followers">Followers</option>
                   <option value="engagement">Engagement Rate</option>
@@ -374,8 +374,8 @@ export default function InfluencersSearchPage() {
                     <div className="h-4 bg-gray-300 rounded mb-2"></div>
                     <div className="h-3 bg-gray-300 rounded mb-4"></div>
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="h-8 bg-gray-300 rounded"></div>
-                      <div className="h-8 bg-gray-300 rounded"></div>
+                      <div className="h-8 bg-gray-300 rounded-full"></div>
+                      <div className="h-8 bg-gray-300 rounded-full"></div>
                     </div>
                   </div>
                 ))}
@@ -401,18 +401,18 @@ export default function InfluencersSearchPage() {
                         <img
                           src={creator.avatar || '/default-avatar.png'}
                           alt={creator.name}
-                          className="w-16 h-16 rounded-full mx-auto mb-3"
+                          className="w-16 h-16 rounded-none mx-auto mb-3"
                         />
                         {creator.verified && (
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 text-white rounded-none flex items-center justify-center text-xs">
                             ✓
                           </div>
                         )}
                         {!creator.isAvailable && (
-                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-gray-400 rounded-full border-2 border-white"></div>
+                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-gray-400 rounded-none border-2 border-white"></div>
                         )}
                         {creator.isAvailable && (
-                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-green-500 rounded-none border-2 border-white"></div>
                         )}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900">{creator.name}</h3>

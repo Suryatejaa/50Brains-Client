@@ -263,7 +263,7 @@ export default function NotificationsPage() {
                   <button
                     key={filterOption.key}
                     onClick={() => setFilter(filterOption.key as any)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
                       filter === filterOption.key
                         ? 'bg-brand-primary text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -323,7 +323,7 @@ export default function NotificationsPage() {
             ) : error ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-red-100 flex items-center justify-center">
                     <span className="text-2xl">❌</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -342,7 +342,7 @@ export default function NotificationsPage() {
             ) : filteredNotifications.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
                     <span className="text-2xl">🔔</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -359,7 +359,7 @@ export default function NotificationsPage() {
             ) : (
               <div className="space-y-2">
                 {/* Select All */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-none">
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -436,7 +436,7 @@ export default function NotificationsPage() {
                               
                               {!notification.isRead && (
                                 <div className="mt-1">
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                  <div className="w-2 h-2 bg-blue-500 rounded-none"></div>
                                 </div>
                               )}
                             </div>

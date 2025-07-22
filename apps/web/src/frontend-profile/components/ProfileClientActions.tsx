@@ -30,8 +30,8 @@ const ProfileClientActions: React.FC<ProfileClientActionsProps> = ({
   if (isLoading) {
     return (
       <div className="fixed bottom-4 right-4">
-        <div className="rounded-lg bg-white p-4 shadow-lg">
-          <div className="border-primary-500 h-6 w-6 animate-spin rounded-full border-b-2"></div>
+        <div className="rounded-none bg-white p-4 shadow-lg">
+          <div className="border-primary-500 h-6 w-6 animate-spin rounded-none border-b-2"></div>
         </div>
       </div>
     );
@@ -50,7 +50,7 @@ const ProfileClientActions: React.FC<ProfileClientActionsProps> = ({
               location: initialProfileData.user.location,
             })
           }
-          className="bg-primary-500 hover:bg-primary-600 rounded-full p-4 text-white shadow-lg transition-all duration-200"
+          className="bg-primary-500 hover:bg-primary-600 rounded-none p-4 text-white shadow-lg transition-all duration-200"
         >
           ✏️ Edit Profile
         </button>
@@ -59,7 +59,7 @@ const ProfileClientActions: React.FC<ProfileClientActionsProps> = ({
       {/* Edit Modal/Overlay */}
       {editing.section && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-3">
+          <div className="w-full max-w-md rounded-none bg-white p-3">
             <h3 className="mb-4 text-lg font-semibold">Edit Profile</h3>
             {/* Edit form content would go here */}
             <div className="mt-6 flex gap-2">

@@ -513,7 +513,7 @@ export default function GigDetailsPage() {
                       href={`/gig/${gigId}/applications`} 
                       className="btn-primary"
                     >
-                      📋 View Applications ({gig._count?.applications || 0})
+                      📋 View Applications ({gig.applicationCount || 0})
                     </Link>
                   )}
                 </div>
@@ -521,7 +521,7 @@ export default function GigDetailsPage() {
               
               {/* Status Badge */}
               {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' && (
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                <span className={`px-3 py-1 rounded-none text-sm font-medium ${
                   gig.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                   gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
                   gig.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
@@ -548,7 +548,7 @@ export default function GigDetailsPage() {
           {/* Draft Notice */}
           {gig.status === 'DRAFT' && (
             <div className="lg:col-span-3 mb-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-none p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">📝</div>
                   <div>
@@ -576,7 +576,7 @@ export default function GigDetailsPage() {
           {/* Already Applied Banner */}
           {(gig.isApplied || alreadyAppliedMessage) && (
             <div className="lg:col-span-3 mb-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="bg-green-50 border border-green-200 rounded-none p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">✅</div>
                   <div>
@@ -606,13 +606,13 @@ export default function GigDetailsPage() {
                         <img 
                           src={gig.brand?.logo} 
                           alt={gig.brand?.name}
-                          className="w-8 h-8 rounded-full"
+                          className="w-8 h-8 rounded-none"
                         />
                       )}
                       <span className="font-medium">{gig.brand?.name}</span>
                       {gig.brand?.verified && <span className="text-blue-500">✓</span>}
                     </div>
-                    <div className="px-1 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <div className="px-1 py-1 bg-blue-100 text-blue-800 rounded-none text-sm">
                       {gig.category}
                     </div>
                   </div>
@@ -692,7 +692,7 @@ export default function GigDetailsPage() {
                   <h3 className="font-semibold mb-3">💼 Skills Required</h3>
                   <div className="flex flex-wrap gap-2">
                     {gig.skillsRequired.map((skill, index) => (
-                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-none text-sm">
                         {skill}
                       </span>
                     ))}
@@ -704,7 +704,7 @@ export default function GigDetailsPage() {
               {gig.roleRequired && (
                 <div className="mb-6">
                   <h3 className="font-semibold mb-3">👤 Role Required</h3>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-none text-sm">
                     {gig.roleRequired}
                   </span>
                 </div>
@@ -714,7 +714,7 @@ export default function GigDetailsPage() {
               {gig.experienceLevel && (
                 <div className="mb-6">
                   <h3 className="font-semibold mb-3">📊 Experience Level</h3>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-none text-sm">
                     {gig.experienceLevel}
                   </span>
                 </div>
@@ -741,7 +741,7 @@ export default function GigDetailsPage() {
               {gig.location && (
                 <div className="mb-6">
                   <h3 className="font-semibold mb-3">📍 Location</h3>
-                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-none text-sm">
                     {gig.location}
                   </span>
                 </div>
@@ -750,7 +750,7 @@ export default function GigDetailsPage() {
               {/* Clan Allowed */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-3">👥 Team Applications</h3>
-                <span className={`px-3 py-1 rounded-full text-sm ${
+                <span className={`px-3 py-1 rounded-none text-sm ${
                   gig.isClanAllowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`}>
                   {gig.isClanAllowed ? 'Team applications allowed' : 'Individual applications only'}
@@ -850,7 +850,7 @@ export default function GigDetailsPage() {
                   <img 
                     src={gig.brand?.logo} 
                     alt={gig.brand?.name}
-                    className="w-12 h-12 rounded-full"
+                    className="w-12 h-12 rounded-none"
                   />
                 )}
                 <div>
@@ -906,7 +906,7 @@ export default function GigDetailsPage() {
                       value={application.coverLetter}
                       onChange={(e) => setApplication(prev => ({ ...prev, coverLetter: e.target.value }))}
                       rows={6}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Tell the brand why you're perfect for this campaign..."
                     />
                   </div>
@@ -925,7 +925,7 @@ export default function GigDetailsPage() {
                           ...prev, 
                           proposedRate: e.target.value ? Number(e.target.value) : undefined 
                         }))}
-                        className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full border border-gray-300 rounded-none pl-8 pr-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Your rate for this campaign"
                       />
                     </div>
@@ -942,7 +942,7 @@ export default function GigDetailsPage() {
                     <select
                       value={application.estimatedTime}
                       onChange={(e) => setApplication(prev => ({ ...prev, estimatedTime: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select estimated time</option>
                       <option value="1-3 days">1-3 days</option>
@@ -962,7 +962,7 @@ export default function GigDetailsPage() {
                     <select
                       value={application.applicantType}
                       onChange={(e) => setApplication(prev => ({ ...prev, applicantType: e.target.value as 'user' | 'clan' }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="user">Individual Application</option>
                       {gig.isClanAllowed && <option value="clan">Team/Clan Application</option>}
@@ -994,7 +994,7 @@ export default function GigDetailsPage() {
                           type="text"
                           value={item.title}
                           onChange={(e) => updatePortfolioItem(index, 'title', e.target.value)}
-                          className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Title"
                         />
                         <div className="flex space-x-2">
@@ -1002,7 +1002,7 @@ export default function GigDetailsPage() {
                             type="url"
                             value={item.url}
                             onChange={(e) => updatePortfolioItem(index, 'url', e.target.value)}
-                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="URL"
                           />
                           <button 
@@ -1042,7 +1042,7 @@ export default function GigDetailsPage() {
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 max-w-md">
-          <div className={`p-4 rounded-lg shadow-lg border-l-4 ${
+          <div className={`p-4 rounded-none shadow-lg border-l-4 ${
             toast.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
             toast.type === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
             'bg-red-50 border-red-500 text-red-800'

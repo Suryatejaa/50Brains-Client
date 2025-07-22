@@ -95,7 +95,7 @@ const ReputationClientWrapper: React.FC<ReputationClientWrapperProps> = ({
 
       {/* Loading overlay for updates */}
       {isLoading && reputation && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white bg-opacity-50">
+        <div className="absolute inset-0 flex items-center justify-center rounded-none bg-white bg-opacity-50">
           <LoadingSpinner size="small" message="Updating..." />
         </div>
       )}

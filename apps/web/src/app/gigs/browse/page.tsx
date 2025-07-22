@@ -342,7 +342,7 @@ export default function GigsBrowsePage() {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                     <p className="text-red-600">❌ {error}</p>
                   </div>
                 )}
@@ -362,7 +362,7 @@ export default function GigsBrowsePage() {
                 ) : gigs.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
-                      <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                         <span className="text-2xl">🔍</span>
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -465,12 +465,12 @@ export default function GigsBrowsePage() {
                             {/* Poster Info */}
                             {gig.poster && (
                               <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold">
                                   {gig.poster.profilePicture ? (
                                     <img 
                                       src={gig.poster.profilePicture} 
                                       alt="Profile" 
-                                      className="w-6 h-6 rounded-full object-cover"
+                                      className="w-6 h-6 rounded-none object-cover"
                                     />
                                   ) : (
                                     (gig.poster.displayName || gig.poster.firstName || 'U')[0]?.toUpperCase()

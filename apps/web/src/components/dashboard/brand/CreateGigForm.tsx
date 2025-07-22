@@ -176,7 +176,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-4xl rounded-lg bg-white p-3 shadow-lg">
+    <div className="mx-auto max-w-4xl rounded-none bg-white p-3 shadow-lg">
       <div className="mb-6">
         <h2 className="mb-2 text-2xl font-bold text-gray-900">
           Create New Gig
@@ -187,7 +187,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
       </div>
 
       {error && (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4">
+        <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -206,7 +206,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., Instagram Post for Beauty Product Launch"
             />
           </div>
@@ -221,7 +221,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, category: e.target.value }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a category</option>
               {CATEGORIES.map((category) => (
@@ -245,7 +245,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, description: e.target.value }))
             }
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Describe your collaboration opportunity in detail..."
           />
         </div>
@@ -267,7 +267,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                   budget: Number(e.target.value),
                 }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="5000"
             />
           </div>
@@ -284,7 +284,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                   budgetType: e.target.value as 'FIXED' | 'HOURLY',
                 }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="FIXED">Fixed Price</option>
               <option value="HOURLY">Hourly Rate</option>
@@ -306,7 +306,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                   maxApplications: Number(e.target.value),
                 }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -326,7 +326,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                   applicationDeadline: e.target.value,
                 }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -340,7 +340,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, deadline: e.target.value }))
               }
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -414,7 +414,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                 type="text"
                 value={newRequirement}
                 onChange={(e) => setNewRequirement(e.target.value)}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Add a requirement..."
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addRequirement())
@@ -423,7 +423,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               <button
                 type="button"
                 onClick={addRequirement}
-                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                className="rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Add
               </button>
@@ -432,7 +432,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               {formData.requirements.map((req, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                  className="inline-flex items-center rounded-none bg-blue-100 px-3 py-1 text-sm text-blue-800"
                 >
                   {req}
                   <button
@@ -461,7 +461,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                 type="text"
                 value={newDeliverable}
                 onChange={(e) => setNewDeliverable(e.target.value)}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Add a deliverable..."
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addDeliverable())
@@ -470,7 +470,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               <button
                 type="button"
                 onClick={addDeliverable}
-                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                className="rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Add
               </button>
@@ -479,7 +479,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               {formData.deliverables.map((del, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm text-green-800"
+                  className="inline-flex items-center rounded-none bg-green-100 px-3 py-1 text-sm text-green-800"
                 >
                   {del}
                   <button
@@ -508,7 +508,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
                 type="text"
                 value={newAudience}
                 onChange={(e) => setNewAudience(e.target.value)}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Add target audience..."
                 onKeyPress={(e) =>
                   e.key === 'Enter' && (e.preventDefault(), addAudience())
@@ -517,7 +517,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               <button
                 type="button"
                 onClick={addAudience}
-                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                className="rounded-none bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Add
               </button>
@@ -526,7 +526,7 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
               {formData.targetAudience.map((aud, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800"
+                  className="inline-flex items-center rounded-none bg-purple-100 px-3 py-1 text-sm text-purple-800"
                 >
                   {aud}
                   <button
@@ -553,14 +553,14 @@ export const CreateGigForm: React.FC<CreateGigFormProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
+            className="rounded-none border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center space-x-2 rounded-none bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading && <LoadingSpinner size="small" />}
             <span>{loading ? 'Creating...' : 'Create Gig'}</span>

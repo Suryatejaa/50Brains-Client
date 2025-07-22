@@ -6,7 +6,7 @@ export default function NotFoundPage() {
       <div className="max-w-md w-full text-center">
         <div className="card-glass p-8">
           <div className="mb-6">
-            <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center">
+            <div className="mx-auto mb-4 h-20 w-20 rounded-none bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center">
               <span className="text-3xl">🚫</span>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">

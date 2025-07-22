@@ -126,9 +126,9 @@ const ReputationCard: React.FC<ReputationCardProps> = ({
             {Math.min(85, (reputation.finalScore / 1000) * 100).toFixed(0)}%
           </span>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-200">
+        <div className="h-2 w-full rounded-none bg-gray-200">
           <div
-            className={`h-2 rounded-full ${tierStyle.bg} ${tierStyle.border}`}
+            className={`h-2 rounded-none ${tierStyle.bg} ${tierStyle.border}`}
             style={{
               width: `${Math.min(85, (reputation.finalScore / 1000) * 100)}%`,
             }}

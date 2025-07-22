@@ -243,7 +243,7 @@ export default function CrewPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -254,7 +254,7 @@ export default function CrewPage() {
                 {Array.from({ length: 6 }, (_, i) => (
                   <div key={i} className="card-glass p-3 animate-pulse">
                     <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+                      <div className="w-16 h-16 bg-gray-300 rounded-none"></div>
                       <div className="flex-1">
                         <div className="h-4 bg-gray-300 rounded mb-2"></div>
                         <div className="h-3 bg-gray-300 rounded w-2/3"></div>
@@ -270,7 +270,7 @@ export default function CrewPage() {
             ) : crewMembers.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">🎬</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -294,12 +294,12 @@ export default function CrewPage() {
                   <div key={crew.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
                     {/* Header */}
                     <div className="flex items-start space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                      <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-none flex items-center justify-center text-white font-semibold text-lg">
                         {crew.profilePicture ? (
                           <img 
                             src={crew.profilePicture} 
                             alt="Profile" 
-                            className="w-16 h-16 rounded-full object-cover"
+                            className="w-16 h-16 rounded-none object-cover"
                           />
                         ) : (
                           getCrewName(crew)[0]?.toUpperCase() || 'C'
@@ -318,7 +318,7 @@ export default function CrewPage() {
                         
                         <div className="flex flex-wrap gap-2 mb-2">
                           {crew.experienceLevel && (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                               experienceLevelColors[crew.experienceLevel] || 'bg-gray-100 text-gray-700'
                             }`}>
                               {crew.experienceLevel}
@@ -326,7 +326,7 @@ export default function CrewPage() {
                           )}
                           
                           {crew.availabilityStatus && (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            <span className={`px-2 py-1 rounded-none text-xs font-medium ${
                               availabilityColors[crew.availabilityStatus] || 'bg-gray-100 text-gray-700'
                             }`}>
                               {crew.availabilityStatus}

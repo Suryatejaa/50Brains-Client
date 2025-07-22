@@ -52,8 +52,8 @@ export const InfluencerDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-4 md:mb-6">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="mb-2 md:mb-2">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-heading text-xl font-bold md:text-2xl">
                 Influencer Dashboard
@@ -79,7 +79,7 @@ export const InfluencerDashboard: React.FC = () => {
         </div>
 
         {/* Key Metrics Row */}
-        <div className="mb-4 grid grid-cols-1 gap-3 md:mb-6 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
+        <div className="mb-2 grid grid-cols-2 gap-2 md:mb-2 md:grid-cols-2 md:gap-2 lg:grid-cols-4">
           <div className="card-glass p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -153,18 +153,18 @@ export const InfluencerDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-4 md:gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 md:gap-2 lg:grid-cols-3">
           {/* Left Column - Content & Campaigns */}
-          <div className="space-y-4 md:space-y-6 lg:col-span-2">
+          <div className="space-y-2 md:space-y-2 lg:col-span-2">
             {/* Content Performance */}
             <div className="card-glass p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between md:mb-4">
+              <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">
                   Content Performance
                 </h3>
                 <div className="text-xl">📈</div>
               </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="grid grid-cols-3 gap-3 md:grid-cols-3">
                 <div className="text-center">
                   <p className="text-muted text-xs md:text-sm">
                     Avg Engagement
@@ -188,7 +188,7 @@ export const InfluencerDashboard: React.FC = () => {
                 </div>
               </div>
               {data?.contentMetrics?.topPerformingPlatform && (
-                <div className="mt-3 rounded-lg bg-blue-50 p-2 md:mt-4">
+                <div className="mt-3 rounded-none bg-blue-50 p-2 md:mt-4">
                   <p className="text-xs text-blue-800 md:text-sm">
                     🏆 Top Platform: {data.contentMetrics.topPerformingPlatform}
                   </p>
@@ -199,7 +199,7 @@ export const InfluencerDashboard: React.FC = () => {
             {/* Social Platforms */}
             {data?.socialPlatforms && data.socialPlatforms.length > 0 && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Social Platforms
                   </h3>
@@ -209,7 +209,7 @@ export const InfluencerDashboard: React.FC = () => {
                   {data.socialPlatforms.map((platform, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-2 md:p-3"
+                      className="flex items-center justify-between rounded-none bg-gray-50 p-2 md:p-3"
                     >
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="text-lg">
@@ -262,7 +262,7 @@ export const InfluencerDashboard: React.FC = () => {
                   {data.recentCampaigns.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-2 md:p-3"
+                      className="flex items-center justify-between rounded-none bg-gray-50 p-2 md:p-3"
                     >
                       <div>
                         <p className="text-heading text-sm font-medium md:text-base">
@@ -278,7 +278,7 @@ export const InfluencerDashboard: React.FC = () => {
                           ${campaign.payment.toLocaleString()}
                         </p>
                         <span
-                          className={`inline-block rounded-full px-2 py-1 text-xs ${
+                          className={`inline-block rounded-none px-2 py-1 text-xs ${
                             campaign.status === 'COMPLETED'
                               ? 'bg-green-100 text-green-800'
                               : campaign.status === 'ACTIVE'
@@ -297,10 +297,10 @@ export const InfluencerDashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Stats & Insights */}
-          <div className="space-y-4 md:space-y-6">
+          <div className="space-y-2 md:space-y-2">
             {/* Earnings Overview */}
             <div className="card-glass p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between md:mb-4">
+              <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Earnings</h3>
                 <div className="text-xl">💰</div>
               </div>
@@ -335,7 +335,7 @@ export const InfluencerDashboard: React.FC = () => {
             {/* Influencer Tier */}
             {data?.influencerTier && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Influencer Tier
                   </h3>
@@ -362,9 +362,9 @@ export const InfluencerDashboard: React.FC = () => {
                       <p className="text-muted mb-2 text-xs">
                         Next: {data.influencerTier.nextTier}
                       </p>
-                      <div className="h-2 rounded-full bg-gray-200">
+                      <div className="h-2 rounded-none bg-gray-200">
                         <div
-                          className="bg-brand-primary h-2 rounded-full transition-all duration-300"
+                          className="bg-brand-primary h-2 rounded-none transition-all duration-300"
                           style={{ width: `${data.influencerTier.progress}%` }}
                         ></div>
                       </div>
@@ -435,7 +435,7 @@ export const InfluencerDashboard: React.FC = () => {
                         .map((tag: string, index: number) => (
                           <span
                             key={index}
-                            className="bg-brand-primary/10 text-brand-primary rounded-full px-2 py-1 text-xs"
+                            className="bg-brand-primary/10 text-brand-primary rounded-none px-2 py-1 text-xs"
                           >
                             #{tag}
                           </span>

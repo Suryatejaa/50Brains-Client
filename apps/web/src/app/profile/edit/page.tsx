@@ -137,7 +137,7 @@ export default function ProfileEditPage() {
 
             {/* Success Message */}
             {success && (
-              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="mb-6 rounded-none border border-green-200 bg-green-50 p-4">
                 <p className="text-green-600">
                   ✅ Profile updated successfully! Redirecting...
                 </p>
@@ -146,7 +146,7 @@ export default function ProfileEditPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -306,7 +306,7 @@ export default function ProfileEditPage() {
                   {formData.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-lg px-3 py-1 text-sm"
+                      className="bg-brand-primary/10 text-brand-primary flex items-center space-x-2 rounded-none px-3 py-1 text-sm"
                     >
                       <span>{skill}</span>
                       <button

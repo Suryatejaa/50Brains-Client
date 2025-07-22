@@ -40,7 +40,7 @@ export default function AuthTestPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow p-3">
+      <div className="max-w-md mx-auto bg-white rounded-none shadow p-3">
         <h1 className="text-2xl font-bold mb-6 text-center">Auth Test Page</h1>
         
         <div className="mb-6 p-4 bg-gray-100 rounded">
@@ -71,7 +71,7 @@ export default function AuthTestPage() {
                 type="email"
                 value={credentials.email}
                 onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -83,13 +83,13 @@ export default function AuthTestPage() {
                 type="password"
                 value={credentials.password}
                 onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-none hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Login (Demo)
             </button>
@@ -101,7 +101,7 @@ export default function AuthTestPage() {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full bg-red-600 text-white py-2 px-4 rounded-none hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               Logout
             </button>

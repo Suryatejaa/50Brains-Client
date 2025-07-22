@@ -28,7 +28,7 @@ export default function ClansPage() {
               <div className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-3">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-lg">
+                    <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-none">
                       <span className="text-xl">🎨</span>
                     </div>
                     <div>
@@ -38,7 +38,7 @@ export default function ClansPage() {
                       <p className="text-muted text-sm">Head • 12 members</p>
                     </div>
                   </div>
-                  <span className="bg-success/10 text-success rounded-full px-2 py-1 text-xs font-medium">
+                  <span className="bg-success/10 text-success rounded-none px-2 py-1 text-xs font-medium">
                     Active
                   </span>
                 </div>
@@ -60,7 +60,7 @@ export default function ClansPage() {
               <div className="card-glass p-3">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="bg-brand-light-blue/20 flex h-12 w-12 items-center justify-center rounded-lg">
+                    <div className="bg-brand-light-blue/20 flex h-12 w-12 items-center justify-center rounded-none">
                       <span className="text-xl">📸</span>
                     </div>
                     <div>
@@ -70,7 +70,7 @@ export default function ClansPage() {
                       <p className="text-muted text-sm">Member • 8 members</p>
                     </div>
                   </div>
-                  <span className="bg-success/10 text-success rounded-full px-2 py-1 text-xs font-medium">
+                  <span className="bg-success/10 text-success rounded-none px-2 py-1 text-xs font-medium">
                     Active
                   </span>
                 </div>
@@ -89,7 +89,7 @@ export default function ClansPage() {
               {/* Create New Clan Card */}
               <div className="card-glass border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/5 cursor-pointer border-2 border-dashed p-3 transition-all duration-200">
                 <div className="text-center">
-                  <div className="bg-brand-light-blue/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                  <div className="bg-brand-light-blue/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-none">
                     <span className="text-xl">➕</span>
                   </div>
                   <h3 className="text-heading mb-2 font-semibold">
@@ -175,7 +175,7 @@ export default function ClansPage() {
                           </div>
                         </div>
                         <div className="flex flex-col items-end">
-                          <span className="bg-success/10 text-success mb-2 rounded-full px-2 py-1 text-xs font-medium">
+                          <span className="bg-success/10 text-success mb-2 rounded-none px-2 py-1 text-xs font-medium">
                             Recruiting
                           </span>
                           <span className="text-muted text-xs">
@@ -204,7 +204,7 @@ export default function ClansPage() {
                     ][clan - 1].map((skill) => (
                       <span
                         key={skill}
-                        className="bg-brand-soft border-brand-border text-body rounded-lg border px-2 py-1 text-xs"
+                        className="bg-brand-soft border-brand-border text-body rounded-none border px-2 py-1 text-xs"
                       >
                         {skill}
                       </span>
@@ -218,7 +218,7 @@ export default function ClansPage() {
                         {[1, 2, 3].map((member) => (
                           <div
                             key={member}
-                            className="bg-brand-light-blue/20 border-brand-base flex h-8 w-8 items-center justify-center rounded-full border-2"
+                            className="bg-brand-light-blue/20 border-brand-base flex h-8 w-8 items-center justify-center rounded-none border-2"
                           >
                             <span className="text-xs">👤</span>
                           </div>

@@ -115,7 +115,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <img
                 src={user.profilePicture || '/default-avatar.jpg'}
                 alt={`${user.firstName} ${user.lastName}`}
-                className="profile-header__avatar-image h-28 w-28 rounded-lg border-4 border-white object-cover shadow-lg lg:h-40 lg:w-40"
+                className="profile-header__avatar-image h-28 w-28 rounded-none border-4 border-white object-cover shadow-lg lg:h-40 lg:w-40"
               />
             )}
           </div>
@@ -132,7 +132,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       setEditData({ ...editData, firstName: e.target.value })
                     }
                     placeholder="First name"
-                    className="profile-header__name-input flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="profile-header__name-input flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="text"
@@ -141,7 +141,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       setEditData({ ...editData, lastName: e.target.value })
                     }
                     placeholder="Last name"
-                    className="profile-header__name-input flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="profile-header__name-input flex-1 rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               ) : (
@@ -169,7 +169,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       setEditData({ ...editData, location: e.target.value })
                     }
                     placeholder="Location"
-                    className="profile-header__location-input w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="profile-header__location-input w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
                   <span className="profile-header__location-text text-gray-600">
@@ -188,7 +188,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     setEditData({ ...editData, bio: e.target.value })
                   }
                   placeholder="Tell us about yourself..."
-                  className="profile-header__bio-textarea resize-vertical w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="profile-header__bio-textarea resize-vertical w-full rounded-none border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
                 />
               ) : (
@@ -206,7 +206,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="profile-header__stats mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-2">
             {analytics && (
               <>
-                <div className="profile-header__stat rounded-lg bg-gray-50 p-3 text-center">
+                <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
                   <span className="profile-header__stat-value block text-xl font-bold text-gray-900">
                     {formatNumber(analytics.profileViews)}
                   </span>
@@ -214,7 +214,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     Profile Views
                   </span>
                 </div>
-                <div className="profile-header__stat rounded-lg bg-gray-50 p-3 text-center">
+                <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
                   <span className="profile-header__stat-value block text-xl font-bold text-gray-900">
                     {analytics.popularityScore.toFixed(1)}
                   </span>
@@ -228,7 +228,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {reputation &&
               reputation.metrics &&
               typeof reputation.metrics.averageRating === 'number' && (
-                <div className="profile-header__stat rounded-lg bg-gray-50 p-3 text-center">
+                <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
                   <span className="profile-header__stat-value block text-xl font-bold text-gray-900">
                     {reputation.metrics.averageRating.toFixed(1)} ⭐
                   </span>
@@ -239,7 +239,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               )}
 
             {user.roles.includes('INFLUENCER') && user.estimatedFollowers && (
-              <div className="profile-header__stat rounded-lg bg-gray-50 p-3 text-center">
+              <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
                 <span className="profile-header__stat-value block text-xl font-bold text-gray-900">
                   {formatNumber(user.estimatedFollowers)}
                 </span>
@@ -256,13 +256,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <div className="profile-header__edit-actions flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={handleSave}
-                  className="btn btn-primary flex-1 rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                  className="btn btn-primary flex-1 rounded-none bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="btn btn-secondary flex-1 rounded-md bg-gray-100 px-4 py-2 font-medium text-gray-700 hover:bg-gray-200"
+                  className="btn btn-secondary flex-1 rounded-none bg-gray-100 px-4 py-2 font-medium text-gray-700 hover:bg-gray-200"
                 >
                   Cancel
                 </button>
@@ -272,21 +272,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 {isOwner ? (
                   <button
                     onClick={onEditClick}
-                    className="profile-header__edit-btn w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                    className="profile-header__edit-btn w-full rounded-none bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
                   >
                     ✏️ Edit Profile
                   </button>
                 ) : (
                   <div className="profile-header__public-actions flex flex-col gap-2 sm:flex-row">
-                    <button className="profile-header__contact-btn flex-1 rounded-md bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700">
+                    <button className="profile-header__contact-btn flex-1 rounded-none bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700">
                       💬 Contact
                     </button>
-                    <button className="profile-header__follow-btn flex-1 rounded-md bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700">
+                    <button className="profile-header__follow-btn flex-1 rounded-none bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700">
                       ⭐ Follow
                     </button>
                   </div>
                 )}
-                <button className="profile-header__share-btn w-full rounded-md bg-gray-100 px-4 py-2 font-medium text-gray-700 hover:bg-gray-200">
+                <button className="profile-header__share-btn w-full rounded-none bg-gray-100 px-4 py-2 font-medium text-gray-700 hover:bg-gray-200">
                   🔗 Share Profile
                 </button>
               </div>

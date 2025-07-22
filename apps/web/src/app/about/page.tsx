@@ -244,7 +244,7 @@ export default function AboutPage() {
                       {milestones.map((milestone, index) => (
                         <div key={index} className={`flex items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
                           <div className="flex-1"></div>
-                          <div className="relative z-10 w-8 h-8 bg-white border-4 border-blue-500 rounded-full flex items-center justify-center">
+                          <div className="relative z-10 w-8 h-8 bg-white border-4 border-blue-500 rounded-none flex items-center justify-center">
                             <span className="text-xs">{milestone.icon}</span>
                           </div>
                           <div className="flex-1 ml-4 md:ml-0">
@@ -278,7 +278,7 @@ export default function AboutPage() {
                   {teamMembers.map((member) => (
                     <div key={member.id} className="card-glass p-3">
                       <div className="flex items-start space-x-4">
-                        <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-2xl font-bold">
                           {member.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div className="flex-1">

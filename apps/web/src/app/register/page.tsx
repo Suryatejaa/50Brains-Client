@@ -190,7 +190,7 @@ export default function RegisterPage() {
       {[1, 2, 3].map((stepNumber) => (
         <div key={stepNumber} className="flex items-center">
           <div
-            className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition-all duration-200 ${
+            className={`flex h-10 w-10 items-center justify-center rounded-none text-sm font-semibold transition-all duration-200 ${
               step >= stepNumber
                 ? 'bg-brand-primary shadow-soft text-white'
                 : 'bg-brand-light-blue text-brand-text-muted border-brand-border border'
@@ -210,7 +210,7 @@ export default function RegisterPage() {
           </div>
           {stepNumber < 3 && (
             <div
-              className={`mx-3 h-1 w-12 rounded-full transition-all duration-200 ${
+              className={`mx-3 h-1 w-12 rounded-none transition-all duration-200 ${
                 step > stepNumber ? 'bg-brand-primary' : 'bg-brand-border'
               }`}
             />
@@ -410,7 +410,7 @@ export default function RegisterPage() {
         {availableRoles.map((role) => (
           <label
             key={role.value}
-            className={`block cursor-pointer rounded-lg border-2 p-4 transition-all duration-200 hover:shadow-md ${
+            className={`block cursor-pointer rounded-none border-2 p-4 transition-all duration-200 hover:shadow-md ${
               formData.roles.includes(role.value)
                 ? 'border-brand-primary bg-brand-primary/5 shadow-md'
                 : 'border-brand-border hover:border-brand-primary/30 hover:bg-brand-light-blue/5 bg-white'
@@ -527,7 +527,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="card-glass p-8">
             {/* Error Message */}
             {error && (
-              <div className="bg-error/10 border-error/20 text-error mb-6 rounded-lg border px-4 py-3 text-sm">
+              <div className="bg-error/10 border-error/20 text-error mb-6 rounded-none border px-4 py-3 text-sm">
                 {error}
               </div>
             )}

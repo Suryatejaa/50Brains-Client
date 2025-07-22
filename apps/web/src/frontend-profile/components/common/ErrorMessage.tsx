@@ -17,7 +17,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 }) => {
   return (
     <div className={`text-center ${className}`}>
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-none bg-red-100">
         <svg
           className="h-6 w-6 text-red-600"
           fill="none"
@@ -37,7 +37,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
       {showRetry && onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center rounded-none border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Try Again
         </button>

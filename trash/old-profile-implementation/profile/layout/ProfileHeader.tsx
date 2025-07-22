@@ -56,7 +56,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         )}
 
         {isEditing && (
-          <button className="absolute bottom-4 right-4 flex items-center space-x-2 rounded-lg bg-black/50 px-4 py-2 text-white transition-colors hover:bg-black/60">
+          <button className="absolute bottom-4 right-4 flex items-center space-x-2 rounded-none bg-black/50 px-4 py-2 text-white transition-colors hover:bg-black/60">
             <Upload className="h-4 w-4" />
             <span>Change Cover</span>
           </button>
@@ -64,13 +64,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         {/* Profile completion overlay */}
         {completionPercentage < 100 && (
-          <div className="absolute left-4 top-4 rounded-lg bg-black/50 px-4 py-2 text-white">
+          <div className="absolute left-4 top-4 rounded-none bg-black/50 px-4 py-2 text-white">
             <div className="text-sm">
               Profile {completionPercentage}% complete
             </div>
-            <div className="mt-1 h-1 w-32 rounded-full bg-white/30">
+            <div className="mt-1 h-1 w-32 rounded-none bg-white/30">
               <div
-                className="h-1 rounded-full bg-white transition-all duration-300"
+                className="h-1 rounded-none bg-white transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -83,7 +83,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="relative -mt-20 flex flex-col items-center sm:flex-row sm:items-end sm:space-x-6">
           {/* Enhanced Profile Picture */}
           <div className="relative">
-            <div className="h-40 w-40 overflow-hidden rounded-full border-4 border-white bg-gray-200 shadow-lg">
+            <div className="h-40 w-40 overflow-hidden rounded-none border-4 border-white bg-gray-200 shadow-lg">
               {userData.profilePicture ? (
                 <img
                   src={userData.profilePicture}
@@ -99,13 +99,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
             {/* Verification Badge */}
             {isVerified && (
-              <div className="absolute -bottom-2 -right-2 rounded-full bg-green-500 p-2 text-white">
+              <div className="absolute -bottom-2 -right-2 rounded-none bg-green-500 p-2 text-white">
                 <CheckCircle className="h-5 w-5" />
               </div>
             )}
 
             {isEditing && (
-              <button className="absolute bottom-2 right-2 rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600">
+              <button className="absolute bottom-2 right-2 rounded-none bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600">
                 <Camera className="h-5 w-5" />
               </button>
             )}
@@ -141,7 +141,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       onChange={(e) =>
                         onUpdate('designationTitle', e.target.value)
                       }
-                      className="w-full rounded-md border border-gray-300 px-3 py-1 text-sm sm:w-auto"
+                      className="w-full rounded-none border border-gray-300 px-3 py-1 text-sm sm:w-auto"
                       placeholder="Your current role or position"
                     />
                   ) : (
@@ -188,14 +188,14 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     <button
                       onClick={onSave}
                       disabled={isSaving}
-                      className="flex items-center space-x-2 rounded-lg bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:opacity-50"
+                      className="flex items-center space-x-2 rounded-none bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
                       <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                     <button
                       onClick={onCancel}
-                      className="flex items-center space-x-2 rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
+                      className="flex items-center space-x-2 rounded-none bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
                     >
                       <X className="h-4 w-4" />
                       <span>Cancel</span>
@@ -204,7 +204,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 ) : (
                   <button
                     onClick={onEdit}
-                    className="flex items-center space-x-2 rounded-lg bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+                    className="flex items-center space-x-2 rounded-none bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
                   >
                     <Edit3 className="h-4 w-4" />
                     <span>Edit Profile</span>
@@ -217,7 +217,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         {/* Profile Completion Suggestions */}
         {incompleteSections.length > 0 && (
-          <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="mt-6 rounded-none border border-amber-200 bg-amber-50 p-4">
             <div className="flex items-start">
               <Info className="mr-3 mt-0.5 h-5 w-5 text-amber-600" />
               <div className="flex-1">

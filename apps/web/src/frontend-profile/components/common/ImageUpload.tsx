@@ -108,7 +108,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       <label className="block text-sm font-medium text-gray-700">{label}</label>
 
       <div
-        className={`relative cursor-pointer rounded-lg border-2 border-dashed transition-colors ${
+        className={`relative cursor-pointer rounded-none border-2 border-dashed transition-colors ${
           isDragging
             ? 'border-blue-400 bg-blue-50'
             : 'border-gray-300 hover:border-gray-400'
@@ -133,11 +133,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             <img
               src={preview}
               alt="Preview"
-              className="h-full w-full rounded-lg object-cover"
+              className="h-full w-full rounded-none object-cover"
             />
             <button
               onClick={handleRemove}
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-sm text-white transition-colors hover:bg-red-600"
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-none bg-red-500 text-sm text-white transition-colors hover:bg-red-600"
               type="button"
             >
               ×

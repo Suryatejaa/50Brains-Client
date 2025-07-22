@@ -146,7 +146,7 @@ export default function MyApplicationsPage() {
               <button
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-4 py-2 rounded-none font-medium transition-colors ${
                   filter === status
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -195,7 +195,7 @@ export default function MyApplicationsPage() {
                       <p className="text-gray-600">by {application.brandName}</p>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
+                      <span className={`px-3 py-1 rounded-none text-sm font-medium ${config.color}`}>
                         {config.icon} {config.label}
                       </span>
                       {isWithdrawable && (
@@ -295,7 +295,7 @@ export default function MyApplicationsPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-none p-3">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">💡 Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/marketplace" className="btn-secondary text-center">
