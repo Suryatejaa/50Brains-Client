@@ -66,6 +66,7 @@ export const BrandDashboard: React.FC = () => {
           brandApiClient.getWallet(),
         ]);
 
+      console.log('Gigs Response:', gigsResponse);
       // Calculate application stats from recent gigs
       let applicationsStats = {
         total: 0,
@@ -118,7 +119,7 @@ export const BrandDashboard: React.FC = () => {
             ? gigsResponse.value.data.gigs.reduce(
                 (acc, gig) => {
                   acc.totalGigs += 1;
-                  if (gig.status === 'ACTIVE') acc.activeGigs += 1;
+                  if (gig.status === 'OPEN' || gig.status === 'ASSIGNED') acc.activeGigs += 1;
                   if (gig.status === 'COMPLETED') acc.completedGigs += 1;
                   acc.totalBudget += gig.budgetMax;
                   return acc;
@@ -126,7 +127,7 @@ export const BrandDashboard: React.FC = () => {
                 {
                   totalGigs: 0,
                   activeGigs: 0,
-                  completedGigs: 0,
+                  completedGigs:0,
                   totalBudget: 0,
                 }
               )
@@ -244,15 +245,15 @@ export const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen bg-gray-50 px-0 py-0 md:p-1">
+      <div className="mx-auto border-1px border-gray-800 max-w-7xl">
         <DashboardHeader
           title={`Welcome back, ${dashboardData.profile?.companyName || 'Brand'}`}
           subtitle="Manage your campaigns and connect with top creators"
         />
 
         {/* Key Metrics */}
-        <div className="mb-2 mt-2 grid grid-cols-2 gap-1 md:mb-2 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
+        <div className="mb-1 grid grid-cols-2 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
@@ -287,10 +288,10 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 gap-3 md:mb-1 md:gap-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-0 md:mb-0 mb-0 md:gap-1 lg:grid-cols-3">
           {/* Profile Completion Widget */}
-          <div className="lg:col-span-1">
-            <div className="card-glass p-3">
+          <div className="lg:col-span-1 sm:mb-1 md:mb-1 mb-1">
+            <div className="card-glass p-3 ">
               <h3 className="text-heading text-lg font-semibold">
                 🏢 Company Overview
               </h3>
@@ -391,7 +392,7 @@ export const BrandDashboard: React.FC = () => {
 
           {/* Recent Gigs */}
           <div className="lg:col-span-2">
-            <div className="sm:mb-2 md:mb-2 mb-2 card-glass p-2">
+            <div className="sm:mb-1 md:mb-1 mb-1 card-glass p-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-heading text-lg font-semibold">
                   📝 Recent Gigs
@@ -446,9 +447,8 @@ export const BrandDashboard: React.FC = () => {
                               Updated: {new Date(gig.updatedAt || gig.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                        </div>
                         <span
-                          className={`rounded-none px-2 py-1 text-xs font-medium ${
+                          className={`rounded-none px-1 py-1 text-xs font-medium ${
                             gig.status === 'ACTIVE'
                               ? 'bg-green-100 text-green-800'
                               : gig.status === 'COMPLETED'
@@ -457,7 +457,8 @@ export const BrandDashboard: React.FC = () => {
                           }`}
                         >
                           {gig.status}
-                        </span>
+                          </span>
+                        </div>                          
                       </div>
                     </div>
                   ))}
@@ -490,7 +491,7 @@ export const BrandDashboard: React.FC = () => {
         <QuickActionsGrid actions={quickActions} title="Brand Tools" />
 
         {/* Performance and Applications Grid */}
-        <div className="mb-2 mt-2 grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div className="mb-1 mt-1 grid grid-cols-1 gap-1 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
@@ -615,9 +616,9 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Analytics & Budget */}
-        <div className="mb-2 grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <div className="card-glass p-3">
-            <h3 className="text-heading mb-6 text-lg font-semibold">
+        <div className="mb-1 grid grid-cols-1 gap-1 lg:grid-cols-2">
+          <div className="card-glass p-2">
+            <h3 className="text-heading mb-3 text-lg font-semibold">
               📈 Gig Analytics
             </h3>
 
@@ -631,7 +632,7 @@ export const BrandDashboard: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-body">Total Gigs Posted</span>
                   <span className="text-heading font-semibold">
@@ -674,12 +675,12 @@ export const BrandDashboard: React.FC = () => {
             )}
           </div>
 
-          <div className="card-glass p-3">
-            <h3 className="text-heading mb-6 text-lg font-semibold">
+          <div className="card-glass p-2">
+            <h3 className="text-heading mb-3 text-lg font-semibold">
               💰 Wallet Management
             </h3>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-body">Available Credits</span>
                 <span className="text-heading font-semibold text-green-600">
@@ -729,9 +730,9 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Performance Overview */}
-        <div className="mb-2">
+        <div className="mb-0">
           <div className="card-glass p-3">
-            <h3 className="text-heading mb-6 text-lg font-semibold">
+            <h3 className="text-heading mb-3 text-lg font-semibold">
               📈 Performance Overview
             </h3>
 
@@ -762,10 +763,7 @@ export const BrandDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Quick Actions */}
-        {/* <QuickActionsGrid actions={quickActions} title="Brand Tools" /> */}
+        </div>        
       </div>
     </div>
   );

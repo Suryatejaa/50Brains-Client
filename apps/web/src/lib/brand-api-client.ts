@@ -74,7 +74,7 @@ export interface BrandGig {
     daysOld: number;
     daysUntilDeadline: number;
   };
-  status: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+  status: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED' | 'OPEN' | 'ASSIGNED';
   budget: number;
   budgetMin: number;
   budgetMax: number;

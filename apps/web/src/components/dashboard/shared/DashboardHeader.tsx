@@ -28,7 +28,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     <div className="card-glass dashboard-section-margin dashboard-card-padding">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-heading mb-1 text-2xl font-bold">{title}</h1>
+          <h1 className="text-heading text-2xl font-bold">
+            {title}
+          </h1>
           {subtitle ? (
             <p className="text-muted">{subtitle}</p>
           ) : (

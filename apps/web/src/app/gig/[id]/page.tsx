@@ -12,7 +12,7 @@ interface Gig {
   title: string;
   description: string;
   category: string;
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN';
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN' | 'ASSIGNED';
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin: number;
   budgetMax: number;
@@ -41,7 +41,7 @@ interface Gig {
     applications: number;
     submissions: number;
   };
-  
+
   // Brand info (optional - might be populated via join)
   brand?: {
     id: string;
@@ -49,7 +49,7 @@ interface Gig {
     logo?: string;
     verified: boolean;
   };
-  
+
   // Application info (for influencer view)
   isApplied?: boolean;
 }
@@ -72,7 +72,7 @@ export default function GigDetailsPage() {
   const [isApplying, setIsApplying] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [alreadyAppliedMessage, setAlreadyAppliedMessage] = useState<string | null>(null);
-  const [toast, setToast] = useState<{type: 'success' | 'error' | 'warning', message: string} | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error' | 'warning', message: string } | null>(null);
   const [application, setApplication] = useState<Application>({
     coverLetter: '',
     portfolio: [],
@@ -98,19 +98,19 @@ export default function GigDetailsPage() {
     // Get the referrer to understand where user came from
     const referrer = document.referrer;
     const currentUrl = window.location.href;
-    
+
     console.log('🔙 Navigation debug:', {
       referrer,
       currentUrl,
       gigId,
       sessionReferrer: sessionStorage.getItem(`gig-${gigId}-referrer`)
     });
-    
+
     // Check if user came from edit page - skip back to original source
     if (referrer && referrer.includes(`/gig/${gigId}/edit`)) {
       // User came from edit page, try to get the original referrer
       const originalReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
-      
+
       if (originalReferrer && originalReferrer !== currentUrl) {
         console.log('🔙 Going back to original referrer:', originalReferrer);
         window.location.href = originalReferrer;
@@ -124,14 +124,14 @@ export default function GigDetailsPage() {
         }
       }
     }
-    
+
     // Check if user came from my-gigs page
     if (referrer && referrer.includes('/my-gigs')) {
       console.log('🔙 Going back to my-gigs');
       router.push('/my-gigs');
       return;
     }
-    
+
     // Check if user came from another gig page (common when browsing gigs)
     if (referrer && referrer.includes('/gig/') && !referrer.includes(`/gig/${gigId}`)) {
       // User came from another gig, try to go to my-gigs if they're the owner
@@ -141,7 +141,7 @@ export default function GigDetailsPage() {
         return;
       }
     }
-    
+
     // Check if user came from dashboard
     if (referrer && referrer.includes('/dashboard')) {
       // If they're viewing their own gig, take them to my-gigs instead of dashboard
@@ -155,7 +155,7 @@ export default function GigDetailsPage() {
         return;
       }
     }
-    
+
     // Default cases based on user type and ownership
     if (isOwner) {
       // If user owns this gig, they probably want to go to my-gigs
@@ -177,31 +177,31 @@ export default function GigDetailsPage() {
       // Store the original referrer if this is the first visit to this gig (not from edit page)
       const referrer = document.referrer;
       const currentReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
-      
+
       console.log('📍 Storing referrer debug:', {
         referrer,
         currentReferrer,
         gigId,
         isEditPage: referrer?.includes(`/gig/${gigId}/edit`)
       });
-      
+
       // Only store referrer if:
       // 1. No referrer is already stored
       // 2. The referrer is not the edit page for this gig
       // 3. The referrer is not another gig page (to avoid gig-hopping confusion)
       // 4. The referrer is a meaningful source page
-      if (!currentReferrer && referrer && 
-          !referrer.includes(`/gig/${gigId}/edit`) && 
-          !referrer.includes('/gig/') && // Don't store other gig pages
-          (referrer.includes('/my-gigs') || 
-           referrer.includes('/dashboard') || 
-           referrer.includes('/marketplace') ||
-           referrer.includes('/search'))) {
-        
+      if (!currentReferrer && referrer &&
+        !referrer.includes(`/gig/${gigId}/edit`) &&
+        !referrer.includes('/gig/') && // Don't store other gig pages
+        (referrer.includes('/my-gigs') ||
+          referrer.includes('/dashboard') ||
+          referrer.includes('/marketplace') ||
+          referrer.includes('/search'))) {
+
         console.log('📍 Storing referrer:', referrer);
         sessionStorage.setItem(`gig-${gigId}-referrer`, referrer);
       }
-      
+
       loadGigDetails();
     }
   }, [gigId]);
@@ -241,14 +241,14 @@ export default function GigDetailsPage() {
   const loadGigDetails = async (forceRefresh = false) => {
     try {
       setIsLoading(true);
-      
+
       // Add cache busting parameter for force refresh
-      const url = forceRefresh 
+      const url = forceRefresh
         ? `/api/gig/${gigId}?_t=${Date.now()}`
         : `/api/gig/${gigId}`;
-      
+
       const response = await apiClient.get(url);
-      
+
       if (response.success && response.data) {
         const gigData = response.data as Gig;
         console.log('🎯 Loaded gig data:', {
@@ -282,9 +282,9 @@ export default function GigDetailsPage() {
 
     // Set a flag in session storage to indicate we want to publish after editing
     sessionStorage.setItem('publishDraftIntent', 'true');
-    
+
     console.log('🚀 Redirecting to edit page for draft completion before publishing:', gigId);
-    
+
     // Navigate to edit page with publish intent
     router.push(`/gig/${gigId}/edit?publish=true`);
   };
@@ -302,27 +302,27 @@ export default function GigDetailsPage() {
 
     try {
       setIsApplying(true);
-      
+
       // Validate required fields
       if (!application.coverLetter.trim()) {
         showToast('warning', 'Please enter a cover letter');
         return;
       }
-      
+
       if (!application.estimatedTime) {
         showToast('warning', 'Please select an estimated time to complete');
         return;
       }
-      
+
       // Validate gig ID format (should be a valid ID)
       if (!gigId || typeof gigId !== 'string' || gigId.length < 10) {
         showToast('error', 'Invalid gig ID. Please refresh the page and try again.');
         return;
       }
-      
+
       // Convert portfolio to string array format expected by backend
       const portfolioUrls = application.portfolio.map(item => item.url).filter(url => url.trim());
-      
+
       // Prepare application data
       const applicationData = {
         proposal: application.coverLetter.trim(),
@@ -331,11 +331,11 @@ export default function GigDetailsPage() {
         estimatedTime: application.estimatedTime,
         applicantType: application.applicantType
       };
-      
+
       console.log('🚀 Sending application data:', applicationData);
       console.log('🔑 User info:', { id: user.id, email: user.email });
       console.log('🎯 Gig ID:', gigId);
-      
+
       const response = await apiClient.post(`/api/gig/${gigId}/apply`, applicationData);
 
       console.log('✅ Application response:', response);
@@ -344,14 +344,14 @@ export default function GigDetailsPage() {
         // Refresh gig data to update application status
         await loadGigDetails();
         setShowApplicationForm(false);
-        setApplication({ 
-          coverLetter: '', 
-          portfolio: [], 
+        setApplication({
+          coverLetter: '',
+          portfolio: [],
           proposedRate: undefined,
           estimatedTime: '',
           applicantType: 'user'
         });
-        
+
         // Show success message
         showToast('success', '✅ Application submitted successfully! The brand will review your application soon.');
       }
@@ -364,10 +364,10 @@ export default function GigDetailsPage() {
         details: error.details
       });
       console.error('❌ Gig ID:', gigId);
-      
+
       // Determine the most appropriate error message
       let userMessage = 'Failed to submit application. Please try again.';
-      
+
       if (error.error) {
         // Backend provided a specific error message
         userMessage = error.error;
@@ -376,7 +376,7 @@ export default function GigDetailsPage() {
       } else if (error.details) {
         userMessage = error.details;
       }
-      
+
       // Special handling for common errors
       if (userMessage.toLowerCase().includes('already applied')) {
         userMessage = 'You have already applied to this gig. Check your applications in the "My Applications" section.';
@@ -415,7 +415,7 @@ export default function GigDetailsPage() {
   const updatePortfolioItem = (index: number, field: 'title' | 'url', value: string) => {
     setApplication(prev => ({
       ...prev,
-      portfolio: prev.portfolio.map((item, i) => 
+      portfolio: prev.portfolio.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       )
     }));
@@ -446,7 +446,7 @@ export default function GigDetailsPage() {
           <div className="text-6xl mb-4">❌</div>
           <h1 className="text-2xl font-bold mb-4">Gig Not Found</h1>
           <p className="text-gray-600 mb-6">The gig you're looking for doesn't exist or has been removed.</p>
-          <button 
+          <button
             onClick={goBack}
             className="btn-primary"
           >
@@ -457,104 +457,98 @@ export default function GigDetailsPage() {
     );
   }
 
-  const canApply = isAuthenticated && !gig.isApplied && 
-                  (gig.status === 'OPEN' || gig.status === 'ACTIVE') && 
-                  (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
+  const canApply = isAuthenticated && !gig.isApplied &&
+    (gig.status === 'OPEN' || gig.status === 'ACTIVE') &&
+    (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
   console.log('🔍 Gig details:', gig);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="mx-auto max-w-6xl px-1 sm:px-1 lg:px-1">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button 
+        <div className="mb-2">
+          <div className="flex flex-row md:flex-row items-left justify-between">
+            <div className="flex items-center space-x-1">
+              <button
                 onClick={goBack}
                 className="btn-secondary"
               >
-                ← Back
+                ←
               </button>
-              <button 
+              <button
                 onClick={() => loadGigDetails(true)}
                 className="btn-secondary text-sm"
                 disabled={isLoading}
                 title="Refresh gig data"
               >
-                {isLoading ? '🔄' : '↻'} Refresh
+                {isLoading ? '🔄' : '↻'}
               </button>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className=" flex items-center space-x-1">
               {/* Owner Actions */}
               {isOwner && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
                   {/* Publish Draft Button - only show for DRAFT status */}
                   {gig.status === 'DRAFT' && (
                     <button
                       onClick={handlePublishDraft}
-                      className="btn-primary"
+                      className="text-sm cursor-pointer text-blue-600 hover:underline"
                       title="Review and complete your draft gig before publishing"
                     >
                       � Complete & Publish
                     </button>
                   )}
-                  
-                  <Link 
-                    href={`/gig/${gigId}/edit`} 
-                    className="btn-secondary"
+                  <span> | </span>
+                  <Link
+                    href={`/gig/${gigId}/edit`}
+                    className="text-sm cursor-pointer text-blue-600 hover:underline"
                   >
-                    ✏️ Edit Gig
+                    Edit
                   </Link>
-                  
+                  <span> | </span>
                   {/* Only show applications link for published gigs */}
                   {gig.status !== 'DRAFT' && (
-                    <Link 
-                      href={`/gig/${gigId}/applications`} 
-                      className="btn-primary"
+                    <Link
+                      href={`/gig/${gigId}/applications`}
+                      className="text-sm cursor-pointer text-blue-600 hover:underline"
                     >
-                      📋 View Applications ({gig.applicationCount || 0})
+                      Applications ({gig.applicationCount || 0})
                     </Link>
                   )}
                 </div>
               )}
-              
               {/* Status Badge */}
-              {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' && (
-                <span className={`px-3 py-1 rounded-none text-sm font-medium ${
-                  gig.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+              {gig.status !== 'OPEN' && gig.status !== 'ASSIGNED' && (
+                <span className={`px-1 py-1 rounded-none text-sm font-medium ${gig.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                   gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
-                  gig.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-                  gig.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {gig.status === 'DRAFT' ? '📝 DRAFT' : gig.status}
+                    gig.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
+                      gig.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
+                        'bg-gray-100 text-gray-800'
+                  }`}>
+                  {gig.status === 'DRAFT' ? 'DRAFT' : gig.status}
                 </span>
               )}
-              
-              <div className="text-sm text-gray-500">
-                Posted {new Date(gig.createdAt).toLocaleDateString()}
-                {gig.updatedAt !== gig.createdAt && (
-                  <div className="text-xs">
-                    Updated {new Date(gig.updatedAt).toLocaleDateString()}
-                  </div>
-                )}
-              </div>
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500">
+              Posted {new Date(gig.createdAt).toLocaleDateString()}
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
           {/* Draft Notice */}
           {gig.status === 'DRAFT' && (
-            <div className="lg:col-span-3 mb-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-none p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-2xl">📝</div>
+            <div className="lg:col-span-3 mb-2">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-none p-1 flex items-center justify-between">
+                <div className="flex items-center space-x-1">
+                  {/* <div className="text-2xl">📝</div> */}
                   <div>
                     <p className="font-semibold text-yellow-800">Draft Gig</p>
                     <p className="text-sm text-yellow-600">
-                      {isOwner 
+                      {isOwner
                         ? 'This gig is still in draft mode. Complete and publish it to make it live and start accepting applications.'
                         : 'This gig is currently in draft mode and not accepting applications.'
                       }
@@ -564,9 +558,9 @@ export default function GigDetailsPage() {
                 {isOwner && (
                   <button
                     onClick={handlePublishDraft}
-                    className="btn-primary"
+                    className="text-sm p-2 cursor-pointer text-blue-600 hover:underline"
                   >
-                    � Complete & Publish
+                  Complete...
                   </button>
                 )}
               </div>
@@ -575,8 +569,8 @@ export default function GigDetailsPage() {
 
           {/* Already Applied Banner */}
           {(gig.isApplied || alreadyAppliedMessage) && (
-            <div className="lg:col-span-3 mb-4">
-              <div className="bg-green-50 border border-green-200 rounded-none p-4 flex items-center justify-between">
+            <div className="lg:col-span-3 mb-1">
+              <div className="bg-green-50 border border-green-200 rounded-none p-1 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">✅</div>
                   <div>
@@ -586,25 +580,25 @@ export default function GigDetailsPage() {
                     </p>
                   </div>
                 </div>
-                <Link href="/my/applications" className="btn-secondary">
-                  View My Applications
+                <Link href="/my/applications" className="text-sm cursor-pointer text-blue-600 hover:underline p-2">
+                  View
                 </Link>
               </div>
             </div>
           )}
 
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-2">
             {/* Gig Header */}
             <div className="card-glass p-2">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-2">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{gig.title}</h1>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       {gig.brand?.logo && (
-                        <img 
-                          src={gig.brand?.logo} 
+                        <img
+                          src={gig.brand?.logo}
                           alt={gig.brand?.name}
                           className="w-8 h-8 rounded-none"
                         />
@@ -625,7 +619,7 @@ export default function GigDetailsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
                 <div>
                   <label className="text-sm font-medium text-gray-500">Deadline</label>
                   <div className="text-lg">{gig.deadline ? new Date(gig.deadline).toLocaleDateString() : 'Not specified'}</div>
@@ -643,11 +637,10 @@ export default function GigDetailsPage() {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Urgency</label>
                   <div className="text-lg">
-                    <span className={`px-2 py-1 rounded text-sm ${
-                      gig.urgency === 'HIGH' ? 'bg-red-100 text-red-800' :
+                    <span className={`px-2 py-1 rounded text-sm ${gig.urgency === 'HIGH' ? 'bg-red-100 text-red-800' :
                       gig.urgency === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                        'bg-green-100 text-green-800'
+                      }`}>
                       {gig.urgency || 'Normal'}
                     </span>
                   </div>
@@ -657,7 +650,7 @@ export default function GigDetailsPage() {
               {gig.tags && gig.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {gig.tags.map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
+                    <span key={index} className="px-1 py-1 bg-gray-100 text-gray-700 rounded text-sm">
                       #{tag}
                     </span>
                   ))}
@@ -666,7 +659,7 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Description */}
-            <div className="card-glass p-3">
+            <div className="card-glass p-1">
               <h2 className="text-xl font-semibold mb-4">📝 Description</h2>
               <div className="prose max-w-none">
                 <p className="text-gray-700 whitespace-pre-wrap">{gig.description}</p>
@@ -674,9 +667,9 @@ export default function GigDetailsPage() {
             </div>
 
             {/* Requirements */}
-            <div className="card-glass p-3">
+            <div className="card-glass p-1">
               <h2 className="text-xl font-semibold mb-4">✅ Requirements</h2>
-              
+
               {/* General Requirements */}
               {gig.requirements && (
                 <div className="mb-6">
@@ -750,9 +743,8 @@ export default function GigDetailsPage() {
               {/* Clan Allowed */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-3">👥 Team Applications</h3>
-                <span className={`px-3 py-1 rounded-none text-sm ${
-                  gig.isClanAllowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
+                <span className={`px-3 py-1 rounded-none text-sm ${gig.isClanAllowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
                   {gig.isClanAllowed ? 'Team applications allowed' : 'Individual applications only'}
                 </span>
               </div>
@@ -776,7 +768,7 @@ export default function GigDetailsPage() {
             {/* Application Status */}
             <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">Application Status</h3>
-              
+
               {!isAuthenticated ? (
                 <div className="text-center">
                   <p className="text-gray-600 mb-4">Sign in to apply for this gig</p>
@@ -789,7 +781,7 @@ export default function GigDetailsPage() {
                   <div className="text-4xl mb-2">📝</div>
                   <p className="font-semibold text-gray-600 mb-2">Draft Mode</p>
                   <p className="text-sm text-gray-600 mb-4">
-                    {isOwner 
+                    {isOwner
                       ? 'Complete and publish this gig to start accepting applications'
                       : 'This gig is not yet published and not accepting applications'
                     }
@@ -817,21 +809,21 @@ export default function GigDetailsPage() {
                   <div className="text-4xl mb-2">⚠️</div>
                   <p className="font-semibold text-yellow-600 mb-2">Cannot Apply</p>
                   <p className="text-sm text-gray-600 mb-4">
-                    {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' ? 'This gig is no longer active' : 
-                     'Application limit reached'}
+                    {gig.status !== 'OPEN' && gig.status !== 'ACTIVE' ? 'This gig is no longer active' :
+                      'Application limit reached'}
                   </p>
                 </div>
               ) : (
                 <div className="text-center">
                   {showApplicationForm ? (
-                    <button 
+                    <button
                       onClick={() => setShowApplicationForm(false)}
                       className="btn-secondary w-full"
                     >
                       Cancel Application
                     </button>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => setShowApplicationForm(true)}
                       className="btn-primary w-full"
                     >
@@ -847,8 +839,8 @@ export default function GigDetailsPage() {
               <h3 className="text-lg font-semibold mb-4">About the Brand</h3>
               <div className="flex items-center space-x-3 mb-4">
                 {gig.brand?.logo && (
-                  <img 
-                    src={gig.brand?.logo} 
+                  <img
+                    src={gig.brand?.logo}
                     alt={gig.brand?.name}
                     className="w-12 h-12 rounded-none"
                   />
@@ -860,8 +852,8 @@ export default function GigDetailsPage() {
                   )}
                 </div>
               </div>
-              <Link 
-                href={`/brand/${gig.brand?.id}` as any} 
+              <Link
+                href={`/brand/${gig.brand?.id}` as any}
                 className="btn-secondary w-full"
               >
                 View Brand Profile
@@ -888,7 +880,7 @@ export default function GigDetailsPage() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Apply to: {gig.title}</h2>
-                  <button 
+                  <button
                     onClick={() => setShowApplicationForm(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
@@ -921,9 +913,9 @@ export default function GigDetailsPage() {
                       <input
                         type="number"
                         value={application.proposedRate || ''}
-                        onChange={(e) => setApplication(prev => ({ 
-                          ...prev, 
-                          proposedRate: e.target.value ? Number(e.target.value) : undefined 
+                        onChange={(e) => setApplication(prev => ({
+                          ...prev,
+                          proposedRate: e.target.value ? Number(e.target.value) : undefined
                         }))}
                         className="w-full border border-gray-300 rounded-none pl-8 pr-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Your rate for this campaign"
@@ -980,14 +972,14 @@ export default function GigDetailsPage() {
                       <label className="block text-sm font-medium text-gray-700">
                         Portfolio Examples
                       </label>
-                      <button 
+                      <button
                         onClick={addPortfolioItem}
                         className="btn-ghost btn-sm text-blue-600"
                       >
                         + Add Item
                       </button>
                     </div>
-                    
+
                     {application.portfolio.map((item, index) => (
                       <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                         <input
@@ -1005,7 +997,7 @@ export default function GigDetailsPage() {
                             className="flex-1 border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="URL"
                           />
-                          <button 
+                          <button
                             onClick={() => removePortfolioItem(index)}
                             className="btn-ghost btn-sm text-red-600"
                           >
@@ -1038,15 +1030,14 @@ export default function GigDetailsPage() {
           </div>
         )}
       </div>
-      
+
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 max-w-md">
-          <div className={`p-4 rounded-none shadow-lg border-l-4 ${
-            toast.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
+          <div className={`p-4 rounded-none shadow-lg border-l-4 ${toast.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
             toast.type === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
-            'bg-red-50 border-red-500 text-red-800'
-          }`}>
+              'bg-red-50 border-red-500 text-red-800'
+            }`}>
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-2">
                 <div className="text-lg">
@@ -1054,7 +1045,7 @@ export default function GigDetailsPage() {
                 </div>
                 <p className="text-sm font-medium">{toast.message}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setToast(null)}
                 className="text-gray-400 hover:text-gray-600 ml-2"
               >

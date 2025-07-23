@@ -49,10 +49,10 @@ export const CrewDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
+    <div className="min-h-screen bg-gray-10 px-1 py-0 md:p-1">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-2 md:mb-2">
+        <div className="mb-1 md:mb-1">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-heading text-xl font-bold md:text-2xl">
@@ -75,7 +75,7 @@ export const CrewDashboard: React.FC = () => {
         </div>
 
         {/* Key Metrics Row */}
-        <div className="mb-2 grid grid-cols-2 gap-2 md:mb-2 md:grid-cols-2 md:gap-2 lg:grid-cols-4">
+        <div className="mb-1 grid grid-cols-2 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
           <div className="card-glass p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -142,9 +142,9 @@ export const CrewDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-3 md:gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-1 md:gap-3 lg:grid-cols-3">
           {/* Left Column - Projects & Performance */}
-          <div className="space-y-2 md:space-y-6 lg:col-span-2">
+          <div className="space-y-2 md:space-y-3 lg:col-span-2">
             {/* Project Performance */}
             <div className="card-glass p-3 md:p-4">
               <div className="mb-2 flex items-center justify-between md:mb-2">
@@ -188,7 +188,7 @@ export const CrewDashboard: React.FC = () => {
             {/* Recent Projects */}
             {data?.recentProjects && data.recentProjects.length > 0 && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-4">
                   <h3 className="text-heading text-lg font-semibold">
                     Recent Projects
                   </h3>
@@ -249,7 +249,7 @@ export const CrewDashboard: React.FC = () => {
             {/* Client History */}
             {data?.clientHistory && data.clientHistory.length > 0 && (
               <div className="card-glass p-3 md:p-4">
-                <div className="mb-3 flex items-center justify-between md:mb-4">
+                <div className="mb-1 flex items-center justify-between md:mb-4">
                   <h3 className="text-heading text-lg font-semibold">
                     Top Clients
                   </h3>
@@ -289,9 +289,9 @@ export const CrewDashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Skills & Business */}
-          <div className="space-y-3 md:space-y-2">
+          <div className="space-y-1 md:space-y-1">
             {/* Skills Overview */}
-            <div className="card-glass p-3 md:p-4">
+            <div className="card-glass p-2 md:p-2">
               <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Skills</h3>
                 <div className="text-xl">🛠️</div>
@@ -351,7 +351,7 @@ export const CrewDashboard: React.FC = () => {
             </div>
 
             {/* Business Metrics */}
-            <div className="card-glass p-3 md:p-4">
+            <div className="card-glass p-2 md:p-4">
               <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Business</h3>
                 <div className="text-xl">📈</div>
@@ -388,7 +388,7 @@ export const CrewDashboard: React.FC = () => {
 
             {/* Equipment Portfolio */}
             {data?.equipmentPortfolio && data.equipmentPortfolio.length > 0 && (
-              <div className="card-glass p-3 md:p-4">
+              <div className="card-glass p-2 md:p-4">
                 <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Equipment
@@ -434,7 +434,7 @@ export const CrewDashboard: React.FC = () => {
 
             {/* Opportunities */}
             {data?.opportunities && (
-              <div className="card-glass p-3 md:p-4">
+              <div className="card-glass p-2 md:p-4">
                 <div className="mb-1 flex items-center justify-between md:mb-1">
                   <h3 className="text-heading text-lg font-semibold">
                     Opportunities

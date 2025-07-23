@@ -33,7 +33,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     return val;
   };
 
-  const cardClassName = `
+  const cardClassName = ` border-1px border-gray-800
     card-glass dashboard-card-padding transition-all duration-200 hover:shadow-lg
     ${urgent ? 'border-l-4 border-red-500' : ''}
     ${onClick ? 'cursor-pointer hover:scale-105' : ''}

@@ -11,7 +11,7 @@ interface Gig {
   title: string;
   description: string;
   category: string;
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN';
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN' | 'ASSIGNED';
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin: number;
   budgetMax: number;
@@ -61,6 +61,7 @@ const statusColors = {
   COMPLETED: 'bg-emerald-100 text-emerald-700',
   CANCELLED: 'bg-red-100 text-red-700',
   OPEN: 'bg-green-100 text-green-700',
+  ASSIGNED: 'bg-blue-100 text-blue-700',
 };
 
 export default function MyGigsPage() {
@@ -281,7 +282,7 @@ export default function MyGigsPage() {
 
             {/* Filters */}
             <div className="mb-6 flex gap-1 overflow-x-auto">
-              {['ALL', 'OPEN', 'DRAFT', 'COMPLETED'].map((status) => (
+              {['ALL', 'OPEN', 'ASSIGNED', 'DRAFT', 'COMPLETED'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilter(status as any)}
@@ -303,8 +304,8 @@ export default function MyGigsPage() {
                 <p className="text-muted">Loading gigs...</p>
               </div>
             ) : filteredGigs.length === 0 ? (
-              <div className="card-glass p-8 text-center">
-                <div className="mb-4">
+              <div className="card-glass p-2 text-center">
+                <div className="mb-2">
                   <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">📋</span>
                   </div>
@@ -329,7 +330,7 @@ export default function MyGigsPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-1">
                 {filteredGigs.map((gig) => (
                   <div key={gig.id} className="card-glass p-2">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -352,11 +353,11 @@ export default function MyGigsPage() {
                           )}
                         </div>
 
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        <p className="text-gray-600 text-sm mb-1 line-clamp-2">
                           {gig.description}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <div className="flex flex-wrap items-center gap-1 text-sm text-gray-500">
                           <span>💰 {formatBudget(gig)}</span>
                           <span>👥 {gig._count.applications} applications</span>
                           <span>� {gig._count.submissions} submissions</span>
@@ -369,7 +370,7 @@ export default function MyGigsPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-wrap gap-2">
+                      <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-wrap gap-1">
                         <Link
                           href={`/gig/${gig.id}`}
                           className="btn-ghost-sm text-gray-700 hover:text-blue-800"
@@ -435,7 +436,7 @@ export default function MyGigsPage() {
 
             {/* Stats Summary */}
             {gigs.length > 0 && (
-              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-1">
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-brand-primary">
                     {gigs.length}
@@ -445,7 +446,7 @@ export default function MyGigsPage() {
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {gigs.filter(g => g.status === 'OPEN').length}
+                    {gigs.filter(g => g.status === 'OPEN').length + gigs.filter(g => g.status === 'ASSIGNED').length}
                   </div>
                   <div className="text-sm text-gray-600">Open</div>
                 </div>

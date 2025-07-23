@@ -49,10 +49,10 @@ export const InfluencerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
+    <div className="min-h-screen bg-gray-50 px-1 py-0 md:p-3">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-2 md:mb-2">
+        <div className="mb-1 md:mb-1">
           <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-heading text-xl font-bold md:text-2xl">
@@ -79,7 +79,7 @@ export const InfluencerDashboard: React.FC = () => {
         </div>
 
         {/* Key Metrics Row */}
-        <div className="mb-2 grid grid-cols-2 gap-2 md:mb-2 md:grid-cols-2 md:gap-2 lg:grid-cols-4">
+        <div className="mb-1 grid grid-cols-2 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
           <div className="card-glass p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -153,9 +153,9 @@ export const InfluencerDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-2 md:gap-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-1 md:gap-1 lg:grid-cols-3">
           {/* Left Column - Content & Campaigns */}
-          <div className="space-y-2 md:space-y-2 lg:col-span-2">
+          <div className="space-y-1 md:space-y-1 lg:col-span-2">
             {/* Content Performance */}
             <div className="card-glass p-3 md:p-4">
               <div className="mb-1 flex items-center justify-between md:mb-1">
@@ -297,7 +297,7 @@ export const InfluencerDashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Stats & Insights */}
-          <div className="space-y-2 md:space-y-2">
+          <div className="space-y-1 md:space-y-1">
             {/* Earnings Overview */}
             <div className="card-glass p-3 md:p-4">
               <div className="mb-1 flex items-center justify-between md:mb-1">
