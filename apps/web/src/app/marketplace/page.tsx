@@ -107,10 +107,10 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
+      <div className="page-container min-h-screen pt-1">
+        <div className="content-container py-1">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-2">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-heading mb-2 text-3xl font-bold">
@@ -128,10 +128,10 @@ export default function MarketplacePage() {
           </div>
 
           {/* Search and Filters */}
-          <div className="mb-8">
+          <div className="mb-2">
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="card-glass p-3">
+            <form onSubmit={handleSearch} className="mb-0">
+              <div className="card-glass p-1">
                 <div className="grid gap-4 md:grid-cols-4">
                   {/* Search */}
                   <div className="md:col-span-2">
@@ -272,7 +272,7 @@ export default function MarketplacePage() {
                           updateFilter('location', e.target.value)
                         }
                         className="input w-full"
-                      />                     
+                      />
                     </div>
                   </div>
                 </div>
@@ -321,21 +321,19 @@ export default function MarketplacePage() {
             <div className="flex space-x-1 rounded-none bg-white p-1">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'all'
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'all'
+                  ? 'bg-brand-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 All Gigs ({gigs.length})
               </button>
               <button
                 onClick={() => setActiveTab('featured')}
-                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'featured'
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'featured'
+                  ? 'bg-brand-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 ⭐ Featured
               </button>
@@ -365,19 +363,18 @@ export default function MarketplacePage() {
 
           {/* Gigs Grid */}
           {!loading && gigs.length > 0 && (
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid gap-1 lg:grid-cols-2">
               {gigs.map((gig, index) => (
                 <Link
                   key={gig.id}
                   href={`/gig/${gig.id}` as any}
-                  className={`card-glass group block p-3 transition-all duration-200 hover:shadow-lg ${
-                    index === 0 && activeTab === 'featured'
-                      ? 'border-brand-primary/30 bg-brand-light-blue/5 border-2 lg:col-span-2'
-                      : ''
-                  }`}
+                  className={`card-glass group block p-2 transition-all duration-200 hover:shadow-lg ${index === 0 && activeTab === 'featured'
+                    ? 'border-brand-primary/30 bg-brand-light-blue/5 border-2 lg:col-span-2'
+                    : ''
+                    }`}
                 >
                   {/* Header */}
-                  <div className="mb-4 flex items-start justify-between">
+                  <div className="mb-2 flex items-start justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="bg-brand-primary/10 text-brand-primary rounded px-2 py-1 text-xs font-medium capitalize">
                         {gig.category.replace('-', ' ')}
@@ -388,13 +385,12 @@ export default function MarketplacePage() {
                         </span>
                       )}
                       <span
-                        className={`rounded px-2 py-1 text-xs font-medium ${
-                          gig.urgency === 'urgent'
-                            ? 'bg-red-100 text-red-600'
-                            : gig.urgency === 'normal'
-                              ? 'bg-yellow-100 text-yellow-600'
-                              : 'bg-green-100 text-green-600'
-                        }`}
+                        className={`rounded px-2 py-1 text-xs font-medium ${gig.urgency === 'urgent'
+                          ? 'bg-red-100 text-red-600'
+                          : gig.urgency === 'normal'
+                            ? 'bg-yellow-100 text-yellow-600'
+                            : 'bg-green-100 text-green-600'
+                          }`}
                       >
                         {gig.urgency}
                       </span>
@@ -405,7 +401,7 @@ export default function MarketplacePage() {
                   </div>
 
                   <div
-                    className={`grid gap-3 ${index === 0 && activeTab === 'featured' ? 'md:grid-cols-3' : ''}`}
+                    className={`grid gap-1 ${index === 0 && activeTab === 'featured' ? 'md:grid-cols-3' : ''}`}
                   >
                     <div
                       className={
@@ -415,11 +411,10 @@ export default function MarketplacePage() {
                       }
                     >
                       <h3
-                        className={`text-heading group-hover:text-brand-primary mb-2 font-semibold transition-colors ${
-                          index === 0 && activeTab === 'featured'
-                            ? 'text-xl'
-                            : 'text-lg'
-                        }`}
+                        className={`text-heading group-hover:text-brand-primary mb-2 font-semibold transition-colors ${index === 0 && activeTab === 'featured'
+                          ? 'text-xl'
+                          : 'text-lg'
+                          }`}
                       >
                         {gig.title}
                       </h3>
@@ -450,7 +445,7 @@ export default function MarketplacePage() {
 
                       {/* Additional details for non-featured */}
                       {!(index === 0 && activeTab === 'featured') && (
-                        <div className="text-muted flex items-center space-x-4 text-xs">
+                        <div className="text-muted flex items-center space-x-2 text-xs">
                           <span>📍 {gig.location || 'Remote'}</span>
                           <span>⏰ {formatDeadline(gig.deadline)}</span>
                           {gig.experienceLevel && (
@@ -462,13 +457,13 @@ export default function MarketplacePage() {
 
                     {/* Price and Action Section */}
                     <div
-                      className={`${index === 0 && activeTab === 'featured' ? 'text-center md:text-right' : 'mt-4 flex items-center justify-between'}`}
+                      className={`${index === 0 && activeTab === 'featured' ? 'text-center md:text-right' : 'mt-2 flex items-center justify-between'}`}
                     >
                       <div
                         className={
                           index === 0 && activeTab === 'featured'
                             ? ''
-                            : 'text-right'
+                            : 'text-left'
                         }
                       >
                         <div
@@ -528,13 +523,13 @@ export default function MarketplacePage() {
           {!loading &&
             gigs.length > 0 &&
             gigs.length >= (filters.limit || 12) && (
-              <div className="mt-12 text-center">
+              <div className="mt-1 text-center">
                 <button
                   onClick={() => {
                     const nextPage = (filters.page || 1) + 1;
                     updateFilter('page', nextPage);
                   }}
-                  className="btn-ghost px-8 py-3"
+                  className="btn-ghost px-8 py-1"
                   disabled={loading}
                 >
                   Load More Gigs
@@ -542,28 +537,6 @@ export default function MarketplacePage() {
               </div>
             )}
 
-          {/* Quick Actions */}
-          <div className="fixed bottom-6 right-6">
-            <Link
-              href="/create-gig"
-              className="bg-brand-primary hover:bg-brand-primary/90 flex h-14 w-14 items-center justify-center rounded-none text-white shadow-lg transition-colors"
-              title="Create New Gig"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </Link>
-          </div>
         </div>
       </div>
     </div>

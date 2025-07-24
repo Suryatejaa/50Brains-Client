@@ -560,7 +560,7 @@ export default function GigDetailsPage() {
                     onClick={handlePublishDraft}
                     className="text-sm p-2 cursor-pointer text-blue-600 hover:underline"
                   >
-                  Complete...
+                    Complete...
                   </button>
                 )}
               </div>
@@ -610,12 +610,12 @@ export default function GigDetailsPage() {
                       {gig.category}
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-green-600">
-                    ₹{gig.budgetMin?.toLocaleString()}{gig.budgetMax && gig.budgetMax !== gig.budgetMin ? ` - ₹${gig.budgetMax?.toLocaleString()}` : ''}
+                  <div className="text-left">
+                    <div className="text-3xl font-bold text-green-600">
+                      ₹{gig.budgetMin?.toLocaleString()}{gig.budgetMax && gig.budgetMax !== gig.budgetMin ? ` - ₹${gig.budgetMax?.toLocaleString()}` : ''}
+                    </div>
+                    <div className="text-sm text-gray-600">Budget ({gig.budgetType})</div>
                   </div>
-                  <div className="text-sm text-gray-600">Budget ({gig.budgetType})</div>
                 </div>
               </div>
 
@@ -668,11 +668,11 @@ export default function GigDetailsPage() {
 
             {/* Requirements */}
             <div className="card-glass p-1">
-              <h2 className="text-xl font-semibold mb-4">✅ Requirements</h2>
+              <h2 className="text-xl font-semibold mb-2">✅ Requirements</h2>
 
               {/* General Requirements */}
               {gig.requirements && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <div className="prose max-w-none">
                     <p className="text-gray-700 whitespace-pre-wrap">{gig.requirements}</p>
                   </div>
@@ -681,7 +681,7 @@ export default function GigDetailsPage() {
 
               {/* Skills Required */}
               {gig.skillsRequired && gig.skillsRequired.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <h3 className="font-semibold mb-3">💼 Skills Required</h3>
                   <div className="flex flex-wrap gap-2">
                     {gig.skillsRequired.map((skill, index) => (
@@ -695,7 +695,7 @@ export default function GigDetailsPage() {
 
               {/* Role Required */}
               {gig.roleRequired && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <h3 className="font-semibold mb-3">👤 Role Required</h3>
                   <span className="px-3 py-1 bg-green-100 text-green-800 rounded-none text-sm">
                     {gig.roleRequired}
@@ -705,7 +705,7 @@ export default function GigDetailsPage() {
 
               {/* Experience Level */}
               {gig.experienceLevel && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <h3 className="font-semibold mb-3">📊 Experience Level</h3>
                   <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-none text-sm">
                     {gig.experienceLevel}
@@ -715,7 +715,7 @@ export default function GigDetailsPage() {
 
               {/* Platform Requirements */}
               {gig.platformRequirements && gig.platformRequirements.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <h3 className="font-semibold mb-3">📱 Platform Requirements</h3>
                   <div className="space-y-2">
                     {gig.platformRequirements.map((req: any, index: number) => (
@@ -732,7 +732,7 @@ export default function GigDetailsPage() {
 
               {/* Location */}
               {gig.location && (
-                <div className="mb-6">
+                <div className="mb-2">
                   <h3 className="font-semibold mb-3">📍 Location</h3>
                   <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-none text-sm">
                     {gig.location}
@@ -741,7 +741,7 @@ export default function GigDetailsPage() {
               )}
 
               {/* Clan Allowed */}
-              <div className="mb-6">
+              <div className="mb-2">
                 <h3 className="font-semibold mb-3">👥 Team Applications</h3>
                 <span className={`px-3 py-1 rounded-none text-sm ${gig.isClanAllowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
@@ -753,7 +753,7 @@ export default function GigDetailsPage() {
             {/* Deliverables */}
             {gig.deliverables && gig.deliverables.length > 0 && (
               <div className="card-glass p-3">
-                <h2 className="text-xl font-semibold mb-4">🎯 Deliverables</h2>
+                <h2 className="text-xl font-semibold mb-2">🎯 Deliverables</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                   {gig.deliverables.map((deliverable, index) => (
                     <li key={index}>{deliverable}</li>
@@ -764,7 +764,7 @@ export default function GigDetailsPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-2">
             {/* Application Status */}
             <div className="card-glass p-3">
               <h3 className="text-lg font-semibold mb-4">Application Status</h3>

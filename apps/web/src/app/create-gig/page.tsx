@@ -279,10 +279,10 @@ export default function CreateGigPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
+      <div className="page-container min-h-screen pt-1">
+        <div className="content-container py-2">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-2">
             <h1 className="text-heading mb-2 text-3xl font-bold">
               Create a New Gig
             </h1>
@@ -291,7 +291,7 @@ export default function CreateGigPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-3">
+          <form onSubmit={handleSubmit} className="grid gap-2 lg:grid-cols-3">
             {/* General Error Display */}
             {errors.general && (
               <div className="mb-4 rounded-none border border-red-200 bg-red-50 p-4 lg:col-span-3">
@@ -302,14 +302,14 @@ export default function CreateGigPage() {
             )}
 
             {/* Main Form */}
-            <div className="space-y-8 lg:col-span-2">
+            <div className="space-y-1 lg:col-span-2">
               {/* Basic Information */}
-              <div className="card-glass p-3">
-                <h2 className="text-heading mb-6 text-xl font-semibold">
+              <div className="card-glass p-1">
+                <h2 className="text-heading mb-2 text-xl font-semibold">
                   Basic Information
                 </h2>
 
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Title */}
                   <div>
                     <label
@@ -367,7 +367,7 @@ export default function CreateGigPage() {
                   </div>
 
                   {/* Category & Role Required */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label
                         htmlFor="category"
@@ -449,12 +449,12 @@ export default function CreateGigPage() {
               </div>
 
               {/* Requirements */}
-              <div className="card-glass p-3">
-                <h2 className="text-heading mb-6 text-xl font-semibold">
+              <div className="card-glass p-1">
+                <h2 className="text-heading mb-1 text-xl font-semibold">
                   Requirements
                 </h2>
 
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Skills */}
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
@@ -576,10 +576,10 @@ export default function CreateGigPage() {
 
                   {/* Expected Deliverables */}
                   <div>
-                    <label className="text-body mb-2 block text-sm font-medium">
+                    <label className="text-body mb-1 block text-sm font-medium">
                       Expected Deliverables *
                     </label>
-                    <div className="mb-3 flex flex-wrap gap-2">
+                    <div className="mb-1 flex flex-wrap gap-2">
                       {formData.deliverables.map((deliverable: string) => (
                         <span
                           key={deliverable}
@@ -722,18 +722,18 @@ export default function CreateGigPage() {
               </div>
 
               {/* Budget & Timeline */}
-              <div className="card-glass p-3">
-                <h2 className="text-heading mb-6 text-xl font-semibold">
+              <div className="card-glass p-1">
+                <h2 className="text-heading mb-1 text-xl font-semibold">
                   Budget & Timeline
                 </h2>
 
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Budget Type */}{' '}
                   <div>
-                    <label className="text-body mb-3 block text-sm font-medium">
+                    <label className="text-body mb-2 block text-sm font-medium">
                       Budget Type
                     </label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-1">
                       {[
                         {
                           value: 'fixed',
@@ -937,13 +937,13 @@ export default function CreateGigPage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-2">
               {/* Preview */}
-              <div className="card-glass p-3">
-                <h3 className="text-heading mb-4 text-lg font-semibold">
+              <div className="card-glass p-2">
+                <h3 className="text-heading mb-2 text-lg font-semibold">
                   Preview
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div>
                     <h4 className="text-body text-sm font-medium">Title</h4>
                     <p className="text-heading">
