@@ -95,19 +95,28 @@ export default function GigDetailsPage() {
 
   // Helper function to navigate back intelligently
   const goBack = () => {
-    // Get the referrer to understand where user came from
-    const referrer = document.referrer;
+    // Use the gig-specific session referrer for navigation, but keep the original referrer for logic if needed
+    const lastPageReferrer = sessionStorage.getItem('lastPage') || document.referrer;
     const currentUrl = window.location.href;
+    const sessionReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
 
-    console.log('🔙 Navigation debug:', {
-      referrer,
+    console.log('🔙 goBack debug:', {
+      lastPageReferrer,
+      sessionReferrer,
       currentUrl,
-      gigId,
-      sessionReferrer: sessionStorage.getItem(`gig-${gigId}-referrer`)
+      gigId
     });
 
+    // Always use session referrer if present and not current page
+    if (sessionReferrer && sessionReferrer !== currentUrl) {
+      console.log('🔙 [goBack] Using session referrer:', sessionReferrer);
+      sessionStorage.removeItem(`gig-${gigId}-referrer`);
+      window.location.href = sessionReferrer;
+      return;
+    }
+
     // Check if user came from edit page - skip back to original source
-    if (referrer && referrer.includes(`/gig/${gigId}/edit`)) {
+    if (lastPageReferrer && lastPageReferrer.includes(`/gig/${gigId}/edit`)) {
       // User came from edit page, try to get the original referrer
       const originalReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
 
@@ -126,14 +135,14 @@ export default function GigDetailsPage() {
     }
 
     // Check if user came from my-gigs page
-    if (referrer && referrer.includes('/my-gigs')) {
+    if (lastPageReferrer && lastPageReferrer.includes('/my-gigs')) {
       console.log('🔙 Going back to my-gigs');
       router.push('/my-gigs');
       return;
     }
 
     // Check if user came from another gig page (common when browsing gigs)
-    if (referrer && referrer.includes('/gig/') && !referrer.includes(`/gig/${gigId}`)) {
+    if (lastPageReferrer && lastPageReferrer.includes('/gig/') && !lastPageReferrer.includes(`/gig/${gigId}`)) {
       // User came from another gig, try to go to my-gigs if they're the owner
       if (isOwner) {
         console.log('🔙 Going to my-gigs (came from other gig, is owner)');
@@ -143,7 +152,7 @@ export default function GigDetailsPage() {
     }
 
     // Check if user came from dashboard
-    if (referrer && referrer.includes('/dashboard')) {
+    if (lastPageReferrer && lastPageReferrer.includes('/dashboard')) {
       // If they're viewing their own gig, take them to my-gigs instead of dashboard
       if (isOwner) {
         console.log('🔙 Going to my-gigs (came from dashboard, is owner)');
@@ -175,10 +184,10 @@ export default function GigDetailsPage() {
   useEffect(() => {
     if (gigId) {
       // Store the original referrer if this is the first visit to this gig (not from edit page)
-      const referrer = document.referrer;
+      const referrer = sessionStorage.getItem('lastPage') || document.referrer;
       const currentReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
 
-      console.log('📍 Storing referrer debug:', {
+      console.log('📍 useEffect storing referrer debug:', {
         referrer,
         currentReferrer,
         gigId,
@@ -198,7 +207,7 @@ export default function GigDetailsPage() {
           referrer.includes('/marketplace') ||
           referrer.includes('/search'))) {
 
-        console.log('📍 Storing referrer:', referrer);
+        console.log('📍 [useEffect] Storing referrer:', referrer);
         sessionStorage.setItem(`gig-${gigId}-referrer`, referrer);
       }
 

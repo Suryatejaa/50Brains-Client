@@ -154,21 +154,21 @@ export default function BrandProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="mx-auto max-w-4xl px-2 sm:px-2 lg:px-2">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+            <div> 
               <h1 className="text-3xl font-bold text-gray-900">Brand Profile</h1>
               <p className="text-gray-600">Manage your brand information and public profile</p>
             </div>
-            <div className="space-x-3">
+            <div className="space-x-2">
               {!isEditing ? (
                 <>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="btn-secondary"
+                    className="btn-secondary px-2 py-2"
                   >
                     ✏️ Edit Profile
                   </button>
@@ -199,15 +199,15 @@ export default function BrandProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
           {/* Main Profile */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-2">
             {/* Basic Information */}
-            <div className="card-glass p-3">
+            <div className="card-glass p-2">
               <h2 className="text-xl font-semibold mb-4">🏢 Basic Information</h2>
               
               {!isEditing ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div className="flex items-center space-x-4">
                     {profile?.logo ? (
                       <img
@@ -229,7 +229,7 @@ export default function BrandProfilePage() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Company Size</label>
                       <p className="text-gray-900">{profile?.companySize || 'Not specified'}</p>
@@ -265,7 +265,7 @@ export default function BrandProfilePage() {
                   )}
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Brand Name
@@ -278,7 +278,7 @@ export default function BrandProfilePage() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Industry
@@ -321,7 +321,7 @@ export default function BrandProfilePage() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Location
@@ -363,10 +363,9 @@ export default function BrandProfilePage() {
                 </div>
               )}
             </div>
-
             {/* Social Media */}
-            <div className="card-glass p-3">
-              <div className="flex items-center justify-between mb-4">
+            <div className="card-glass p-2">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-semibold">📱 Social Media</h2>
                 {isEditing && (
                   <button
@@ -379,11 +378,11 @@ export default function BrandProfilePage() {
               </div>
               
               {!isEditing ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {profile?.socialMedia && profile.socialMedia.length > 0 ? (
                     profile.socialMedia.map((social, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-none">
-                        <div className="flex items-center space-x-3">
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-none">
+                        <div className="flex items-center space-x-2">
                           <span className="font-medium">{social.platform}</span>
                           <span className="text-gray-600">@{social.handle}</span>
                         </div>
@@ -402,9 +401,9 @@ export default function BrandProfilePage() {
                   )}
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {editForm.socialMedia?.map((social, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-gray-200 rounded-none">
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-2 p-2 border border-gray-200 rounded-none">
                       <select
                         value={social.platform}
                         onChange={(e) => updateSocialMedia(index, 'platform', e.target.value)}
@@ -451,10 +450,10 @@ export default function BrandProfilePage() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-2">
             {/* Profile Statistics */}
             {profile?.stats && (
-              <div className="card-glass p-3">
+              <div className="card-glass p-2">
                 <h3 className="text-lg font-semibold mb-4">📊 Profile Statistics</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">

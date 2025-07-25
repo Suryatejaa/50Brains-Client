@@ -198,7 +198,7 @@ export const BrandDashboard: React.FC = () => {
       permission: 'applications.manage',
     },
     {
-      href: '/analytics/campaigns',
+      href: '/analytics',
       icon: '📊',
       label: 'Analytics',
       description: 'Campaign insights',

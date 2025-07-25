@@ -121,12 +121,12 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary-500 hover:bg-primary-700 focus-visible:ring-primary-500/50 
+    @apply btn bg-primary-600 hover:bg-primary-700 border border-primary-600 focus-visible:ring-primary-500/50 
            shadow-professional font-semibold text-white;
   }
 
   .btn-secondary {
-    @apply btn focus-visible:ring-primary-500/50 border border-gray-200 text-gray-900 
+    @apply btn focus-visible:ring-primary-500/50 border border-gray-400 text-gray-900 
            hover:bg-gray-50;
   }
 
@@ -199,7 +199,7 @@
   }
 
   .text-accent {
-    @apply text-primary-500;
+    @apply text-primary-600;
   }
 
   /* 📱 Layout Containers */

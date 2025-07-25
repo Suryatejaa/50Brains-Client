@@ -143,22 +143,22 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+            <div className="flex flex-col gap-1">
               <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
               <p className="text-gray-600">
                 {userType === 'creator' ? 'Track your creator performance and earnings' : 'Monitor your campaign performance and ROI'}
               </p>
             </div>
-            <div className="space-x-3">
+            <div className="flex space-x-1">
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex px-5 py-0 lg:py-0 md:py-0 cursor-pointer border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -178,10 +178,10 @@ export default function AnalyticsPage() {
             <p>Loading your analytics...</p>
           </div>
         ) : analytics ? (
-          <div className="space-y-8">
+          <div className="space-y-2">
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="card-glass p-3">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-1">
+              <div className="card-glass p-1">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Profile Views</p>
@@ -297,7 +297,7 @@ export default function AnalyticsPage() {
 
             {/* Creator Specific Analytics */}
             {userType === 'creator' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 {/* Social Media Performance */}
                 <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">📱 Social Media Performance</h3>
@@ -355,7 +355,7 @@ export default function AnalyticsPage() {
 
             {/* Brand Specific Analytics */}
             {userType === 'brand' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 {/* Campaign Performance */}
                 <div className="card-glass p-3">
                   <h3 className="text-lg font-semibold mb-4">📊 Campaign Performance</h3>

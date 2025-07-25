@@ -112,7 +112,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
 
       {/* Debug Controls */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-2">
+        <div className="fixed bottom-2 right-2 z-40 flex flex-col gap-2">
           <button
             onClick={forceRefreshProfile}
             className="rounded bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"

@@ -74,7 +74,7 @@ export default function InfluencersPage() {
         ...(filters.verified && { verified: 'true' }),
       });
       
-      const response = await apiClient.get(`/api/influencers?${params}`);
+      const response = await apiClient.get(`/api/user/search/influencers?${params}`);
       
       if (response.success) {
         setInfluencers(Array.isArray(response.data) ? response.data : []);

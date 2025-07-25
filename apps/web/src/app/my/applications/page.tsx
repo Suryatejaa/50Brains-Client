@@ -5,18 +5,32 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 
+interface Gig {
+  id: string;
+  title: string;
+  description: string;
+  budgetMin: number;
+  budgetMax: number;
+  budgetType: string;
+  status: string;
+  deadline: string;
+  createdAt: string;
+}
+
 interface Application {
   id: string;
   gigId: string;
-  gigTitle: string;
-  brandName: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED';
+  applicantId: string;
+  applicantType: string;
+  proposal: string;
+  quotedPrice: number;
+  estimatedTime: string;
+  portfolio: string[] | { title: string; url: string }[];
+  status: string;
   appliedAt: string;
-  budget: number;
-  deadline: string;
-  description: string;
-  requirements: string[];
-  portfolio?: { title: string; url: string }[];
+  respondedAt: string;
+  rejectionReason: string | null;
+  gig: Gig;
 }
 
 const statusConfig = {
@@ -49,17 +63,18 @@ export default function MyApplicationsPage() {
     try {
       setIsLoading(true);
       const response = await apiClient.get('/api/my/applications');
-      
+
+      console.log(response);
       if (response.success && response.data) {
-        const apps = Array.isArray(response.data) ? response.data : [];
-        setApplications(apps);
-        
+        const { applications = [] } = response.data as { applications: Application[] };
+        setApplications(applications);
+        console.log(applications);
         // Calculate stats
         setStats({
-          total: apps.length,
-          pending: apps.filter((app: Application) => app.status === 'PENDING').length,
-          accepted: apps.filter((app: Application) => app.status === 'ACCEPTED').length,
-          completed: apps.filter((app: Application) => app.status === 'COMPLETED').length
+          total: applications.length,
+          pending: applications.filter((app: Application) => app.status === 'PENDING').length,
+          accepted: applications.filter((app: Application) => app.status === 'ACCEPTED').length,
+          completed: applications.filter((app: Application) => app.status === 'COMPLETED').length
         });
       }
     } catch (error) {
@@ -69,7 +84,7 @@ export default function MyApplicationsPage() {
     }
   };
 
-  const filteredApplications = applications.filter(app => 
+  const filteredApplications = applications.filter(app =>
     filter === 'ALL' || app.status === filter
   );
 
@@ -99,18 +114,18 @@ export default function MyApplicationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="mx-auto max-w-6xl px-2 sm:px-6 lg:px-2">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-2">
+          <div className="flex flex-col md:flex-row items-left justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">My Applications</h1>
               <p className="text-gray-600">Track your campaign applications and collaborations</p>
             </div>
-            <div className="space-x-3">
+            <div className="space-x-1 mt-2">
               <Link href="/marketplace" className="btn-secondary">
-                Browse Gigs
+                Browse
               </Link>
               <Link href="/dashboard" className="btn-primary">
                 Dashboard
@@ -120,37 +135,36 @@ export default function MyApplicationsPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
-          <div className="card-glass p-3 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-1">
+          <div className="card-glass p-1 text-center">
             <div className="text-3xl font-bold text-blue-600">{stats.total}</div>
             <div className="text-gray-600">Total Applications</div>
           </div>
-          <div className="card-glass p-3 text-center">
+          <div className="card-glass p-1 text-center">
             <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
             <div className="text-gray-600">Under Review</div>
           </div>
-          <div className="card-glass p-3 text-center">
+          <div className="card-glass p-1 text-center">
             <div className="text-3xl font-bold text-green-600">{stats.accepted}</div>
             <div className="text-gray-600">Accepted</div>
           </div>
-          <div className="card-glass p-3 text-center">
+          <div className="card-glass p-1 text-center">
             <div className="text-3xl font-bold text-purple-600">{stats.completed}</div>
             <div className="text-gray-600">Completed</div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="card-glass p-3 mb-8">
+        <div className="card-glass p-1 mb-1">
           <div className="flex flex-wrap gap-2">
             {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED'].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-none font-medium transition-colors ${
-                  filter === status
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`px-4 py-2 rounded-none font-medium transition-colors ${filter === status
+                  ? 'bg-blue-700 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
               >
                 {status === 'ALL' ? 'All Applications' : status.toLowerCase().replace('_', ' ')}
               </button>
@@ -165,14 +179,14 @@ export default function MyApplicationsPage() {
             <p>Loading your applications...</p>
           </div>
         ) : filteredApplications.length === 0 ? (
-          <div className="card-glass p-8 text-center">
-            <div className="text-6xl mb-4">📝</div>
+          <div className="card-glass p-4 text-center">
+            <div className="text-5xl mb-2">📝</div>
             <h3 className="text-xl font-semibold mb-2">
               {filter === 'ALL' ? 'No Applications Yet' : `No ${filter.toLowerCase()} applications`}
             </h3>
-            <p className="text-gray-600 mb-6">
-              {filter === 'ALL' 
-                ? 'Start applying to gigs to see them here!' 
+            <p className="text-gray-600 mb-2">
+              {filter === 'ALL'
+                ? 'Start applying to gigs to see them here!'
                 : `You don't have any ${filter.toLowerCase()} applications at the moment.`}
             </p>
             <Link href="/marketplace" className="btn-primary">
@@ -180,23 +194,21 @@ export default function MyApplicationsPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-1">
             {filteredApplications.map((application) => {
-              const config = statusConfig[application.status];
+              const config = statusConfig[application.status as keyof typeof statusConfig];
               const isWithdrawable = application.status === 'PENDING';
-              
               return (
-                <div key={application.id} className="card-glass p-3">
-                  <div className="flex items-start justify-between mb-4">
+                <div key={application.id} className="card-glass p-2">
+                  <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">
-                        {application.gigTitle}
+                        {application.gig.title}
                       </h3>
-                      <p className="text-gray-600">by {application.brandName}</p>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`px-3 py-1 rounded-none text-sm font-medium ${config.color}`}>
-                        {config.icon} {config.label}
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-3 py-1 rounded-none text-sm font-medium ${config?.color}`}>
+                        {config?.icon} {config?.label}
                       </span>
                       {isWithdrawable && (
                         <button
@@ -209,65 +221,72 @@ export default function MyApplicationsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Budget</label>
                       <div className="text-lg font-semibold text-green-600">
-                        ${application.budget.toLocaleString()}
+                        ₹{application.gig.budgetMin.toLocaleString()} - ₹{application.gig.budgetMax.toLocaleString()}
                       </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Deadline</label>
+                      <label className="text-sm font-bold text-gray-500">Deadline</label>
                       <div className="text-lg">
-                        {new Date(application.deadline).toLocaleDateString()}
+                        {new Date(application.gig.deadline).toLocaleDateString()}
                       </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Applied</label>
+                      <label className="text-sm font-bold text-gray-500">Applied</label>
                       <div className="text-lg">
                         {new Date(application.appliedAt).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="text-sm font-medium text-gray-500">Description</label>
-                    <p className="text-gray-800 mt-1">{application.description}</p>
+                  <div className="mb-2">
+                    <label className="text-sm font-bold text-gray-500">Description</label>
+                    <p className="text-gray-800 mt-1">{application.gig.description}</p>
                   </div>
 
-                  {application.requirements && application.requirements.length > 0 && (
-                    <div className="mb-4">
-                      <label className="text-sm font-medium text-gray-500">Requirements</label>
-                      <ul className="list-disc list-inside text-gray-700 mt-1 space-y-1">
-                        {application.requirements.map((req, index) => (
-                          <li key={index}>{req}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
                   {application.portfolio && application.portfolio.length > 0 && (
-                    <div className="mb-4">
-                      <label className="text-sm font-medium text-gray-500">Submitted Portfolio</label>
+                    <div className="mb-2">
+                      <label className="text-sm font-bold text-gray-500">Submitted Portfolio</label>
                       <div className="mt-2 space-y-2">
-                        {application.portfolio.map((item, index) => (
-                          <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                            <span className="text-sm">{item.title}</span>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              View →
-                            </a>
-                          </div>
-                        ))}
+                        {application.portfolio.map((item, index) => {
+                          if (typeof item === 'string') {
+                            return (
+                              <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                <span className="text-sm">{item}</span>
+                                <a
+                                  href={item}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  View →
+                                </a>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                <span className="text-sm">{item.title}</span>
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  View →
+                                </a>
+                              </div>
+                            );
+                          }
+                        })}
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="flex items-center justify-between pt-1 border-t">
                     <div className="text-sm text-gray-500">
                       Application ID: {application.id}
                     </div>
@@ -295,9 +314,9 @@ export default function MyApplicationsPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-none p-3">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">💡 Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-2 bg-blue-50 border border-blue-200 rounded-none p-3">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">💡 Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <Link href="/marketplace" className="btn-secondary text-center">
               🔍 Browse New Gigs
             </Link>

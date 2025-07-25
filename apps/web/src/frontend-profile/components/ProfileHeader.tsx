@@ -93,7 +93,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* Profile Content */}
       <div className="profile-header__content">
-        <div className="profile-header__main flex flex-col gap-3 lg:flex-row">
+        <div className="profile-header__main flex flex-col gap-2 lg:flex-row">
           {/* Profile Picture */}
           <div className="profile-header__avatar flex-shrink-0 lg:order-1">
             {isEditing ? (
@@ -201,9 +201,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
 
         {/* Stats and Actions */}
-        <div className="profile-header__sidebar mt-6 lg:mt-0">
+        <div className="profile-header__sidebar mt-2 lg:mt-0">
           {/* Quick Stats */}
-          <div className="profile-header__stats mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-2">
+          <div className="profile-header__stats mb-2 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-2">
             {analytics && (
               <>
                 <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">

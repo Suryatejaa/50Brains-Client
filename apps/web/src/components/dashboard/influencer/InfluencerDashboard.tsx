@@ -68,7 +68,7 @@ export const InfluencerDashboard: React.FC = () => {
                 { label: 'Browse Gigs', href: '/marketplace', icon: '🎯' },
                 {
                   label: 'My Applications',
-                  href: '/my-applications',
+                  href: '/my/applications',
                   icon: '📋',
                 },
                 { label: 'Analytics', href: '/analytics', icon: '📊' },

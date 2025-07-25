@@ -37,7 +37,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
-    type: searchParams.get('type') || 'ALL',
+    type: searchParams.get('type') || 'users',
     category: searchParams.get('category') || '',
     minBudget: searchParams.get('minBudget') || '',
     maxBudget: searchParams.get('maxBudget') || '',
@@ -53,27 +53,33 @@ export default function SearchPage() {
     }
   }, [searchParams]);
 
+  const endpointMap: Record<string, string> = {
+    users: '/api/user/search/users',
+    influencers: '/api/user/search/influencers',
+    brands: '/api/user/search/brands',
+    crew: '/api/user/search/crew',
+  };
+
   const performSearch = async (searchQuery: string = query) => {
     if (!searchQuery.trim()) return;
-    
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
-        q: searchQuery,
-        type: filters.type,
+        query: searchQuery,
         ...(filters.category && { category: filters.category }),
         ...(filters.minBudget && { minBudget: filters.minBudget }),
         ...(filters.maxBudget && { maxBudget: filters.maxBudget }),
         ...(filters.location && { location: filters.location }),
         ...(filters.isRemote && { remote: 'true' }),
       });
-      
-      const response = await apiClient.get(`/api/search?${params}`);
-      
+
+      const endpoint = endpointMap[filters.type] || endpointMap['users'];
+      const response = await apiClient.get(`${endpoint}?${params}`);
+      console.log(response);
       if (response.success) {
-        setResults((response.data as SearchResult[]) || []);
+        setResults(((response.data as any)?.results as SearchResult[]) || []);
       } else {
         setError('Search failed');
       }
@@ -95,7 +101,7 @@ export default function SearchPage() {
         ...(filters.location && { location: filters.location }),
         ...(filters.isRemote && { remote: 'true' }),
       });
-      
+
       router.push(`/search?${params}`);
       performSearch();
     }
@@ -104,7 +110,7 @@ export default function SearchPage() {
   const handleFilterChange = (key: string, value: string | boolean) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    
+
     // Auto-search when filters change if there's a query
     if (query.trim()) {
       performSearch();
@@ -128,22 +134,22 @@ export default function SearchPage() {
               </span>
             )}
           </div>
-          
+
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">
             {result.description}
           </p>
-          
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
             {result.category && <span>🏷️ {result.category}</span>}
             {result.budget && (
               <span>
-                💰 {result.budget.type === 'NEGOTIABLE' ? 'Negotiable' : 
-                    `${result.budget.currency} ${result.budget.min}${result.budget.max ? ` - ${result.budget.max}` : '+'}`}
+                💰 {result.budget.type === 'NEGOTIABLE' ? 'Negotiable' :
+                  `${result.budget.currency} ${result.budget.min}${result.budget.max ? ` - ${result.budget.max}` : '+'}`}
               </span>
             )}
             {result.location && <span>📍 {result.location}</span>}
           </div>
-          
+
           {result.skills && result.skills.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {result.skills.slice(0, 5).map((skill) => (
@@ -159,7 +165,7 @@ export default function SearchPage() {
             </div>
           )}
         </div>
-        
+
         <div className="ml-6">
           <Link
             href={`/gig/${result.id}` as any}
@@ -177,21 +183,21 @@ export default function SearchPage() {
       <div className="flex items-start space-x-4">
         <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold text-lg">
           {result.profilePicture ? (
-            <img 
-              src={result.profilePicture} 
-              alt="Profile" 
+            <img
+              src={result.profilePicture}
+              alt="Profile"
               className="w-16 h-16 rounded-none object-cover"
             />
           ) : (
             result.name?.[0]?.toUpperCase() || 'U'
           )}
         </div>
-        
+
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
             <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-              {result.roles?.includes('INFLUENCER') ? 'INFLUENCER' : 
-               result.roles?.includes('CREW') ? 'CREW' : 'USER'}
+              {result.roles?.includes('INFLUENCER') ? 'INFLUENCER' :
+                result.roles?.includes('CREW') ? 'CREW' : 'USER'}
             </span>
             <h3 className="text-lg font-semibold text-gray-900">
               {result.name}
@@ -204,16 +210,16 @@ export default function SearchPage() {
               </div>
             )}
           </div>
-          
+
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">
             {result.description}
           </p>
-          
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
             {result.category && <span>🏷️ {result.category}</span>}
             {result.location && <span>📍 {result.location}</span>}
           </div>
-          
+
           {result.skills && result.skills.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {result.skills.slice(0, 5).map((skill) => (
@@ -229,7 +235,7 @@ export default function SearchPage() {
             </div>
           )}
         </div>
-        
+
         <div className="flex flex-col space-y-2">
           <Link
             href={`/profile/${result.id}` as any}
@@ -237,7 +243,7 @@ export default function SearchPage() {
           >
             View Profile
           </Link>
-          
+
           {isAuthenticated && user?.roles?.includes('BRAND') && (
             <Link
               href={`/messages/new?to=${result.id}` as any}
@@ -253,29 +259,29 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
+      <div className="page-container min-h-screen pt-1">
+        <div className="content-container py-1">
           <div className="mx-auto max-w-6xl">
             {/* Search Header */}
-            <div className="mb-8">
-              <h1 className="text-heading mb-4 text-3xl font-bold">
+            <div className="mb-1">
+              <h1 className="text-heading mb-1 text-3xl font-bold">
                 Search
               </h1>
-              
-              <form onSubmit={handleSearch} className="space-y-4">
-                <div className="flex gap-4">
+
+              <form onSubmit={handleSearch} className="space-y-1">
+                <div className="flex gap-1">
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search for gigs, influencers, or crew members..."
-                    className="input flex-1 text-lg py-3"
+                    className="input flex-1 text-lg py-1"
                   />
-                  <button type="submit" className="btn-primary px-8">
+                  <button type="submit" className="btn-primary px-1">
                     Search
                   </button>
                 </div>
-                
+
                 {/* Filters */}
                 <div className="flex flex-wrap gap-4">
                   <select
@@ -283,11 +289,12 @@ export default function SearchPage() {
                     onChange={(e) => handleFilterChange('type', e.target.value)}
                     className="input w-auto"
                   >
-                    <option value="ALL">All Results</option>
-                    <option value="GIG">Gigs Only</option>
-                    <option value="USER">People Only</option>
+                    <option value="users">Users</option>
+                    <option value="influencers">Influencers</option>
+                    <option value="brands">Brands</option>
+                    <option value="crew">Crew</option>
                   </select>
-                  
+
                   <input
                     type="text"
                     value={filters.category}
@@ -295,7 +302,7 @@ export default function SearchPage() {
                     placeholder="Category"
                     className="input w-32"
                   />
-                  
+
                   <input
                     type="text"
                     value={filters.location}
@@ -303,7 +310,7 @@ export default function SearchPage() {
                     placeholder="Location"
                     className="input w-32"
                   />
-                  
+
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -340,7 +347,7 @@ export default function SearchPage() {
                     Found {results.length} results
                   </p>
                 </div>
-                
+
                 {results.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
@@ -357,7 +364,7 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {results.map((result) => 
+                    {results.map((result) =>
                       result.type === 'GIG' ? renderGigResult(result) : renderUserResult(result)
                     )}
                   </div>
@@ -376,20 +383,20 @@ export default function SearchPage() {
                     Find gigs, influencers, crew members, and more
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                   <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">💼</div>
                     <h4 className="font-medium text-gray-900">Find Gigs</h4>
                     <p className="text-sm text-gray-600">Browse available projects and campaigns</p>
                   </div>
-                  
+
                   <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">👥</div>
                     <h4 className="font-medium text-gray-900">Find Talent</h4>
                     <p className="text-sm text-gray-600">Discover influencers and crew members</p>
                   </div>
-                  
+
                   <div className="p-4 bg-gray-50 rounded-none">
                     <div className="text-2xl mb-2">🎯</div>
                     <h4 className="font-medium text-gray-900">Smart Filters</h4>

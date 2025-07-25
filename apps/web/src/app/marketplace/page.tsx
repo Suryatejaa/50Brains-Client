@@ -110,20 +110,25 @@ export default function MarketplacePage() {
       <div className="page-container min-h-screen pt-1">
         <div className="content-container py-1">
           {/* Header */}
-          <div className="mb-2">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-heading mb-2 text-3xl font-bold">
-                  Marketplace
-                </h1>
-                <p className="text-muted">
+          <div className="mb-1">
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row justify-between lg:gap-4 md:gap-4 sm:gap-4">
+                  <h1 className="flex text-heading text-4xl font-bold">
+                    Marketplace
+                  </h1>
+                  <Link href="/search" className="flex btn-primary px-3 py-2">
+                    Search People
+                  </Link>
+                </div>
+                <p className="flex text-muted">
                   Discover amazing opportunities and collaborate with top
                   creators
                 </p>
               </div>
-              <Link href="/create-gig" className="btn-primary px-6 py-3">
+              {/* <Link href="/create-gig" className="btn-primary px-6 py-3">
                 Post a Gig
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -132,7 +137,7 @@ export default function MarketplacePage() {
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="mb-0">
               <div className="card-glass p-1">
-                <div className="grid gap-4 md:grid-cols-4">
+                <div className="grid gap-2 md:grid-cols-2">
                   {/* Search */}
                   <div className="md:col-span-2">
                     <input
@@ -140,7 +145,7 @@ export default function MarketplacePage() {
                       placeholder="Search gigs by title, description, or skills..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="input w-full"
+                      className="input w-full border-2 border-gray-700"
                     />
                   </div>
 
@@ -149,7 +154,7 @@ export default function MarketplacePage() {
                     <select
                       value={filters.category}
                       onChange={(e) => updateFilter('category', e.target.value)}
-                      className="input w-full"
+                      className="input w-full border-2 border-gray-700"
                     >
                       <option value="">All Categories</option>
                       {Object.entries(GIG_CATEGORIES).map(([key, label]) => (
@@ -322,7 +327,7 @@ export default function MarketplacePage() {
               <button
                 onClick={() => setActiveTab('all')}
                 className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'all'
-                  ? 'bg-brand-primary text-white'
+                  ? 'bg-blue-700 text-white'
                   : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
@@ -331,7 +336,7 @@ export default function MarketplacePage() {
               <button
                 onClick={() => setActiveTab('featured')}
                 className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'featured'
-                  ? 'bg-brand-primary text-white'
+                  ? 'bg-blue-700 text-white'
                   : 'text-gray-600 hover:text-gray-900'
                   }`}
               >

@@ -123,11 +123,11 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
+      <div className="page-container min-h-screen pt-2">
+        <div className="content-container py-2">
           <div className="mx-auto max-w-6xl">
             {/* Header */}
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-heading mb-2 text-3xl font-bold">
                   My Portfolio
@@ -147,7 +147,7 @@ export default function PortfolioPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-none border border-red-200 bg-red-50 p-4">
+              <div className="mb-2 rounded-none border border-red-200 bg-red-50 p-4">
                 <p className="text-red-600">❌ {error}</p>
               </div>
             )}
@@ -184,20 +184,20 @@ export default function PortfolioPage() {
 
             {/* Portfolio Grid */}
             {loading ? (
-              <div className="card-glass p-8 text-center">
+              <div className="card-glass p-2 text-center">
                 <div className="border-brand-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
                 <p className="text-muted">Loading portfolio...</p>
               </div>
             ) : filteredItems.length === 0 ? (
-              <div className="card-glass p-8 text-center">
-                <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="card-glass p-2 text-center">
+                <div className="mb-2">
+                  <div className="mx-auto mb-2 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-2xl">🎨</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {filter === 'ALL' ? 'No portfolio items yet' : `No ${filter} items`}
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-2">
                     {filter === 'ALL' 
                       ? 'Start building your portfolio by adding your best work.'
                       : `You don't have any ${filter} items in your portfolio yet.`
@@ -215,7 +215,7 @@ export default function PortfolioPage() {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {filteredItems.map((item) => (
                   <div key={item.id} className="card-glass overflow-hidden">
                     {/* Media */}
@@ -325,29 +325,29 @@ export default function PortfolioPage() {
 
             {/* Portfolio Stats */}
             {portfolioItems.length > 0 && (
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="card-glass p-4 text-center">
+              <div className="mt-2 grid grid-cols-1 md:grid-cols-4 gap-2">
+                <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-brand-primary">
                     {portfolioItems.length}
                   </div>
                   <div className="text-sm text-gray-600">Portfolio Items</div>
                 </div>
                 
-                <div className="card-glass p-4 text-center">
+                <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-green-600">
                     {categories.length}
                   </div>
                   <div className="text-sm text-gray-600">Categories</div>
                 </div>
                 
-                <div className="card-glass p-4 text-center">
+                <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-blue-600">
                     {portfolioItems.reduce((sum, item) => sum + (item.metrics?.views || 0), 0).toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-600">Total Views</div>
                 </div>
                 
-                <div className="card-glass p-4 text-center">
+                <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-purple-600">
                     {portfolioItems.reduce((sum, item) => sum + (item.metrics?.reach || 0), 0).toLocaleString()}
                   </div>
@@ -358,12 +358,12 @@ export default function PortfolioPage() {
 
             {/* Portfolio Tips */}
             {portfolioItems.length === 0 && (
-              <div className="mt-8 card-glass p-3">
+              <div className="mt-2 card-glass p-2">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   💡 Portfolio Tips
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="flex space-x-3">
                     <div className="text-2xl">🎯</div>
                     <div>

@@ -301,22 +301,22 @@ export default function GigApplicationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-1">
+      <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Gig Applications</h1>
               <p className="text-gray-600">Manage applications for your gig</p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={loadGigAndApplications}
-                className="btn-secondary"
+                className="btn-secondary px-2 py-2"
                 disabled={isLoading}
               >
-                {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+                {isLoading ? 'Refreshing...' : 'Refresh'}
               </button>
               <Link href="/my-gigs" className="btn-secondary">
                 ← Back to My Gigs
@@ -329,19 +329,19 @@ export default function GigApplicationsPage() {
         </div>
 
         {/* Gig Info */}
-        <div className="card-glass p-6 mb-8">
+        <div className="card-glass p-2 mb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h2 className="text-xl font-semibold mb-2">{gig.title}</h2>
-              <p className="text-gray-600 mb-4 line-clamp-2">{gig.description}</p>
-              <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <p className="text-gray-600 mb-2 line-clamp-2">{gig.description}</p>
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <span>Category: {gig.category}</span>
                 <span>Budget: ₹{gig.budgetMin.toLocaleString()} - ₹{gig.budgetMax.toLocaleString()}</span>
                 <span>Applications: {gig.applicationCount}</span>
                 {gig.deadline && <span>Deadline: {new Date(gig.deadline).toLocaleDateString()}</span>}
               </div>
             </div>
-            <span className={`px-3 py-1 rounded-none text-sm font-medium ${
+            <span className={`px-2 py-0 rounded-none text-sm font-medium ${
               gig.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
               gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
               'bg-gray-100 text-gray-800'
@@ -352,23 +352,25 @@ export default function GigApplicationsPage() {
         </div>
 
         {/* Filters and Stats */}
-        <div className="card-glass p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="card-glass p-2 mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+            <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold">Applications ({filteredApplications.length})</h3>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pr-8 pl-1 py-0 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="all">All Applications</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option value="ALL">All Applications</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+                <option value="WITHDRAWN">Withdrawn</option>
               </select>
             </div>
             
-            <div className="flex items-center space-x-4 text-sm">
+            
+            <div className="flex items-center space-x-2 text-sm">
               <span className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
                 <span>Pending: {applications.filter(a => a.status === 'PENDING').length}</span>
@@ -387,11 +389,11 @@ export default function GigApplicationsPage() {
 
         {/* Applications List */}
         {filteredApplications.length > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-2">
             {filteredApplications.map((application) => (
-              <div key={application.id} className="card-glass p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start space-x-4">
+              <div key={application.id} className="card-glass p-2">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start space-x-2">
                     <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
                       <span className="text-gray-500 font-medium">
                         {application.applicantId.slice(-2).toUpperCase()}
@@ -410,7 +412,7 @@ export default function GigApplicationsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-3 py-1 rounded-none text-sm font-medium ${getStatusColor(application.status)}`}>
+                    <span className={`px-2 py-1 rounded-none text-sm font-medium ${getStatusColor(application.status)}`}>
                       {application.status}
                     </span>
                     <p className="text-sm text-gray-500 mt-1">
@@ -420,17 +422,17 @@ export default function GigApplicationsPage() {
                 </div>
 
                 {/* Application Details */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
                   <div>
                     <h4 className="font-semibold mb-2">Proposal</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-none whitespace-pre-wrap">
+                    <p className="text-gray-700 bg-gray-50 p-2 rounded-none whitespace-pre-wrap">
                       {application.proposal}
                     </p>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div>
                       <h4 className="font-semibold mb-2">Application Details</h4>
-                      <div className="space-y-2 text-sm">
+                      <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">₹{application.quotedPrice.toLocaleString()}</span>
@@ -450,7 +452,7 @@ export default function GigApplicationsPage() {
 
                 {/* Portfolio */}
                 {application.portfolio && application.portfolio.length > 0 && (
-                  <div className="mb-6">
+                  <div className="mb-2">
                     <h4 className="font-semibold mb-2">Portfolio</h4>
                     <div className="space-y-2">
                       {application.portfolio.map((url, index) => (
@@ -470,9 +472,9 @@ export default function GigApplicationsPage() {
 
                 {/* Rejection Reason */}
                 {application.status === 'REJECTED' && application.rejectionReason && (
-                  <div className="mb-6">
+                  <div className="mb-2">
                     <h4 className="font-semibold mb-2 text-red-600">Rejection Reason</h4>
-                    <p className="text-gray-700 bg-red-50 p-3 rounded-none">
+                    <p className="text-gray-700 bg-red-50 p-2 rounded-none">
                       {application.rejectionReason}
                     </p>
                   </div>
@@ -501,10 +503,10 @@ export default function GigApplicationsPage() {
             ))}
           </div>
         ) : (
-          <div className="card-glass p-12 text-center">
-            <div className="text-6xl mb-4">📨</div>
+          <div className="card-glass p-2 text-center">
+            <div className="text-6xl mb-2">📨</div>
             <h3 className="text-xl font-semibold mb-2">No Applications Yet</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-2">
               {selectedStatus === 'all' 
                 ? 'No one has applied to this gig yet.' 
                 : `No ${selectedStatus} applications found.`}
@@ -518,9 +520,9 @@ export default function GigApplicationsPage() {
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-none max-w-md w-full p-6">
-              <h2 className="text-xl font-bold mb-4">Reject Application</h2>
-              <p className="text-gray-600 mb-4">
+            <div className="bg-white rounded-none max-w-md w-full p-2">
+              <h2 className="text-xl font-bold mb-2">Reject Application</h2>
+              <p className="text-gray-600 mb-2">
                 Please provide a reason for rejecting this application:
               </p>
               <textarea

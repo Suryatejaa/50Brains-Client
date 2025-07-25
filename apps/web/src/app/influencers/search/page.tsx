@@ -14,13 +14,13 @@ interface Creator {
   avatar?: string;
   bio: string;
   verified: boolean;
-  
+
   // Social metrics
   totalFollowers: number;
   avgEngagementRate: number;
   categories: string[];
   location?: string;
-  
+
   // Platform stats
   platforms: {
     platform: string;
@@ -28,7 +28,7 @@ interface Creator {
     handle: string;
     verified: boolean;
   }[];
-  
+
   // Portfolio
   portfolioItems: {
     id: string;
@@ -38,7 +38,7 @@ interface Creator {
     views?: number;
     likes?: number;
   }[];
-  
+
   // Rates and availability
   rates: {
     post: number;
@@ -46,12 +46,12 @@ interface Creator {
     reel: number;
     video: number;
   };
-  
+
   // Performance
   rating: number;
   completedCampaigns: number;
   responseTime: string; // e.g., "Within 24 hours"
-  
+
   // Availability
   isAvailable: boolean;
   nextAvailableDate?: string;
@@ -111,7 +111,7 @@ export default function InfluencersSearchPage() {
     try {
       setIsLoading(true);
       const params = new URLSearchParams();
-      
+
       if (searchQuery) params.append('search', searchQuery);
       if (filters.category) params.append('category', filters.category);
       if (filters.location) params.append('location', filters.location);
@@ -124,7 +124,7 @@ export default function InfluencersSearchPage() {
       params.append('sortBy', filters.sortBy);
 
       const response = await apiClient.get(`/api/creators/search?${params.toString()}`);
-      
+
       if (response.success) {
         setCreators(((response.data as any)?.creators || []) as Creator[]);
       }
@@ -173,15 +173,15 @@ export default function InfluencersSearchPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2 py-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Find Influencers</h1>
               <p className="mt-1 text-sm text-gray-600">
                 Discover and connect with creators for your campaigns
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-2">
               <Link href="/my-gigs" className="btn-secondary">
                 My Gigs
               </Link>
@@ -193,14 +193,14 @@ export default function InfluencersSearchPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2 py-2">
+        <div className="flex flex-col lg:flex-row gap-2">
           {/* Sidebar Filters */}
           <div className="lg:w-80">
-            <div className="card-glass p-3 sticky top-8">
-              <div className="flex items-center justify-between mb-6">
+            <div className="card-glass p-2 sticky top-2">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-semibold">Filters</h2>
-                <button 
+                <button
                   onClick={clearFilters}
                   className="text-sm text-blue-600 hover:text-blue-800"
                 >
@@ -209,8 +209,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Search */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Search
                 </label>
                 <input
@@ -223,8 +223,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Category */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Category
                 </label>
                 <select
@@ -240,8 +240,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Platforms */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Platforms
                 </label>
                 <div className="space-y-2">
@@ -260,8 +260,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Followers Range */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Followers Range
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -283,8 +283,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Engagement Rate */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Min Engagement Rate (%)
                 </label>
                 <input
@@ -298,8 +298,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Max Rate */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Max Rate per Post ($)
                 </label>
                 <input
@@ -312,8 +312,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Location */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Location
                 </label>
                 <input
@@ -326,8 +326,8 @@ export default function InfluencersSearchPage() {
               </div>
 
               {/* Availability */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
                   Availability
                 </label>
                 <select
@@ -485,7 +485,7 @@ export default function InfluencersSearchPage() {
 
                     {/* Actions */}
                     <div className="space-y-2">
-                      <Link 
+                      <Link
                         href={`/influencer/${creator.id}` as any}
                         className="btn-primary w-full text-center block"
                       >

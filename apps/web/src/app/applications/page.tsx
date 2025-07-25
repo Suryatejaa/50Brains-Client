@@ -169,11 +169,11 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Applications Received</h1>
               <p className="text-gray-600">Manage applications for your gigs</p>
@@ -194,14 +194,14 @@ export default function ApplicationsPage() {
         </div>
 
         {/* Filters */}
-        <div className="card-glass p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h3 className="text-lg font-semibold">Filter Applications</h3>
+        <div className="card-glass p-2 mb-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+            <div className="flex items-center space-x-2">
+              <h3 className="flex text-lg font-semibold">Filter Applications</h3>
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pr-8 px-1 py-0 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="ALL">All Applications</option>
                 <option value="PENDING">Pending</option>
@@ -211,7 +211,7 @@ export default function ApplicationsPage() {
               </select>
             </div>
             
-            <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-2 text-sm">
               <span className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
                 <span>Pending: {applications.filter(a => a.status === 'PENDING').length}</span>
@@ -230,11 +230,11 @@ export default function ApplicationsPage() {
 
         {/* Applications List */}
         {filteredApplications.length > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-2">
             {filteredApplications.map((application) => (
-              <div key={application.id} className="card-glass p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start space-x-4">
+              <div key={application.id} className="card-glass p-2">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start space-x-2">
                     <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
                       <span className="text-gray-500 font-medium">
                         {getApplicantName(application.applicantId)[0]?.toUpperCase() || 'A'}
@@ -244,14 +244,14 @@ export default function ApplicationsPage() {
                       <h3 className="font-semibold text-lg">
                         {getApplicantName(application.applicantId)}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <span>Type: {application.applicantType}</span>
                         <span>Estimated Time: {application.estimatedTime}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-3 py-1 rounded-none text-sm font-medium ${statusColors[application.status]}`}>
+                    <span className={`px-2 py-0 rounded-none text-sm font-medium ${statusColors[application.status]}`}>
                       {application.status}
                     </span>
                     <p className="text-sm text-gray-500 mt-1">
@@ -261,7 +261,7 @@ export default function ApplicationsPage() {
                 </div>
 
                 {/* Gig Details */}
-                <div className="bg-gray-50 p-4 rounded-none mb-4">
+                <div className="bg-gray-50 p-2 rounded-none mb-2">
                   <h4 className="font-semibold mb-2">Gig: {application.gig.title}</h4>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                     <span>Category: {application.gig.category}</span>
@@ -272,17 +272,17 @@ export default function ApplicationsPage() {
                 </div>
 
                 {/* Application Details */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
                   <div>
                     <h4 className="font-semibold mb-2">Proposal</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-none whitespace-pre-wrap">
+                    <p className="text-gray-700 bg-gray-50 p-2 rounded-none whitespace-pre-wrap">
                       {application.proposal}
                     </p>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div>
                       <h4 className="font-semibold mb-2">Application Details</h4>
-                      <div className="space-y-2 text-sm">
+                      <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">₹{application.quotedPrice.toLocaleString()}</span>
@@ -302,7 +302,7 @@ export default function ApplicationsPage() {
 
                 {/* Portfolio */}
                 {application.portfolio && application.portfolio.length > 0 && (
-                  <div className="mb-6">
+                  <div className="mb-2">
                     <h4 className="font-semibold mb-2">Portfolio</h4>
                     <div className="space-y-2">
                       {application.portfolio.map((url, index) => (
@@ -322,9 +322,9 @@ export default function ApplicationsPage() {
 
                 {/* Rejection Reason */}
                 {application.status === 'REJECTED' && application.rejectionReason && (
-                  <div className="mb-6">
+                  <div className="mb-2">
                     <h4 className="font-semibold mb-2 text-red-600">Rejection Reason</h4>
-                    <p className="text-gray-700 bg-red-50 p-3 rounded-none">
+                    <p className="text-gray-700 bg-red-50 p-2 rounded-none">
                       {application.rejectionReason}
                     </p>
                   </div>
@@ -332,7 +332,7 @@ export default function ApplicationsPage() {
 
                 {/* Actions */}
                 {application.status === 'PENDING' && (
-                  <div className="flex items-center justify-end space-x-3">
+                  <div className="flex items-center justify-end space-x-2">
                     <button
                       onClick={() => handleStatusChange(application.id, 'REJECTED')}
                       className="btn-secondary text-red-600 hover:bg-red-50"
@@ -348,7 +348,7 @@ export default function ApplicationsPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
                   <Link 
                     href={`/gig/${application.gigId}`}
                     className="text-blue-600 hover:underline text-sm"
@@ -366,10 +366,10 @@ export default function ApplicationsPage() {
             ))}
           </div>
         ) : (
-          <div className="card-glass p-12 text-center">
-            <div className="text-6xl mb-4">📨</div>
+          <div className="card-glass p-2 text-center">
+            <div className="text-6xl mb-2">📨</div>
             <h3 className="text-xl font-semibold mb-2">No Applications</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-2">
               {filter === 'ALL' 
                 ? 'No applications received yet.' 
                 : `No ${filter.toLowerCase()} applications found.`}
