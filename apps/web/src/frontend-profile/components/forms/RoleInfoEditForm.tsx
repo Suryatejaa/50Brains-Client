@@ -279,39 +279,8 @@ const RoleInfoEditForm: React.FC<RoleInfoEditFormProps> = ({
         </div>
       </div>
 
-      <div className="form-field">
-        <label>Equipment:</label>
-        <div className="tag-editor">
-          <div className="tags-list">
-            {(formData.equipmentOwned || []).map(
-              (equipment: string, index: number) => (
-                <span key={index} className="tag">
-                  {equipment}
-                  <button
-                    type="button"
-                    onClick={() => removeFromArray('equipmentOwned', index)}
-                    className="tag-remove"
-                  >
-                    ×
-                  </button>
-                </span>
-              )
-            )}
-          </div>
-          <input
-            type="text"
-            placeholder="Add equipment and press Enter"
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addToArray('equipmentOwned', e.currentTarget.value);
-                e.currentTarget.value = '';
-              }
-            }}
-            className="tag-input"
-          />
-        </div>
-      </div>
+      {/* disabled equipment field */}
+     
     </>
   );
 

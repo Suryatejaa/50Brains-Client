@@ -114,8 +114,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             ) : (
               <img
                 src={user.profilePicture || '/default-avatar.jpg'}
-                alt={`${user.firstName} ${user.lastName}`}
-                className="profile-header__avatar-image h-28 w-28 rounded-none border-4 border-white object-cover shadow-lg lg:h-40 lg:w-40"
+                alt={`${user.firstName}`}
+                className="profile-header__avatar-image border-2 rounded-full shadow-lg lg:h-32 lg:w-32"
               />
             )}
           </div>

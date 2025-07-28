@@ -2,7 +2,7 @@
 .profile-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2px;
   background-color: #f9fafb;
   min-height: 100vh;
 }
@@ -44,6 +44,6 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-page {
-    padding: 12px;
+    padding: 1px;
   }
 }

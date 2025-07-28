@@ -3,7 +3,7 @@
   position: relative;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 0px;
   overflow: hidden;
 }
 
@@ -28,18 +28,17 @@
 
 .profile-header__avatar-container {
   position: relative;
-  margin-top: -4rem;
+  margin-top: -3rem;
   margin-bottom: 1rem;
 }
 
 .profile-header__avatar {
-  width: 8rem;
-  height: 8rem;
-  border-radius: 8px;
-  border: 4px solid white;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  width: 10rem;
+  height: 10rem;
+  border-radius: 100%;
   object-fit: cover;
   background: #f9fafb;
+  border: 1px solid #e5e7eb;
 }
 
 .profile-header__actions {
@@ -127,7 +126,7 @@
   .profile-header__avatar {
     width: 6rem;
     height: 6rem;
-    border-radius: 6px;
+    border-radius: 100%;
     margin-top: -3rem;
   }
 

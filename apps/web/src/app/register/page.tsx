@@ -31,13 +31,7 @@ export default function RegisterPage() {
   }, [isAuthenticated, router]);
 
   // Available roles for client-side registration (excluding admin roles)
-  const availableRoles = [
-    {
-      value: 'USER',
-      title: 'General User',
-      description: 'I want to explore the platform and see what it offers',
-      category: 'general',
-    },
+  const availableRoles = [    
     {
       value: 'INFLUENCER',
       title: 'Content Creator / Influencer',
@@ -172,12 +166,33 @@ export default function RegisterPage() {
   };
 
   const handleRoleToggle = (roleValue: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(roleValue)
-        ? prev.roles.filter((r) => r !== roleValue)
-        : [...prev.roles, roleValue],
-    }));
+    setFormData((prev) => {
+      let newRoles = [...prev.roles];
+      
+      if (roleValue === 'BRAND') {
+        // If selecting BRAND, remove all other roles and only keep BRAND
+        if (prev.roles.includes('BRAND')) {
+          newRoles = newRoles.filter(r => r !== 'BRAND');
+        } else {
+          newRoles = ['BRAND']; // Only BRAND, remove all others
+        }
+      } else {
+        // If selecting INFLUENCER or CREW, remove BRAND first
+        newRoles = newRoles.filter(r => r !== 'BRAND');
+        
+        // Then toggle the selected role
+        if (prev.roles.includes(roleValue)) {
+          newRoles = newRoles.filter(r => r !== roleValue);
+        } else {
+          newRoles = [...newRoles, roleValue];
+        }
+      }
+      
+      return {
+        ...prev,
+        roles: newRoles,
+      };
+    });
 
     if (error) {
       setError('');
@@ -404,60 +419,90 @@ export default function RegisterPage() {
           Select one or more roles that describe you (you can change these
           later)
         </p>
+        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700">
+            <strong>Note:</strong> Brand accounts are separate from individual creator accounts. 
+            You can be both an Influencer and Freelancer, but Brand is exclusive.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-3">
-        {availableRoles.map((role) => (
-          <label
-            key={role.value}
-            className={`block cursor-pointer rounded-none border-2 p-4 transition-all duration-200 hover:shadow-md ${
-              formData.roles.includes(role.value)
-                ? 'border-brand-primary bg-brand-primary/5 shadow-md'
-                : 'border-brand-border hover:border-brand-primary/30 hover:bg-brand-light-blue/5 bg-white'
-            }`}
-            onClick={() => handleRoleToggle(role.value)}
-          >
-            <div className="flex items-start space-x-3">
-              <div className="mt-1 flex h-5 w-5 items-center justify-center">
-                <div
-                  className={`h-4 w-4 rounded border-2 transition-all duration-200 ${
-                    formData.roles.includes(role.value)
-                      ? 'border-brand-primary bg-brand-primary'
-                      : 'border-gray-300 bg-white'
-                  }`}
-                >
-                  {formData.roles.includes(role.value) && (
-                    <svg
-                      className="h-3 w-3 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
+        {availableRoles.map((role) => {
+          const isSelected = formData.roles.includes(role.value);
+          const isDisabled = 
+            (role.value === 'BRAND' && formData.roles.some(r => r !== 'BRAND')) ||
+            (role.value !== 'BRAND' && formData.roles.includes('BRAND'));
+          
+          return (
+            <label
+              key={role.value}
+              className={`block rounded-none border-2 p-4 transition-all duration-200 ${
+                isDisabled
+                  ? 'cursor-not-allowed opacity-50 border-gray-200 bg-gray-50'
+                  : 'cursor-pointer hover:shadow-md'
+              } ${
+                isSelected
+                  ? 'border-brand-primary bg-brand-primary/5 shadow-md'
+                  : isDisabled
+                  ? 'border-gray-200 bg-gray-50'
+                  : 'border-brand-border hover:border-brand-primary/30 hover:bg-brand-light-blue/5 bg-white'
+              }`}
+              onClick={() => !isDisabled && handleRoleToggle(role.value)}
+            >
+              <div className="flex items-start space-x-3">
+                <div className="mt-1 flex h-5 w-5 items-center justify-center">
+                  <div
+                    className={`h-4 w-4 rounded border-2 transition-all duration-200 ${
+                      isSelected
+                        ? 'border-brand-primary bg-brand-primary'
+                        : isDisabled
+                        ? 'border-gray-300 bg-gray-200'
+                        : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {isSelected && (
+                      <svg
+                        className="h-3 w-3 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3
+                    className={`text-base font-semibold ${
+                      isSelected
+                        ? 'text-brand-primary'
+                        : isDisabled
+                        ? 'text-gray-400'
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    {role.title}
+                    {isDisabled && (
+                      <span className="ml-2 text-xs font-normal text-gray-400">
+                        (Not compatible with current selection)
+                      </span>
+                    )}
+                  </h3>
+                  <p className={`mt-1 text-sm leading-relaxed ${
+                    isDisabled ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    {role.description}
+                  </p>
                 </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <h3
-                  className={`text-base font-semibold ${
-                    formData.roles.includes(role.value)
-                      ? 'text-brand-primary'
-                      : 'text-gray-900'
-                  }`}
-                >
-                  {role.title}
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                  {role.description}
-                </p>
-              </div>
-            </div>
-          </label>
-        ))}
+            </label>
+          );
+        })}
       </div>
 
       <div className="mt-8 space-y-4 border-t border-gray-200 pt-6">

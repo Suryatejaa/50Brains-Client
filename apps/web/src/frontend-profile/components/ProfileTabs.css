@@ -4,6 +4,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   overflow: hidden;
+  margin-top: 6px;
 }
 
 .profile-tabs__nav {
@@ -14,14 +15,14 @@
 
 .profile-tabs__nav-item {
   flex: 1;
-  padding: 16px 20px;
+  padding: 1px 1px;
   border: none;
   background: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 2px;
   transition: all 0.2s;
   color: #6b7280;
   font-weight: 500;
@@ -51,7 +52,7 @@
 }
 
 .profile-tabs__content {
-  padding: 24px;
+  padding: 2px;
   min-height: 400px;
   background: white;
 }
@@ -60,7 +61,7 @@
 @media (max-width: 768px) {
   .profile-tabs__nav-item {
     flex-direction: column;
-    padding: 12px 8px;
+    padding: 1px 1px;
     gap: 4px;
     text-transform: none;
   }
@@ -70,6 +71,6 @@
   }
 
   .profile-tabs__content {
-    padding: 16px;
+    padding: 5px;
   }
 }

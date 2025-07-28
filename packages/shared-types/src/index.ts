@@ -20,9 +20,9 @@ export interface APISuccessResponse<T> {
 }
 
 export interface APIErrorResponse {
-  success: false;
-  error: string;
-  message: string;
+  success?: boolean;
+  errors?: string[];
+  message?: string;
   statusCode: number;
   timestamp: string;
   path: string;

@@ -301,7 +301,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                     <label>Equipment:</label>
                     <div className="overview-tab__tags">
                       {user.equipmentOwned.map((equipment, index) => (
-                        <span key={index} className="overview-tab__tag">
+                        <span key={index}
+                          className="overview-tab__tag cursor-pointer"
+                          onClick={() => {
+                            window.location.href = `/equipment`;
+                          }}
+                        >
                           {equipment}
                         </span>
                       ))}

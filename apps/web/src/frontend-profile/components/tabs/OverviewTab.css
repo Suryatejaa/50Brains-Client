@@ -13,9 +13,9 @@
   grid-column: 1 / -1;
   background: white;
   border: 1px solid #e5e7eb;
-  padding: 24px;
+  padding: 2px;
   border-radius: 8px;
-  margin-top: 16px;
+  margin-top: 2px;
 }
 
 .overview-tab__role-content {
@@ -186,13 +186,13 @@
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .stat-item {
   text-align: center;
-  padding: 20px;
+  padding: 2px;
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -283,7 +283,7 @@
 @media (max-width: 768px) {
   .overview-tab__grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 10px;
   }
 
   .stats-grid {
@@ -299,6 +299,6 @@
   }
 
   .overview-tab__role-section {
-    padding: 20px;
+    padding: 2px;
   }
 }
