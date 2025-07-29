@@ -35,7 +35,7 @@ interface Application {
 
 const statusConfig = {
   PENDING: { color: 'bg-yellow-100 text-yellow-800', icon: '⏳', label: 'Under Review' },
-  ACCEPTED: { color: 'bg-green-100 text-green-800', icon: '✅', label: 'Accepted' },
+  APPROVED: { color: 'bg-green-100 text-green-800', icon: '✅', label: 'Approved' },
   REJECTED: { color: 'bg-red-100 text-red-800', icon: '❌', label: 'Rejected' },
   COMPLETED: { color: 'bg-blue-100 text-blue-800', icon: '🎉', label: 'Completed' },
   CANCELLED: { color: 'bg-gray-100 text-gray-800', icon: '⚪', label: 'Cancelled' }
@@ -49,7 +49,7 @@ export default function MyApplicationsPage() {
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
-    accepted: 0,
+    approved: 0,
     completed: 0
   });
 
@@ -73,7 +73,7 @@ export default function MyApplicationsPage() {
         setStats({
           total: applications.length,
           pending: applications.filter((app: Application) => app.status === 'PENDING').length,
-          accepted: applications.filter((app: Application) => app.status === 'ACCEPTED').length,
+          approved: applications.filter((app: Application) => app.status === 'APPROVED').length,
           completed: applications.filter((app: Application) => app.status === 'COMPLETED').length
         });
       }
@@ -145,8 +145,8 @@ export default function MyApplicationsPage() {
             <div className="text-gray-600">Under Review</div>
           </div>
           <div className="card-glass p-1 text-center">
-            <div className="text-3xl font-bold text-green-600">{stats.accepted}</div>
-            <div className="text-gray-600">Accepted</div>
+            <div className="text-3xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-gray-600">Approved</div>
           </div>
           <div className="card-glass p-1 text-center">
             <div className="text-3xl font-bold text-purple-600">{stats.completed}</div>
@@ -157,7 +157,7 @@ export default function MyApplicationsPage() {
         {/* Filters */}
         <div className="card-glass p-1 mb-1">
           <div className="flex flex-wrap gap-2">
-            {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED'].map((status) => (
+            {['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELLED'].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilter(status)}

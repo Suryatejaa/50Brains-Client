@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { RoleSwitcher } from './RoleSwitcher';
+import NotificationBell from '@/components/NotificationBell';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,15 +28,7 @@ export function Header() {
               <RoleSwitcher />
 
               {/* Notifications */}
-              <Link
-                href="/dashboard"
-                className="text-body hover:text-accent relative p-2 transition-colors"
-                title="Notifications"
-              >
-                <span className="text-xl">🔔</span>
-                {/* Notification badge - you can add logic to show count */}
-                {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-none w-5 h-5 flex items-center justify-center text-xs">3</span> */}
-              </Link>
+              <NotificationBell />
 
               {/* User Avatar & Dropdown */}
 

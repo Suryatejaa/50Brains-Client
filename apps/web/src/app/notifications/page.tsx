@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 
 interface Notification {
   id: string;
-  type: 'gig_application' | 'gig_accepted' | 'gig_completed' | 'payment_received' | 
-        'clan_invite' | 'clan_join_request' | 'message' | 'connection_request' | 
-        'portfolio_comment' | 'review_received' | 'system' | 'promotion';
+  type: 'gig_application' | 'gig_accepted' | 'gig_completed' | 'payment_received' |
+  'clan_invite' | 'clan_join_request' | 'message' | 'connection_request' |
+  'portfolio_comment' | 'review_received' | 'system' | 'promotion';
   title: string;
   message: string;
   isRead: boolean;
@@ -50,7 +50,7 @@ const categoryColors = {
 
 export default function NotificationsPage() {
   const { user, isAuthenticated } = useAuth();
-  
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (filter !== 'all') {
         if (filter === 'unread') {
@@ -76,9 +76,9 @@ export default function NotificationsPage() {
           params.append('category', filter);
         }
       }
-      
-      const response = await apiClient.get(`/api/notifications?${params}`);
-      
+
+      const response = await apiClient.get(`/api/notification?${params}`);
+
       if (response.success) {
         const data = response.data as NotificationsResponse;
         setNotifications(data?.notifications || []);
@@ -94,14 +94,14 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationIds: string[]) => {
     try {
-      const response = await apiClient.post('/api/notifications/mark-read', {
+      const response = await apiClient.post('/api/notification/mark-read', {
         notificationIds
       });
-      
+
       if (response.success) {
-        setNotifications(prev => 
-          prev.map(notif => 
-            notificationIds.includes(notif.id) 
+        setNotifications(prev =>
+          prev.map(notif =>
+            notificationIds.includes(notif.id)
               ? { ...notif, isRead: true }
               : notif
           )
@@ -115,10 +115,10 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      const response = await apiClient.post('/api/notifications/mark-all-read');
-      
+      const response = await apiClient.post('/api/notification/mark-all-read');
+
       if (response.success) {
-        setNotifications(prev => 
+        setNotifications(prev =>
           prev.map(notif => ({ ...notif, isRead: true }))
         );
       }
@@ -132,10 +132,10 @@ export default function NotificationsPage() {
       try {
         const params = new URLSearchParams();
         notificationIds.forEach(id => params.append('ids', id));
-        const response = await apiClient.delete(`/api/notifications?${params}`);
-        
+        const response = await apiClient.delete(`/api/notification?${params}`);
+
         if (response.success) {
-          setNotifications(prev => 
+          setNotifications(prev =>
             prev.filter(notif => !notificationIds.includes(notif.id))
           );
           setSelectedNotifications([]);
@@ -151,7 +151,7 @@ export default function NotificationsPage() {
     if (!notification.isRead) {
       await markAsRead([notification.id]);
     }
-    
+
     // Navigate to action URL if available
     if (notification.actionUrl) {
       window.location.href = notification.actionUrl;
@@ -159,7 +159,7 @@ export default function NotificationsPage() {
   };
 
   const handleSelectNotification = (notificationId: string) => {
-    setSelectedNotifications(prev => 
+    setSelectedNotifications(prev =>
       prev.includes(notificationId)
         ? prev.filter(id => id !== notificationId)
         : [...prev, notificationId]
@@ -169,8 +169,8 @@ export default function NotificationsPage() {
   const handleSelectAll = () => {
     const visibleNotificationIds = filteredNotifications.map(n => n.id);
     setSelectedNotifications(
-      selectedNotifications.length === visibleNotificationIds.length 
-        ? [] 
+      selectedNotifications.length === visibleNotificationIds.length
+        ? []
         : visibleNotificationIds
     );
   };
@@ -188,7 +188,7 @@ export default function NotificationsPage() {
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     const diffInMinutes = Math.floor(diffInMs / 60000);
-    
+
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
@@ -236,7 +236,7 @@ export default function NotificationsPage() {
                     {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up!'}
                   </p>
                 </div>
-                
+
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
@@ -263,11 +263,10 @@ export default function NotificationsPage() {
                   <button
                     key={filterOption.key}
                     onClick={() => setFilter(filterOption.key as any)}
-                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${
-                      filter === filterOption.key
+                    className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${filter === filterOption.key
                         ? 'bg-brand-primary text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                      }`}
                   >
                     {filterOption.label}
                     {filterOption.count > 0 && (
@@ -285,7 +284,7 @@ export default function NotificationsPage() {
                   <div className="text-sm text-gray-600">
                     {selectedNotifications.length} notification(s) selected
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <button
                       onClick={() => markAsRead(selectedNotifications)}
@@ -331,7 +330,7 @@ export default function NotificationsPage() {
                   </h3>
                   <p className="text-gray-600 mb-6">{error}</p>
                 </div>
-                
+
                 <button
                   onClick={loadNotifications}
                   className="btn-primary"
@@ -349,7 +348,7 @@ export default function NotificationsPage() {
                     {filter === 'unread' ? 'No unread notifications' : 'No notifications'}
                   </h3>
                   <p className="text-gray-600">
-                    {filter === 'unread' 
+                    {filter === 'unread'
                       ? "You're all caught up! No new notifications."
                       : "You'll see notifications here when you have activity."
                     }
@@ -377,9 +376,8 @@ export default function NotificationsPage() {
                 {filteredNotifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`card-glass border-l-4 ${categoryColors[notification.category]} ${
-                      !notification.isRead ? 'bg-blue-50' : ''
-                    } hover:shadow-md transition-shadow`}
+                    className={`card-glass border-l-4 ${categoryColors[notification.category]} ${!notification.isRead ? 'bg-blue-50' : ''
+                      } hover:shadow-md transition-shadow`}
                   >
                     <div className="p-3">
                       <div className="flex items-start space-x-4">
@@ -406,7 +404,7 @@ export default function NotificationsPage() {
                               <p className="text-sm text-gray-600 mt-1">
                                 {notification.message}
                               </p>
-                              
+
                               {/* Additional Data */}
                               {notification.data && (
                                 <div className="mt-2 text-xs text-gray-500">
@@ -422,18 +420,18 @@ export default function NotificationsPage() {
                                 </div>
                               )}
                             </div>
-                            
+
                             <div className="ml-4 text-right">
                               <p className="text-xs text-gray-500">
                                 {timeAgo(notification.createdAt)}
                               </p>
-                              
+
                               {notification.priority === 'high' && (
                                 <span className="inline-block mt-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
                                   High Priority
                                 </span>
                               )}
-                              
+
                               {!notification.isRead && (
                                 <div className="mt-1">
                                   <div className="w-2 h-2 bg-blue-500 rounded-none"></div>
@@ -441,7 +439,7 @@ export default function NotificationsPage() {
                               )}
                             </div>
                           </div>
-                          
+
                           {/* Action Button */}
                           {(notification.actionUrl || notification.actionText) && (
                             <div className="mt-3">
@@ -460,7 +458,7 @@ export default function NotificationsPage() {
                 ))}
               </div>
             )}
-            
+
             {/* Load More */}
             {filteredNotifications.length > 0 && filteredNotifications.length % 20 === 0 && (
               <div className="text-center mt-8">

@@ -227,15 +227,14 @@ export const CrewDashboard: React.FC = () => {
                           ${project.budget.toLocaleString()}
                         </p>
                         <span
-                          className={`inline-block rounded-none px-2 py-1 text-xs ${
-                            project.status === 'COMPLETED'
+                          className={`inline-block rounded-none px-2 py-1 text-xs ${project.status === 'COMPLETED'
                               ? 'bg-green-100 text-green-800'
                               : project.status === 'ACTIVE'
                                 ? 'bg-blue-100 text-blue-800'
                                 : project.status === 'PENDING'
                                   ? 'bg-yellow-100 text-yellow-800'
                                   : 'bg-gray-100 text-gray-800'
-                          }`}
+                            }`}
                         >
                           {project.status}
                         </span>

@@ -268,7 +268,7 @@ export default function EquipmentPage() {
         return;
       }
 
-      // Filter out empty/undefined fields to avoid sending them
+      // Filter out empty/undefined fields and userID to avoid sending them
       const equipmentData = Object.fromEntries(
         Object.entries({
           ...newEquipment,
@@ -276,17 +276,21 @@ export default function EquipmentPage() {
           currentValue: Number(newEquipment.currentValue) || 0,
           insuranceValue: Number(newEquipment.insuranceValue) || 0,
         }).filter(([key, value]) => {
+          // Exclude userID and empty values
+          if (key === 'userID' || key === 'userId' || key === 'id') return false;
+          if (key === 'createdAt' || key === 'updatedAt') return false;
           // Keep required fields and non-empty values
           if (key === 'name' || key === 'category') return true;
           if (value === null || value === undefined) return false;
           if (typeof value === 'string' && value.trim() === '') return false;
+          if (typeof value === 'number' && value === 0 && key !== 'purchasePrice' && key !== 'currentValue' && key !== 'insuranceValue') return false;
           return true;
         })
       );
       console.log('Equipment data:', equipmentData);
       let response;
       if (editingItem) {
-        response = await apiClient.patch(`/api/user/equipment/${editingItem.id}`, equipmentData);
+        response = await apiClient.put(`/api/user/equipment/${editingItem.id}`, equipmentData);
       } else {
         response = await apiClient.post('/api/user/equipment', equipmentData);
       }
@@ -705,19 +709,21 @@ export default function EquipmentPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
                 {filteredEquipment.map((item) => (
-                  <div key={item.id} className="card-glass p-1 hover:shadow-lg transition-shadow">
+                  <div key={item.id} className="card-glass p-3 hover:shadow-lg transition-shadow flex flex-col h-full">
                     {/* Equipment Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
                           {item.name}
                         </h3>
-                        <p className="text-sm text-gray-600">
-                          {item.brand} {item.model}
-                        </p>
+                        {(item.brand || item.model) && (
+                          <p className="text-sm text-gray-600 truncate">
+                            {item.brand} {item.model}
+                          </p>
+                        )}
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 ml-2">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${conditionConfig[item.condition].color}`}>
                           {conditionConfig[item.condition].icon} {conditionConfig[item.condition].label}
                         </span>
@@ -751,47 +757,58 @@ export default function EquipmentPage() {
                     )}
 
                     {/* Value Information */}
-                    <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                      {item.purchasePrice && (
-                        <div>
-                          <span className="text-gray-500">Purchase:</span>
-                          <p className="font-semibold">{formatCurrency(item.purchasePrice)}</p>
-                        </div>
-                      )}
-                      {item.currentValue && (
-                        <div>
-                          <span className="text-gray-500">Current:</span>
-                          <p className="font-semibold text-green-600">{formatCurrency(item.currentValue)}</p>
-                        </div>
-                      )}
-                    </div>
+                    {(item.purchasePrice || item.currentValue) && (
+                      <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+                        {item.purchasePrice ? (
+                          <div>
+                            <span className="text-gray-500 text-xs">Purchase:</span>
+                            <p className="font-semibold text-sm">{formatCurrency(item.purchasePrice)}</p>
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
+                        {item.currentValue ? (
+                          <div>
+                            <span className="text-gray-500 text-xs">Current:</span>
+                            <p className="font-semibold text-green-600 text-sm">{formatCurrency(item.currentValue)}</p>
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Additional Details */}
-                    <div className="text-xs text-gray-500 space-y-1 mb-4">
-                      {item.serialNumber && (
-                        <div>S/N: {item.serialNumber}</div>
-                      )}
-                      {item.location && (
-                        <div>📍 {item.location}</div>
-                      )}
-                      {item.purchaseDate && (
-                        <div>📅 {getEquipmentAge(item.purchaseDate)} old</div>
-                      )}
-                      {item.insuranceValue && item.insuranceValue > 0 && (
-                        <div>🛡️ Insured: {formatCurrency(item.insuranceValue)}</div>
-                      )}
-                      {item.nextServiceDue && new Date(item.nextServiceDue) > new Date() && (
-                        <div className="text-orange-600">🔧 Service due: {formatDate(item.nextServiceDue)}</div>
-                      )}
-                      {item.notes && (
-                        <div className="text-gray-600 mt-2 p-2 bg-gray-50 rounded text-xs">
-                          📝 {item.notes}
-                        </div>
-                      )}
-                    </div>
+                    {(item.serialNumber || item.location || item.purchaseDate || (item.insuranceValue && item.insuranceValue > 0) || item.notes) && (
+                      <div className="text-xs text-gray-500 space-y-1 mb-3 flex-grow">
+                        {item.serialNumber && (
+                          <div>S/N: {item.serialNumber}</div>
+                        )}
+                        {item.location && (
+                          <div>📍 {item.location}</div>
+                        )}
+                        {item.purchaseDate && (
+                          <div>📅 {getEquipmentAge(item.purchaseDate)} old</div>
+                        )}
+                        {item.insuranceValue && item.insuranceValue > 0 && (
+                          <div>🛡️ Insured: {formatCurrency(item.insuranceValue)}</div>
+                        )}
+                        {item.nextServiceDue && new Date(item.nextServiceDue) > new Date() && (
+                          <div className="text-orange-600">🔧 Service due: {formatDate(item.nextServiceDue)}</div>
+                        )}
+                        {item.notes && (
+                          <div className="text-gray-600 mt-2 p-2 bg-gray-50 rounded text-xs">
+                            📝 {item.notes}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Spacer to push buttons to bottom */}
+                    <div className="flex-grow"></div>
 
                     {/* Actions */}
-                    <div className="flex space-x-1 border-t pt-2 border-gray-800">
+                    <div className="flex space-x-1 border-t pt-2 mt-auto">
                       <button
                         onClick={() => {
                           setEditingItem(item);
