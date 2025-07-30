@@ -29,9 +29,9 @@ const CrewWorkhistory: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-1 py-1">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-1">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Welcome back, {user.username || user.email}!
         </h1>
@@ -39,14 +39,14 @@ const CrewWorkhistory: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-1 mb-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === tab.id
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
           >
             <span className="mr-2">{tab.icon}</span>
@@ -56,17 +56,17 @@ const CrewWorkhistory: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="space-y-6">
+      <div className="space-y-1">
         {activeTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-1">
             <WorkHistorySummary userId={user.id} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
               <div>
-                <h2 className="text-xl font-semibold mb-4">Recent Work</h2>
+                <h2 className="text-xl font-semibold mb-1">Recent Work</h2>
                 <WorkHistoryList userId={user.id} showFilters={false} limit={5} />
               </div>
               <div>
-                <h2 className="text-xl font-semibold mb-4">Recent Achievements</h2>
+                <h2 className="text-xl font-semibold mb-1">Recent Achievements</h2>
                 <Achievements userId={user.id} showVerifiedOnly={false} />
               </div>
             </div>
@@ -75,21 +75,21 @@ const CrewWorkhistory: React.FC = () => {
 
         {activeTab === 'work-history' && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Work History</h2>
+            <h2 className="text-xl font-semibold mb-1">Work History</h2>
             <WorkHistoryList userId={user.id} />
           </div>
         )}
 
         {activeTab === 'portfolio' && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Portfolio</h2>
+            <h2 className="text-xl font-semibold mb-1">Portfolio</h2>
             <Portfolio userId={user.id} showPublicOnly={false} />
           </div>
         )}
 
         {activeTab === 'achievements' && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Achievements</h2>
+            <h2 className="text-xl font-semibold mb-1">Achievements</h2>
             <Achievements userId={user.id} />
           </div>
         )}

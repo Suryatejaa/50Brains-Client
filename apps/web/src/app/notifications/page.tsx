@@ -77,8 +77,9 @@ export default function NotificationsPage() {
         }
       }
 
-      const response = await apiClient.get(`/api/notification?${params}`);
-
+      // Fixed: Use correct singular endpoint
+      const response = await apiClient.get(`/api/notification/${user?.id}?${params}`);
+      console.log('Notifications response:', response);
       if (response.success) {
         const data = response.data as NotificationsResponse;
         setNotifications(data?.notifications || []);
@@ -86,6 +87,7 @@ export default function NotificationsPage() {
         setError('Failed to load notifications');
       }
     } catch (error: any) {
+      console.error('Error loading notifications:', error);
       setError(error.message || 'Failed to load notifications');
     } finally {
       setLoading(false);
@@ -94,11 +96,15 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationIds: string[]) => {
     try {
-      const response = await apiClient.post('/api/notification/mark-read', {
-        notificationIds
-      });
+      // Fixed: Use PATCH method for individual notifications with singular endpoint
+      const promises = notificationIds.map(id =>
+        apiClient.patch(`/api/notification/mark-read/${id}`)
+      );
 
-      if (response.success) {
+      const responses = await Promise.all(promises);
+      const allSuccessful = responses.every(response => response.success);
+
+      if (allSuccessful) {
         setNotifications(prev =>
           prev.map(notif =>
             notificationIds.includes(notif.id)
@@ -107,22 +113,29 @@ export default function NotificationsPage() {
           )
         );
         setSelectedNotifications([]);
+      } else {
+        alert('Failed to mark some notifications as read');
       }
     } catch (error: any) {
+      console.error('Error marking notifications as read:', error);
       alert('Failed to mark notifications as read');
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const response = await apiClient.post('/api/notification/mark-all-read');
+      // Fixed: Use PATCH method with user ID and singular endpoint
+      const response = await apiClient.patch(`/api/notification/mark-all-read/${user?.id}`);
 
       if (response.success) {
         setNotifications(prev =>
           prev.map(notif => ({ ...notif, isRead: true }))
         );
+      } else {
+        alert('Failed to mark all notifications as read');
       }
     } catch (error: any) {
+      console.error('Error marking all notifications as read:', error);
       alert('Failed to mark all notifications as read');
     }
   };
@@ -130,17 +143,24 @@ export default function NotificationsPage() {
   const deleteNotifications = async (notificationIds: string[]) => {
     if (confirm(`Delete ${notificationIds.length} notification(s)?`)) {
       try {
-        const params = new URLSearchParams();
-        notificationIds.forEach(id => params.append('ids', id));
-        const response = await apiClient.delete(`/api/notification?${params}`);
+        // Fixed: Use DELETE method for individual notifications with singular endpoint
+        const promises = notificationIds.map(id =>
+          apiClient.delete(`/api/notification/${id}`)
+        );
 
-        if (response.success) {
+        const responses = await Promise.all(promises);
+        const allSuccessful = responses.every(response => response.success);
+
+        if (allSuccessful) {
           setNotifications(prev =>
             prev.filter(notif => !notificationIds.includes(notif.id))
           );
           setSelectedNotifications([]);
+        } else {
+          alert('Failed to delete some notifications');
         }
       } catch (error: any) {
+        console.error('Error deleting notifications:', error);
         alert('Failed to delete notifications');
       }
     }
@@ -264,8 +284,8 @@ export default function NotificationsPage() {
                     key={filterOption.key}
                     onClick={() => setFilter(filterOption.key as any)}
                     className={`px-3 py-1 rounded-none text-sm font-medium transition-colors ${filter === filterOption.key
-                        ? 'bg-brand-primary text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-brand-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                   >
                     {filterOption.label}

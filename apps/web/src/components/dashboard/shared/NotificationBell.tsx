@@ -29,7 +29,7 @@ export const NotificationBell: React.FC = () => {
     setLoading(true);
     try {
       const response = await apiClient.get(
-        `/api/notifications/user/${user.id}?limit=10`
+        `/api/notification/${user.id}?limit=10`
       );
       if (response.success) {
         const notificationData = Array.isArray(response.data) ? response.data : [];
@@ -48,7 +48,7 @@ export const NotificationBell: React.FC = () => {
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     try {
-      await apiClient.post(`/api/notifications/${notificationId}/read`);
+      await apiClient.patch(`/api/notification/mark-read/${notificationId}`);
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
       );
@@ -63,7 +63,7 @@ export const NotificationBell: React.FC = () => {
     if (!user) return;
 
     try {
-      await apiClient.post(`/api/notifications/user/${user.id}/read-all`);
+      await apiClient.patch(`/api/notification/mark-all-read/${user.id}`);
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -171,9 +171,8 @@ export const NotificationBell: React.FC = () => {
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`cursor-pointer border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 ${
-                    !notification.isRead ? 'bg-blue-50' : ''
-                  }`}
+                  className={`cursor-pointer border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50' : ''
+                    }`}
                   onClick={() => {
                     if (!notification.isRead) {
                       markAsRead(notification.id);
@@ -189,11 +188,10 @@ export const NotificationBell: React.FC = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p
-                        className={`text-sm font-medium ${
-                          !notification.isRead
-                            ? 'text-gray-900'
-                            : 'text-gray-700'
-                        }`}
+                        className={`text-sm font-medium ${!notification.isRead
+                          ? 'text-gray-900'
+                          : 'text-gray-700'
+                          }`}
                       >
                         {notification.title}
                       </p>

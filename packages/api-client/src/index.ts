@@ -378,7 +378,7 @@ export class APIClient {
 
 // Service classes for different API endpoints
 export class AuthService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async login(credentials: LoginRequest): Promise<TokenPair> {
     const response = await this.client.post<TokenPair>(
@@ -439,7 +439,7 @@ export class AuthService {
 }
 
 export class UserService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getProfile(): Promise<User> {
     const response = await this.client.get<User>('/api/user/profile');
@@ -493,7 +493,7 @@ export class UserService {
 }
 
 export class GigService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getGigFeed(
     params?: PaginationParams
@@ -640,7 +640,7 @@ export class GigService {
 }
 
 export class ClanService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getClanFeed(
     params?: PaginationParams
@@ -706,7 +706,7 @@ export class ClanService {
 }
 
 export class CreditService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getWallet(): Promise<CreditWallet> {
     const response = await this.client.get<CreditWallet>('/api/credit/wallet');
@@ -748,7 +748,7 @@ export class CreditService {
 }
 
 export class NotificationService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getNotifications(
     params?: PaginationParams
@@ -759,25 +759,25 @@ export class NotificationService {
     const response = await this.client.get<{
       notifications: Notification[];
       pagination: any;
-    }>(`/api/notifications${queryString}`);
+    }>(`/api/notification${queryString}`);
     return response.data;
   }
 
   async markAsRead(notificationId: string): Promise<void> {
-    await this.client.put(`/api/notifications/${notificationId}/read`);
+    await this.client.patch(`/api/notification/mark-read/${notificationId}`);
   }
 
   async markAllAsRead(): Promise<void> {
-    await this.client.put('/api/notifications/read-all');
+    await this.client.patch('/api/notification/mark-all-read');
   }
 
   async deleteNotification(notificationId: string): Promise<void> {
-    await this.client.delete(`/api/notifications/${notificationId}`);
+    await this.client.delete(`/api/notification/${notificationId}`);
   }
 }
 
 export class SocialMediaService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   // Profile Social Media Management
   async getConnectedAccounts(): Promise<SocialMediaHandle[]> {
@@ -881,7 +881,7 @@ export class SocialMediaService {
 }
 
 export class ReputationService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getUserReputation(userId?: string): Promise<ReputationScore> {
     const endpoint = userId
@@ -943,7 +943,7 @@ export class ReputationService {
 }
 
 export class WorkHistoryService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getWorkHistory(
     userId?: string,
@@ -994,7 +994,7 @@ export class WorkHistoryService {
 }
 
 export class AnalyticsService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   async getDashboardAnalytics(): Promise<any> {
     const response = await this.client.get<any>('/api/analytics/dashboard');
@@ -1037,7 +1037,7 @@ export class AnalyticsService {
 
 // Influencer-specific service
 export class InfluencerService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   // Dashboard Data
   async getDashboardMetrics(): Promise<InfluencerDashboardMetrics> {
@@ -1296,7 +1296,7 @@ export class InfluencerService {
 
 // Crew-specific service
 export class CrewService {
-  constructor(private client: APIClient) {}
+  constructor(private client: APIClient) { }
 
   // Dashboard Data
   async getDashboardMetrics(): Promise<CrewDashboardMetrics> {

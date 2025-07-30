@@ -1,6 +1,140 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useClans, Clan } from '@/hooks/useClans';
+import { ClanCard } from '@/components/clan/ClanCard';
+import { ClanFilters } from '@/components/clan/ClanFilters';
+import { CreateClanModal } from '@/components/clan/CreateClanModal';
+import { clanApiClient } from '@/lib/clan-api';
+import Link from 'next/link';
+
 export default function ClansPage() {
+  const { user, isAuthenticated } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'my-clans' | 'discover'>('my-clans');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [joinRequestLoading, setJoinRequestLoading] = useState<string | null>(null);
+
+  // Initialize clans hook with default filters
+  const {
+    clans,
+    loading,
+    error,
+    filters,
+    pagination,
+    userClans,
+    userHeadClans,
+    updateFilters,
+    refetch,
+    getPublicClans,
+    getFeaturedClans,
+    setError
+  } = useClans({
+    sortBy: 'score',
+    order: 'desc',
+    limit: 20
+  });
+
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // You can implement search logic here or use it as a filter
+  };
+
+  // Handle filter changes
+  const handleFiltersChange = (newFilters: any) => {
+    updateFilters(newFilters);
+  };
+
+  // Handle join clan request
+  const handleJoinClan = async (clanId: string) => {
+    if (!user) return;
+
+    try {
+      setJoinRequestLoading(clanId);
+      await clanApiClient.inviteMember({
+        clanId,
+        invitedUserId: user.id,
+        role: 'MEMBER',
+        message: `Hi! I'd like to join your clan. I'm excited to collaborate and contribute to your team.`
+      });
+
+      // Show success message
+      alert('Join request sent successfully!');
+
+      // Refresh clans to update the UI
+      refetch();
+    } catch (error: any) {
+      console.error('Error joining clan:', error);
+      alert(error.message || 'Failed to send join request');
+    } finally {
+      setJoinRequestLoading(null);
+    }
+  };
+
+  // Handle view clan details
+  const handleViewClan = (clanId: string) => {
+    // Navigate to clan detail page
+    window.location.href = `/clans/${clanId}`;
+  };
+
+  // Handle manage clan
+  const handleManageClan = (clanId: string) => {
+    // Navigate to clan management page
+    window.location.href = `/clans/${clanId}/manage`;
+  };
+
+  // Handle clan creation success
+  const handleClanCreated = (clan: Clan) => {
+    // Refresh the clans list
+    refetch();
+    // Show success message
+    alert(`Clan "${clan.name}" created successfully!`);
+  };
+
+  // Load different clan sets based on active tab
+  useEffect(() => {
+    if (activeTab === 'discover') {
+      getPublicClans();
+    } else {
+      refetch();
+    }
+  }, [activeTab, getPublicClans, refetch]);
+
+  // Filter clans based on search query
+  const filteredClans = clans.filter(clan =>
+    searchQuery === '' ||
+    clan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    clan.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    clan.tagline?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    clan.primaryCategory?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="page-container min-h-screen pt-16">
+          <div className="content-container py-8">
+            <div className="mx-auto max-w-2xl">
+              <div className="card-glass p-8 text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Please Sign In
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  You need to be signed in to view and join clans.
+                </p>
+                <Link href="/login" className="btn-primary">
+                  Sign In
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="page-container min-h-screen pt-0">
@@ -14,233 +148,232 @@ export default function ClansPage() {
                   Join creative teams and collaborate on amazing projects
                 </p>
               </div>
-              <button className="btn-primary px-2 py-2">Create Clan</button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="btn-primary px-2 py-2"
+              >
+                Create Clan
+              </button>
             </div>
           </div>
 
-          {/* My Clans Section */}
-          <div className="mb-2">
-            <h2 className="text-heading mb-2 text-xl font-semibold">
-              My Clans
-            </h2>
-            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-              {/* Active Clan */}
-              <div className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-2">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="bg-brand-primary/20 flex h-12 w-12 items-center justify-center rounded-none">
-                      <span className="text-xl">🎨</span>
-                    </div>
-                    <div>
-                      <h3 className="text-heading font-semibold">
-                        Creative Collective
-                      </h3>
-                      <p className="text-muted text-sm">Head • 12 members</p>
-                    </div>
-                  </div>
-                  <span className="bg-success/10 text-success rounded-none px-2 py-1 text-xs font-medium">
-                    Active
-                  </span>
-                </div>
-                <p className="text-muted mb-4 text-sm">
-                  A diverse group of content creators specializing in lifestyle
-                  and tech content.
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted text-xs">
-                    <span>🏆 Gold Tier • ⭐ 4.9 rating</span>
-                  </div>
-                  <button className="btn-secondary px-4 py-2 text-sm">
-                    Manage
-                  </button>
-                </div>
-              </div>
-
-              {/* Member Clan */}
-              <div className="card-glass p-2">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="bg-brand-light-blue/20 flex h-12 w-12 items-center justify-center rounded-none">
-                      <span className="text-xl">📸</span>
-                    </div>
-                    <div>
-                      <h3 className="text-heading font-semibold">
-                        Photo Studios Pro
-                      </h3>
-                      <p className="text-muted text-sm">Member • 8 members</p>
-                    </div>
-                  </div>
-                  <span className="bg-success/10 text-success rounded-none px-2 py-1 text-xs font-medium">
-                    Active
-                  </span>
-                </div>
-                <p className="text-muted mb-4 text-sm">
-                  Professional photography clan focusing on brand and product
-                  shoots.
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted text-xs">
-                    <span>💎 Platinum Tier • ⭐ 5.0 rating</span>
-                  </div>
-                  <button className="btn-ghost px-4 py-2 text-sm">View</button>
-                </div>
-              </div>
-
-              {/* Create New Clan Card */}
-              <div className="card-glass border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/5 cursor-pointer border-2 border-dashed transition-all duration-200">
-                <div className="text-center pb-2">
-                  <div className="bg-brand-light-blue/20 mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-none">
-                    <span className="text-xl">➕</span>
-                  </div>
-                  <h3 className="text-heading mb-2 font-semibold">
-                    Create New Clan
-                  </h3>
-                  <p className="text-muted mb-2 text-sm">
-                    Start your own creative team and collaborate with talented
-                    creators
-                  </p>
-                  <button className="btn-primary px-2 py-2 text-sm">
-                    Get Started
-                  </button>
-                </div>
-              </div>
+          {/* Tab Navigation */}
+          <div className="mb-4">
+            <div className="flex space-x-1 border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('my-clans')}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'my-clans'
+                    ? 'bg-brand-primary text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                My Clans ({userClans.length + userHeadClans.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('discover')}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'discover'
+                    ? 'bg-brand-primary text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                Discover Clans ({filteredClans.length})
+              </button>
             </div>
           </div>
 
-          {/* Discover Clans */}
-          <div className="mb-2">
-            <div className="mb-2 flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
-              <h2 className="text-heading text-xl font-semibold">
-                Discover Clans
-              </h2>
-              <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
-                <input
-                  type="text"
-                  placeholder="Search clans..."
-                  className="input w-full lg:w-64 md:w-64"
-                />
-                <select className="input w-auto">
-                  <option>All Categories</option>
-                  <option>Content Creation</option>
-                  <option>Video Production</option>
-                  <option>Photography</option>
-                  <option>Design</option>
-                </select>
-              </div>
-            </div>
+          {/* Filters */}
+          <ClanFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+          />
 
-            <div className="grid gap-2 lg:grid-cols-2">
-              {[1, 2, 3, 4, 5, 6].map((clan) => (
-                <div
-                  key={clan}
-                  className="card-glass hover:bg-brand-light-blue/5 p-2 transition-all duration-200"
-                >
-                  <div className="mb-4 flex items-start space-x-4">
-                    <div className="from-brand-primary/20 to-brand-light-blue/20 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br">
-                      <span className="text-2xl">
-                        {['🎬', '🎨', '📱', '🎵', '📸', '✨'][clan - 1]}
-                      </span>
-                    </div>
+          {/* Loading State */}
+          {loading && (
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="card-glass p-3 animate-pulse">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-16 h-16 bg-gray-200 rounded-xl"></div>
                     <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-heading mb-1 text-lg font-semibold">
-                            {
-                              [
-                                'Video Creators Hub',
-                                'Design Collective',
-                                'Mobile Content Pro',
-                                'Audio Creators',
-                                'Photo Masters',
-                                'Creative Innovators',
-                              ][clan - 1]
-                            }
-                          </h3>
-                          <div className="text-muted flex items-center space-x-4 text-sm">
-                            <span>{15 + clan * 3} members</span>
-                            <span>⭐ {4.5 + clan * 0.1}</span>
-                            <span>
-                              {
-                                [
-                                  'Gold',
-                                  'Platinum',
-                                  'Silver',
-                                  'Gold',
-                                  'Diamond',
-                                  'Platinum',
-                                ][clan - 1]
-                              }{' '}
-                              Tier
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <span className="bg-success/10 text-success mb-2 rounded-none px-2 py-1 text-xs font-medium">
-                            Recruiting
-                          </span>
-                          <span className="text-muted text-xs">
-                            {clan * 2} active gigs
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-muted mb-4 text-sm">
-                    A collaborative team of creative professionals specializing
-                    in high-quality content creation for brands and social media
-                    platforms.
-                  </p>
-
-                  {/* Skills */}
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {[
-                      ['Video Editing', 'Motion Graphics', 'Storytelling'],
-                      ['UI Design', 'Branding', 'Illustration'],
-                      ['Mobile Apps', 'Social Media', 'TikTok'],
-                      ['Podcasting', 'Music Production', 'Sound Design'],
-                      ['Photography', 'Retouching', 'Studio Work'],
-                      ['Innovation', 'Strategy', 'Creative Direction'],
-                    ][clan - 1].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-brand-soft border-brand-border text-body rounded-none border px-2 py-1 text-xs"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex -space-x-2">
-                        {[1, 2, 3].map((member) => (
-                          <div
-                            key={member}
-                            className="bg-brand-light-blue/20 border-brand-base flex h-8 w-8 items-center justify-center rounded-none border-2"
-                          >
-                            <span className="text-xs">👤</span>
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-muted text-xs">
-                        +{12 + clan} more
-                      </span>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button className="btn-ghost px-4 py-2 text-sm">
-                        View Details
-                      </button>
-                      <button className="btn-primary px-4 py-2 text-sm">
-                        Request to Join
-                      </button>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="card-glass p-8 text-center">
+              <div className="mb-4">
+                <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-red-100 flex items-center justify-center">
+                  <span className="text-2xl">❌</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Error Loading Clans
+                </h3>
+                <p className="text-gray-600 mb-6">{error}</p>
+              </div>
+              <button onClick={refetch} className="btn-primary">
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* Content */}
+          {!loading && !error && (
+            <>
+              {/* My Clans Section */}
+              {activeTab === 'my-clans' && (
+                <div className="mb-2">
+                  <h2 className="text-heading mb-2 text-xl font-semibold">
+                    My Clans
+                  </h2>
+
+                  {userClans.length === 0 && userHeadClans.length === 0 ? (
+                    <div className="card-glass p-8 text-center">
+                      <div className="mb-4">
+                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
+                          <span className="text-2xl">👥</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          No Clans Yet
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                          You haven't joined any clans yet. Start by discovering clans or create your own!
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('discover')}
+                        className="btn-primary"
+                      >
+                        Discover Clans
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                      {/* User's Head Clans */}
+                      {userHeadClans.map((clan) => (
+                        <div key={clan.id} className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-2">
+                          <ClanCard
+                            clan={clan}
+                            showActions={true}
+                            onView={handleViewClan}
+                            onManage={handleManageClan}
+                          />
+                        </div>
+                      ))}
+
+                      {/* User's Member Clans */}
+                      {userClans.filter(clan => !userHeadClans.some(headClan => headClan.id === clan.id)).map((clan) => (
+                        <div key={clan.id} className="card-glass p-2">
+                          <ClanCard
+                            clan={clan}
+                            showActions={true}
+                            onView={handleViewClan}
+                          />
+                        </div>
+                      ))}
+
+                      {/* Create New Clan Card */}
+                      <div className="card-glass border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/5 cursor-pointer border-2 border-dashed transition-all duration-200">
+                        <div className="text-center pb-2">
+                          <div className="bg-brand-light-blue/20 mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-none">
+                            <span className="text-xl">➕</span>
+                          </div>
+                          <h3 className="text-heading mb-2 font-semibold">
+                            Create New Clan
+                          </h3>
+                          <p className="text-muted mb-2 text-sm">
+                            Start your own creative team and collaborate with talented creators
+                          </p>
+                          <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="btn-primary px-2 py-2 text-sm"
+                          >
+                            Get Started
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Discover Clans Section */}
+              {activeTab === 'discover' && (
+                <div className="mb-2">
+                  <h2 className="text-heading mb-2 text-xl font-semibold">
+                    Discover Clans
+                  </h2>
+
+                  {filteredClans.length === 0 ? (
+                    <div className="card-glass p-8 text-center">
+                      <div className="mb-4">
+                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
+                          <span className="text-2xl">🔍</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          No Clans Found
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                          {searchQuery
+                            ? `No clans match your search for "${searchQuery}". Try adjusting your filters.`
+                            : 'No clans available with the current filters. Try adjusting your search criteria.'
+                          }
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleFiltersChange({});
+                          setSearchQuery('');
+                        }}
+                        className="btn-primary"
+                      >
+                        Clear Filters
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid gap-2 lg:grid-cols-2">
+                      {filteredClans.map((clan) => (
+                        <ClanCard
+                          key={clan.id}
+                          clan={clan}
+                          showActions={true}
+                          onJoin={handleJoinClan}
+                          onView={handleViewClan}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  {pagination && pagination.totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                      <div className="flex space-x-2">
+                        {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            onClick={() => updateFilters({ page })}
+                            className={`px-3 py-2 text-sm rounded ${page === pagination.page
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                              }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
 
           {/* Clan Benefits */}
           <div className="card-glass p-2 text-center">
@@ -248,28 +381,24 @@ export default function ClansPage() {
               Why Join a Clan?
             </h2>
             <p className="text-muted mx-auto mb-2 max-w-2xl">
-              Collaborate with talented creators, share resources, and take on
-              bigger projects together
+              Collaborate with talented creators, share resources, and take on bigger projects together
             </p>
             <div className="grid gap-2 md:grid-cols-3">
               {[
                 {
                   icon: '🤝',
                   title: 'Collaboration',
-                  description:
-                    'Work together on complex projects and share expertise',
+                  description: 'Work together on complex projects and share expertise',
                 },
                 {
                   icon: '💰',
                   title: 'Higher Earnings',
-                  description:
-                    'Access to premium gigs and better negotiating power',
+                  description: 'Access to premium gigs and better negotiating power',
                 },
                 {
                   icon: '🏆',
                   title: 'Reputation Boost',
-                  description:
-                    'Build credibility through verified team achievements',
+                  description: 'Build credibility through verified team achievements',
                 },
               ].map((benefit) => (
                 <div key={benefit.title} className="text-center">
@@ -284,6 +413,13 @@ export default function ClansPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Clan Modal */}
+      <CreateClanModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={handleClanCreated}
+      />
     </div>
   );
 }

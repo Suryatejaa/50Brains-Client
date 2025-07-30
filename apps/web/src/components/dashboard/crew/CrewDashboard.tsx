@@ -4,6 +4,10 @@ import React from 'react';
 import { useCrewDashboard } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
 import { QuickActionsGrid } from '../shared/QuickActions';
+import { WorkHistorySummary } from '@/components/WorkHistorySummary';
+import { WorkHistoryList } from '@/components/WorkHistoryList';
+import { Portfolio } from '@/components/Portfolio';
+import { Achievements } from '@/components/Achievements';
 
 export const CrewDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -142,12 +146,12 @@ export const CrewDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-1 md:gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-1 md:gap-1 lg:grid-cols-3">
           {/* Left Column - Projects & Performance */}
-          <div className="space-y-2 md:space-y-3 lg:col-span-2">
+          <div className="space-y-1 md:space-y-1 lg:col-span-2">
             {/* Project Performance */}
-            <div className="card-glass p-3 md:p-4">
-              <div className="mb-2 flex items-center justify-between md:mb-2">
+            <div className="card-glass p-1 md:p-1">
+              <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">
                   Project Performance
                 </h3>
@@ -228,12 +232,12 @@ export const CrewDashboard: React.FC = () => {
                         </p>
                         <span
                           className={`inline-block rounded-none px-2 py-1 text-xs ${project.status === 'COMPLETED'
-                              ? 'bg-green-100 text-green-800'
-                              : project.status === 'ACTIVE'
-                                ? 'bg-blue-100 text-blue-800'
-                                : project.status === 'PENDING'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800'
+                            : project.status === 'ACTIVE'
+                              ? 'bg-blue-100 text-blue-800'
+                              : project.status === 'PENDING'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
                             }`}
                         >
                           {project.status}
@@ -244,6 +248,54 @@ export const CrewDashboard: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Work History Section */}
+            <div className="mt-0 space-y-0 md:space-y-0">
+              <div className="card-glass p-1 md:p-1">
+                <div className="mb-2 flex items-center justify-between md:mb-4">
+                  <h3 className="text-heading text-lg font-semibold">
+                    Work History & Portfolio
+                  </h3>
+                  <div className="text-xl">📊</div>
+                </div>
+
+                {/* Work History Summary */}
+                <div className="mb-1">
+                  <WorkHistorySummary userId={user?.id} />
+                </div>
+
+                {/* Recent Work and Achievements Grid */}
+                <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-2">
+                  <div>
+                    <h4 className="text-heading mb-2 text-sm font-medium md:text-base">
+                      Recent Work
+                    </h4>
+                    <div className="max-h-64 overflow-y-auto">
+                      <WorkHistoryList userId={user?.id} showFilters={false} limit={3} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
+                      Recent Achievements
+                    </h4>
+                    <div className="max-h-64 overflow-y-auto">
+                      <Achievements userId={user?.id} showVerifiedOnly={false} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Portfolio Preview */}
+                <div className="mt-1">
+                  <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
+                    Portfolio Highlights
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto">
+                    <Portfolio userId={user?.id} showPublicOnly={false} />
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Client History */}
             {data?.clientHistory && data.clientHistory.length > 0 && (
@@ -480,6 +532,8 @@ export const CrewDashboard: React.FC = () => {
               </div>
             )}
           </div>
+
+          
         </div>
       </div>
     </div>

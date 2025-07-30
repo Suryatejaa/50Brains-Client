@@ -218,7 +218,7 @@ export async function markNotificationAsRead(
   notificationId: string
 ): Promise<void> {
   try {
-    await apiClient.post(`/api/notifications/${notificationId}/read`);
+    await apiClient.patch(`/api/notification/mark-read/${notificationId}`);
   } catch (error) {
     console.error('Failed to mark notification as read:', error);
   }
@@ -229,7 +229,7 @@ export async function getUnreadNotificationCount(
 ): Promise<number> {
   try {
     const response = await apiClient.get(
-      `/api/notifications/unread/${userId}/count`
+      `/api/notification/count/${userId}`
     );
     return response.success ? (response.data as { count: number }).count : 0;
   } catch (error) {

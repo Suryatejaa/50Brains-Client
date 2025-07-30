@@ -28,7 +28,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
 
   if (loading) {
     return (
-      <div className="card-glass p-4">
+      <div className="card-glass p-1">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
         <p className="text-center text-gray-600 mt-2">Loading portfolio...</p>
       </div>
@@ -37,16 +37,16 @@ export const Portfolio: React.FC<PortfolioProps> = ({
 
   if (error) {
     return (
-      <div className="card-glass p-4">
+      <div className="card-glass p-1">
         <p className="text-red-600 text-center">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {/* Filters */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1">
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -72,18 +72,18 @@ export const Portfolio: React.FC<PortfolioProps> = ({
 
       {/* Portfolio Grid */}
       {filteredPortfolio.length === 0 ? (
-        <div className="card-glass p-8 text-center">
-          <div className="text-4xl mb-4">📁</div>
-          <h3 className="text-lg font-semibold mb-2">No Portfolio Items</h3>
+        <div className="card-glass p-1 text-center">
+          <div className="text-4xl mb-1">📁</div>
+          <h3 className="text-lg font-semibold mb-1">No Portfolio Items</h3>
           <p className="text-gray-600">No portfolio items found for the selected filters.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
           {filteredPortfolio.map((item) => (
-            <div key={item.id} className="card-glass p-4 hover:shadow-lg transition-shadow">
+            <div key={item.id} className="card-glass p-1 hover:shadow-lg transition-shadow">
               {/* Media Preview */}
               {item.mediaUrls && item.mediaUrls.length > 0 && (
-                <div className="mb-3 h-48 bg-gray-100 rounded-lg overflow-hidden">
+                <div className="mb-1 h-48 bg-gray-100 rounded-lg overflow-hidden">
                   <img
                     src={item.mediaUrls[0]}
                     alt={item.title}
@@ -95,12 +95,12 @@ export const Portfolio: React.FC<PortfolioProps> = ({
               {/* Content */}
               <div>
                 <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-gray-600 text-sm mb-1 line-clamp-2">
                   {item.description}
                 </p>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-3">
+                <div className="flex flex-wrap gap-1 mb-1">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
                     {item.category}
                   </span>

@@ -36,7 +36,7 @@ export const Achievements: React.FC<AchievementsProps> = ({
 
     if (loading) {
         return (
-            <div className="card-glass p-4">
+            <div className="card-glass p-1">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                 <p className="text-center text-gray-600 mt-2">Loading achievements...</p>
             </div>
@@ -45,16 +45,16 @@ export const Achievements: React.FC<AchievementsProps> = ({
 
     if (error) {
         return (
-            <div className="card-glass p-4">
+            <div className="card-glass p-1">
                 <p className="text-red-600 text-center">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-1">
             {/* Filter */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1">
                 <select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
@@ -69,15 +69,15 @@ export const Achievements: React.FC<AchievementsProps> = ({
 
             {/* Achievements Grid */}
             {filteredAchievements.length === 0 ? (
-                <div className="card-glass p-8 text-center">
-                    <div className="text-4xl mb-4">🏆</div>
-                    <h3 className="text-lg font-semibold mb-2">No Achievements</h3>
+                <div className="card-glass p-1 text-center">
+                    <div className="text-4xl mb-1">🏆</div>
+                    <h3 className="text-lg font-semibold mb-1">No Achievements</h3>
                     <p className="text-gray-600">No achievements found for the selected filters.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
                     {filteredAchievements.map((achievement) => (
-                        <div key={achievement.id} className="card-glass p-4 hover:shadow-lg transition-shadow">
+                        <div key={achievement.id} className="card-glass p-1 hover:shadow-lg transition-shadow">
                             <div className="flex items-start space-x-3">
                                 {/* Icon */}
                                 <div className="text-3xl">
@@ -91,7 +91,7 @@ export const Achievements: React.FC<AchievementsProps> = ({
                                 {/* Content */}
                                 <div className="flex-1">
                                     <h3 className="font-semibold text-lg mb-1">{achievement.title}</h3>
-                                    <p className="text-gray-600 text-sm mb-2">{achievement.description}</p>
+                                    <p className="text-gray-600 text-sm mb-1">{achievement.description}</p>
 
                                     {/* Meta Info */}
                                     <div className="flex items-center justify-between text-xs text-gray-500">
@@ -101,7 +101,7 @@ export const Achievements: React.FC<AchievementsProps> = ({
 
                                     {/* Value */}
                                     {achievement.value && (
-                                        <div className="mt-2">
+                                        <div className="mt-1">
                                             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
                                                 Value: {achievement.value}
                                             </span>
@@ -110,7 +110,7 @@ export const Achievements: React.FC<AchievementsProps> = ({
 
                                     {/* Verification Badge */}
                                     {achievement.verified && (
-                                        <div className="mt-2">
+                                        <div className="mt-1">
                                             <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
                                                 ✓ Verified
                                             </span>

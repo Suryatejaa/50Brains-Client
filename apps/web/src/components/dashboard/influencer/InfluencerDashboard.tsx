@@ -4,6 +4,10 @@ import React from 'react';
 import { useInfluencerDashboard } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
 import { QuickActionsGrid } from '../shared/QuickActions';
+import { WorkHistorySummary } from '@/components/WorkHistorySummary';
+import { WorkHistoryList } from '@/components/WorkHistoryList';
+import { Portfolio } from '@/components/Portfolio';
+import { Achievements } from '@/components/Achievements';
 
 export const InfluencerDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -279,10 +283,10 @@ export const InfluencerDashboard: React.FC = () => {
                         </p>
                         <span
                           className={`inline-block rounded-none px-2 py-1 text-xs ${campaign.status === 'COMPLETED'
-                              ? 'bg-green-100 text-green-800'
-                              : campaign.status === 'ACTIVE'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100 text-green-800'
+                            : campaign.status === 'ACTIVE'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-yellow-100 text-yellow-800'
                             }`}
                         >
                           {campaign.status}
@@ -293,6 +297,54 @@ export const InfluencerDashboard: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Work History Section */}
+            <div className="mt-1 space-y-1 md:space-y-1">
+              <div className="card-glass p-1 md:p-1">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
+                  <h3 className="text-heading text-lg font-semibold">
+                    Work History & Portfolio
+                  </h3>
+                  <div className="text-xl">📊</div>
+                </div>
+
+                {/* Work History Summary */}
+                <div className="mb-1">
+                  <WorkHistorySummary userId={user?.id} />
+                </div>
+
+                {/* Recent Work and Achievements Grid */}
+                <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-2">
+                  <div>
+                    <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
+                      Recent Work
+                    </h4>
+                    <div className="max-h-64 overflow-y-auto">
+                      <WorkHistoryList userId={user?.id} showFilters={false} limit={3} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-heading mb-2 text-sm font-medium md:text-base">
+                      Recent Achievements
+                    </h4>
+                    <div className="max-h-64 overflow-y-auto">
+                      <Achievements userId={user?.id} showVerifiedOnly={false} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Portfolio Preview */}
+                <div className="mt-1">
+                  <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
+                    Portfolio Highlights
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto">
+                    <Portfolio userId={user?.id} showPublicOnly={false} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Column - Stats & Insights */}
@@ -446,6 +498,7 @@ export const InfluencerDashboard: React.FC = () => {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

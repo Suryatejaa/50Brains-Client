@@ -362,7 +362,7 @@ export default function GigDetailsPage() {
         });
 
         // Show success message
-        showToast('success', '✅ Application submitted successfully! The brand will review your application soon.');
+        showToast('success', 'Application submitted successfully! The brand will review your application soon.');
       }
     } catch (error: any) {
       console.error('❌ Failed to apply to gig:', error);
@@ -1027,7 +1027,7 @@ export default function GigDetailsPage() {
                     </button>
                     <button
                       onClick={handleApply}
-                      disabled={!application.coverLetter.trim() || !application.estimatedTime || isApplying}
+                      disabled={application.coverLetter.trim().length < 10 || !application.estimatedTime || isApplying}
                       className="flex-1 btn-primary disabled:opacity-50"
                     >
                       {isApplying ? 'Applying...' : 'Submit Application'}
