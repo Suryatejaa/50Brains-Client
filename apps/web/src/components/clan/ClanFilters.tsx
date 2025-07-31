@@ -50,9 +50,9 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
     ];
 
     return (
-        <div className="card-glass p-4 mb-6">
+        <div className="card-glass p-1 mb-2">
             <div className="flex flex-col lg:flex-row md:flex-row gap-2 items-start justify-between">
-                <div className="flex flex-col lg:flex-row md:flex-row gap-2 items-left justify-between w-full">
+                <div className="flex flex-col lg:flex-row md:flex-col gap-1 items-left justify-between w-full">
                     {/* Search */}
                     <div className="flex-1">
                         <input
@@ -84,7 +84,7 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
                         <select
                             value={filters.visibility || ''}
                             onChange={(e) => onFiltersChange({ visibility: e.target.value as any || undefined })}
-                            className="input w-auto"
+                            className="input w-auto pr-6 pl-2"
                         >
                             {visibilityOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -114,7 +114,7 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
                         <select
                             value={filters.order || 'desc'}
                             onChange={(e) => onFiltersChange({ order: e.target.value as any })}
-                            className="input w-auto"
+                            className="input w-auto pr-6 pl-2"
                         >
                             <option value="desc">Descending</option>
                             <option value="asc">Ascending</option>
@@ -122,7 +122,7 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
                     </div>
 
                     {/* Verified Only */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                         <input
                             type="checkbox"
                             id="verifiedOnly"

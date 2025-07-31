@@ -14,17 +14,28 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         name: '',
-        slug: '',
         description: '',
         tagline: '',
         visibility: 'PUBLIC' as 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY',
+        isVerified: false,
+        isActive: true,
         email: '',
         website: '',
+        instagramHandle: '',
+        twitterHandle: '',
+        linkedinHandle: '',
+        requiresApproval: true,
+        isPaidMembership: false,
+        membershipFee: 0,
+        maxMembers: 50,
         primaryCategory: '',
         categories: [] as string[],
         skills: [] as string[],
         location: '',
-        maxMembers: 50
+        timezone: '',
+        portfolioImages: [] as string[],
+        portfolioVideos: [] as string[],
+        showcaseProjects: [] as string[]
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -59,16 +70,6 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
             newErrors.name = 'Clan name cannot exceed 50 characters';
         }
 
-        if (!formData.slug.trim()) {
-            newErrors.slug = 'Slug is required';
-        } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-            newErrors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens';
-        } else if (formData.slug.length < 2) {
-            newErrors.slug = 'Slug must be at least 2 characters';
-        } else if (formData.slug.length > 30) {
-            newErrors.slug = 'Slug cannot exceed 30 characters';
-        }
-
         if (formData.description && formData.description.length > 500) {
             newErrors.description = 'Description cannot exceed 500 characters';
         }
@@ -101,24 +102,37 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
         try {
             setLoading(true);
             const response = await clanApiClient.createClan(formData);
+            console.log('Clan creation response:', response);
 
             if (response.success) {
-                onSuccess((response.data as any).clan);
+                console.log('Clan data:', response.data);
+                onSuccess(response.data);
                 onClose();
                 // Reset form
                 setFormData({
                     name: '',
-                    slug: '',
                     description: '',
                     tagline: '',
                     visibility: 'PUBLIC',
+                    isVerified: false,
+                    isActive: true,
                     email: '',
                     website: '',
+                    instagramHandle: '',
+                    twitterHandle: '',
+                    linkedinHandle: '',
+                    requiresApproval: true,
+                    isPaidMembership: false,
+                    membershipFee: 0,
+                    maxMembers: 50,
                     primaryCategory: '',
                     categories: [],
                     skills: [],
                     location: '',
-                    maxMembers: 50
+                    timezone: '',
+                    portfolioImages: [],
+                    portfolioVideos: [],
+                    showcaseProjects: []
                 });
                 setErrors({});
             } else {
@@ -160,7 +174,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Create New Clan</h2>
                     <button
@@ -173,36 +187,19 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Basic Information */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                Clan Name *
-                            </label>
-                            <input
-                                type="text"
-                                id="name"
-                                value={formData.name}
-                                onChange={(e) => handleChange('name', e.target.value)}
-                                className={`input w-full ${errors.name ? 'border-red-500' : ''}`}
-                                placeholder="Enter clan name"
-                            />
-                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                        </div>
-
-                        <div>
-                            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
-                                Slug *
-                            </label>
-                            <input
-                                type="text"
-                                id="slug"
-                                value={formData.slug}
-                                onChange={(e) => handleChange('slug', e.target.value.toLowerCase())}
-                                className={`input w-full ${errors.slug ? 'border-red-500' : ''}`}
-                                placeholder="clan-slug"
-                            />
-                            {errors.slug && <p className="text-red-500 text-xs mt-1">{errors.slug}</p>}
-                        </div>
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                            Clan Name *
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => handleChange('name', e.target.value)}
+                            className={`input w-full ${errors.name ? 'border-red-500' : ''}`}
+                            placeholder="Enter clan name"
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
 
                     <div>
@@ -219,6 +216,25 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                             maxLength={100}
                         />
                         {errors.tagline && <p className="text-red-500 text-xs mt-1">{errors.tagline}</p>}
+                    </div>
+
+                    <div>
+                        <label htmlFor="primaryCategory" className="block text-sm font-medium text-gray-700 mb-1">
+                            Primary Category
+                        </label>
+                        <select
+                            id="primaryCategory"
+                            value={formData.primaryCategory}
+                            onChange={(e) => handleChange('primaryCategory', e.target.value)}
+                            className="input w-full"
+                        >
+                            <option value="">Select a category</option>
+                            {categories.map((category) => (
+                                <option key={category} value={category.toUpperCase().replace(' ', '_')}>
+                                    {category}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
@@ -272,6 +288,52 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                         </div>
                     </div>
 
+                    {/* Membership Settings */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="requiresApproval"
+                                checked={formData.requiresApproval}
+                                onChange={(e) => handleChange('requiresApproval', e.target.checked)}
+                                className="rounded"
+                            />
+                            <label htmlFor="requiresApproval" className="text-sm font-medium text-gray-700">
+                                Requires Approval to Join
+                            </label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="isPaidMembership"
+                                checked={formData.isPaidMembership}
+                                onChange={(e) => handleChange('isPaidMembership', e.target.checked)}
+                                className="rounded"
+                            />
+                            <label htmlFor="isPaidMembership" className="text-sm font-medium text-gray-700">
+                                Paid Membership
+                            </label>
+                        </div>
+
+                        {formData.isPaidMembership && (
+                            <div>
+                                <label htmlFor="membershipFee" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Membership Fee ($)
+                                </label>
+                                <input
+                                    type="number"
+                                    id="membershipFee"
+                                    value={formData.membershipFee}
+                                    onChange={(e) => handleChange('membershipFee', parseFloat(e.target.value))}
+                                    className="input w-full"
+                                    min={0}
+                                    step={0.01}
+                                />
+                            </div>
+                        )}
+                    </div>
+
                     {/* Contact Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -305,19 +367,89 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Location */}
-                    <div>
-                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                            Location
-                        </label>
-                        <input
-                            type="text"
-                            id="location"
-                            value={formData.location}
-                            onChange={(e) => handleChange('location', e.target.value)}
-                            className="input w-full"
-                            placeholder="City, Country"
-                        />
+                    {/* Social Media Handles */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="instagramHandle" className="block text-sm font-medium text-gray-700 mb-1">
+                                Instagram Handle
+                            </label>
+                            <input
+                                type="text"
+                                id="instagramHandle"
+                                value={formData.instagramHandle}
+                                onChange={(e) => handleChange('instagramHandle', e.target.value)}
+                                className="input w-full"
+                                placeholder="clanhandle"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="twitterHandle" className="block text-sm font-medium text-gray-700 mb-1">
+                                Twitter Handle
+                            </label>
+                            <input
+                                type="text"
+                                id="twitterHandle"
+                                value={formData.twitterHandle}
+                                onChange={(e) => handleChange('twitterHandle', e.target.value)}
+                                className="input w-full"
+                                placeholder="clanhandle"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="linkedinHandle" className="block text-sm font-medium text-gray-700 mb-1">
+                                LinkedIn Handle
+                            </label>
+                            <input
+                                type="text"
+                                id="linkedinHandle"
+                                value={formData.linkedinHandle}
+                                onChange={(e) => handleChange('linkedinHandle', e.target.value)}
+                                className="input w-full"
+                                placeholder="clanhandle"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Location & Timezone */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                                Location
+                            </label>
+                            <input
+                                type="text"
+                                id="location"
+                                value={formData.location}
+                                onChange={(e) => handleChange('location', e.target.value)}
+                                className="input w-full"
+                                placeholder="City, Country"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-1">
+                                Timezone
+                            </label>
+                            <select
+                                id="timezone"
+                                value={formData.timezone}
+                                onChange={(e) => handleChange('timezone', e.target.value)}
+                                className="input w-full"
+                            >
+                                <option value="">Select timezone</option>
+                                <option value="America/New_York">Eastern Time (ET)</option>
+                                <option value="America/Chicago">Central Time (CT)</option>
+                                <option value="America/Denver">Mountain Time (MT)</option>
+                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                <option value="Europe/London">London (GMT)</option>
+                                <option value="Europe/Paris">Paris (CET)</option>
+                                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                <option value="Asia/Shanghai">Shanghai (CST)</option>
+                                <option value="Australia/Sydney">Sydney (AEST)</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Categories */}
@@ -381,6 +513,171 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                     const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                                     handleSkillAdd(input.value);
                                     input.value = '';
+                                }}
+                                className="btn-secondary px-4"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Portfolio Images */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Portfolio Images (URLs)
+                        </label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {formData.portfolioImages.map((image, index) => (
+                                <span
+                                    key={index}
+                                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center gap-1"
+                                >
+                                    Image {index + 1}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleChange('portfolioImages', formData.portfolioImages.filter((_, i) => i !== index))}
+                                        className="text-blue-800 hover:text-red-500"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                            <input
+                                type="url"
+                                placeholder="https://example.com/image.jpg"
+                                className="input flex-1"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const url = (e.target as HTMLInputElement).value;
+                                        if (url.trim()) {
+                                            handleChange('portfolioImages', [...formData.portfolioImages, url.trim()]);
+                                            (e.target as HTMLInputElement).value = '';
+                                        }
+                                    }
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                                    const url = input.value.trim();
+                                    if (url) {
+                                        handleChange('portfolioImages', [...formData.portfolioImages, url]);
+                                        input.value = '';
+                                    }
+                                }}
+                                className="btn-secondary px-4"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Portfolio Videos */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Portfolio Videos (URLs)
+                        </label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {formData.portfolioVideos.map((video, index) => (
+                                <span
+                                    key={index}
+                                    className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm flex items-center gap-1"
+                                >
+                                    Video {index + 1}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleChange('portfolioVideos', formData.portfolioVideos.filter((_, i) => i !== index))}
+                                        className="text-green-800 hover:text-red-500"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                            <input
+                                type="url"
+                                placeholder="https://example.com/video.mp4"
+                                className="input flex-1"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const url = (e.target as HTMLInputElement).value;
+                                        if (url.trim()) {
+                                            handleChange('portfolioVideos', [...formData.portfolioVideos, url.trim()]);
+                                            (e.target as HTMLInputElement).value = '';
+                                        }
+                                    }
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                                    const url = input.value.trim();
+                                    if (url) {
+                                        handleChange('portfolioVideos', [...formData.portfolioVideos, url]);
+                                        input.value = '';
+                                    }
+                                }}
+                                className="btn-secondary px-4"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Showcase Projects */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Showcase Projects
+                        </label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {formData.showcaseProjects.map((project, index) => (
+                                <span
+                                    key={index}
+                                    className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm flex items-center gap-1"
+                                >
+                                    {project}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleChange('showcaseProjects', formData.showcaseProjects.filter((_, i) => i !== index))}
+                                        className="text-purple-800 hover:text-red-500"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Project name"
+                                className="input flex-1"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const project = (e.target as HTMLInputElement).value;
+                                        if (project.trim()) {
+                                            handleChange('showcaseProjects', [...formData.showcaseProjects, project.trim()]);
+                                            (e.target as HTMLInputElement).value = '';
+                                        }
+                                    }
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                                    const project = input.value.trim();
+                                    if (project) {
+                                        handleChange('showcaseProjects', [...formData.showcaseProjects, project]);
+                                        input.value = '';
+                                    }
                                 }}
                                 className="btn-secondary px-4"
                             >

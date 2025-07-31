@@ -36,6 +36,10 @@ export default function ClansPage() {
     limit: 20
   });
 
+  console.log('clans', clans);
+  console.log('userClans', userClans);
+  console.log('userHeadClans', userHeadClans);
+
   // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -87,6 +91,15 @@ export default function ClansPage() {
 
   // Handle clan creation success
   const handleClanCreated = (clan: Clan) => {
+    console.log('handleClanCreated called with:', clan);
+
+    if (!clan || !clan.name) {
+      console.error('Invalid clan data received:', clan);
+      alert('Clan created successfully, but there was an issue with the response data.');
+      refetch();
+      return;
+    }
+
     // Refresh the clans list
     refetch();
     // Show success message
@@ -163,8 +176,8 @@ export default function ClansPage() {
               <button
                 onClick={() => setActiveTab('my-clans')}
                 className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'my-clans'
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-brand-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 My Clans ({userClans.length + userHeadClans.length})
@@ -172,8 +185,8 @@ export default function ClansPage() {
               <button
                 onClick={() => setActiveTab('discover')}
                 className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'discover'
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-brand-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 Discover Clans ({filteredClans.length})
@@ -235,9 +248,9 @@ export default function ClansPage() {
                   </h2>
 
                   {userClans.length === 0 && userHeadClans.length === 0 ? (
-                    <div className="card-glass p-8 text-center">
+                    <div className="card-glass p-2 text-center">
                       <div className="mb-4">
-                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
+                        <div className="mx-auto mb-2 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
                           <span className="text-2xl">👥</span>
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -255,10 +268,10 @@ export default function ClansPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3 p-2">
                       {/* User's Head Clans */}
                       {userHeadClans.map((clan) => (
-                        <div key={clan.id} className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-2">
+                        <div key={clan.id} className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-0">
                           <ClanCard
                             clan={clan}
                             showActions={true}
@@ -352,16 +365,16 @@ export default function ClansPage() {
                   )}
 
                   {/* Pagination */}
-                  {pagination && pagination.totalPages > 1 && (
+                  {pagination && pagination.pages > 1 && (
                     <div className="mt-6 flex justify-center">
                       <div className="flex space-x-2">
-                        {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                        {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
                           <button
                             key={page}
                             onClick={() => updateFilters({ page })}
                             className={`px-3 py-2 text-sm rounded ${page === pagination.page
-                                ? 'bg-brand-primary text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                              ? 'bg-brand-primary text-white'
+                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                               }`}
                           >
                             {page}

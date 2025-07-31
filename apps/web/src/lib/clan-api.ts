@@ -21,7 +21,7 @@ export const clanApiClient = {
         queryParams.append(key, value.toString());
       }
     });
-    
+
     const endpoint = `/api/clan?${queryParams}`;
     console.log('Calling getClans with URL:', endpoint);
     return apiClient.get(endpoint);
@@ -46,8 +46,8 @@ export const clanApiClient = {
         queryParams.append(key, value.toString());
       }
     });
-    
-    const endpoint = `/api/clans/feed?${queryParams}`;
+
+    const endpoint = `/api/clan/feed?${queryParams}`;
     console.log('Calling getClanFeed with URL:', endpoint);
     return apiClient.get(endpoint);
   },
@@ -62,10 +62,11 @@ export const clanApiClient = {
   // Create new clan
   async createClan(clanData: {
     name: string;
-    slug: string;
     description?: string;
     tagline?: string;
     visibility?: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
+    isVerified?: boolean;
+    isActive?: boolean;
     email?: string;
     website?: string;
     instagramHandle?: string;
@@ -80,6 +81,9 @@ export const clanApiClient = {
     skills?: string[];
     location?: string;
     timezone?: string;
+    portfolioImages?: string[];
+    portfolioVideos?: string[];
+    showcaseProjects?: string[];
   }) {
     const endpoint = '/api/clan';
     console.log('Calling createClan with URL:', endpoint);
@@ -185,7 +189,7 @@ export const clanApiClient = {
         queryParams.append(key, value.toString());
       }
     });
-    
+
     const endpoint = `/api/rankings?${queryParams}`;
     console.log('Calling getRankings with URL:', endpoint);
     return apiClient.get(endpoint);
@@ -217,22 +221,22 @@ export const clanApiClient = {
         queryParams.append(key, value.toString());
       }
     });
-    
-    const endpoint = `/api/clan/public?${queryParams}`;
+
+    const endpoint = `/api/public?${queryParams}`;
     console.log('Calling getPublicClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get featured clans
   async getFeaturedClans() {
-    const endpoint = '/api/clan/public/featured';
+    const endpoint = '/api/public/featured';
     console.log('Calling getFeaturedClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Health check
   async getHealth() {
-    const endpoint = '/api/clan/health';
+    const endpoint = '/api/health';
     console.log('Calling getHealth with URL:', endpoint);
     return apiClient.get(endpoint);
   }
