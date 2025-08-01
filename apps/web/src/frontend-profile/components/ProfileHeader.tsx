@@ -59,7 +59,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
+    return num?.toString();
   };
 
   return (
@@ -216,7 +216,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </div>
                 <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
                   <span className="profile-header__stat-value block text-xl font-bold text-gray-900">
-                    {analytics.popularityScore.toFixed(1)}
+                    {analytics.popularityScore?.toFixed(1)}
                   </span>
                   <span className="profile-header__stat-label text-sm text-gray-600">
                     Popularity Score

@@ -63,7 +63,7 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
                             className="input w-full lg:w-64 md:w-64"
                         />
                     </div>
-
+                    <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-5 gap-1 md:gap-2 lg:gap-2">
                     {/* Category Filter */}
                     <div className="flex-1">
                         <select
@@ -133,6 +133,7 @@ export const ClanFilters: React.FC<ClanFiltersProps> = ({
                         <label htmlFor="verifiedOnly" className="text-sm text-muted">
                             Verified Only
                         </label>
+                        </div>
                     </div>
                 </div>
             </div>

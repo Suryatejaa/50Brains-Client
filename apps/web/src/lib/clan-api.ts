@@ -10,7 +10,7 @@ export const clanApiClient = {
     isVerified?: boolean;
     minMembers?: number;
     maxMembers?: number;
-    sortBy?: 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
+    sortBy?: 'rank' | 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
     order?: 'asc' | 'desc';
     page?: number;
     limit?: number;
@@ -35,7 +35,7 @@ export const clanApiClient = {
     isVerified?: boolean;
     minMembers?: number;
     maxMembers?: number;
-    sortBy?: 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
+    sortBy?: 'rank' | 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
     order?: 'asc' | 'desc';
     page?: number;
     limit?: number;
@@ -210,7 +210,7 @@ export const clanApiClient = {
     isVerified?: boolean;
     minMembers?: number;
     maxMembers?: number;
-    sortBy?: 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
+    sortBy?: 'rank' | 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
     order?: 'asc' | 'desc';
     page?: number;
     limit?: number;
@@ -222,15 +222,22 @@ export const clanApiClient = {
       }
     });
 
-    const endpoint = `/api/public?${queryParams}`;
+    const endpoint = `/api/clan/public?${queryParams}`;
     console.log('Calling getPublicClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get featured clans
   async getFeaturedClans() {
-    const endpoint = '/api/public/featured';
+    const endpoint = '/api/clan/featured';
     console.log('Calling getFeaturedClans with URL:', endpoint);
+    return apiClient.get(endpoint);
+  },
+
+  // Get user's clans (my clans)
+  async getMyClans() {
+    const endpoint = '/api/clan/my';
+    console.log('Calling getMyClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
@@ -239,5 +246,34 @@ export const clanApiClient = {
     const endpoint = '/api/health';
     console.log('Calling getHealth with URL:', endpoint);
     return apiClient.get(endpoint);
+  },
+
+  // Join Request Endpoints
+  // Request to join a clan
+  async joinClan(clanId: string, data: { message?: string } = {}) {
+    const endpoint = `/api/clan/${clanId}/join`;
+    console.log('Calling joinClan with URL:', endpoint);
+    return apiClient.post(endpoint, data);
+  },
+
+  // Get join requests (clan head only)
+  async getJoinRequests(clanId: string) {
+    const endpoint = `/api/members/${clanId}/join-requests`;
+    console.log('Calling getJoinRequests with URL:', endpoint);
+    return apiClient.get(endpoint);
+  },
+
+  // Approve join request
+  async approveJoinRequest(clanId: string, requestId: string) {
+    const endpoint = `/api/members/${clanId}/join-requests/${requestId}/approve`;
+    console.log('Calling approveJoinRequest with URL:', endpoint);
+    return apiClient.post(endpoint);
+  },
+
+  // Reject join request
+  async rejectJoinRequest(clanId: string, requestId: string, data: { reason?: string } = {}) {
+    const endpoint = `/api/members/${clanId}/join-requests/${requestId}/reject`;
+    console.log('Calling rejectJoinRequest with URL:', endpoint);
+    return apiClient.post(endpoint, data);
   }
 }; 

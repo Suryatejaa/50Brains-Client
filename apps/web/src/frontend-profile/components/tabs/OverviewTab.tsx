@@ -299,17 +299,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   </div>
                   <div className="overview-tab__field">
                     <label>Equipment:</label>
-                    <div className="overview-tab__tags">
-                      {user.equipmentOwned.map((equipment, index) => (
-                        <span key={index}
-                          className="overview-tab__tag cursor-pointer"
-                          onClick={() => {
-                            window.location.href = `/equipment`;
-                          }}
-                        >
-                          {equipment}
-                        </span>
-                      ))}
+                    <div className="overview-tab__tags flex flex-col gap-1">
+                      <span className="overview-tab__tag cursor-pointer" onClick={() => {
+                        window.location.href = `/equipment`;
+                      }}>
+                        Manage Equipment ({user.equipmentOwned.length})
+                      </span>
                     </div>
                   </div>
                 </>

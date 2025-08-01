@@ -415,7 +415,7 @@ export class UserAPI {
   static async getPublicProfile(
     userId: string
   ): Promise<APIResponse<UserProfile>> {
-    return apiClient.get<UserProfile>(`/api/user/public/users/${userId}`);
+    return apiClient.get<UserProfile>(`/api/public/users/${userId}`);
   }
 
   static async searchUsers(params: {

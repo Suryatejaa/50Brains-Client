@@ -12,6 +12,10 @@ export interface Clan {
     isVerified: boolean;
     isActive: boolean;
     clanHeadId: string;
+    userMembership?: {
+        status: 'pending' | 'member' | 'rejected';
+        role: 'admin' | 'member';
+    };
     email?: string;
     website?: string;
     instagramHandle?: string;
@@ -31,12 +35,12 @@ export interface Clan {
     totalRevenue: number;
     averageRating: number;
     reputationScore: number;
-    portfolioImages: string[];
-    portfolioVideos: string[];
-    showcaseProjects: string[];
+    portfolioImages?: string[];
+    portfolioVideos?: string[];
+    showcaseProjects?: string[];
     createdAt: string;
     updatedAt: string;
-    _count: {
+    _count?: {
         members: number;
         portfolio: number;
         reviews: number;
@@ -46,6 +50,31 @@ export interface Clan {
     portfolio?: any[];
     reviews?: any[];
     analytics?: any;
+    // New fields from the updated API response
+    calculatedScore?: number;
+    rank?: number;
+    reputation?: {
+        averageScore: number;
+        totalScore: number;
+        tier: string;
+        rank: number | null;
+    };
+    stats?: {
+        totalGigs: number;
+        completedGigs: number;
+        successRate: number;
+        avgProjectValue: number;
+        recentActivity: string;
+    };
+    featured?: {
+        topMembers: Array<{
+            userId: string;
+            role: string;
+            contributionScore: number;
+            gigsParticipated: number;
+        }>;
+        recentPortfolio: any[];
+    };
 }
 
 export interface ClanMember {
@@ -77,7 +106,7 @@ export interface ClanFilters {
     isVerified?: boolean;
     minMembers?: number;
     maxMembers?: number;
-    sortBy?: 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
+    sortBy?: 'rank' | 'score' | 'name' | 'createdAt' | 'reputationScore' | 'totalGigs' | 'averageRating';
     order?: 'asc' | 'desc';
     page?: number;
     limit?: number;
@@ -117,10 +146,14 @@ export function useClans(initialFilters: ClanFilters = {}) {
             const response = await clanApiClient.getClans(currentFilters);
             console.log('response', response);
             if (response.success) {
-                const data = response.data as Clan[];
-                setClans(data || []);
-                // The meta is at the top level of the response
-                setPagination((response as any).meta || null);
+                // Handle both old and new API response structures
+                const responseData = response.data as any;
+                const clansData = responseData?.clans || response.data;
+                const data = Array.isArray(clansData) ? clansData : [];
+                console.log('Setting clans:', data);
+                setClans(data);
+                // The meta/pagination is now nested in response.data
+                setPagination(responseData?.pagination || (response as any).meta || null);
             } else {
                 setError('Failed to load clans');
                 setClans([]); // Ensure clans is always an array
@@ -148,7 +181,7 @@ export function useClans(initialFilters: ClanFilters = {}) {
 
     // Get user's clans (clans where user is a member)
     const getUserClans = useCallback(() => {
-        if (!user || !clans) return [];
+        if (!user || !Array.isArray(clans)) return [];
         return clans.filter(clan =>
             clan.members?.some(member => member.userId === user.id)
         );
@@ -156,7 +189,7 @@ export function useClans(initialFilters: ClanFilters = {}) {
 
     // Get clans where user is the head
     const getUserHeadClans = useCallback(() => {
-        if (!user || !clans) return [];
+        if (!user || !Array.isArray(clans)) return [];
         return clans.filter(clan => clan.clanHeadId === user.id);
     }, [clans, user]);
 
@@ -169,9 +202,12 @@ export function useClans(initialFilters: ClanFilters = {}) {
             const response = await clanApiClient.getPublicClans(filters);
 
             if (response.success) {
-                const data = response.data as Clan[];
-                setClans(data || []);
-                setPagination((response as any).meta || null);
+                // Handle both old and new API response structures
+                const responseData = response.data as any;
+                const clansData = responseData?.clans || response.data;
+                const data = Array.isArray(clansData) ? clansData : [];
+                setClans(data);
+                setPagination(responseData?.pagination || (response as any).meta || null);
             } else {
                 setError('Failed to load public clans');
                 setClans([]); // Ensure clans is always an array
@@ -179,6 +215,31 @@ export function useClans(initialFilters: ClanFilters = {}) {
         } catch (error: any) {
             console.error('Error fetching public clans:', error);
             setError(error.message || 'Failed to load public clans');
+            setClans([]); // Ensure clans is always an array even on error
+        } finally {
+            setLoading(false);
+        }
+    }, [filters]);
+
+    const getClanFeed = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await clanApiClient.getClanFeed(filters);
+
+            if (response.success) {
+                // Handle both old and new API response structures
+                const responseData = response.data as any;
+                const clansData = responseData?.clans || response.data;
+                const data = Array.isArray(clansData) ? clansData : [];
+                console.log('Setting clans (getClanFeed):', data);
+                setClans(data);
+                setPagination(responseData?.pagination || (response as any).meta || null);
+            }
+        } catch (error: any) {
+            console.error('Error fetching clan feed:', error);
+            setError(error.message || 'Failed to load clan feed');
             setClans([]); // Ensure clans is always an array even on error
         } finally {
             setLoading(false);
@@ -194,9 +255,12 @@ export function useClans(initialFilters: ClanFilters = {}) {
             const response = await clanApiClient.getFeaturedClans();
 
             if (response.success) {
-                const data = response.data as Clan[];
-                setClans(data || []);
-                setPagination((response as any).meta || null);
+                // Handle both old and new API response structures
+                const responseData = response.data as any;
+                const clansData = responseData?.clans || response.data;
+                const data = Array.isArray(clansData) ? clansData : [];
+                setClans(data);
+                setPagination(responseData?.pagination || (response as any).meta || null);
             } else {
                 setError('Failed to load featured clans');
                 setClans([]); // Ensure clans is always an array
@@ -204,6 +268,35 @@ export function useClans(initialFilters: ClanFilters = {}) {
         } catch (error: any) {
             console.error('Error fetching featured clans:', error);
             setError(error.message || 'Failed to load featured clans');
+            setClans([]); // Ensure clans is always an array even on error
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Get user's clans (my clans)
+    const getMyClans = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await clanApiClient.getMyClans();
+
+            if (response.success) {
+                // Handle the basic clan data structure from /api/clan/my
+                const responseData = response.data as any;
+                const clansData = responseData?.clans || response.data;
+                const data = Array.isArray(clansData) ? clansData : [];
+                console.log('Setting my clans:', data);
+                setClans(data);
+                setPagination(responseData?.pagination || (response as any).meta || null);
+            } else {
+                setError('Failed to load my clans');
+                setClans([]); // Ensure clans is always an array
+            }
+        } catch (error: any) {
+            console.error('Error fetching my clans:', error);
+            setError(error.message || 'Failed to load my clans');
             setClans([]); // Ensure clans is always an array even on error
         } finally {
             setLoading(false);
@@ -221,8 +314,8 @@ export function useClans(initialFilters: ClanFilters = {}) {
         fetchClans,
         updateFilters,
         refetch,
-        getPublicClans,
-        getFeaturedClans,
+        getClanFeed,
+        getMyClans,
         setError
     };
 }

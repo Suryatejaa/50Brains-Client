@@ -43,7 +43,7 @@ interface Clan {
 
 const clanCategories = [
   'Content Creation',
-  'Video Production', 
+  'Video Production',
   'Graphic Design',
   'Social Media',
   'Marketing',
@@ -64,13 +64,13 @@ const sizeBrackets = [
 export default function ClansBrowsePage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  
+
   const [clans, setClans] = useState<Clan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  
+
   const [filters, setFilters] = useState({
     category: '',
     size: '',
@@ -89,7 +89,7 @@ export default function ClansBrowsePage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '12',
@@ -101,9 +101,9 @@ export default function ClansBrowsePage() {
         ...(filters.hasOpenings && { hasOpenings: 'true' }),
         sortBy: filters.sortBy
       });
-      
+
       const response = await apiClient.get(`/api/clan/browse?${params}`);
-      
+
       if (response.success) {
         setClans((response.data as any)?.clans || []);
         setTotalCount((response.data as any)?.total || 0);
@@ -130,7 +130,7 @@ export default function ClansBrowsePage() {
 
     try {
       const response = await apiClient.post(`/api/clan/${clanId}/join`);
-      
+
       if (response.success) {
         // Refresh clans to show updated membership
         loadClans();
@@ -169,11 +169,20 @@ export default function ClansBrowsePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
+      <div className="page-container min-h-screen pt-1">
+        <div className="content-container py-1">
           <div className="mx-auto max-w-7xl">
+            <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+              <Link href="/clans" className="hover:text-brand-primary">
+                Clans
+              </Link>
+              <span>›</span>
+              <Link href="/clans/browse" className="hover:text-brand-primary">
+                Browse
+              </Link>
+            </nav>
             {/* Header */}
-            <div className="mb-8">
+            <div className="mb-1">
               <h1 className="text-heading mb-2 text-3xl font-bold">
                 Browse Clans
               </h1>
@@ -189,7 +198,7 @@ export default function ClansBrowsePage() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Filter Clans
                   </h3>
-                  
+
                   {/* Search */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -320,7 +329,7 @@ export default function ClansBrowsePage() {
                   <div className="text-gray-600">
                     {loading ? 'Loading...' : `${totalCount.toLocaleString()} clans found`}
                   </div>
-                  
+
                   <div className="mt-4 sm:mt-0">
                     <select
                       value={filters.sortBy}
@@ -369,7 +378,7 @@ export default function ClansBrowsePage() {
                         Try adjusting your filters or create your own clan
                       </p>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <button
                         onClick={() => {
@@ -408,19 +417,19 @@ export default function ClansBrowsePage() {
                             </Link>
                             <p className="text-sm text-gray-600">{clan.category}</p>
                           </div>
-                          
+
                           {!clan.isPublic && (
                             <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
                               Private
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Description */}
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                           {clan.description}
                         </p>
-                        
+
                         {/* Stats */}
                         <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-none">
                           <div className="text-center">
@@ -432,7 +441,7 @@ export default function ClansBrowsePage() {
                             <p className="text-xs text-gray-600">Active Projects</p>
                           </div>
                         </div>
-                        
+
                         {/* Performance Metrics */}
                         <div className="flex items-center justify-between mb-4 text-sm">
                           <div>
@@ -441,7 +450,7 @@ export default function ClansBrowsePage() {
                               {formatEarnings(clan.stats.totalEarnings)}
                             </span>
                           </div>
-                          
+
                           {clan.stats.averageRating > 0 && (
                             <div className="flex items-center space-x-1">
                               {renderStars(clan.stats.averageRating)}
@@ -451,7 +460,7 @@ export default function ClansBrowsePage() {
                             </div>
                           )}
                         </div>
-                        
+
                         {/* Skills */}
                         {clan.skills.length > 0 && (
                           <div className="mb-4">
@@ -469,16 +478,16 @@ export default function ClansBrowsePage() {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Members Preview */}
                         <div className="flex items-center space-x-2 mb-4">
                           <div className="flex -space-x-2">
                             {clan.members.slice(0, 3).map((member, index) => (
                               <div key={member.id} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
                                 {member.profilePicture ? (
-                                  <img 
-                                    src={member.profilePicture} 
-                                    alt="Member" 
+                                  <img
+                                    src={member.profilePicture}
+                                    alt="Member"
                                     className="w-8 h-8 rounded-none object-cover"
                                   />
                                 ) : (
@@ -496,23 +505,23 @@ export default function ClansBrowsePage() {
                             {clan.size} members
                           </span>
                         </div>
-                        
+
                         {/* Owner */}
                         <div className="flex items-center space-x-2 mb-4 text-sm text-gray-600">
                           <span>👑</span>
                           <span>
-                            Led by {clan.owner.displayName || 
-                             `${clan.owner.firstName || ''} ${clan.owner.lastName || ''}`.trim() || 
-                             'Anonymous'}
+                            Led by {clan.owner.displayName ||
+                              `${clan.owner.firstName || ''} ${clan.owner.lastName || ''}`.trim() ||
+                              'Anonymous'}
                           </span>
                         </div>
-                        
+
                         {/* Action Button */}
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-gray-500">
                             {getClanSizeLabel(clan.size, clan.maxMembers)}
                           </div>
-                          
+
                           <div className="flex space-x-2">
                             <Link
                               href={`/clan/${clan.id}` as any}
@@ -520,7 +529,7 @@ export default function ClansBrowsePage() {
                             >
                               View Details
                             </Link>
-                            
+
                             {clan.size < clan.maxMembers && isAuthenticated && (
                               <button
                                 onClick={() => handleJoinClan(clan.id)}
@@ -546,28 +555,27 @@ export default function ClansBrowsePage() {
                     >
                       ← Previous
                     </button>
-                    
+
                     <div className="flex space-x-1">
                       {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                         const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                         if (page > totalPages) return null;
-                        
+
                         return (
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`px-3 py-1 rounded text-sm ${
-                              currentPage === page
+                            className={`px-3 py-1 rounded text-sm ${currentPage === page
                                 ? 'bg-brand-primary text-white'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
+                              }`}
                           >
                             {page}
                           </button>
                         );
                       })}
                     </div>
-                    
+
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}

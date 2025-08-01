@@ -27,18 +27,21 @@ export default function ClansPage() {
     userHeadClans,
     updateFilters,
     refetch,
-    getPublicClans,
-    getFeaturedClans,
+    getClanFeed,
+    getMyClans,
     setError
   } = useClans({
-    sortBy: 'score',
-    order: 'desc',
+    sortBy: 'rank',
+    order: 'asc',
     limit: 20
   });
 
+  // Debug logs
   console.log('clans', clans);
   console.log('userClans', userClans);
   console.log('userHeadClans', userHeadClans);
+  console.log('activeTab', activeTab);
+  console.log('searchQuery', searchQuery);
 
   // Handle search
   const handleSearch = (query: string) => {
@@ -57,15 +60,12 @@ export default function ClansPage() {
 
     try {
       setJoinRequestLoading(clanId);
-      await clanApiClient.inviteMember({
-        clanId,
-        invitedUserId: user.id,
-        role: 'MEMBER',
+      await clanApiClient.joinClan(clanId, {
         message: `Hi! I'd like to join your clan. I'm excited to collaborate and contribute to your team.`
       });
 
       // Show success message
-      alert('Join request sent successfully!');
+      alert('Join request sent successfully! The clan leader will review your request.');
 
       // Refresh clans to update the UI
       refetch();
@@ -80,13 +80,13 @@ export default function ClansPage() {
   // Handle view clan details
   const handleViewClan = (clanId: string) => {
     // Navigate to clan detail page
-    window.location.href = `/clans/${clanId}`;
+    window.location.href = `/clan/${clanId}`;
   };
 
   // Handle manage clan
   const handleManageClan = (clanId: string) => {
     // Navigate to clan management page
-    window.location.href = `/clans/${clanId}/manage`;
+    window.location.href = `/clan/${clanId}/manage`;
   };
 
   // Handle clan creation success
@@ -109,20 +109,26 @@ export default function ClansPage() {
   // Load different clan sets based on active tab
   useEffect(() => {
     if (activeTab === 'discover') {
-      getPublicClans();
+      getClanFeed();
     } else {
-      refetch();
+      getMyClans();
     }
-  }, [activeTab, getPublicClans, refetch]);
+  }, [activeTab, getClanFeed, getMyClans]);
 
-  // Filter clans based on search query
-  const filteredClans = clans.filter(clan =>
-    searchQuery === '' ||
-    clan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    clan.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    clan.tagline?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    clan.primaryCategory?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter clans based on search query and exclude owned clans
+  const filteredClans = Array.isArray(clans) ? clans.filter(clan => {
+    // Exclude clans owned by the current user
+    if (user && clan.clanHeadId === user.id) {
+      return false;
+    }
+
+    // Apply search filter
+    return searchQuery === '' ||
+      clan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      clan.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      clan.tagline?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      clan.primaryCategory?.toLowerCase().includes(searchQuery.toLowerCase());
+  }) : [];
 
   if (!isAuthenticated) {
     return (
@@ -180,7 +186,7 @@ export default function ClansPage() {
                   : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
-                My Clans ({userClans.length + userHeadClans.length})
+                My Clans ({activeTab === 'my-clans' ? userHeadClans.length : userClans.length + userHeadClans.length})
               </button>
               <button
                 onClick={() => setActiveTab('discover')}
@@ -189,7 +195,7 @@ export default function ClansPage() {
                   : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
-                Discover Clans ({filteredClans.length})
+                Discover Clans
               </button>
             </div>
           </div>
@@ -247,7 +253,7 @@ export default function ClansPage() {
                     My Clans
                   </h2>
 
-                  {userClans.length === 0 && userHeadClans.length === 0 ? (
+                  {userHeadClans.length === 0 ? (
                     <div className="card-glass p-2 text-center">
                       <div className="mb-4">
                         <div className="mx-auto mb-2 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
@@ -269,25 +275,14 @@ export default function ClansPage() {
                     </div>
                   ) : (
                     <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3 p-2">
-                      {/* User's Head Clans */}
+                      {/* User's Clans from API */}
                       {userHeadClans.map((clan) => (
-                        <div key={clan.id} className="card-glass border-brand-primary/30 bg-brand-light-blue/5 border-2 p-0">
+                        <div key={clan.id} className={`card-glass p-0`}>
                           <ClanCard
                             clan={clan}
                             showActions={true}
                             onView={handleViewClan}
-                            onManage={handleManageClan}
-                          />
-                        </div>
-                      ))}
-
-                      {/* User's Member Clans */}
-                      {userClans.filter(clan => !userHeadClans.some(headClan => headClan.id === clan.id)).map((clan) => (
-                        <div key={clan.id} className="card-glass p-2">
-                          <ClanCard
-                            clan={clan}
-                            showActions={true}
-                            onView={handleViewClan}
+                            onManage={clan.clanHeadId === user?.id ? handleManageClan : undefined}
                           />
                         </div>
                       ))}
@@ -324,7 +319,7 @@ export default function ClansPage() {
                     Discover Clans
                   </h2>
 
-                  {filteredClans.length === 0 ? (
+                  {clans.length === 0 ? (
                     <div className="card-glass p-8 text-center">
                       <div className="mb-4">
                         <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
@@ -353,6 +348,7 @@ export default function ClansPage() {
                   ) : (
                     <div className="grid gap-2 lg:grid-cols-2">
                       {filteredClans.map((clan) => (
+
                         <ClanCard
                           key={clan.id}
                           clan={clan}
@@ -389,14 +385,14 @@ export default function ClansPage() {
           )}
 
           {/* Clan Benefits */}
-          <div className="card-glass p-2 text-center">
-            <h2 className="text-heading mb-2 text-2xl font-bold">
+          <div className="card-glass p-1 text-center">
+            <h2 className="text-heading mb-1 text-xl font-bold">
               Why Join a Clan?
             </h2>
-            <p className="text-muted mx-auto mb-2 max-w-2xl">
+            <p className="text-muted mx-auto mb-1 max-w-2xl">
               Collaborate with talented creators, share resources, and take on bigger projects together
             </p>
-            <div className="grid gap-2 md:grid-cols-3">
+            <div className="grid grid-cols-3 gap-1 md:grid-cols-3">
               {[
                 {
                   icon: '🤝',

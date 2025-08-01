@@ -14,7 +14,7 @@ export async function getProfileData(
       analyticsResponse,
       reputationResponse,
     ] = await Promise.allSettled([
-      fetch(`${API_BASE_URL}/api/public/users/${userId}`, {
+      fetch(`${API_BASE_URL}/api/user/public/users/${userId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
