@@ -188,8 +188,8 @@ export default function MarketplacePage() {
 
             {/* Advanced Filters Panel */}
             {showFilters && (
-              <div className="card-glass mb-4 p-3">
-                <div className="mb-4 flex items-center justify-between">
+              <div className="card-glass mb-1 p-1">
+                <div className="mb-1 flex items-center justify-between">
                   <h3 className="text-heading text-lg font-semibold">
                     Advanced Filters
                   </h3>
@@ -201,7 +201,7 @@ export default function MarketplacePage() {
                   </button>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-4">
                   {/* Experience Level */}
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
@@ -283,10 +283,10 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Budget Range */}
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="mt-1 grid gap-1 md:grid-cols-2">
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
-                      Min Budget ($)
+                      Min Budget (₹)
                     </label>
                     <input
                       type="number"
@@ -303,7 +303,7 @@ export default function MarketplacePage() {
                   </div>
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
-                      Max Budget ($)
+                      Max Budget (₹)
                     </label>
                     <input
                       type="number"
@@ -368,7 +368,7 @@ export default function MarketplacePage() {
 
           {/* Gigs Grid */}
           {!loading && gigs.length > 0 && (
-            <div className="grid gap-1 lg:grid-cols-2">
+            <div className="grid gap-1 lg:grid-cols-3">
               {gigs.map((gig, index) => (
                 <Link
                   key={gig.id}

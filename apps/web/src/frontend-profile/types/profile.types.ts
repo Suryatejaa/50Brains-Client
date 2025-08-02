@@ -19,6 +19,9 @@ export interface UserProfileData {
   youtubeHandle?: string;
   website?: string;
 
+  // Privacy Settings
+  showContact?: boolean;
+
   // Role-specific Data
   roles: string[];
   status: string;

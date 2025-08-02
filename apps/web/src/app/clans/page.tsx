@@ -7,6 +7,7 @@ import { ClanCard } from '@/components/clan/ClanCard';
 import { ClanFilters } from '@/components/clan/ClanFilters';
 import { CreateClanModal } from '@/components/clan/CreateClanModal';
 import { clanApiClient } from '@/lib/clan-api';
+import { toast } from 'sonner';
 import Link from 'next/link';
 
 export default function ClansPage() {
@@ -65,13 +66,13 @@ export default function ClansPage() {
       });
 
       // Show success message
-      alert('Join request sent successfully! The clan leader will review your request.');
+      toast.success('Join request sent successfully! The clan leader will review your request.');
 
       // Refresh clans to update the UI
       refetch();
     } catch (error: any) {
       console.error('Error joining clan:', error);
-      alert(error.message || 'Failed to send join request');
+      toast.error(error.message || 'Failed to send join request');
     } finally {
       setJoinRequestLoading(null);
     }
@@ -95,7 +96,7 @@ export default function ClansPage() {
 
     if (!clan || !clan.name) {
       console.error('Invalid clan data received:', clan);
-      alert('Clan created successfully, but there was an issue with the response data.');
+      toast.error('Clan created successfully, but there was an issue with the response data.');
       refetch();
       return;
     }
@@ -103,7 +104,7 @@ export default function ClansPage() {
     // Refresh the clans list
     refetch();
     // Show success message
-    alert(`Clan "${clan.name}" created successfully!`);
+    toast.success(`Clan "${clan.name}" created successfully!`);
   };
 
   // Load different clan sets based on active tab
@@ -248,13 +249,13 @@ export default function ClansPage() {
             <>
               {/* My Clans Section */}
               {activeTab === 'my-clans' && (
-                <div className="mb-2">
-                  <h2 className="text-heading mb-2 text-xl font-semibold">
+                <div className="mb-1">
+                  <h2 className="text-heading mb-1 text-xl font-semibold">
                     My Clans
                   </h2>
 
                   {userHeadClans.length === 0 ? (
-                    <div className="card-glass p-2 text-center">
+                    <div className="card-glass p-1 text-center">
                       <div className="mb-4">
                         <div className="mx-auto mb-2 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
                           <span className="text-2xl">👥</span>
@@ -274,7 +275,7 @@ export default function ClansPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3 p-2">
+                    <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3 p-0">
                       {/* User's Clans from API */}
                       {userHeadClans.map((clan) => (
                         <div key={clan.id} className={`card-glass p-0`}>
@@ -315,7 +316,7 @@ export default function ClansPage() {
               {/* Discover Clans Section */}
               {activeTab === 'discover' && (
                 <div className="mb-2">
-                  <h2 className="text-heading mb-2 text-xl font-semibold">
+                  <h2 className="text-heading mb-1 text-xl font-semibold">
                     Discover Clans
                   </h2>
 
@@ -346,7 +347,7 @@ export default function ClansPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid gap-2 lg:grid-cols-2">
+                    <div className="grid gap-1 lg:grid-cols-3">
                       {filteredClans.map((clan) => (
 
                         <ClanCard

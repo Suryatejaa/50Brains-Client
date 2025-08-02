@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,8 +63,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="flex flex-col space-y-2 min-h-screen items-center justify-center bg-white p-4">
+      <div className="w-full max-w-md space-y-1">
         <div className="rounded-3xl border border-black/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg">
           <div className="text-center">
             <h2 className="mb-2 text-3xl font-bold text-black">Welcome Back</h2>
@@ -217,6 +218,9 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
+      </div>
+      <div className="w-full rounded-3xl border border-black/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg space-y-1">
+        <BusinessRoadmap />
       </div>
     </div>
   );

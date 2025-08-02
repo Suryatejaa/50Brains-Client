@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 
 const teamMembers = [
   {
@@ -128,7 +129,7 @@ export default function AboutPage() {
                 About 50BraIns
               </h1>
               <p className="text-muted text-xl max-w-3xl mx-auto leading-relaxed">
-                We're building the future of the creator economy by connecting talented creators, 
+                We're building the future of the creator economy by connecting talented creators,
                 influencers, and brands in a transparent, fair, and innovative marketplace.
               </p>
             </div>
@@ -144,6 +145,11 @@ export default function AboutPage() {
               ))}
             </div>
 
+            {/* Business Roadmap */}
+            <div className="mb-16">
+              <BusinessRoadmap />
+            </div>
+
             {/* Navigation Tabs */}
             <div className="flex flex-wrap justify-center mb-8 border-b border-gray-200">
               {[
@@ -155,11 +161,10 @@ export default function AboutPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as any)}
-                  className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
-                    activeTab === tab.key
+                  className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.key
                       ? 'border-brand-primary text-brand-primary'
                       : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
+                    }`}
                 >
                   <span className="mr-2">{tab.icon}</span>
                   {tab.label}
@@ -176,8 +181,8 @@ export default function AboutPage() {
                     Our Mission
                   </h2>
                   <p className="text-lg text-gray-700 text-center max-w-4xl mx-auto leading-relaxed">
-                    To democratize the creator economy by providing a transparent, efficient, and fair platform 
-                    where creators can showcase their talents, brands can find perfect matches, and everyone can 
+                    To democratize the creator economy by providing a transparent, efficient, and fair platform
+                    where creators can showcase their talents, brands can find perfect matches, and everyone can
                     thrive in the digital economy.
                   </p>
                 </div>
@@ -269,7 +274,7 @@ export default function AboutPage() {
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
                   <p className="text-gray-600 max-w-2xl mx-auto">
-                    We're a passionate group of entrepreneurs, engineers, and creator economy experts 
+                    We're a passionate group of entrepreneurs, engineers, and creator economy experts
                     committed to building the future of digital collaboration.
                   </p>
                 </div>
@@ -285,29 +290,29 @@ export default function AboutPage() {
                           <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
                           <p className="text-brand-primary font-medium mb-2">{member.role}</p>
                           <p className="text-gray-600 text-sm mb-4">{member.bio}</p>
-                          
+
                           <div className="flex space-x-3">
                             {member.linkedin && (
-                              <a href={member.linkedin} target="_blank" rel="noopener noreferrer" 
-                                 className="text-blue-600 hover:text-blue-700 transition-colors">
+                              <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700 transition-colors">
                                 💼
                               </a>
                             )}
                             {member.twitter && (
                               <a href={member.twitter} target="_blank" rel="noopener noreferrer"
-                                 className="text-blue-400 hover:text-blue-500 transition-colors">
+                                className="text-blue-400 hover:text-blue-500 transition-colors">
                                 🐦
                               </a>
                             )}
                             {member.github && (
                               <a href={member.github} target="_blank" rel="noopener noreferrer"
-                                 className="text-gray-700 hover:text-gray-800 transition-colors">
+                                className="text-gray-700 hover:text-gray-800 transition-colors">
                                 💻
                               </a>
                             )}
                             {member.instagram && (
                               <a href={member.instagram} target="_blank" rel="noopener noreferrer"
-                                 className="text-pink-600 hover:text-pink-700 transition-colors">
+                                className="text-pink-600 hover:text-pink-700 transition-colors">
                                 📸
                               </a>
                             )}
@@ -345,7 +350,7 @@ export default function AboutPage() {
                     Ready to Join Our Mission?
                   </h3>
                   <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                    Whether you're a creator looking for opportunities or a brand seeking talent, 
+                    Whether you're a creator looking for opportunities or a brand seeking talent,
                     we'd love to have you as part of our community.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">

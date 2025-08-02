@@ -145,7 +145,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 {/* Skills */}
                 {profile.skills && profile.skills.length > 0 && (
                   <div className="card-glass p-1">
-                      <h2 className="text-sm font-semibold text-gray-900 mb-1">Skills</h2>
+                    <h2 className="text-sm font-semibold text-gray-900 mb-1">Skills</h2>
                     <div className="flex flex-wrap gap-1">
                       {profile.skills.map((skill: string) => (
                         <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm">
@@ -182,29 +182,31 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
               {/* Sidebar */}
               <div className="space-y-1">
-                {/* Contact Info */}
-                <div className="card-glass p-1">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">Contact</h3>
-                  <div className="space-y-1">
-                    {profile.website && (
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-600">🌐</span>
-                        <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                          Website
-                        </a>
-                      </div>
-                    )}
-                    {profile.location && (
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-600">📍</span>
-                        <span>{profile.location}</span>
-                      </div>
-                    )}
+                {/* Contact Info - Only show if showContact is true */}
+                {profile.showContact !== false && (
+                  <div className="card-glass p-1">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Contact</h3>
+                    <div className="space-y-1">
+                      {profile.website && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-600">🌐</span>
+                          <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            Website
+                          </a>
+                        </div>
+                      )}
+                      {profile.location && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-600">📍</span>
+                          <span>{profile.location}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Social Links */}
-                {(profile.instagramHandle || profile.twitterHandle || profile.linkedinHandle) && (
+                {/* Social Links - Only show if showContact is true */}
+                {profile.showContact !== false && (profile.instagramHandle || profile.twitterHandle || profile.linkedinHandle) && (
                   <div className="card-glass p-1">
                     <h3 className="text-sm font-semibold text-gray-900 mb-1">Social</h3>
                     <div className="space-y-1">
@@ -232,6 +234,18 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                           </a>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Contact Privacy Notice */}
+                {profile.showContact === false && (
+                  <div className="card-glass p-1">
+                    <div className="text-center">
+                      <div className="text-gray-400 mb-2">🔒</div>
+                      <p className="text-xs text-gray-500">
+                        Contact information is private
+                      </p>
                     </div>
                   </div>
                 )}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -19,7 +20,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [showRoadmap, setShowRoadmap] = useState(false);
   const { register, isAuthenticated, clearError } = useAuth();
   const router = useRouter();
 
@@ -31,7 +32,7 @@ export default function RegisterPage() {
   }, [isAuthenticated, router]);
 
   // Available roles for client-side registration (excluding admin roles)
-  const availableRoles = [    
+  const availableRoles = [
     {
       value: 'INFLUENCER',
       title: 'Content Creator / Influencer',
@@ -116,12 +117,12 @@ export default function RegisterPage() {
 
     // Final validation for step 3
     if (formData.roles.length === 0) {
-      setError('Please select at least one role.');
+      setError('Please select at least one role to continue.');
       return;
     }
 
     if (!formData.agreedToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy.');
+      setError('Please agree to the Terms of Service and Privacy Policy to continue.');
       return;
     }
 
@@ -168,7 +169,7 @@ export default function RegisterPage() {
   const handleRoleToggle = (roleValue: string) => {
     setFormData((prev) => {
       let newRoles = [...prev.roles];
-      
+
       if (roleValue === 'BRAND') {
         // If selecting BRAND, remove all other roles and only keep BRAND
         if (prev.roles.includes('BRAND')) {
@@ -179,7 +180,7 @@ export default function RegisterPage() {
       } else {
         // If selecting INFLUENCER or CREW, remove BRAND first
         newRoles = newRoles.filter(r => r !== 'BRAND');
-        
+
         // Then toggle the selected role
         if (prev.roles.includes(roleValue)) {
           newRoles = newRoles.filter(r => r !== roleValue);
@@ -187,7 +188,7 @@ export default function RegisterPage() {
           newRoles = [...newRoles, roleValue];
         }
       }
-      
+
       return {
         ...prev,
         roles: newRoles,
@@ -201,15 +202,14 @@ export default function RegisterPage() {
   };
 
   const renderStepIndicator = () => (
-    <div className="mb-8 flex items-center justify-center">
+    <div className="mb-1 flex items-center justify-center">
       {[1, 2, 3].map((stepNumber) => (
         <div key={stepNumber} className="flex items-center">
           <div
-            className={`flex h-10 w-10 items-center justify-center rounded-none text-sm font-semibold transition-all duration-200 ${
-              step >= stepNumber
-                ? 'bg-brand-primary shadow-soft text-white'
-                : 'bg-brand-light-blue text-brand-text-muted border-brand-border border'
-            }`}
+            className={`flex h-10 w-10 items-center justify-center rounded-none text-sm font-semibold transition-all duration-200 ${step >= stepNumber
+              ? 'bg-brand-primary shadow-soft text-white'
+              : 'bg-brand-light-blue text-brand-text-muted border-brand-border border'
+              }`}
           >
             {step > stepNumber ? (
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -225,9 +225,8 @@ export default function RegisterPage() {
           </div>
           {stepNumber < 3 && (
             <div
-              className={`mx-3 h-1 w-12 rounded-none transition-all duration-200 ${
-                step > stepNumber ? 'bg-brand-primary' : 'bg-brand-border'
-              }`}
+              className={`mx-3 h-1 w-12 rounded-none transition-all duration-200 ${step > stepNumber ? 'bg-brand-primary' : 'bg-brand-border'
+                }`}
             />
           )}
         </div>
@@ -236,13 +235,13 @@ export default function RegisterPage() {
   );
 
   const renderStep1 = () => (
-    <div className="space-y-6">
-      <div className="mb-6 text-center">
+    <div className="space-y-1">
+      <div className="mb-1 text-center">
         <h2 className="text-heading mb-2 text-2xl font-bold">Account Setup</h2>
         <p className="text-muted">Enter your email to get started</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-1">
         <div className="space-y-2">
           <label
             htmlFor="email"
@@ -267,13 +266,13 @@ export default function RegisterPage() {
   );
 
   const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="mb-6 text-center">
+    <div className="space-y-1">
+      <div className="mb-1 text-center">
         <h2 className="text-heading mb-2 text-2xl font-bold">Security</h2>
         <p className="text-muted">Create a strong password</p>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <label
           htmlFor="password"
           className="text-body block text-sm font-medium"
@@ -340,7 +339,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <label
           htmlFor="confirmPassword"
           className="text-body block text-sm font-medium"
@@ -412,54 +411,58 @@ export default function RegisterPage() {
   );
 
   const renderStep3 = () => (
-    <div className="space-y-6">
-      <div className="mb-6 text-center">
+    <div className="space-y-1">
+      <div className="mb-1 text-center">
         <h2 className="text-heading mb-2 text-2xl font-bold">Your Roles</h2>
         <p className="text-muted">
           Select one or more roles that describe you (you can change these
           later)
         </p>
+        {formData.roles.length === 0 && step === 3 && (
+          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-700">
+              <strong>Required:</strong> Please select at least one role to continue.
+            </p>
+          </div>
+        )}
         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-700">
-            <strong>Note:</strong> Brand accounts are separate from individual creator accounts. 
+            <strong>Note:</strong> Brand accounts are separate from individual creator accounts.
             You can be both an Influencer and Freelancer, but Brand is exclusive.
           </p>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1">
         {availableRoles.map((role) => {
           const isSelected = formData.roles.includes(role.value);
-          const isDisabled = 
+          const isDisabled =
             (role.value === 'BRAND' && formData.roles.some(r => r !== 'BRAND')) ||
             (role.value !== 'BRAND' && formData.roles.includes('BRAND'));
-          
+
           return (
             <label
               key={role.value}
-              className={`block rounded-none border-2 p-4 transition-all duration-200 ${
-                isDisabled
-                  ? 'cursor-not-allowed opacity-50 border-gray-200 bg-gray-50'
-                  : 'cursor-pointer hover:shadow-md'
-              } ${
-                isSelected
+              className={`block rounded-none border-2 p-4 transition-all duration-200 ${isDisabled
+                ? 'cursor-not-allowed opacity-50 border-gray-200 bg-gray-50'
+                : 'cursor-pointer hover:shadow-md'
+                } ${isSelected
                   ? 'border-brand-primary bg-brand-primary/5 shadow-md'
                   : isDisabled
-                  ? 'border-gray-200 bg-gray-50'
-                  : 'border-brand-border hover:border-brand-primary/30 hover:bg-brand-light-blue/5 bg-white'
-              }`}
+                    ? 'border-gray-200 bg-gray-50'
+                    : 'border-brand-border hover:border-brand-primary/30 hover:bg-brand-light-blue/5 bg-white'
+                }`}
               onClick={() => !isDisabled && handleRoleToggle(role.value)}
             >
               <div className="flex items-start space-x-3">
                 <div className="mt-1 flex h-5 w-5 items-center justify-center">
                   <div
-                    className={`h-4 w-4 rounded border-2 transition-all duration-200 ${
-                      isSelected
-                        ? 'border-brand-primary bg-brand-primary'
-                        : isDisabled
+                    className={`h-4 w-4 rounded border-2 transition-all duration-200 ${isSelected
+                      ? 'border-brand-primary bg-brand-primary'
+                      : isDisabled
                         ? 'border-gray-300 bg-gray-200'
                         : 'border-gray-300 bg-white'
-                    }`}
+                      }`}
                   >
                     {isSelected && (
                       <svg
@@ -478,13 +481,12 @@ export default function RegisterPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3
-                    className={`text-base font-semibold ${
-                      isSelected
-                        ? 'text-brand-primary'
-                        : isDisabled
+                    className={`text-base font-semibold ${isSelected
+                      ? 'text-brand-primary'
+                      : isDisabled
                         ? 'text-gray-400'
                         : 'text-gray-900'
-                    }`}
+                      }`}
                   >
                     {role.title}
                     {isDisabled && (
@@ -493,9 +495,8 @@ export default function RegisterPage() {
                       </span>
                     )}
                   </h3>
-                  <p className={`mt-1 text-sm leading-relaxed ${
-                    isDisabled ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
+                  <p className={`mt-1 text-sm leading-relaxed ${isDisabled ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
                     {role.description}
                   </p>
                 </div>
@@ -505,7 +506,7 @@ export default function RegisterPage() {
         })}
       </div>
 
-      <div className="mt-8 space-y-4 border-t border-gray-200 pt-6">
+      <div className="mt-1 space-y-1 border-t border-gray-200 pt-1">
         <label className="flex items-start space-x-3">
           <input
             name="agreedToTerms"
@@ -554,9 +555,9 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="page-container pb-bottom-nav-safe min-h-screen pt-16">
-      <div className="flex min-h-screen items-center justify-center py-12">
-        <div className="w-full max-w-2xl">
+    <div className="page-container pb-bottom-nav-safe min-h-screen pt-0">
+      <div className="flex flex-col space-y-2 min-h-screen items-center justify-center py-0">
+        <div className="w-full max-w-2xl space-y-1">
           {/* Header */}
           <div className="mb-8 text-center">
             <h1 className="text-heading mb-2 text-3xl font-bold">
@@ -583,12 +584,12 @@ export default function RegisterPage() {
             {step === 3 && renderStep3()}
 
             {/* Navigation Buttons */}
-            <div className="mt-8 flex justify-between">
+            <div className="mt-1 flex justify-between">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="btn-ghost px-6 py-3"
+                  className="btn-ghost px-1 py-1"
                   disabled={isLoading}
                 >
                   Previous
@@ -599,9 +600,13 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={
-                    isLoading || (step === 3 && !formData.agreedToTerms)
+                    isLoading ||
+                    (step === 3 && (
+                      formData.roles.length === 0 ||
+                      !formData.agreedToTerms
+                    ))
                   }
-                  className="btn-primary flex items-center justify-center px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="btn-primary flex items-center justify-center px-1 py-1 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? (
                     <>
@@ -628,7 +633,7 @@ export default function RegisterPage() {
                       Creating Account...
                     </>
                   ) : step === 3 ? (
-                    'Create Account'
+                    formData.roles.length === 0 ? 'Select a Role to Continue' : 'Create Account'
                   ) : (
                     'Next'
                   )}
@@ -638,7 +643,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Sign In Link */}
-          <div className="mt-6 text-center">
+          <div className="mt-1 text-center">
             <p className="text-muted text-sm">
               Already have an account?{' '}
               <Link
@@ -650,6 +655,17 @@ export default function RegisterPage() {
             </p>
           </div>
         </div>
+        {/* toggle to show/hide the roadmap */}
+        <div className="flex justify-center">
+          <button className="btn-ghost px-1 py-1" onClick={() => setShowRoadmap(!showRoadmap)}>
+            {showRoadmap ? 'Hide Roadmap' : 'Show Roadmap'}
+          </button>
+        </div>
+        {showRoadmap && (
+          <div className="w-full rounded-3xl border border-black/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg space-y-1">
+            <BusinessRoadmap />
+          </div>
+        )}
       </div>
     </div>
   );

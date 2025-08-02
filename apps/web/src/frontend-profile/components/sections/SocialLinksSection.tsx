@@ -4,6 +4,7 @@
 import React from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';
+import { apiClient } from '@/lib/api-client';
 
 interface SocialLinksSectionProps {
   user: UserProfileData;
@@ -12,6 +13,7 @@ interface SocialLinksSectionProps {
   onEdit: () => void;
   onSave: (data: any) => Promise<void>;
   onCancel: () => void;
+  onUserUpdate?: (updatedUser: Partial<UserProfileData>) => void;
 }
 
 const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
@@ -21,6 +23,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   onEdit,
   onSave,
   onCancel,
+  onUserUpdate,
 }) => {
   const [editData, setEditData] = React.useState({
     instagramHandle: user.instagramHandle || '',
@@ -29,6 +32,9 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
     youtubeHandle: user.youtubeHandle || '',
     website: user.website || '',
   });
+
+  const [showContact, setShowContact] = React.useState(user.showContact ?? true);
+  const [togglingContact, setTogglingContact] = React.useState(false);
 
   // Update editData when user data changes or when entering edit mode
   React.useEffect(() => {
@@ -39,6 +45,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
       linkedinHandle: user.linkedinHandle,
       youtubeHandle: user.youtubeHandle,
       website: user.website,
+      showContact: user.showContact,
     });
     setEditData({
       instagramHandle: user.instagramHandle || '',
@@ -47,12 +54,14 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
       youtubeHandle: user.youtubeHandle || '',
       website: user.website || '',
     });
+    setShowContact(user.showContact ?? true);
   }, [
     user.instagramHandle,
     user.twitterHandle,
     user.linkedinHandle,
     user.youtubeHandle,
     user.website,
+    user.showContact,
   ]);
 
   // Debug user data changes
@@ -63,6 +72,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
       linkedinHandle: user.linkedinHandle,
       youtubeHandle: user.youtubeHandle,
       website: user.website,
+      showContact: user.showContact,
     });
   }, [
     user.instagramHandle,
@@ -70,7 +80,56 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
     user.linkedinHandle,
     user.youtubeHandle,
     user.website,
+    user.showContact,
   ]);
+
+  // Debug toggle state
+  React.useEffect(() => {
+    console.log('🎨 Toggle state changed - showContact:', showContact, 'translate-x-5:', showContact ? 'translate-x-5' : 'translate-x-0');
+  }, [showContact]);
+
+  const handleToggleContact = async () => {
+    if (!isOwner) return;
+
+    console.log('🔄 Toggling contact privacy from:', showContact, 'to:', !showContact);
+    console.log('🎯 Current showContact value:', showContact);
+
+    // Optimistically update the UI immediately
+    const newShowContact = !showContact;
+    setShowContact(newShowContact);
+
+    console.log('✅ Updated showContact to:', newShowContact);
+
+    try {
+      setTogglingContact(true);
+      const response = await apiClient.patch('/api/user/toggle-contact');
+
+      console.log('📡 API Response:', response);
+
+      if (response.success) {
+        const responseData = response.data as { showContact: boolean };
+        console.log('✅ Contact visibility toggled to:', responseData.showContact);
+
+        // Update local state with server response
+        setShowContact(responseData.showContact);
+
+        // Notify parent component about the user update
+        if (onUserUpdate) {
+          onUserUpdate({ showContact: responseData.showContact });
+        }
+      } else {
+        console.error('❌ Failed to toggle contact visibility:', response);
+        // Revert the visual state if API failed
+        setShowContact(user.showContact ?? true);
+      }
+    } catch (error) {
+      console.error('❌ Error toggling contact visibility:', error);
+      // Revert the visual state if API failed
+      setShowContact(user.showContact ?? true);
+    } finally {
+      setTogglingContact(false);
+    }
+  };
 
   const handleSave = async () => {
     console.log('💾 Saving social links data:', editData);
@@ -101,14 +160,43 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
     user.youtubeHandle ||
     user.website;
 
+  // Don't show anything if contact is disabled and user is not the owner
+  if (!showContact && !isOwner) {
+    return null;
+  }
+
   return (
     <div className="social-links-section">
       <div className="section-header">
         <h3>Social Links</h3>
-        {isOwner && !isEditing && (
-          <button onClick={onEdit} className="btn btn--secondary">
-            Edit
-          </button>
+        {isOwner && (
+          <div className="flex items-center space-x-2">
+            {/* Contact Privacy Toggle */}
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-600">Contact Privacy: {showContact ? 'Public' : 'Private'}</span>
+              <button
+                onClick={handleToggleContact}
+                disabled={togglingContact}
+                className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 ${showContact ? 'bg-green-500' : 'bg-gray-300'
+                  } ${togglingContact ? 'opacity-50' : ''}`}
+              >
+                <span
+                  className={`absolute h-4 w-4 transform rounded-full bg-white transition-all duration-200 ease-in-out ${showContact ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  style={{
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    left: showContact ? '20px' : '2px',
+                  }}
+                />
+              </button>
+            </div>
+
+            {!isEditing && (
+              <button onClick={onEdit} className="btn btn--secondary">
+                Edit
+              </button>
+            )}
+          </div>
         )}
       </div>
 

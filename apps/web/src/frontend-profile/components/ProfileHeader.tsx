@@ -112,11 +112,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 className="w-full max-w-xs"
               />
             ) : (
-              <img
-                src={user.profilePicture || '/default-avatar.jpg'}
-                alt={`${user.firstName}`}
-                className="profile-header__avatar-image border-2 rounded-full shadow-lg lg:h-32 lg:w-32"
-              />
+              <div className="profile-header__avatar">
+                <img
+                  src={user.profilePicture || '/default-avatar.jpg'}
+                  alt={`${user.firstName}`}
+                  className="profile-header__avatar-image"
+                />
+              </div>
             )}
           </div>
 

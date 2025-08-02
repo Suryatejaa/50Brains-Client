@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { clanApiClient } from '@/lib/clan-api';
 import { getClanJoinStatus, getClanJoinButtonInfo, canManageClan } from '@/lib/clan-utils';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -264,15 +265,15 @@ export default function ClanDetailPage({ params }: PageProps) {
       });
 
       if (response.success) {
-        alert('Join request sent successfully! The clan leader will review your request.');
+        toast.success('Join request sent successfully! The clan leader will review your request.');
         // Refresh clan data to show updated membership status
         loadClanDetail();
       } else {
-        alert('Failed to send join request. Please try again.');
+        toast.error('Failed to send join request. Please try again.');
       }
     } catch (error: any) {
       console.error('Error joining clan:', error);
-      alert(error.message || 'Failed to send join request');
+      toast.error(error.message || 'Failed to send join request');
     } finally {
       setJoinLoading(false);
     }
@@ -293,8 +294,18 @@ export default function ClanDetailPage({ params }: PageProps) {
       const response = await clanApiClient.joinClan(params.id, {
         message: `Hi! I'd like to join your clan. I'm excited to collaborate and contribute to your team.`
       });
+
+      if (response.success) {
+        toast.success('Join request sent successfully! The clan leader will review your request.');
+        loadClanDetail();
+      } else {
+        toast.error('Failed to send join request. Please try again.');
+      }
     } catch (error: any) {
       console.error('Error requesting to join clan:', error);
+      toast.error(error.message || 'Failed to send join request');
+    } finally {
+      setJoinLoading(false);
     }
   };
 
@@ -304,14 +315,14 @@ export default function ClanDetailPage({ params }: PageProps) {
         const response = await clanApiClient.leaveClan(params.id);
 
         if (response.success) {
-          alert('Successfully left the clan.');
+          toast.success('Successfully left the clan.');
           loadClanDetail();
         } else {
-          alert('Failed to leave clan. Please try again.');
+          toast.error('Failed to leave clan. Please try again.');
         }
       } catch (error: any) {
         console.error('Error leaving clan:', error);
-        alert(error.message || 'Failed to leave clan');
+        toast.error(error.message || 'Failed to leave clan');
       }
     }
   };
@@ -447,19 +458,19 @@ export default function ClanDetailPage({ params }: PageProps) {
                       <h1 className="text-3xl font-bold text-gray-900">
                         {clan.name}
                       </h1>
-                      {clan.visibility !== 'PRIVATE' && (
+                      {clan.visibility === 'PRIVATE' && (
                         <span className="px-1 py-1 bg-yellow-100 text-yellow-700 rounded-none text-sm font-medium">
                           Private
                         </span>
                       )}
-                    </div>  
+                    </div>
                     <div className="flex flex-row items-center space-x-1">
                       {/* Button for manage clan */}
                       {clan.clanHeadId === user?.id && (
                         <Link href={`/clan/${clan.id}/manage` as any} className="btn-secondary">
                           Manage Clan
                         </Link>
-                      )}                      
+                      )}
                     </div>
                   </div>
 
@@ -558,8 +569,19 @@ export default function ClanDetailPage({ params }: PageProps) {
                     </div>
                   )}
 
-                  <button className="btn-ghost w-full">
-                    Share Clan
+                  <button
+                    className="btn-secondary w-full"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        toast.success('Clan link copied to clipboard');
+                      } catch (err) {
+                        // fallback: alert if clipboard API is not available
+                        alert('Clan link copied to clipboard');
+                      }
+                    }}
+                  >
+                    📥Share Clan
                   </button>
                 </div>
               </div>
@@ -908,13 +930,15 @@ export default function ClanDetailPage({ params }: PageProps) {
                 <div className="space-y-1">
                   {/* Clan Leader */}
                   <div className="card-glass p-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Leader</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Clan Leader</h3>
                     <div className="flex items-center space-x-3"
                       onClick={() => {
-                        if (clan.clanHeadId) {
+                        if (clan.clanHeadId && clan.clanHeadId !== user?.id) {
                           router.push(`/profile/${clan.clanHeadId}`);
+                        } else if (clan.clanHeadId === user?.id) {
+                          router.push(`/profile`);
                         } else {
-                          alert('Clan leader profile not available');
+                          toast.error('Clan leader profile not available');
                         }
                       }}
                     >
@@ -942,7 +966,7 @@ export default function ClanDetailPage({ params }: PageProps) {
 
                   {/* Quick Stats */}
                   <div className="card-glass p-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Performance</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-gray-600">Score</span>
@@ -979,7 +1003,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                   {/* Analytics */}
                   {clan.analytics && (
                     <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics</h3>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Analytics</h3>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600">Profile Views</span>
@@ -1014,7 +1038,7 @@ export default function ClanDetailPage({ params }: PageProps) {
                   {/* Join Requests (for clan head) */}
                   {clan.clanHeadId === user?.id && clan.joinRequests && clan.joinRequests > 0 && (
                     <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Pending Requests</h3>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Pending Requests</h3>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-brand-primary mb-2">
                           {clan.joinRequests}

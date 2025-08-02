@@ -167,8 +167,8 @@ export const ClanCard: React.FC<ClanCardProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between mt-auto">
-                <div className="flex items-center space-x-3">
+            <div className="grid grid-cols-1 items-start justify-start mt-auto">
+                <div className="flex items-center space-x-3 mb-1">
                     {clan.location && (
                         <span className="text-muted text-xs">📍 {clan.location}</span>
                     )}
@@ -177,17 +177,17 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                     </span>
                 </div>
                 {showActions && (
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1">
                         <button
                             onClick={() => onView?.(clan.id)}
-                            className="btn-ghost px-4 py-2 text-sm"
+                            className="btn-secondary px-1 py-1 text-sm"
                         >
                             View Details
                         </button>
                         {onJoin && (
                             <button
                                 onClick={() => onJoin(clan.id)}
-                                className="btn-primary px-4 py-2 text-sm"
+                                className="btn-primary px-1 py-1 text-sm"
                             >
                                 Request to Join
                             </button>
@@ -195,7 +195,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                         {onManage && (
                             <button
                                 onClick={() => onManage(clan.id)}
-                                className="btn-secondary px-4 py-2 text-sm"
+                                className="btn-primary px-1 py-1 text-sm"
                             >
                                 Manage
                             </button>
