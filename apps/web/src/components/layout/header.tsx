@@ -22,6 +22,36 @@ export function Header() {
               <h1 className="text-accent text-2xl font-bold">50BraIns</h1>
             </Link>
 
+            {/* 📱 Mobile Header Actions */}
+            <div className="flex items-center space-x-2 md:hidden">
+              {/* Notifications for Mobile */}
+              <NotificationBell />
+
+              {/* Mobile menu button */}
+              <button
+                className="text-body hover:text-accent p-2 transition-colors"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d={
+                      isMenuOpen
+                        ? 'M6 18L18 6M6 6l12 12'
+                        : 'M4 6h16M4 12h16M4 18h16'
+                    }
+                  />
+                </svg>
+              </button>
+            </div>
+
             {/* 🚀 Desktop User Menu */}
             <div className="hidden items-center space-x-4 md:flex">
               {/* Role Switcher - Only show if user has multiple roles */}
@@ -112,30 +142,6 @@ export function Header() {
                 )}
               </div>
             </div>
-
-            {/* 📱 Mobile menu button */}
-            <button
-              className="text-body hover:text-accent p-2 transition-colors md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={
-                    isMenuOpen
-                      ? 'M6 18L18 6M6 6l12 12'
-                      : 'M4 6h16M4 12h16M4 18h16'
-                  }
-                />
-              </svg>
-            </button>
           </div>
 
           {/* 📱 Mobile User Menu */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
@@ -26,6 +26,29 @@ interface ClanMember {
     name: string;
     email: string;
     avatar?: string;
+  };
+}
+
+interface ClanJoinRequest {
+  id: string;
+  clanId: string;
+  userId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  message?: string;
+  portfolioUrls?: string[];
+  skills?: string[];
+  availability?: string;
+  expectedContribution?: string;
+  submittedAt: string;
+  respondedAt?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+    reputationScore?: number;
+    totalGigs?: number;
+    completedGigs?: number;
   };
 }
 
@@ -83,6 +106,7 @@ type TabType = 'overview' | 'members' | 'applications' | 'gigs' | 'credits' | 's
 export default function ClanManagePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuth();
   const clanId = params.id as string;
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -91,6 +115,8 @@ export default function ClanManagePage() {
   const [clan, setClan] = useState<ClanDetail | null>(null);
   const [clanLoading, setClanLoading] = useState(true);
   const [clanError, setClanError] = useState<string | null>(null);
+  const [joinRequests, setJoinRequests] = useState<ClanJoinRequest[]>([]);
+  const [joinRequestsLoading, setJoinRequestsLoading] = useState(false);
 
   // Check if user has permission to manage this clan
   const canManage = clan && user && (clan.clanHeadId === user.id ||
@@ -99,7 +125,17 @@ export default function ClanManagePage() {
       ['HEAD', 'CO_HEAD', 'ADMIN'].includes(member.role)
     ));
 
+  // Set active tab from URL parameter
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') as TabType;
+    if (tabParam && ['overview', 'members', 'applications', 'gigs', 'credits', 'settings', 'logs'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
   const loadClanDetail = async () => {
+    if (!clanId) return;
+
     try {
       setClanLoading(true);
       setClanError(null);
@@ -109,16 +145,45 @@ export default function ClanManagePage() {
       if (response.success) {
         setClan(response.data as ClanDetail);
       } else {
-        setClanError('Clan not found');
+        setClanError('Failed to load clan details');
       }
     } catch (error: any) {
-      if (error.status === 404) {
-        notFound();
-      } else {
-        setClanError(error.message || 'Failed to load clan details');
-      }
+      console.error('Error loading clan:', error);
+      setClanError(error.message || 'Failed to load clan details');
     } finally {
       setClanLoading(false);
+    }
+  };
+
+  const loadJoinRequests = async () => {
+    if (!clanId || !canManage) return;
+
+    try {
+      setJoinRequestsLoading(true);
+      const response = await apiClient.get(`/api/clan/${clanId}/join-requests`);
+
+      if (response.success) {
+        setJoinRequests((response.data as any).joinRequests || []);
+      }
+    } catch (error: any) {
+      console.error('Error loading join requests:', error);
+    } finally {
+      setJoinRequestsLoading(false);
+    }
+  };
+
+  const handleJoinRequestAction = async (requestId: string, action: 'approve' | 'reject') => {
+    try {
+      const response = await apiClient.post(`/api/clan/${clanId}/join-requests/${requestId}/${action}`);
+
+      if (response.success) {
+        // Reload join requests
+        await loadJoinRequests();
+        // Reload clan details to update member count
+        await loadClanDetail();
+      }
+    } catch (error: any) {
+      console.error(`Error ${action}ing join request:`, error);
     }
   };
 
@@ -127,36 +192,16 @@ export default function ClanManagePage() {
   }, [clanId]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
+    if (canManage && activeTab === 'applications') {
+      loadJoinRequests();
     }
-
-    if (clan && !canManage) {
-      router.push(`/clan/${clanId}`);
-      return;
-    }
-  }, [isAuthenticated, clan, canManage, clanId, router]);
+  }, [canManage, activeTab, clanId]);
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="page-container min-h-screen pt-16">
-          <div className="content-container py-8">
-            <div className="mx-auto max-w-2xl">
-              <div className="card-glass p-8 text-center">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Please Sign In
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  You need to be signed in to manage clans.
-                </p>
-                <Link href="/login" className="btn-primary">
-                  Sign In
-                </Link>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-xl font-semibold text-gray-900 mb-2">Please log in to manage clans</div>
         </div>
       </div>
     );
@@ -167,34 +212,16 @@ export default function ClanManagePage() {
       <div className="min-h-screen bg-gray-50">
         <div className="page-container min-h-screen pt-16">
           <div className="content-container py-8">
-            <div className="card-glass p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading clan management...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (clanError) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="page-container min-h-screen pt-16">
-          <div className="content-container py-8">
-            <div className="card-glass p-8 text-center">
-              <div className="mb-4">
-                <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-red-100 flex items-center justify-center">
-                  <span className="text-2xl">❌</span>
+            <div className="mx-auto max-w-6xl">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-20 bg-gray-200 rounded"></div>
+                  ))}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Error Loading Clan
-                </h3>
-                <p className="text-gray-600 mb-6">{clanError}</p>
               </div>
-              <button onClick={() => window.location.reload()} className="btn-primary">
-                Try Again
-              </button>
             </div>
           </div>
         </div>
@@ -202,26 +229,8 @@ export default function ClanManagePage() {
     );
   }
 
-  if (!clan) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="page-container min-h-screen pt-16">
-          <div className="content-container py-8">
-            <div className="card-glass p-8 text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Clan Not Found
-              </h3>
-              <p className="text-gray-600 mb-6">
-                The clan you're looking for doesn't exist or you don't have permission to view it.
-              </p>
-              <Link href="/clans" className="btn-primary">
-                Browse Clans
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (clanError || !clan) {
+    return notFound();
   }
 
   if (!canManage) {
@@ -229,16 +238,14 @@ export default function ClanManagePage() {
       <div className="min-h-screen bg-gray-50">
         <div className="page-container min-h-screen pt-16">
           <div className="content-container py-8">
-            <div className="card-glass p-8 text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Access Denied
-              </h3>
-              <p className="text-gray-600 mb-6">
-                You don't have permission to manage this clan.
-              </p>
-              <Link href={`/clan/${clanId}`} className="btn-primary">
-                View Clan
-              </Link>
+            <div className="mx-auto max-w-6xl">
+              <div className="text-center">
+                <div className="text-xl font-semibold text-gray-900 mb-2">Access Denied</div>
+                <div className="text-gray-600 mb-4">You don't have permission to manage this clan.</div>
+                <Link href={`/clan/${clanId}`} className="btn-primary">
+                  View Clan
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -246,24 +253,16 @@ export default function ClanManagePage() {
     );
   }
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'members', label: 'Members', icon: '👥' },
-    { id: 'applications', label: 'Applications', icon: '🪪' },
-    { id: 'gigs', label: 'Gigs', icon: '🎯' },
-    { id: 'credits', label: 'Credits', icon: '💰' },
-    { id: 'settings', label: 'Settings', icon: '🛠️' },
-    { id: 'logs', label: 'Logs', icon: '🔔' },
-  ];
+  const members = clan.members || [];
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab clan={clan} members={clan?.members || []} />;
+        return <OverviewTab clan={clan} members={members} />;
       case 'members':
-        return <MembersTab clan={clan} members={clan?.members || []} />;
+        return <MembersTab clan={clan} members={members} />;
       case 'applications':
-        return <ApplicationsTab clan={clan} />;
+        return <ApplicationsTab clan={clan} joinRequests={joinRequests} loading={joinRequestsLoading} onAction={handleJoinRequestAction} />;
       case 'gigs':
         return <GigsTab clan={clan} />;
       case 'credits':
@@ -273,75 +272,64 @@ export default function ClanManagePage() {
       case 'logs':
         return <LogsTab clan={clan} />;
       default:
-        return <OverviewTab clan={clan} members={clan?.members || []} />;
+        return <OverviewTab clan={clan} members={members} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-1">
-        <div className="content-container py-1">
-          {/* Breadcrumb Navigation */}
-          <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
-            <Link href="/clans" className="hover:text-brand-primary">
-              Clans
-            </Link>
-            <span>›</span>
-            <Link href="/clans/browse" className="hover:text-brand-primary">
-              Browse
-            </Link>
-            <span>›</span>
-            <Link href={`/clan/${clanId}`} className="hover:text-brand-primary">
-              {clan.name}
-            </Link>
-            <span>›</span>
-            <span className="text-gray-900">Manage</span>
-          </nav>
-
-          {/* Header */}
-          <div className="mb-1">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-heading mb-2 text-3xl font-bold">
-                  Clan Management
-                </h1>
-                <p className="text-muted">
-                  Manage {clan.name} - Control panel for clan operations
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                <Link href={`/clan/${clanId}`} className="btn-ghost">
-                  View Clan
+      <div className="page-container min-h-screen pt-16">
+        <div className="content-container py-8">
+          <div className="mx-auto max-w-6xl">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">{clan.name}</h1>
+                  <p className="text-gray-600">Clan Management</p>
+                </div>
+                <Link href={`/clan/${clanId}`} className="btn-secondary">
+                  View Public Page
                 </Link>
-                <button className="btn-primary">
-                  Save Changes
-                </button>
               </div>
             </div>
-          </div>
 
-          {/* Tab Navigation */}
-          <div className="mb-1">
-            <div className="flex flex-wrap gap-1 border-b border-gray-200">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as TabType)}
-                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center space-x-2 ${activeTab === tab.id
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                >
-                  <span>{tab.icon}</span>
-                  <span>{tab.label}</span>
-                </button>
-              ))}
+            {/* Navigation Tabs */}
+            <div className="border-b border-gray-200 mb-8">
+              <nav className="-mb-px flex space-x-8">
+                {[
+                  { id: 'overview', label: 'Overview', icon: '📊' },
+                  { id: 'members', label: 'Members', icon: '👥' },
+                  { id: 'applications', label: 'Applications', icon: '📝', badge: joinRequests.filter(r => r.status === 'PENDING').length },
+                  { id: 'gigs', label: 'Gigs', icon: '🎯' },
+                  { id: 'credits', label: 'Credits', icon: '💰' },
+                  { id: 'settings', label: 'Settings', icon: '⚙️' },
+                  { id: 'logs', label: 'Logs', icon: '📋' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as TabType)}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
+                        ? 'border-brand-primary text-brand-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    {tab.badge && tab.badge > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </nav>
             </div>
-          </div>
 
-          {/* Tab Content */}
-          <div className="card-glass p-1">
-            {renderTabContent()}
+            {/* Tab Content */}
+            <div className="space-y-6">
+              {renderTabContent()}
+            </div>
           </div>
         </div>
       </div>
@@ -470,16 +458,22 @@ function MembersTab({ clan, members }: { clan: ClanDetail | null; members: ClanM
   );
 }
 
-function ApplicationsTab({ clan }: { clan: ClanDetail | null }) {
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Applications & Invites</h2>
-        <button className="btn-primary">Send Invite</button>
-      </div>
+function ApplicationsTab({ clan, joinRequests, loading, onAction }: { clan: ClanDetail | null; joinRequests: ClanJoinRequest[]; loading: boolean; onAction: (requestId: string, action: 'approve' | 'reject') => Promise<void> }) {
+  if (!clan) return null;
 
+  if (loading && joinRequests.length === 0) {
+    return (
       <div className="card-glass p-6 text-center">
-        <div className="text-4xl mb-4">🪪</div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading applications...</p>
+      </div>
+    );
+  }
+
+  if (joinRequests.length === 0) {
+    return (
+      <div className="card-glass p-6 text-center">
+        <div className="text-4xl mb-4">📝</div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           No Applications Yet
         </h3>
@@ -488,6 +482,63 @@ function ApplicationsTab({ clan }: { clan: ClanDetail | null }) {
         </p>
         <button className="btn-primary">Invite Members</button>
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-900">Applications & Invites</h2>
+        <button className="btn-primary">Send Invite</button>
+      </div>
+
+      {joinRequests.map((request) => (
+        <div key={request.id} className="card-glass p-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+              {request.user.avatar ? (
+                <img src={request.user.avatar} alt={request.user.name} className="w-12 h-12 rounded-full" />
+              ) : (
+                <span className="text-lg font-semibold text-gray-600">
+                  {request.user.name.charAt(0)}
+                </span>
+              )}
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">{request.user.name}</h3>
+              <p className="text-sm text-gray-600">{request.user.email}</p>
+              <p className="text-xs text-gray-500">Submitted: {new Date(request.submittedAt).toLocaleDateString()}</p>
+              {request.message && (
+                <p className="text-sm text-gray-600 mt-1">Message: {request.message}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            {request.status === 'PENDING' && (
+              <>
+                <button
+                  onClick={() => onAction(request.id, 'approve')}
+                  className="btn-success text-sm"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => onAction(request.id, 'reject')}
+                  className="btn-error text-sm"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+            {request.status === 'APPROVED' && (
+              <span className="text-sm text-green-600">Approved</span>
+            )}
+            {request.status === 'REJECTED' && (
+              <span className="text-sm text-red-600">Rejected</span>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

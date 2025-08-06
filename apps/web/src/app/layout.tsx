@@ -4,7 +4,7 @@ import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
   title: {
-    default: '50BraIns - Creator Economy Platform',
+    default: '50BraIns',
     template: '%s | 50BraIns',
   },
   description:
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://50brains.com',
     siteName: '50BraIns',
-    title: '50BraIns - Creator Economy Platform',
+    title: '50BraIns',
     description: 'The premier platform where creativity meets opportunity.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: '50BraIns - Creator Economy Platform',
+        alt: '50BraIns',
       },
     ],
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@50brains',
     creator: '@50brains',
-    title: '50BraIns - Creator Economy Platform',
+    title: '50BraIns',
     description: 'The premier platform where creativity meets opportunity.',
     images: ['/og-image.jpg'],
   },

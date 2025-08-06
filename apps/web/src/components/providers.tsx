@@ -7,6 +7,8 @@ import { AuthProvider } from '../hooks/useAuth';
 import { RoleSwitchProvider } from '../hooks/useRoleSwitch';
 import { ThemeProvider } from './theme-provider';
 import { APIProvider } from './api-provider';
+import { NotificationProvider } from './NotificationProvider';
+import { NotificationToast } from './NotificationToast';
 import { LayoutWrapper } from './layout/LayoutWrapper';
 import { RouteGuard } from './auth/RouteGuard';
 
@@ -32,20 +34,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <APIProvider>
           <AuthProvider>
             <RoleSwitchProvider>
-              <RouteGuard>
-                <LayoutWrapper>{children}</LayoutWrapper>
-              </RouteGuard>
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                  },
-                }}
-              />
+              <NotificationProvider>
+                <NotificationToast enabled={true} />
+                <RouteGuard>
+                  <LayoutWrapper>{children}</LayoutWrapper>
+                </RouteGuard>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 2000,
+                    style: {
+                      background: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                    },
+                  }}
+                />
+              </NotificationProvider>
             </RoleSwitchProvider>
           </AuthProvider>
         </APIProvider>
