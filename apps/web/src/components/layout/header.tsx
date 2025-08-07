@@ -23,7 +23,7 @@ export function Header() {
             </Link>
 
             {/* 📱 Mobile Header Actions */}
-            <div className="flex items-center space-x-2 md:hidden">
+            <div className="flex items-center space-x-0 md:hidden">
               {/* Notifications for Mobile */}
               <NotificationBell />
 

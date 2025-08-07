@@ -12,6 +12,10 @@ import { DashboardHeader } from '../shared/DashboardHeader';
 import { MetricCard } from '../shared/MetricCard';
 import { QuickActionsGrid } from '../shared/QuickActions';
 import { ProfileCompletionWidget } from '@/components/ProfileCompletionWidget';
+import { BarChartIcon, Building2Icon, FileTextIcon, GlobeIcon, HeadphonesIcon, MapPinIcon, MegaphoneIcon, PlusIcon, RocketIcon } from 'lucide-react';
+import { AlertCircleIcon, CheckCircleIcon, MailIcon, SearchIcon } from 'lucide-react';
+import { CreditCardIcon, EyeIcon } from 'lucide-react';
+import { DollarSignIcon } from 'lucide-react';
 
 interface BrandDashboardData {
   profile: BrandProfile | null;
@@ -77,7 +81,7 @@ export const BrandDashboard: React.FC = () => {
       // console.log('Gigs Response:', gigsResponse);
       if (
         gigsResponse.status === 'fulfilled' &&
-        gigsResponse.value.success && 
+        gigsResponse.value.success &&
         gigsResponse.value.data?.gigs
       ) {
         // Sum up applications from all gigs
@@ -95,8 +99,8 @@ export const BrandDashboard: React.FC = () => {
           // console.log(`Gig ${gig.id} applications:`, appCount);
           return sum + appCount;
         }, 0);
-       
-        
+
+
         applicationsStats.approved = gigs.reduce((sum, gig) => {
           const acceptedCount = gig.acceptedCount || 0;
           return sum + acceptedCount;
@@ -108,35 +112,35 @@ export const BrandDashboard: React.FC = () => {
       const data: BrandDashboardData = {
         profile:
           profileResponse.status === 'fulfilled' &&
-          profileResponse.value.success
+            profileResponse.value.success
             ? (profileResponse.value.data as any)?.user || null
             : null,
 
         gigsStats:
           gigsResponse.status === 'fulfilled' &&
-          gigsResponse.value.success &&
-          gigsResponse.value.data?.gigs
+            gigsResponse.value.success &&
+            gigsResponse.value.data?.gigs
             ? gigsResponse.value.data.gigs.reduce(
-                (acc, gig) => {
-                  acc.totalGigs += 1;
-                  if (gig.status === 'OPEN' || gig.status === 'ASSIGNED') acc.activeGigs += 1;
-                  if (gig.status === 'COMPLETED') acc.completedGigs += 1;
-                  acc.totalBudget += gig.budgetMax;
-                  return acc;
-                },
-                {
-                  totalGigs: 0,
-                  activeGigs: 0,
-                  completedGigs:0,
-                  totalBudget: 0,
-                }
-              )
-            : {
+              (acc, gig) => {
+                acc.totalGigs += 1;
+                if (gig.status === 'OPEN' || gig.status === 'ASSIGNED') acc.activeGigs += 1;
+                if (gig.status === 'COMPLETED') acc.completedGigs += 1;
+                acc.totalBudget += gig.budgetMax;
+                return acc;
+              },
+              {
                 totalGigs: 0,
                 activeGigs: 0,
                 completedGigs: 0,
                 totalBudget: 0,
-              },
+              }
+            )
+            : {
+              totalGigs: 0,
+              activeGigs: 0,
+              completedGigs: 0,
+              totalBudget: 0,
+            },
 
         wallet:
           walletResponse.status === 'fulfilled' && walletResponse.value.success
@@ -147,16 +151,16 @@ export const BrandDashboard: React.FC = () => {
 
         recentGigs:
           gigsResponse.status === 'fulfilled' &&
-          gigsResponse.value.success &&
-          gigsResponse.value.data?.gigs
+            gigsResponse.value.success &&
+            gigsResponse.value.data?.gigs
             ? gigsResponse.value.data.gigs
-                .sort((a, b) => {
-                  // Use updatedAt if available, fallback to createdAt
-                  const dateA = new Date(a.updatedAt || a.createdAt).getTime();
-                  const dateB = new Date(b.updatedAt || b.createdAt).getTime();
-                  return dateB - dateA; // Most recent first
-                })
-                .slice(0, 2) // Only show latest 3 gigs
+              .sort((a, b) => {
+                // Use updatedAt if available, fallback to createdAt
+                const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+                const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+                return dateB - dateA; // Most recent first
+              })
+              .slice(0, 2) // Only show latest 3 gigs
             : [],
       };
 
@@ -172,54 +176,54 @@ export const BrandDashboard: React.FC = () => {
   const quickActions = [
     {
       href: '/create-gig',
-      icon: '➕',
+      icon: <PlusIcon className="w-6 h-6" />,
       label: 'Create Campaign',
       description: 'Launch new campaign',
       permission: 'gig.create',
     },
     {
       href: '/my-gigs',
-      icon: '📢',
+      icon: <MegaphoneIcon className="w-6 h-6" />,
       label: 'My Gigs',
       description: 'Manage gigs',
     },
     {
       href: '/influencers/search',
-      icon: '🔍',
+      icon: <SearchIcon className="w-6 h-6" />,
       label: 'Find Influencers',
       description: 'Discover creators',
       permission: 'influencer.search',
     },
     {
       href: '/applications',
-      icon: '📨',
+      icon: <MailIcon className="w-6 h-6" />,
       label: 'Applications',
       description: 'Review applications',
       permission: 'applications.manage',
     },
     {
       href: '/analytics',
-      icon: '📊',
+      icon: <BarChartIcon className="w-6 h-6" />,
       label: 'Analytics',
       description: 'Campaign insights',
       permission: 'analytics.view',
     },
     {
       href: '/credits/purchase',
-      icon: '💳',
+      icon: <CreditCardIcon className="w-6 h-6" />,
       label: 'Buy Credits',
       description: 'Add budget',
       permission: 'credits.purchase',
     },
     {
       href: '/brand/profile',
-      icon: '🏢',
+      icon: <Building2Icon className="w-6 h-6" />,
       label: 'Brand Profile',
       description: 'Update brand info',
     },
     {
       href: '/support',
-      icon: '🎧',
+      icon: <HeadphonesIcon className="w-6 h-6" />,
       label: 'Support',
       description: 'Get help',
     },
@@ -257,14 +261,14 @@ export const BrandDashboard: React.FC = () => {
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
-            icon="🎯"
+            icon={<RocketIcon className="w-6 h-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/my-gigs?status=ACTIVE')}
           />
           <MetricCard
             title="Pending Applications"
             value={dashboardData.applications.pending}
-            icon="📨"
+            icon={<MailIcon className="w-6 h-6" />}
             loading={loading}
             urgent={dashboardData.applications.pending > 10}
             onClick={() =>
@@ -274,14 +278,14 @@ export const BrandDashboard: React.FC = () => {
           <MetricCard
             title="Profile Views"
             value={dashboardData.profile?.profileViews || 0}
-            icon="�️"
+            icon={<EyeIcon className="w-6 h-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/profile')}
           />
           <MetricCard
             title="Credits Balance"
             value={`₹${dashboardData.wallet?.balance || 0}`}
-            icon="💰"
+            icon={<DollarSignIcon className="w-6 h-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/credits')}
           />
@@ -292,8 +296,8 @@ export const BrandDashboard: React.FC = () => {
           {/* Profile Completion Widget */}
           <div className="lg:col-span-1 sm:mb-1 md:mb-1 mb-1">
             <div className="card-glass p-3 ">
-              <h3 className="text-heading text-lg font-semibold">
-                🏢 Company Overview
+              <h3 className="flex items-center gap-2 text-heading text-lg font-semibold">
+                <Building2Icon className="w-6 h-6" />  Company Overview
               </h3>
 
               {loading ? (
@@ -321,15 +325,15 @@ export const BrandDashboard: React.FC = () => {
 
                   <div className="flex items-center space-x-4 text-sm">
                     <span className="flex items-center space-x-1">
-                      <span>📍</span>
+                      <span><MapPinIcon className="w-6 h-6" /></span>
                       <span>{dashboardData.profile.location || 'Location not specified'}</span>
                     </span>
                     {dashboardData.profile.website && (
                       <span className="flex items-center space-x-1">
-                        <span>🌐</span>
-                        <a 
-                          href={dashboardData.profile.website} 
-                          target="_blank" 
+                        <span><GlobeIcon className="w-6 h-6" /></span>
+                        <a
+                          href={dashboardData.profile.website}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
                         >
@@ -340,15 +344,14 @@ export const BrandDashboard: React.FC = () => {
                   </div>
 
                   <div className="flex items-center space-x-4 text-sm">
-                    <span className={`flex items-center space-x-1 ${
-                      dashboardData.profile.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'
-                    }`}>
-                      <span>{dashboardData.profile.status === 'ACTIVE' ? '✓' : '⚠'}</span>
+                    <span className={`flex items-center space-x-1 ${dashboardData.profile.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'
+                      }`}>
+                      <span>{dashboardData.profile.status === 'ACTIVE' ? <CheckCircleIcon className="w-6 h-6" /> : <AlertCircleIcon className="w-6 h-6" />}</span>
                       <span>{dashboardData.profile.status === 'ACTIVE' ? 'Active' : 'Inactive'}</span>
                     </span>
                     {dashboardData.profile.emailVerified && (
                       <span className="flex items-center space-x-1 text-blue-600">
-                        <span>✓</span>
+                        <span><CheckCircleIcon className="w-6 h-6" /></span>
                         <span>Email Verified</span>
                       </span>
                     )}
@@ -394,8 +397,8 @@ export const BrandDashboard: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="sm:mb-1 md:mb-1 mb-1 card-glass p-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-heading text-lg font-semibold">
-                  📝 Recent Gigs
+                <h3 className="flex items-center gap-2 text-heading text-lg font-semibold">
+                  <FileTextIcon className="w-6 h-6" /> Recent Gigs
                 </h3>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-gray-500">Latest 2</span>
@@ -447,18 +450,17 @@ export const BrandDashboard: React.FC = () => {
                               Updated: {new Date(gig.updatedAt || gig.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                        <span
-                          className={`rounded-none px-1 py-1 text-xs font-medium ${
-                            gig.status === 'ACTIVE'
+                          <span
+                            className={`rounded-none px-1 py-1 text-xs font-medium ${gig.status === 'ACTIVE'
                               ? 'bg-green-100 text-green-800'
                               : gig.status === 'COMPLETED'
                                 ? 'bg-blue-100 text-blue-800'
                                 : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {gig.status}
+                              }`}
+                          >
+                            {gig.status}
                           </span>
-                        </div>                          
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -474,7 +476,7 @@ export const BrandDashboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="py-8 text-center">
-                  <span className="mb-2 block text-4xl">📝</span>
+                  <span className="mb-2 block text-4xl"><FileTextIcon className="w-6 h-6" /></span>
                   <p className="text-muted mb-4">No gigs posted yet</p>
                   <button
                     onClick={() => (window.location.href = '/create-gig')}
@@ -494,8 +496,8 @@ export const BrandDashboard: React.FC = () => {
         <div className="mb-1 mt-1 grid grid-cols-1 gap-1 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="card-glass p-3">
-              <h3 className="text-heading mb-6 text-lg font-semibold">
-                📊 Gig Performance
+              <h3 className="flex items-center gap-2 text-heading mb-6 text-lg font-semibold">
+                <BarChartIcon className="w-6 h-6" /> Gig Performance
               </h3>
 
               {loading ? (
@@ -536,8 +538,8 @@ export const BrandDashboard: React.FC = () => {
 
           {/* Recent Applications */}
           <div className="card-glass p-3">
-            <h3 className="text-heading mb-2 text-lg font-semibold">
-              📨 Recent Applications
+            <h3 className="flex items-center gap-2 text-heading mb-2 text-lg font-semibold">
+              <MailIcon className="w-6 h-6" /> Recent Applications
             </h3>
 
             {loading ? (
@@ -598,7 +600,7 @@ export const BrandDashboard: React.FC = () => {
                   </>
                 ) : (
                   <div className="py-2 text-center">
-                    <span className="mb-2 block text-4xl">📨</span>
+                    <span className="mb-2 block text-4xl"><MailIcon className="w-6 h-6" /></span>
                     <p className="text-muted mb-4">
                       No applications received yet
                     </p>
@@ -618,8 +620,8 @@ export const BrandDashboard: React.FC = () => {
         {/* Analytics & Budget */}
         <div className="mb-1 grid grid-cols-1 gap-1 lg:grid-cols-2">
           <div className="card-glass p-2">
-            <h3 className="text-heading mb-3 text-lg font-semibold">
-              📈 Gig Analytics
+            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
+              <BarChartIcon className="w-6 h-6" /> Gig Analytics
             </h3>
 
             {loading ? (
@@ -676,8 +678,8 @@ export const BrandDashboard: React.FC = () => {
           </div>
 
           <div className="card-glass p-2">
-            <h3 className="text-heading mb-3 text-lg font-semibold">
-              💰 Wallet Management
+            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
+              <DollarSignIcon className="w-6 h-6" /> Wallet Management
             </h3>
 
             <div className="space-y-2">
@@ -732,8 +734,8 @@ export const BrandDashboard: React.FC = () => {
         {/* Performance Overview */}
         <div className="mb-0">
           <div className="card-glass p-3">
-            <h3 className="text-heading mb-3 text-lg font-semibold">
-              📈 Performance Overview
+            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
+              <BarChartIcon className="w-6 h-6" /> Performance Overview
             </h3>
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -763,7 +765,7 @@ export const BrandDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>        
+        </div>
       </div>
     </div>
   );

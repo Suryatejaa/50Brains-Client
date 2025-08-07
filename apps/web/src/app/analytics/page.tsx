@@ -5,32 +5,37 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
+import { CheckCircleIcon, CreditCardIcon, DollarSignIcon } from 'lucide-react';
+import { FileTextIcon } from 'lucide-react';
+import { UsersIcon } from 'lucide-react';
+import { MegaphoneIcon } from 'lucide-react';
+import { EyeIcon } from 'lucide-react';
 
 interface AnalyticsData {
   // Common analytics
   profileViews: number;
   profileViewsChange: number;
-  
+
   // Creator analytics
   totalApplications?: number;
   acceptedApplications?: number;
   completedCampaigns?: number;
   totalEarnings?: number;
   averageRating?: number;
-  
+
   // Brand analytics  
   totalCampaigns?: number;
   activeCampaigns?: number;
   totalSpent?: number;
   averageCampaignCost?: number;
   successfulCampaigns?: number;
-  
+
   // Social media analytics
   totalFollowers?: number;
   totalPosts?: number;
   averageEngagement?: number;
   influencerTier?: string;
-  
+
   // Time series data
   weeklyData?: Array<{
     date: string;
@@ -58,7 +63,7 @@ export default function AnalyticsPage() {
   const loadAnalytics = async () => {
     try {
       setIsLoading(true);
-      
+
       // Load different analytics based on user type
       const endpoints = userType === 'creator' ? [
         apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
@@ -71,7 +76,7 @@ export default function AnalyticsPage() {
       ];
 
       const results = await Promise.allSettled(endpoints);
-      
+
       let combinedData: AnalyticsData = {
         profileViews: 0,
         profileViewsChange: 0
@@ -93,7 +98,7 @@ export default function AnalyticsPage() {
           combinedData.averageEngagement = socialData?.averageEngagement;
           combinedData.influencerTier = socialData?.influencerTier;
         }
-        
+
         // Application stats
         if (results[2].status === 'fulfilled' && results[2].value.success) {
           const appData = results[2].value.data as any;
@@ -111,7 +116,7 @@ export default function AnalyticsPage() {
           combinedData.activeCampaigns = campaignData?.active;
           combinedData.successfulCampaigns = campaignData?.successful;
         }
-        
+
         // Spending analytics
         if (results[2].status === 'fulfilled' && results[2].value.success) {
           const spendingData = results[2].value.data as any;
@@ -188,7 +193,7 @@ export default function AnalyticsPage() {
                     <p className="text-2xl font-bold text-gray-900">{analytics.profileViews?.toLocaleString() || 0}</p>
                   </div>
                   <div className="w-10 h-10 bg-blue-100 rounded-none flex items-center justify-center">
-                    👁️
+                    <EyeIcon className="w-6 h-6" />
                   </div>
                 </div>
                 <p className={`text-sm mt-2 ${analytics.profileViewsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -205,7 +210,7 @@ export default function AnalyticsPage() {
                         <p className="text-2xl font-bold text-gray-900">{analytics.totalApplications || 0}</p>
                       </div>
                       <div className="w-10 h-10 bg-yellow-100 rounded-none flex items-center justify-center">
-                        📝
+                        <FileTextIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -220,7 +225,7 @@ export default function AnalyticsPage() {
                         <p className="text-2xl font-bold text-gray-900">{analytics.totalFollowers?.toLocaleString() || 0}</p>
                       </div>
                       <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
-                        👥
+                        <UsersIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -235,7 +240,7 @@ export default function AnalyticsPage() {
                         <p className="text-2xl font-bold text-gray-900">${analytics.totalEarnings?.toLocaleString() || 0}</p>
                       </div>
                       <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
-                        💰
+                        <DollarSignIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -252,7 +257,7 @@ export default function AnalyticsPage() {
                         <p className="text-2xl font-bold text-gray-900">{analytics.totalCampaigns || 0}</p>
                       </div>
                       <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
-                        📢
+                        <MegaphoneIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -267,7 +272,7 @@ export default function AnalyticsPage() {
                         <p className="text-2xl font-bold text-gray-900">${analytics.totalSpent?.toLocaleString() || 0}</p>
                       </div>
                       <div className="w-10 h-10 bg-red-100 rounded-none flex items-center justify-center">
-                        💳
+                        <CreditCardIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -284,7 +289,7 @@ export default function AnalyticsPage() {
                         </p>
                       </div>
                       <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
-                        🎯
+                        <CheckCircleIcon className="w-6 h-6" />
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -330,21 +335,21 @@ export default function AnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Acceptance Rate</span>
                       <span className="font-semibold text-green-600">
-                        {analytics.totalApplications ? 
+                        {analytics.totalApplications ?
                           Math.round(((analytics.acceptedApplications || 0) / analytics.totalApplications) * 100) : 0}%
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Completion Rate</span>
                       <span className="font-semibold text-blue-600">
-                        {analytics.acceptedApplications ? 
+                        {analytics.acceptedApplications ?
                           Math.round(((analytics.completedCampaigns || 0) / analytics.acceptedApplications) * 100) : 0}%
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Avg Earnings per Campaign</span>
                       <span className="font-semibold text-green-600">
-                        ${analytics.completedCampaigns ? 
+                        ${analytics.completedCampaigns ?
                           Math.round((analytics.totalEarnings || 0) / analytics.completedCampaigns).toLocaleString() : 0}
                       </span>
                     </div>
@@ -363,7 +368,7 @@ export default function AnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Success Rate</span>
                       <span className="font-semibold text-green-600">
-                        {analytics.totalCampaigns ? 
+                        {analytics.totalCampaigns ?
                           Math.round(((analytics.successfulCampaigns || 0) / analytics.totalCampaigns) * 100) : 0}%
                       </span>
                     </div>
@@ -389,14 +394,14 @@ export default function AnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Cost per Success</span>
                       <span className="font-semibold">
-                        ${analytics.successfulCampaigns ? 
+                        ${analytics.successfulCampaigns ?
                           Math.round((analytics.totalSpent || 0) / analytics.successfulCampaigns).toLocaleString() : 0}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Campaign Efficiency</span>
                       <span className="font-semibold text-purple-600">
-                        {analytics.totalCampaigns ? 
+                        {analytics.totalCampaigns ?
                           ((analytics.successfulCampaigns || 0) / analytics.totalCampaigns * 100).toFixed(1) : 0}% success rate
                       </span>
                     </div>
@@ -442,12 +447,12 @@ export default function AnalyticsPage() {
             <div className="text-6xl mb-4">📊</div>
             <h3 className="text-xl font-semibold mb-2">No Analytics Data Available</h3>
             <p className="text-gray-600 mb-6">
-              {userType === 'creator' 
-                ? 'Start applying to gigs to see your analytics!' 
+              {userType === 'creator'
+                ? 'Start applying to gigs to see your analytics!'
                 : 'Create your first campaign to see analytics data!'}
             </p>
-            <Link 
-              href={userType === 'creator' ? '/marketplace' : '/create-gig'} 
+            <Link
+              href={userType === 'creator' ? '/marketplace' : '/create-gig'}
               className="btn-primary"
             >
               {userType === 'creator' ? 'Browse Gigs' : 'Create Campaign'}

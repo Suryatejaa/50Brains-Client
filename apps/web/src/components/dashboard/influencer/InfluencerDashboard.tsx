@@ -8,10 +8,18 @@ import { WorkHistorySummary } from '@/components/WorkHistorySummary';
 import { WorkHistoryList } from '@/components/WorkHistoryList';
 import { Portfolio } from '@/components/Portfolio';
 import { Achievements } from '@/components/Achievements';
+import { DollarSignIcon, InstagramIcon, MegaphoneIcon, PartyPopperIcon, SmileIcon, TwitterIcon, UsersIcon, YoutubeIcon } from 'lucide-react';
+import { BarChartIcon, PhoneIcon, TargetIcon } from 'lucide-react';
+import { FileTextIcon, GlobeIcon, StarIcon } from 'lucide-react';
+import { TrophyIcon, TikTokIcon,    UserIcon } from 'lucide-react';
+import { LightbulbIcon } from 'lucide-react';
+import { TrendingUpIcon } from 'lucide-react';
 
 export const InfluencerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { data, loading, error, refresh } = useInfluencerDashboard();
+
+  console.log('🎯 Influencer Dashboard Data:', data);
 
   if (loading) {
     return (
@@ -62,21 +70,20 @@ export const InfluencerDashboard: React.FC = () => {
               <h1 className="text-heading text-xl font-bold md:text-2xl">
                 Influencer Dashboard
               </h1>
-              <p className="text-muted text-sm md:text-base">
-                Welcome back, {user?.username || user?.email || 'Influencer'}!
-                🎨
+              <p className="flex items-center gap-1 text-muted text-sm md:text-base">
+                Welcome back, {user?.username || user?.email || 'Influencer'}! <SmileIcon className="w-4 h-4" />
               </p>
             </div>
             <QuickActionsGrid
               actions={[
-                { label: 'Browse Gigs', href: '/marketplace', icon: '🎯' },
+                { label: 'Browse Gigs', href: '/marketplace', icon: <MegaphoneIcon className="w-6 h-6" /> },
                 {
                   label: 'My Applications',
                   href: '/my/applications',
-                  icon: '📋',
+                  icon: <FileTextIcon className="w-6 h-6" />,
                 },
-                { label: 'Analytics', href: '/analytics', icon: '📊' },
-                { label: 'Profile', href: '/profile', icon: '👤' },
+                { label: 'Analytics', href: '/analytics', icon: <BarChartIcon className="w-6 h-6" /> },
+                { label: 'Profile', href: '/profile', icon: <UserIcon className="w-6 h-6" /> },
               ]}
             />
           </div>
@@ -98,7 +105,7 @@ export const InfluencerDashboard: React.FC = () => {
                     : ''}
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">👥</div>
+              <div className="text-2xl md:text-3xl"><UsersIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -119,7 +126,7 @@ export const InfluencerDashboard: React.FC = () => {
                     '0'}
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">💰</div>
+              <div className="text-2xl md:text-3xl"><DollarSignIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -136,7 +143,7 @@ export const InfluencerDashboard: React.FC = () => {
                   {data?.campaignMetrics?.pendingApplications || 0} pending
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">🎯</div>
+              <div className="text-2xl md:text-3xl"><TargetIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -151,7 +158,7 @@ export const InfluencerDashboard: React.FC = () => {
                   Rating: {data?.campaignMetrics?.averageRating || 0}/5
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">⭐</div>
+              <div className="text-2xl md:text-3xl"><StarIcon className="w-6 h-6" /></div>
             </div>
           </div>
         </div>
@@ -166,7 +173,7 @@ export const InfluencerDashboard: React.FC = () => {
                 <h3 className="text-heading text-lg font-semibold">
                   Content Performance
                 </h3>
-                <div className="text-xl">📈</div>
+                <div className="text-xl"><TrendingUpIcon className="w-6 h-6" /></div>
               </div>
               <div className="grid grid-cols-3 gap-3 md:grid-cols-3">
                 <div className="text-center">
@@ -207,7 +214,7 @@ export const InfluencerDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Social Platforms
                   </h3>
-                  <div className="text-xl">🌐</div>
+                  <div className="text-xl"><GlobeIcon className="w-6 h-6" /></div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.socialPlatforms.map((platform, index) => (
@@ -217,16 +224,16 @@ export const InfluencerDashboard: React.FC = () => {
                     >
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="text-lg">
-                          {platform.platform === 'Instagram' && '📸'}
-                          {platform.platform === 'TikTok' && '🎵'}
-                          {platform.platform === 'YouTube' && '📺'}
-                          {platform.platform === 'Twitter' && '🐦'}
+                          {platform.platform === 'Instagram' && <InstagramIcon className="w-6 h-6" />}
+                            {platform.platform === 'TikTok' && <TikTokIcon className="w-6 h-6" />}
+                          {platform.platform === 'YouTube' && <YoutubeIcon className="w-6 h-6" />}
+                          {platform.platform === 'Twitter' && <TwitterIcon className="w-6 h-6" />}
                           {![
                             'Instagram',
                             'TikTok',
                             'YouTube',
                             'Twitter',
-                          ].includes(platform.platform) && '📱'}
+                          ].includes(platform.platform) && <PhoneIcon className="w-6 h-6" />}
                         </div>
                         <div>
                           <p className="text-heading text-sm font-medium md:text-base">
@@ -260,7 +267,7 @@ export const InfluencerDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Recent Campaigns
                   </h3>
-                  <div className="text-xl">🎯</div>
+                  <div className="text-xl"><TargetIcon className="w-6 h-6" /></div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.recentCampaigns.map((campaign) => (
@@ -305,7 +312,7 @@ export const InfluencerDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Work History & Portfolio
                   </h3>
-                  <div className="text-xl">📊</div>
+                  <div className="text-xl"><BarChartIcon className="w-6 h-6" /></div>
                 </div>
 
                 {/* Work History Summary */}
@@ -353,7 +360,7 @@ export const InfluencerDashboard: React.FC = () => {
             <div className="card-glass p-3 md:p-4">
               <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Earnings</h3>
-                <div className="text-xl">💰</div>
+                <div className="text-xl"><DollarSignIcon className="w-6 h-6" /></div>
               </div>
               <div className="space-y-2 md:space-y-3">
                 <div className="flex justify-between">
@@ -390,20 +397,20 @@ export const InfluencerDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Influencer Tier
                   </h3>
-                  <div className="text-xl">🏆</div>
+                  <div className="text-xl"><TrophyIcon className="w-6 h-6" /></div>
                 </div>
                 <div className="text-center">
                   <div className="text-brand-primary mb-2 text-2xl font-bold md:text-3xl">
                     {data.influencerTier.current}
                   </div>
                   <div className="mb-2 text-4xl">
-                    {data.influencerTier.current === 'BRONZE' && '🥉'}
-                    {data.influencerTier.current === 'SILVER' && '🥈'}
-                    {data.influencerTier.current === 'GOLD' && '🥇'}
-                    {data.influencerTier.current === 'DIAMOND' && '💎'}
+                    {data.influencerTier.current === 'BRONZE' && <TrophyIcon className="w-6 h-6" />}
+                    {data.influencerTier.current === 'SILVER' && <TrophyIcon className="w-6 h-6" />}
+                    {data.influencerTier.current === 'GOLD' && <TrophyIcon className="w-6 h-6" />}
+                    {data.influencerTier.current === 'DIAMOND' && <TrophyIcon className="w-6 h-6" />}
                     {!['BRONZE', 'SILVER', 'GOLD', 'DIAMOND'].includes(
                       data.influencerTier.current
-                    ) && '⭐'}
+                      ) && <StarIcon className="w-6 h-6" />}
                   </div>
                   <p className="text-muted mb-3 text-sm">
                     Score: {data.influencerTier.score}/100
@@ -435,7 +442,7 @@ export const InfluencerDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     For You
                   </h3>
-                  <div className="text-xl">💡</div>
+                  <div className="text-xl"><LightbulbIcon className="w-6 h-6" /></div>
                 </div>
                 {data.recommendations &&
                   'suggestedGigs' in data.recommendations &&

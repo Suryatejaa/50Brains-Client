@@ -5,6 +5,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { RocketIcon } from 'lucide-react';
+import { DollarSignIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
+import { CopyIcon } from 'lucide-react';
+import { BarChartIcon } from 'lucide-react';
+import { LineChartIcon } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -276,7 +283,9 @@ export default function CampaignsPage() {
                     <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
                     <p className="text-2xl font-bold text-gray-900">{campaigns.length}</p>
                   </div>
-                  <div className="text-2xl">📊</div>
+                  <div className="text-2xl">
+                    <BarChartIcon className="w-6 h-6" />
+                  </div>
                 </div>
               </div>
               
@@ -286,7 +295,9 @@ export default function CampaignsPage() {
                     <p className="text-sm font-medium text-gray-600">Active Campaigns</p>
                     <p className="text-2xl font-bold text-green-600">{activeCampaigns}</p>
                   </div>
-                  <div className="text-2xl">🚀</div>
+                  <div className="text-2xl">
+                    <RocketIcon className="w-6 h-6" />
+                  </div>
                 </div>
               </div>
               
@@ -296,7 +307,9 @@ export default function CampaignsPage() {
                     <p className="text-sm font-medium text-gray-600">Total Budget</p>
                     <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalBudget)}</p>
                   </div>
-                  <div className="text-2xl">💰</div>
+                  <div className="text-2xl">
+                    <DollarSignIcon className="w-6 h-6" />
+                  </div>
                 </div>
               </div>
               
@@ -306,7 +319,9 @@ export default function CampaignsPage() {
                     <p className="text-sm font-medium text-gray-600">Total Spent</p>
                     <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalSpent)}</p>
                   </div>
-                  <div className="text-2xl">📈</div>
+                  <div className="text-2xl">
+                    <LineChartIcon className="w-6 h-6" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -325,7 +340,7 @@ export default function CampaignsPage() {
                       className="input w-64 pl-10"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                      🔍
+                      <SearchIcon className="w-6 h-6" />
                     </div>
                   </div>
                   
@@ -377,7 +392,7 @@ export default function CampaignsPage() {
                     onClick={() => setView('grid')}
                     className={`p-2 rounded ${view === 'grid' ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-600'}`}
                   >
-                    ⊞
+                    <PlusIcon className="w-6 h-6" />
                   </button>
                   <button
                     onClick={() => setView('list')}
@@ -629,7 +644,7 @@ export default function CampaignsPage() {
                           className="btn-ghost-sm"
                           title="Duplicate"
                         >
-                          📋
+                          <CopyIcon className="w-6 h-6" />
                         </button>
                       </div>
                     </div>

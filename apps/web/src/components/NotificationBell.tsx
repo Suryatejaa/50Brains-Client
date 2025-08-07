@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNotificationBell } from '@/components/NotificationProvider';
 import Link from 'next/link';
 import { Notification } from '@/types/notification.types';
+import { BellIcon } from 'lucide-react';
 
 // Priority colors
 const priorityColors = {
@@ -39,7 +40,7 @@ export default function NotificationBell() {
 
     // Handle count display logic: show "9+" for counts > 9, then change to dot after 1 second
     useEffect(() => {
-        if (displayUnreadCount > 9) {
+        if (displayUnreadCount > 0) {
             // Clear any existing timeout
             if (dotTimeoutRef.current) {
                 clearTimeout(dotTimeoutRef.current);
@@ -156,7 +157,12 @@ export default function NotificationBell() {
     };
 
     const handleBellClick = async () => {
-        // Just toggle the dropdown - mark as read will happen automatically when opening
+        // Mark all as read and clear UI immediately
+        if (unreadCount > 0) {
+            setOptimisticUnreadCount(0);
+            setShowDot(false);
+            await handleMarkAllAsRead();
+        }
         setOpen((v) => !v);
     };
 
@@ -165,21 +171,23 @@ export default function NotificationBell() {
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="relative p-2  hover:bg-gray-100 rounded-full transition-colors"
                 onClick={handleBellClick}
                 aria-label="Notifications"
             >
-                <span className="text-xl">🔔</span>
+                <span className="text-xl">
+                    <BellIcon className="w-6 h-6" />
+                </span>
                 {displayUnreadCount > 0 && (
                     <>
                         {/* Show dot for counts > 9 after 1 second */}
-                        {displayUnreadCount > 9 && showDot ? (
-                            <span className="absolute top-1 right-1 bg-red-500 rounded-full h-3 w-3 flex items-center justify-center transition-all duration-300 ease-in-out">
+                        {displayUnreadCount > 0 && showDot ? (
+                            <span className="absolute top-0 right-0 sm:top-1 sm:right-1 bg-red-500 rounded-full h-3 w-3 flex items-center justify-center transition-all duration-300 ease-in-out">
                                 <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                             </span>
                         ) : (
                             /* Show count or "9+" for counts > 9 initially */
-                            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium transition-all duration-300 ease-in-out">
+                            <span className="absolute top-0 right-0 sm:top-1 sm:right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium transition-all duration-300 ease-in-out">
                                 {displayUnreadCount > 9 ? '9+' : displayUnreadCount}
                             </span>
                         )}
@@ -196,16 +204,11 @@ export default function NotificationBell() {
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 w-80 bg-white shadow-xl rounded-lg z-50 border border-gray-200">
+                <div className="absolute -right-8 mt-2 w-80 bg-white shadow-xl rounded-lg z-50 border border-gray-200">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                         <span className="font-semibold text-gray-900">Notifications</span>
                         <div className="flex items-center space-x-2">
-                            {isMarkingAsRead && (
-                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                                    Marking as read...
-                                </span>
-                            )}
                             {!isConnected && connectionStatus !== 'connected' && (
                                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                                     {connectionStatus === 'error' ? 'Connection error' :

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Notification, NotificationPreferences } from '@/types/notification.types';
 import { toast } from 'sonner';
 import NotificationDebugger from '@/components/debug/NotificationDebugger';
+import { RefreshCcwIcon } from 'lucide-react';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
@@ -257,19 +258,7 @@ export default function NotificationsPage() {
         <div className="bg-white rounded-lg shadow-sm p-1 mb-1">
           <div className="flex items-center justify-between mb-1">
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-            <div className="flex space-x-2">
-              {/* <button
-                onClick={() => setShowPreferences(!showPreferences)}
-                className="px-1 py-1 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-              >
-                Preferences
-              </button>
-              <button
-                onClick={handleMarkAllAsRead}
-                className="px-1 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
-              >
-                Mark all as read
-              </button> */}
+            <div className="flex space-x-2">              
               <button
                 onClick={() => {
                   fetchNotifications();
@@ -277,14 +266,8 @@ export default function NotificationsPage() {
                 }}
                 className="px-1 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
               >
-                Refresh
-              </button>
-              <button
-                onClick={handleClearAll}
-                className="px-1 py-1 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
-              >
-                Clear all
-              </button>
+                <RefreshCcwIcon className="w-4 h-4" />
+              </button>            
             </div>
           </div>
 
@@ -508,7 +491,7 @@ export default function NotificationsPage() {
         {/* Debug Section - Only show in development */}
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-8">
-            <NotificationDebugger />
+            {/* <NotificationDebugger /> */}
           </div>
         )}
       </div>

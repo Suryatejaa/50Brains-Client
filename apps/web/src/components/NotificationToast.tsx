@@ -65,6 +65,7 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
                         },
                     },
                     dismissible: true,
+                    className: 'mt-10',
                 }
             );
 
@@ -112,6 +113,7 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
                                 },
                             },
                             dismissible: true,
+                            className: 'mt-10',
                         }
                     );
 
@@ -161,6 +163,7 @@ export function useNotificationToast() {
                     onClick: () => markNotificationAsRead(notification.id),
                 },
                 dismissible: true,
+                className: 'mt-10',
             }
         );
     };

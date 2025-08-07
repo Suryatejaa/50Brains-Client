@@ -8,6 +8,8 @@ import { WorkHistorySummary } from '@/components/WorkHistorySummary';
 import { WorkHistoryList } from '@/components/WorkHistoryList';
 import { Portfolio } from '@/components/Portfolio';
 import { Achievements } from '@/components/Achievements';
+import { TargetIcon, VideoIcon, WrenchIcon, BarChartIcon, MegaphoneIcon, TrendingUpIcon, SmileIcon, DollarSignIcon, FileTextIcon, UserIcon } from 'lucide-react';
+import { Handshake } from 'lucide-react';
 
 export const CrewDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -62,17 +64,16 @@ export const CrewDashboard: React.FC = () => {
               <h1 className="text-heading text-xl font-bold md:text-2xl">
                 Crew Dashboard
               </h1>
-              <p className="text-muted text-sm md:text-base">
-                Welcome back, {user?.username || user?.email || 'Crew Member'}!
-                🎬
+              <p className="flex items-center gap-1 text-muted text-sm md:text-base">
+                Welcome back, {user?.username || user?.email || 'Crew Member'}! <SmileIcon className="w-4 h-4" />
               </p>
             </div>
             <QuickActionsGrid
               actions={[
-                { label: 'Browse Projects', href: '/marketplace', icon: '🎬' },
-                { label: 'My Bids', href: '/my-bids', icon: '📋' },
-                { label: 'Equipment', href: '/equipment', icon: '📹' },
-                { label: 'Profile', href: '/profile', icon: '👤' },
+                { label: 'Browse Projects', href: '/marketplace', icon: <VideoIcon className="w-6 h-6" /> },
+                { label: 'My Bids', href: '/my-bids', icon: <FileTextIcon className="w-6 h-6" /> },
+                { label: 'Equipment', href: '/equipment', icon: <VideoIcon className="w-6 h-6" /> },
+                { label: 'Profile', href: '/profile', icon: <UserIcon className="w-6 h-6" /> },
               ]}
             />
           </div>
@@ -91,7 +92,7 @@ export const CrewDashboard: React.FC = () => {
                   {data?.projectMetrics?.pendingBids || 0} pending bids
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">🎬</div>
+              <div className="text-2xl md:text-3xl"><VideoIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -110,7 +111,7 @@ export const CrewDashboard: React.FC = () => {
                     '0'}
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">💰</div>
+                  <div className="text-2xl md:text-3xl"><DollarSignIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -125,7 +126,7 @@ export const CrewDashboard: React.FC = () => {
                   {data?.projectMetrics?.onTimeDelivery || 0}% on time
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">🎯</div>
+              <div className="text-2xl md:text-3xl"><TargetIcon className="w-6 h-6" /></div>
             </div>
           </div>
 
@@ -140,7 +141,7 @@ export const CrewDashboard: React.FC = () => {
                   {data?.skillMetrics?.expertiseLevel || 'Beginner'}
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl">🛠️</div>
+              <div className="text-2xl md:text-3xl"><WrenchIcon className="w-6 h-6" /></div>
             </div>
           </div>
         </div>
@@ -155,7 +156,7 @@ export const CrewDashboard: React.FC = () => {
                 <h3 className="text-heading text-lg font-semibold">
                   Project Performance
                 </h3>
-                <div className="text-xl">📊</div>
+                <div className="text-xl"><BarChartIcon className="w-6 h-6" /></div>
               </div>
               <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
                 <div className="text-center">
@@ -196,7 +197,7 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Recent Projects
                   </h3>
-                  <div className="text-xl">🎬</div>
+                  <div className="text-xl"><MegaphoneIcon className="w-6 h-6" /></div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.recentProjects.map((project) => (
@@ -256,7 +257,7 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Work History & Portfolio
                   </h3>
-                  <div className="text-xl">📊</div>
+                  <div className="text-xl"><BarChartIcon className="w-6 h-6" /></div>
                 </div>
 
                 {/* Work History Summary */}
@@ -304,7 +305,7 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Top Clients
                   </h3>
-                  <div className="text-xl">🤝</div>
+                  <div className="text-xl"><Handshake className="w-6 h-6" /></div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.clientHistory.slice(0, 5).map((client) => (
@@ -345,7 +346,7 @@ export const CrewDashboard: React.FC = () => {
             <div className="card-glass p-2 md:p-2">
               <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Skills</h3>
-                <div className="text-xl">🛠️</div>
+                <div className="text-xl"><WrenchIcon className="w-6 h-6" /></div>
               </div>
               <div className="space-y-2 md:space-y-3">
                 <div className="flex justify-between">
@@ -405,7 +406,7 @@ export const CrewDashboard: React.FC = () => {
             <div className="card-glass p-2 md:p-4">
               <div className="mb-1 flex items-center justify-between md:mb-1">
                 <h3 className="text-heading text-lg font-semibold">Business</h3>
-                <div className="text-xl">📈</div>
+                <div className="text-xl"><TrendingUpIcon className="w-6 h-6" /></div>
               </div>
               <div className="space-y-2 md:space-y-3">
                 <div className="flex justify-between">
@@ -444,7 +445,7 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Equipment
                   </h3>
-                  <div className="text-xl">📹</div>
+                  <div className="text-xl"><VideoIcon className="w-6 h-6" /></div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.equipmentPortfolio.map((category, index) => (
@@ -490,7 +491,7 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Opportunities
                   </h3>
-                  <div className="text-xl">🎯</div>
+                  <div className="text-xl"><TargetIcon className="w-6 h-6" /></div>
                 </div>
                 {data.opportunities.matchedProjects?.length > 0 && (
                   <div className="mb-3 md:mb-4">
@@ -533,7 +534,7 @@ export const CrewDashboard: React.FC = () => {
             )}
           </div>
 
-          
+
         </div>
       </div>
     </div>

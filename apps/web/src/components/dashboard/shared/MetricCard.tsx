@@ -5,7 +5,7 @@ import React from 'react';
 interface MetricCardProps {
   title: string;
   value: string | number;
-  icon: string;
+  icon: React.ReactNode;
   trend?: number;
   urgent?: boolean;
   loading?: boolean;

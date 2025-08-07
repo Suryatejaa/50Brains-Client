@@ -5,7 +5,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 
 interface QuickActionButtonProps {
   href: string;
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   permission?: string;
   description?: string;
@@ -87,7 +87,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
 }) => {
   return (
     <div className="card-glass dashboard-card-padding">
-      <h3 className="text-heading mb-mobile text-lg font-semibold">{title}</h3>
+      <h3 className="flex items-center gap-2 text-heading mb-mobile text-lg font-semibold">{title}</h3>
       <div className="dashboard-grid-gap grid grid-cols-2 md:grid-cols-4">
         {actions.map((action, index) => (
           <QuickActionButton key={index} {...action} />
