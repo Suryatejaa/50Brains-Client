@@ -6,6 +6,9 @@ import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useClanSearch } from '@/hooks/useClanSearch';
+import { useMemberSuggest } from '@/hooks/useMemberSuggest';
+import { useMyClans, useClanMembers } from '@/hooks/useClans';
 
 interface Gig {
   id: string;
@@ -60,6 +63,12 @@ interface Application {
   proposedRate?: number;
   estimatedTime?: string;
   applicantType: 'user' | 'clan';
+  // Clan-only fields
+  clanId?: string;
+  clanSlug?: string;
+  teamPlan?: Array<{ role: string; memberId: string; hours?: number; deliverables?: string[] }>;
+  milestonePlan?: Array<{ title: string; dueAt: string; amount: number; deliverables?: string[] }>;
+  payoutSplit?: Array<{ memberId: string; percentage?: number; fixedAmount?: number }>;
 }
 
 export default function GigDetailsPage() {
@@ -260,15 +269,7 @@ export default function GigDetailsPage() {
 
       if (response.success && response.data) {
         const gigData = response.data as Gig;
-        console.log('🎯 Loaded gig data:', {
-          id: gigData.id,
-          title: gigData.title,
-          isApplied: gigData.isApplied,
-          status: gigData.status,
-          applicationCount: gigData._count?.applications,
-          updatedAt: gigData.updatedAt,
-          forceRefresh
-        });
+        console.log('🎯 Loaded gig data:', gigData);
         setGig(gigData);
       } else {
         // Go back to previous page or fallback to marketplace
@@ -332,8 +333,8 @@ export default function GigDetailsPage() {
       // Convert portfolio to string array format expected by backend
       const portfolioUrls = application.portfolio.map(item => item.url).filter(url => url.trim());
 
-      // Prepare application data
-      const applicationData = {
+      // Base payload
+      let applicationData: any = {
         proposal: application.coverLetter.trim(),
         portfolio: portfolioUrls,
         quotedPrice: application.proposedRate || 0,
@@ -341,9 +342,97 @@ export default function GigDetailsPage() {
         applicantType: application.applicantType
       };
 
+      if (application.applicantType === 'clan') {
+        // Require a clan selection only
+        if (!(application.clanSlug?.trim() || application.clanId?.trim())) {
+          showToast('warning', 'Please select your clan (slug or ID)');
+          return;
+        }
+
+        // Enforce proposed price not exceeding gig max budget (if provided)
+        if (gig?.budgetMax && (Number(application.proposedRate || 0) > Number(gig.budgetMax))) {
+          showToast('warning', `Proposed price (₹${application.proposedRate}) cannot exceed gig max budget (₹${gig.budgetMax}).`);
+          return;
+        }
+
+        // If milestones provided, ensure valid and within proposed price
+        if ((application.milestonePlan?.length || 0) > 0) {
+          const milestoneInvalid = (application.milestonePlan || []).some((ms: any) => !ms.title?.trim() || !ms.dueAt || (Number(ms.amount) || 0) <= 0);
+          if (milestoneInvalid) {
+            showToast('warning', 'Each milestone needs title, due date, and amount > 0');
+            return;
+          }
+          const totalMilestoneAmount = (application.milestonePlan || []).reduce((sum: number, ms: any) => sum + (Number(ms.amount) || 0), 0);
+          const proposedTotal = Number(application.proposedRate || 0);
+          if (proposedTotal > 0 && totalMilestoneAmount > proposedTotal) {
+            showToast('warning', `Total milestone amount (₹${totalMilestoneAmount}) cannot exceed proposed price (₹${proposedTotal}).`);
+            return;
+          }
+        }
+
+        // If payout provided, ensure each entry has some value
+        if ((application.payoutSplit?.length || 0) > 0) {
+          const payoutInvalid = (application.payoutSplit || []).some((p: any) => (Number(p.percentage) || 0) <= 0 && (Number(p.fixedAmount) || 0) <= 0);
+          if (payoutInvalid) {
+            showToast('warning', 'Each payout entry must have percentage or fixed amount > 0');
+            return;
+          }
+        }
+
+        // If team provided, ensure each entry has role and hours
+        if ((application.teamPlan?.length || 0) > 0) {
+          const teamInvalid = (application.teamPlan || []).some((m: any) => !m.role?.trim() || (Number(m.hours) || 0) <= 0);
+          if (teamInvalid) {
+            showToast('warning', 'Each team member must have a role and hours > 0');
+            return;
+          }
+        }
+
+        const sanitize = (list: any[]) => (list || []).map((s: any) => String(s).replace(/,+$/, '').trim()).filter(Boolean);
+        const toIdentifier = (m: any) => {
+          const uuidLike = typeof m.username === 'string' && /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-/.test(m.username);
+          const id = m.memberId || (uuidLike ? m.username : undefined);
+          return id ? { memberId: id } : (m.username ? { username: m.username } : {});
+        };
+
+        applicationData = {
+          ...applicationData,
+          applicantType: 'clan',
+          clanSlug: application.clanSlug?.trim(),
+          ...(application.clanId?.trim() ? { clanId: application.clanId.trim() } : {}),
+          ...(application.teamPlan && application.teamPlan.length > 0 ? {
+            teamPlan: application.teamPlan.map((m: any) => ({
+              role: m.role,
+              ...toIdentifier(m),
+              ...(m.email ? { email: m.email } : {}),
+              hours: m.hours,
+              deliverables: sanitize(m.deliverables)
+            }))
+          } : {}),
+          ...(application.milestonePlan && application.milestonePlan.length > 0 ? {
+            milestonePlan: application.milestonePlan.map((ms: any) => ({
+              title: ms.title,
+              dueAt: ms.dueAt,
+              amount: ms.amount,
+              deliverables: sanitize(ms.deliverables)
+            }))
+          } : {}),
+          ...(application.payoutSplit && application.payoutSplit.length > 0 ? {
+            payoutSplit: application.payoutSplit.map((p: any) => ({
+              ...toIdentifier(p),
+              ...(p.email ? { email: p.email } : {}),
+              percentage: p.percentage,
+              fixedAmount: p.fixedAmount
+            }))
+          } : {})
+        };
+      }
+
       console.log('🚀 Sending application data:', applicationData);
       console.log('🔑 User info:', { id: user.id, email: user.email });
       console.log('🎯 Gig ID:', gigId);
+
+      console.log('🚀 Application data:', applicationData);
 
       const response = await apiClient.post(`/api/gig/${gigId}/apply`, applicationData);
 
@@ -363,6 +452,11 @@ export default function GigDetailsPage() {
 
         // Show success message
         showToast('success', 'Application submitted successfully! The brand will review your application soon.');
+
+        // If applied as clan, navigate to the workflow to assign tasks
+        if (application.applicantType === 'clan' && application.clanId) {
+          router.push(`/clan/${application.clanId}/gig-workflow?gigId=${gigId}&tab=tasks`);
+        }
       }
     } catch (error: any) {
       console.error('❌ Failed to apply to gig:', error);
@@ -437,6 +531,62 @@ export default function GigDetailsPage() {
     }));
   };
 
+  // Add mobile-optimized styles for select elements
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @media (max-width: 768px) {
+        select {
+          max-width: 100vw !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          word-wrap: break-word !important;
+          white-space: nowrap !important;
+          box-sizing: border-box !important;
+        }
+        select option {
+          max-width: 100vw !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+          font-size: 14px !important;
+          padding: 8px !important;
+        }
+        .application-modal {
+          max-width: calc(100vw - 16px) !important;
+          width: calc(100vw - 16px) !important;
+        }
+        .application-modal select,
+        .application-modal input,
+        .application-modal textarea {
+          max-width: 100% !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .application-modal select option {
+          max-width: calc(100vw - 32px) !important;
+          width: calc(100vw - 32px) !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+        /* Force mobile-friendly select behavior */
+        select:focus {
+          max-width: 100% !important;
+          width: 100% !important;
+        }
+        select:focus option {
+          max-width: 100% !important;
+          width: 100% !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -470,7 +620,7 @@ export default function GigDetailsPage() {
     (gig.status === 'OPEN' || gig.status === 'ACTIVE') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
-  console.log('🔍 Gig details:', gig);
+  // console.log('🔍 Gig details:', gig);
 
   return (
     <div className="min-h-screen bg-gray-50 py-2">
@@ -505,7 +655,7 @@ export default function GigDetailsPage() {
                       className="text-sm cursor-pointer text-blue-600 hover:underline"
                       title="Review and complete your draft gig before publishing"
                     >
-                      � Complete & Publish
+                      Complete & Publish
                     </button>
                   )}
                   <span> | </span>
@@ -754,7 +904,7 @@ export default function GigDetailsPage() {
                 <h3 className="font-semibold mb-3">👥 Team Applications</h3>
                 <span className={`px-3 py-1 rounded-none text-sm ${gig.isClanAllowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                  {gig.isClanAllowed ? 'Team applications allowed' : 'Individual applications only'}
+                  {gig.isClanAllowed ? 'Clan applications allowed' : 'Individual applications only'}
                 </span>
               </div>
             </div>
@@ -800,7 +950,7 @@ export default function GigDetailsPage() {
                       onClick={handlePublishDraft}
                       className="btn-primary w-full"
                     >
-                      � Complete & Publish
+                      Complete & Publish
                     </button>
                   )}
                 </div>
@@ -884,41 +1034,38 @@ export default function GigDetailsPage() {
 
         {/* Application Form Modal */}
         {showApplicationForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Apply to: {gig.title}</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1">
+            <div className="bg-white w-full max-w-[85vw] -mt-10 max-h-[85vh] overflow-y-auto mx-2 application-modal" style={{ maxWidth: 'calc(100vw - 8px)' }}>
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-bold truncate flex-1 mr-2">Apply to: {gig.title}</h2>
                   <button
                     onClick={() => setShowApplicationForm(false)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 flex-shrink-0"
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-3">
                   {/* Cover Letter */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Cover Letter *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter *</label>
                     <textarea
                       value={application.coverLetter}
                       onChange={(e) => setApplication(prev => ({ ...prev, coverLetter: e.target.value }))}
-                      rows={6}
-                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={4}
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       placeholder="Tell the brand why you're perfect for this campaign..."
+                      style={{ maxWidth: '100%' }}
                     />
                   </div>
 
                   {/* Proposed Rate */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Proposed Rate (optional)
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Proposed Rate (optional)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                      <span className="absolute left-3 top-2 text-gray-500 text-sm">₹</span>
                       <input
                         type="number"
                         value={application.proposedRate || ''}
@@ -926,89 +1073,112 @@ export default function GigDetailsPage() {
                           ...prev,
                           proposedRate: e.target.value ? Number(e.target.value) : undefined
                         }))}
-                        className="w-full border border-gray-300 rounded-none pl-8 pr-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full border border-gray-300 rounded-none pl-8 pr-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         placeholder="Your rate for this campaign"
+                        style={{ maxWidth: '100%' }}
                       />
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Budget: ₹{gig.budgetMin?.toLocaleString()}{gig.budgetMax && gig.budgetMax !== gig.budgetMin ? ` - ₹${gig.budgetMax?.toLocaleString()}` : ''} ({gig.budgetType})
                     </p>
                   </div>
 
                   {/* Estimated Time */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Estimated Time to Complete *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Time to Complete *</label>
                     <select
                       value={application.estimatedTime}
                       onChange={(e) => setApplication(prev => ({ ...prev, estimatedTime: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      style={{
+                        fontSize: '14px',
+                        maxWidth: '100%',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
                     >
-                      <option value="">Select estimated time</option>
-                      <option value="1-3 days">1-3 days</option>
-                      <option value="4-7 days">4-7 days</option>
-                      <option value="1-2 weeks">1-2 weeks</option>
-                      <option value="2-4 weeks">2-4 weeks</option>
-                      <option value="1-2 months">1-2 months</option>
-                      <option value="2+ months">2+ months</option>
+                      <option value="" style={{ fontSize: '14px' }}>Select estimated time</option>
+                      <option value="1-3 days" style={{ fontSize: '14px' }}>1-3 days</option>
+                      <option value="4-7 days" style={{ fontSize: '14px' }}>4-7 days</option>
+                      <option value="1-2 weeks" style={{ fontSize: '14px' }}>1-2 weeks</option>
+                      <option value="2-4 weeks" style={{ fontSize: '14px' }}>2-4 weeks</option>
+                      <option value="1-2 months" style={{ fontSize: '14px' }}>1-2 months</option>
+                      <option value="2+ months" style={{ fontSize: '14px' }}>2+ months</option>
                     </select>
                   </div>
 
                   {/* Application Type */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Application Type
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Application Type</label>
                     <select
                       value={application.applicantType}
                       onChange={(e) => setApplication(prev => ({ ...prev, applicantType: e.target.value as 'user' | 'clan' }))}
-                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      style={{
+                        fontSize: '14px',
+                        maxWidth: '100%',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
                     >
-                      <option value="user">Individual Application</option>
-                      {gig.isClanAllowed && <option value="clan">Team/Clan Application</option>}
+                      <option value="user" style={{ fontSize: '14px' }}>Individual Application</option>
+                      {gig.isClanAllowed && <option value="clan" style={{ fontSize: '14px' }}>Clan Application</option>}
                     </select>
                     {!gig.isClanAllowed && (
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 mt-1">
                         This gig only accepts individual applications
                       </p>
                     )}
                   </div>
 
+                  {/* Clan-only Fields */}
+                  {application.applicantType === 'clan' && (
+                    <ClanApplyExtras
+                      application={application}
+                      setApplication={setApplication}
+                    />
+                  )}
+
                   {/* Portfolio */}
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-1">
                       <label className="block text-sm font-medium text-gray-700">
                         Portfolio Examples
                       </label>
                       <button
                         onClick={addPortfolioItem}
-                        className="btn-ghost btn-sm text-blue-600"
+                        className="btn-ghost btn-sm text-blue-600 text-xs"
                       >
                         + Add Item
                       </button>
                     </div>
 
                     {application.portfolio.map((item, index) => (
-                      <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                      <div key={index} className="grid grid-cols-1 gap-2 mb-2">
                         <input
                           type="text"
                           value={item.title}
                           onChange={(e) => updatePortfolioItem(index, 'title', e.target.value)}
-                          className="border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                           placeholder="Title"
+                          style={{ maxWidth: '100%' }}
                         />
                         <div className="flex space-x-2">
                           <input
                             type="url"
                             value={item.url}
                             onChange={(e) => updatePortfolioItem(index, 'url', e.target.value)}
-                            className="flex-1 border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="flex-1 border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                             placeholder="URL"
+                            style={{ maxWidth: '100%' }}
                           />
                           <button
                             onClick={() => removePortfolioItem(index)}
-                            className="btn-ghost btn-sm text-red-600"
+                            className="btn-ghost btn-sm text-red-600 text-xs px-2"
                           >
                             Remove
                           </button>
@@ -1017,20 +1187,20 @@ export default function GigDetailsPage() {
                     ))}
                   </div>
 
-                  {/* Submit */}
-                  <div className="flex space-x-3 pt-4">
+                  {/* Submit Buttons */}
+                  <div className="flex gap-2 pt-2">
                     <button
                       onClick={() => setShowApplicationForm(false)}
-                      className="flex-1 btn-secondary"
+                      className="flex-1 btn-secondary text-sm py-2"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleApply}
                       disabled={application.coverLetter.trim().length < 10 || !application.estimatedTime || isApplying}
-                      className="flex-1 btn-primary disabled:opacity-50"
+                      className="flex-1 btn-primary disabled:opacity-50 text-sm py-0"
                     >
-                      {isApplying ? 'Applying...' : 'Submit Application'}
+                      {isApplying ? 'Applying...' : 'Apply'}
                     </button>
                   </div>
                 </div>
@@ -1064,6 +1234,347 @@ export default function GigDetailsPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// --- Clan extras subcomponent ---
+function ClanApplyExtras({ application, setApplication }: {
+  application: any;
+  setApplication: React.Dispatch<React.SetStateAction<any>>;
+}) {
+  const { clans: myClans, loading: clansLoading } = useMyClans();
+  const { members: clanMembers, loading: membersLoading } = useClanMembers(application.clanId);
+
+  const handleClanChange = (clanId: string) => {
+    const selectedClan = myClans.find(clan => clan.id === clanId);
+    setApplication((prev: any) => ({
+      ...prev,
+      clanId: clanId,
+      clanSlug: selectedClan?.slug || '',
+      clanName: selectedClan?.name || ''
+    }));
+  };
+
+  const handleMemberSelect = (member: any, type: 'team' | 'payout') => {
+    if (type === 'team') {
+      setApplication((prev: any) => ({
+        ...prev,
+        teamPlan: [...(prev.teamPlan || []), {
+          role: '',
+          memberId: member.userId,
+          username: member.username || member.user?.username || member.email,
+          email: member.email,
+          hours: 0,
+          deliverables: []
+        }]
+      }));
+    } else {
+      setApplication((prev: any) => ({
+        ...prev,
+        payoutSplit: [...(prev.payoutSplit || []), {
+          memberId: member.userId,
+          username: member.username || member.user?.username || member.email,
+          email: member.email,
+          percentage: 0
+        }]
+      }));
+    }
+  };
+
+  // Helpers to edit team plan entries
+  const updateTeamMember = (index: number, field: string, value: any) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      teamPlan: (prev.teamPlan || []).map((m: any, i: number) => i === index ? { ...m, [field]: value } : m)
+    }));
+  };
+  const removeTeamMember = (index: number) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      teamPlan: (prev.teamPlan || []).filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  // Helpers to edit payout split
+  const updatePayout = (index: number, field: string, value: any) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      payoutSplit: (prev.payoutSplit || []).map((p: any, i: number) => i === index ? { ...p, [field]: value } : p)
+    }));
+  };
+  const removePayout = (index: number) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      payoutSplit: (prev.payoutSplit || []).filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  // Helpers to edit milestones
+  const addMilestone = () => {
+    setApplication((prev: any) => ({
+      ...prev,
+      milestonePlan: [
+        ...(prev.milestonePlan || []),
+        { title: '', dueAt: new Date().toISOString().slice(0, 10), amount: 0, deliverables: [] }
+      ]
+    }));
+  };
+  const updateMilestone = (index: number, field: string, value: any) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      milestonePlan: (prev.milestonePlan || []).map((m: any, i: number) => i === index ? { ...m, [field]: value } : m)
+    }));
+  };
+  const removeMilestone = (index: number) => {
+    setApplication((prev: any) => ({
+      ...prev,
+      milestonePlan: (prev.milestonePlan || []).filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Clan Selector */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Select Clan *</label>
+        <select
+          value={application.clanId || ''}
+          onChange={(e) => handleClanChange(e.target.value)}
+          className="w-full border border-gray-300 rounded-none px-3 py-2 text-sm"
+          disabled={clansLoading}
+          style={{
+            fontSize: '14px',
+            maxWidth: '100%',
+            width: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          <option value="" style={{ fontSize: '14px' }}>Select a clan...</option>
+          {myClans.map((clan: any) => (
+            <option key={clan.id} value={clan.id} style={{ fontSize: '14px' }}>
+              {clan.name.length > 20 ? `${clan.name.substring(0, 20)}...` : clan.name}
+            </option>
+          ))}
+        </select>
+        {clansLoading && (
+          <p className="text-xs text-gray-500 mt-1">Loading your clans...</p>
+        )}
+        {application.clanId && (
+          <p className="text-xs text-gray-500 mt-1 truncate">
+            Selected: {myClans.find((c: any) => c.id === application.clanId)?.name}
+          </p>
+        )}
+      </div>
+
+      {/* Clan Members List (optional) */}
+      {application.clanId && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Clan Members</label>
+          {membersLoading ? (
+            <p className="text-xs text-gray-500">Loading members...</p>
+          ) : clanMembers.length > 0 ? (
+            <div className="border rounded p-2 bg-gray-50">
+              <p className="text-xs text-gray-600 mb-1">Click to add members to your application:</p>
+              <div className="space-y-1">
+                {clanMembers.map((member: any) => (
+                  <div key={member.id} className="flex items-center justify-between p-1.5 bg-white rounded border text-xs">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">
+                        {member.user?.name || member.user?.username || member.username || member.email || member.userId || 'Unknown Member'}
+                      </div>
+                      <div className="text-gray-500 truncate">
+                        Role: {member.role}
+                      </div>
+                    </div>
+                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleMemberSelect(member, 'team')}
+                        className="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 whitespace-nowrap"
+                      >
+                        + Team
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMemberSelect(member, 'payout')}
+                        className="px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 whitespace-nowrap"
+                      >
+                        + Payout
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-gray-500">No members found in this clan.</p>
+          )}
+        </div>
+      )}
+
+      {/* Selected Team Plan (optional) */}
+      {(application.teamPlan && application.teamPlan.length > 0) && (
+        <div className="border rounded p-2">
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-sm font-medium">Selected Team</h4>
+          </div>
+          <p className="text-[11px] text-gray-500 mb-2">Assign a role and estimated hours for each team member.</p>
+          <div className="space-y-1">
+            {application.teamPlan.map((m: any, idx: number) => (
+              <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                <div className="text-xs truncate" aria-label="Team member username">{m.username || m.email}</div>
+                <div>
+                  <label className="block text-[11px] text-gray-600 mb-0.5">Role</label>
+                  <input
+                    value={m.role}
+                    onChange={(e) => updateTeamMember(idx, 'role', e.target.value)}
+                    placeholder="e.g., Editor, Director"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Role"
+                  />
+                  <label className="block text-[11px] text-gray-600 mt-2 mb-0.5">Deliverables</label>
+                  <textarea
+                    rows={2}
+                    value={(m.deliverables || []).join('\n')}
+                    onChange={(e) => updateTeamMember(idx, 'deliverables', (e.target.value || '').split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean))}
+                    placeholder="One per line (e.g. First cut)"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Team member deliverables"
+                  />
+                </div>
+                <div className="flex items-start gap-1">
+                  <div className="flex-1">
+                    <label className="block text-[11px] text-gray-600 mb-0.5">Hours</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={m.hours || 0}
+                      onChange={(e) => updateTeamMember(idx, 'hours', Number(e.target.value) || 0)}
+                      placeholder="e.g., 10"
+                      className="border px-2 py-1 text-xs w-full"
+                      aria-label="Estimated hours"
+                    />
+                  </div>
+                  <button onClick={() => removeTeamMember(idx)} className="text-red-600 text-xs mt-6" aria-label="Remove team member">Remove</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Milestone Plan (optional) */}
+      <div className="border rounded p-2">
+        <div className="flex items-center justify-between mb-1">
+          <h4 className="text-sm font-medium">Milestones</h4>
+          <button type="button" onClick={addMilestone} className="text-xs text-blue-600" aria-label="Add milestone">+ Add</button>
+        </div>
+        <p className="text-[11px] text-gray-500 mb-2">Break down the work and budget into phases.</p>
+        {(application.milestonePlan && application.milestonePlan.length > 0) ? (
+          <div className="space-y-2">
+            {application.milestonePlan.map((ms: any, i: number) => (
+              <div key={i} className="grid grid-cols-3 gap-2 items-center">
+                <div>
+                  <label className="block text-[11px] text-gray-600 mb-0.5">Title</label>
+                  <input
+                    value={ms.title}
+                    onChange={(e) => updateMilestone(i, 'title', e.target.value)}
+                    placeholder="e.g., Pre-production"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Milestone title"
+                  />
+                  <label className="block text-[11px] text-gray-600 mt-2 mb-0.5">Deliverables</label>
+                  <textarea
+                    rows={2}
+                    value={(ms.deliverables || []).join('\n')}
+                    onChange={(e) => updateMilestone(i, 'deliverables', (e.target.value || '').split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean))}
+                    placeholder="One per line (e.g. Script)"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Milestone deliverables"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-600 mb-0.5">Due date</label>
+                  <input
+                    type="date"
+                    value={(ms.dueAt || '').slice(0, 10)}
+                    onChange={(e) => updateMilestone(i, 'dueAt', e.target.value)}
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Milestone due date"
+                  />
+                </div>
+                <div className="flex items-start gap-1">
+                  <div className="flex-1">
+                    <label className="block text-[11px] text-gray-600 mb-0.5">Amount (₹)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={ms.amount || 0}
+                      onChange={(e) => updateMilestone(i, 'amount', Number(e.target.value) || 0)}
+                      placeholder="e.g., 1500"
+                      className="border px-2 py-1 text-xs w-full"
+                      aria-label="Milestone amount"
+                    />
+                  </div>
+                  <button type="button" onClick={() => removeMilestone(i)} className="text-red-600 text-xs mt-6" aria-label="Remove milestone">Remove</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-gray-500">Add at least one milestone.</p>
+        )}
+      </div>
+
+      {/* Payout Split (optional) */}
+      {(application.payoutSplit && application.payoutSplit.length > 0) && (
+        <div className="border rounded p-2">
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-sm font-medium">Payout Split</h4>
+          </div>
+          <p className="text-[11px] text-gray-500 mb-2">Set each member's payout percentage (typically totals 100%).</p>
+          <div className="space-y-1">
+            {application.payoutSplit.map((p: any, idx: number) => (
+              <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                <div className="text-xs truncate" aria-label="Payout member username">{p.username || p.email}</div>
+                <div>
+                  <label className="block text-[11px] text-gray-600 mb-0.5">Percentage</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={p.percentage || 0}
+                    onChange={(e) => updatePayout(idx, 'percentage', Number(e.target.value) || 0)}
+                    placeholder="e.g., 50"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Payout percentage"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-600 mb-0.5">Fixed Amount (₹, optional)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={p.fixedAmount || 0}
+                    onChange={(e) => updatePayout(idx, 'fixedAmount', Number(e.target.value) || 0)}
+                    placeholder="e.g., 1000"
+                    className="border px-2 py-1 text-xs w-full"
+                    aria-label="Payout fixed amount"
+                  />
+                </div>
+                <button onClick={() => removePayout(idx)} className="text-red-600 text-xs mt-4" aria-label="Remove payout entry">Remove</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Inline notes */}
+      <p className="text-xs text-gray-500 italic">💡 You can add team, milestones, and payout now or set them up later in the workflow after applying.</p>
+      <p className="text-[11px] text-gray-500">• Team/Milestones/Payout are optional here. You can finish details in the clan workflow.</p>
     </div>
   );
 }

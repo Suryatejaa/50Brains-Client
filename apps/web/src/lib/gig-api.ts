@@ -12,6 +12,12 @@ import type {
   GigStats,
   GigBoostEvent,
   GigApiResponse,
+  // New GIG-CLAN workflow types
+  GigMilestone,
+  GigTask,
+  TeamPlan,
+  MilestonePlan,
+  PayoutSplit,
 } from '@/types/gig.types';
 
 // Use the main API gateway instead of direct service connection
@@ -354,8 +360,8 @@ export class GigAPI {
   }
 
   // Application Management
-  static async applyToGig(data: CreateApplicationData): Promise<Application> {
-    const response = await apiClient.post(`${GIG_API_BASE}/applications`, data);
+  static async applyToGig(gigId: string, data: CreateApplicationData): Promise<Application> {
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/apply`, data);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to apply to gig');
     }
@@ -550,6 +556,98 @@ export class GigAPI {
       );
     }
     return response.data as string[];
+  }
+
+  // New GIG-CLAN Workflow Methods
+
+  // Create milestone
+  static async createMilestone(gigId: string, data: {
+    title: string;
+    description?: string;
+    dueAt: string;
+    amount: number;
+    deliverables: string[];
+  }): Promise<GigMilestone> {
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to create milestone');
+    }
+    return response.data as GigMilestone;
+  }
+
+  // Submit milestone
+  static async submitMilestone(gigId: string, milestoneId: string, data: {
+    deliverables: string[];
+    notes?: string;
+  }): Promise<GigMilestone> {
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/submit`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to submit milestone');
+    }
+    return response.data as GigMilestone;
+  }
+
+  // Approve milestone
+  static async approveMilestone(gigId: string, milestoneId: string, data: {
+    feedback?: string;
+  }): Promise<GigMilestone> {
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/approve`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to approve milestone');
+    }
+    return response.data as GigMilestone;
+  }
+
+  // Create task
+  static async createTask(gigId: string, data: {
+    title: string;
+    description?: string;
+    assigneeUserId: string;
+    milestoneId?: string;
+    estimatedHours?: number;
+    deliverables: string[];
+  }): Promise<GigTask> {
+    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/tasks`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to create task');
+    }
+    return response.data as GigTask;
+  }
+
+  // Update task
+  static async updateTask(gigId: string, taskId: string, data: {
+    title?: string;
+    description?: string;
+    assigneeUserId?: string;
+    status?: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'COMPLETED';
+    estimatedHours?: number;
+    actualHours?: number;
+    deliverables?: string[];
+    notes?: string;
+  }): Promise<GigTask> {
+    const response = await apiClient.patch(`${GIG_API_BASE}/${gigId}/tasks/${taskId}`, data);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to update task');
+    }
+    return response.data as GigTask;
+  }
+
+  // Get gig milestones
+  static async getGigMilestones(gigId: string): Promise<GigMilestone[]> {
+    const response = await apiClient.get(`${GIG_API_BASE}/${gigId}/milestones`);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to fetch milestones');
+    }
+    return response.data as GigMilestone[];
+  }
+
+  // Get gig tasks
+  static async getGigTasks(gigId: string): Promise<GigTask[]> {
+    const response = await apiClient.get(`${GIG_API_BASE}/${gigId}/tasks`);
+    if (!response.success) {
+      throw new Error((response as any).error || 'Failed to fetch tasks');
+    }
+    return response.data as GigTask[];
   }
 }
 

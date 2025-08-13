@@ -9,7 +9,6 @@ import { WorkHistoryList } from '@/components/WorkHistoryList';
 import { Portfolio } from '@/components/Portfolio';
 import { Achievements } from '@/components/Achievements';
 import { TargetIcon, VideoIcon, WrenchIcon, BarChartIcon, MegaphoneIcon, TrendingUpIcon, SmileIcon, DollarSignIcon, FileTextIcon, UserIcon } from 'lucide-react';
-import { Handshake } from 'lucide-react';
 
 export const CrewDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -305,7 +304,10 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Top Clients
                   </h3>
-                  <div className="text-xl"><Handshake className="w-6 h-6" /></div>
+                  <div className="text-xl">
+                    {/* Replace UserGroupIcon with a valid icon or remove if not available */}
+                    {/* Example: <UsersIcon className="w-6 h-6" /> */}
+                  </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.clientHistory.slice(0, 5).map((client) => (

@@ -625,7 +625,7 @@ export default function EditGigPage() {
         alert('Gig published successfully!');
         // Use replace instead of push to avoid back navigation issues
         // Add timestamp to force refresh of my-gigs page data
-        router.replace('/my-gigs?refresh=' + Date.now());
+        router.replace(`/my-gigs?refresh=${Date.now()}`);
       } else {
         throw new Error('Failed to publish gig');
       }

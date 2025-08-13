@@ -6,6 +6,8 @@ import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { RefreshCcw } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface Applicant {
   id: string;
@@ -76,6 +78,8 @@ export default function GigApplicationsPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectApplicationId, setRejectApplicationId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [approveApplication, setApproveApplication] = useState<Application | null>(null);
 
   const gigId = params.id as string;
   const userType = getUserTypeForRole(currentRole);
@@ -99,30 +103,30 @@ export default function GigApplicationsPage() {
     try {
       console.log('🔄 Starting loadGigAndApplications for gigId:', gigId);
       setIsLoading(true);
-      
+
       // Load gig details and applications in parallel
       const [gigResponse, applicationsResponse] = await Promise.allSettled([
         apiClient.get(`/api/gig/${gigId}`),
         apiClient.get(`/api/gig/${gigId}/applications`)
       ]);
 
-      console.log('📡 API responses received - Gig:', gigResponse.status, 'Applications:', applicationsResponse.status);
+      console.log('📡 API responses received - Gig:', gigResponse.status, 'Applications:', applicationsResponse);
 
       // Handle gig response
       if (gigResponse.status === 'fulfilled' && gigResponse.value.success) {
         const gigData = gigResponse.value.data;
         console.log('✅ Gig data received successfully');
-        
+
         // Check if user owns this gig
         const gigDetails = gigData as any;
         const gigOwnerId = gigDetails.brand?.id || gigDetails.postedById;
-        
+
         if (gigOwnerId !== user?.id) {
           console.log('❌ Ownership check failed - Redirecting to my-gigs');
           router.push('/my-gigs');
           return;
         }
-        
+
         console.log('✅ Ownership check passed - Setting gig data');
         setGig(gigData as Gig);
       } else {
@@ -135,7 +139,7 @@ export default function GigApplicationsPage() {
       if (applicationsResponse.status === 'fulfilled' && applicationsResponse.value.success) {
         const applicationsData = applicationsResponse.value.data as any;
         console.log('📊 Applications data structure:', Object.keys(applicationsData || {}));
-        
+
         // Try different possible structures
         let extractedApplications = [];
         if (applicationsData?.applications) {
@@ -143,7 +147,7 @@ export default function GigApplicationsPage() {
         } else if (Array.isArray(applicationsData)) {
           extractedApplications = applicationsData;
         }
-        
+
         console.log('✅ Setting', extractedApplications.length, 'applications');
         setApplications(extractedApplications);
       } else {
@@ -153,7 +157,7 @@ export default function GigApplicationsPage() {
       }
 
       console.log('🎉 loadGigAndApplications completed successfully');
-      
+
     } catch (error) {
       console.error('💥 Exception in loadGigAndApplications:', error);
       // Don't redirect on refresh errors, just log them
@@ -166,11 +170,11 @@ export default function GigApplicationsPage() {
 
   const handleAcceptApplication = async (applicationId: string) => {
     if (!confirm('Are you sure you want to accept this application?')) return;
-    
+
     try {
       console.log('Accepting application:', applicationId);
       setProcessingApplicationId(applicationId);
-      
+
       const response = await apiClient.post(`/api/gig/applications/${applicationId}/approve`, {
         notes: 'Application approved'
       });
@@ -195,11 +199,11 @@ export default function GigApplicationsPage() {
 
   const handleRejectApplication = async () => {
     if (!rejectApplicationId || !rejectionReason.trim()) return;
-    
+
     try {
       console.log('Rejecting application:', rejectApplicationId);
       setProcessingApplicationId(rejectApplicationId);
-      
+
       const response = await apiClient.post(`/api/gig/applications/${rejectApplicationId}/reject`, {
         reason: rejectionReason,
         feedback: rejectionReason
@@ -229,6 +233,11 @@ export default function GigApplicationsPage() {
   const openRejectModal = (applicationId: string) => {
     setRejectApplicationId(applicationId);
     setShowRejectModal(true);
+  };
+
+  const openApproveModal = (app: Application) => {
+    setApproveApplication(app);
+    setShowApproveModal(true);
   };
 
   const filteredApplications = applications.filter(app => {
@@ -316,13 +325,13 @@ export default function GigApplicationsPage() {
                 className="btn-secondary px-2 py-2"
                 disabled={isLoading}
               >
-                {isLoading ? 'Refreshing...' : 'Refresh'}
+                {isLoading ? <RefreshCcw className="w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
               </button>
               <Link href="/my-gigs" className="btn-secondary">
-                ← Back to My Gigs
+                <ArrowLeft className="w-4 h-4" /> {isLoading ? <RefreshCcw className="w-4 h-4" /> : 'Back to My Gigs'}
               </Link>
               <Link href={`/gig/${gigId}`} className="btn-secondary">
-                View Gig Details
+                {isLoading ? <RefreshCcw className="w-4 h-4" /> : 'View Gig Details'}
               </Link>
             </div>
           </div>
@@ -341,11 +350,10 @@ export default function GigApplicationsPage() {
                 {gig.deadline && <span>Deadline: {new Date(gig.deadline).toLocaleDateString()}</span>}
               </div>
             </div>
-            <span className={`px-2 py-0 rounded-none text-sm font-medium ${
-              gig.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+            <span className={`px-2 py-0 rounded-none text-sm font-medium ${gig.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
               gig.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+                'bg-gray-100 text-gray-800'
+              }`}>
               {gig.status}
             </span>
           </div>
@@ -368,8 +376,8 @@ export default function GigApplicationsPage() {
                 <option value="WITHDRAWN">Withdrawn</option>
               </select>
             </div>
-            
-            
+
+
             <div className="flex items-center space-x-2 text-sm">
               <span className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
@@ -491,11 +499,11 @@ export default function GigApplicationsPage() {
                       {processingApplicationId === application.id ? 'Processing...' : 'Reject'}
                     </button>
                     <button
-                      onClick={() => handleAcceptApplication(application.id)}
+                      onClick={() => openApproveModal(application)}
                       disabled={processingApplicationId === application.id}
                       className="btn-primary"
                     >
-                      {processingApplicationId === application.id ? 'Processing...' : 'Accept'}
+                      {processingApplicationId === application.id ? 'Processing...' : 'Review & Approve'}
                     </button>
                   </div>
                 )}
@@ -507,8 +515,8 @@ export default function GigApplicationsPage() {
             <div className="text-6xl mb-2">📨</div>
             <h3 className="text-xl font-semibold mb-2">No Applications Yet</h3>
             <p className="text-gray-600 mb-2">
-              {selectedStatus === 'all' 
-                ? 'No one has applied to this gig yet.' 
+              {selectedStatus === 'all'
+                ? 'No one has applied to this gig yet.'
                 : `No ${selectedStatus} applications found.`}
             </p>
             <Link href="/marketplace" className="btn-primary">
@@ -549,6 +557,110 @@ export default function GigApplicationsPage() {
                   className="flex-1 btn-primary bg-red-600 hover:bg-red-700 disabled:opacity-50"
                 >
                   {processingApplicationId === rejectApplicationId ? 'Rejecting...' : 'Reject Application'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approve Modal */}
+        {showApproveModal && approveApplication && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-none max-w-2xl w-full p-3">
+              <h2 className="text-xl font-bold mb-2">Review Application</h2>
+              <p className="text-sm text-gray-600 mb-2">Please review the plan before approving.</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                <div>
+                  <h3 className="font-semibold mb-1">Summary</h3>
+                  <div className="text-sm space-y-1">
+                    <div className="flex justify-between"><span className="text-gray-600">Quoted Price</span><span className="font-medium">₹{approveApplication.quotedPrice.toLocaleString()}</span></div>
+                    {approveApplication.estimatedTime && (
+                      <div className="flex justify-between"><span className="text-gray-600">Timeline</span><span className="font-medium">{approveApplication.estimatedTime}</span></div>
+                    )}
+                    <div className="flex justify-between"><span className="text-gray-600">Type</span><span className="font-medium capitalize">{approveApplication.applicantType}</span></div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Quick Checks</h3>
+                  {(() => {
+                    const msTotal = (approveApplication as any).milestonePlan?.reduce((s: number, m: any) => s + (m.amount || 0), 0) || 0;
+                    const pctTotal = (approveApplication as any).payoutSplit?.reduce((s: number, p: any) => s + (p.percentage || 0), 0) || 0;
+                    return (
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between"><span className="text-gray-600">Milestone Total</span><span className="font-medium">₹{msTotal.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Payout % Total</span><span className="font-medium">{pctTotal}%</span></div>
+                        {msTotal > approveApplication.quotedPrice && (
+                          <div className="text-xs text-red-600">Warning: milestones exceed quoted price</div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Team Plan */}
+              {(approveApplication as any).teamPlan?.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Team Plan</h3>
+                  <div className="space-y-1 text-sm">
+                    {(approveApplication as any).teamPlan.map((m: any, i: number) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600">{m.role}</span>
+                        <span className="text-gray-600 cursor-pointer" onClick={() => {
+                          router.push(`/profile/${m.memberId}`);
+                        }}>ID: {m.memberId?.slice(0, 8)}… • {m.hours}h</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Milestones */}
+              {(approveApplication as any).milestonePlan?.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Milestones</h3>
+                  <div className="space-y-1 text-sm">
+                    {(approveApplication as any).milestonePlan.map((m: any, i: number) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600">{m.title} — {new Date(m.dueAt).toLocaleDateString()}</span>
+                        <span className="font-medium">₹{(m.amount || 0).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Payout Split */}
+              {(approveApplication as any).payoutSplit?.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Payout Split</h3>
+                  <div className="space-y-1 text-sm">
+                    {(approveApplication as any).payoutSplit.map((p: any, i: number) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600 cursor-pointer" onClick={() => {
+                          router.push(`/profile/${p.memberId}`);
+                        }}>Member ID: {p.memberId?.slice(0, 8)}…</span>
+                        <span className="font-medium">{p.percentage ? `${p.percentage}%` : `₹${(p.fixedAmount || 0).toLocaleString()}`}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex space-x-3 mt-4">
+                <button
+                  onClick={() => { setShowApproveModal(false); setApproveApplication(null); }}
+                  className="flex-1 btn-secondary py-1 px-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { if (approveApplication) handleAcceptApplication(approveApplication.id); setShowApproveModal(false); }}
+                  disabled={processingApplicationId === approveApplication?.id}
+                  className="flex-1 btn-primary py-1 px-1"
+                >
+                  {processingApplicationId === approveApplication?.id ? 'Approving…' : 'Approve'}
                 </button>
               </div>
             </div>

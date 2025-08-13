@@ -146,6 +146,118 @@ export const testAPIGatewayConnection = async (): Promise<{ success: boolean; me
     }
 };
 
+// === CLAN NOTIFICATION CHANNELS ===
+
+/**
+ * Subscribe to clan-specific notification channels
+ */
+export const subscribeToClanChannels = async (
+    userId: string,
+    clanIds: string[]
+): Promise<{ success: boolean; message: string }> => {
+    try {
+        const channels = clanIds.flatMap(clanId => [
+            `clan:${clanId}:gig_approved`,
+            `clan:${clanId}:milestone_created`,
+            `clan:${clanId}:milestone_approved`,
+            `clan:${clanId}:member:${userId}:task_assigned`,
+            `clan:${clanId}:member:${userId}:task_updated`
+        ]);
+
+        const response = await apiClient.post('/api/notification/clan/subscribe', {
+            userId,
+            channels
+        });
+
+        return { success: true, message: `Subscribed to ${channels.length} clan channels` };
+    } catch (error: any) {
+        console.error('Failed to subscribe to clan channels:', error);
+        return {
+            success: false,
+            message: `Failed to subscribe: ${error.message || 'Unknown error'}`
+        };
+    }
+};
+
+/**
+ * Unsubscribe from clan notification channels
+ */
+export const unsubscribeFromClanChannels = async (
+    userId: string,
+    clanIds: string[]
+): Promise<{ success: boolean; message: string }> => {
+    try {
+        const channels = clanIds.flatMap(clanId => [
+            `clan:${clanId}:gig_approved`,
+            `clan:${clanId}:milestone_created`,
+            `clan:${clanId}:milestone_approved`,
+            `clan:${clanId}:member:${userId}:task_assigned`,
+            `clan:${clanId}:member:${userId}:task_updated`
+        ]);
+
+        const response = await apiClient.post('/api/notification/clan/unsubscribe', {
+            userId,
+            channels
+        });
+
+        return { success: true, message: `Unsubscribed from ${channels.length} clan channels` };
+    } catch (error: any) {
+        console.error('Failed to unsubscribe from clan channels:', error);
+        return {
+            success: false,
+            message: `Failed to unsubscribe: ${error.message || 'Unknown error'}`
+        };
+    }
+};
+
+/**
+ * Get clan notification channels for a user
+ */
+export const getClanNotificationChannels = async (
+    userId: string
+): Promise<{ success: boolean; data: { channels: string[] } }> => {
+    try {
+        const response = await apiClient.get(`/api/notification/clan/channels/${userId}`);
+        if (response.success) {
+            return { success: true, data: { channels: (response.data as any)?.channels || [] } };
+        }
+        return { success: false, data: { channels: [] } };
+    } catch (error: any) {
+        console.error('Failed to get clan notification channels:', error);
+        return { success: false, data: { channels: [] } };
+    }
+};
+
+/**
+ * Test clan WebSocket connection
+ */
+export const testClanWebSocketConnection = async (
+    userId: string,
+    clanId: string
+): Promise<{ success: boolean; message: string }> => {
+    return new Promise((resolve) => {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+        const wsUrl = `${baseUrl.replace('http://', 'ws://').replace('https://', 'wss://')}/api/notifications/clan/ws?userId=${userId}&clanId=${clanId}`;
+
+        const ws = new WebSocket(wsUrl);
+        const timeout = setTimeout(() => {
+            ws.close();
+            resolve({ success: false, message: 'Clan WebSocket connection timeout' });
+        }, 5000);
+
+        ws.onopen = () => {
+            clearTimeout(timeout);
+            ws.close();
+            resolve({ success: true, message: 'Clan WebSocket connection successful' });
+        };
+
+        ws.onerror = (error) => {
+            clearTimeout(timeout);
+            resolve({ success: false, message: `Clan WebSocket connection error: ${error}` });
+        };
+    });
+};
+
 /**
  * Test WebSocket connection via API Gateway
  */

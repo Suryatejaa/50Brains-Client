@@ -5,13 +5,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { GigStatus } from '@/types/gig.types';
 
 interface Gig {
   id: string;
   title: string;
   description: string;
   category: string;
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN' | 'ASSIGNED';
+  status: GigStatus;
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin: number;
   budgetMax: number;
@@ -55,13 +56,14 @@ interface GigsResponse {
 
 const statusColors = {
   DRAFT: 'bg-gray-100 text-gray-700',
-  ACTIVE: 'bg-green-100 text-green-700',
-  PAUSED: 'bg-yellow-100 text-yellow-700',
+  OPEN: 'bg-green-100 text-green-700',
+  IN_REVIEW: 'bg-yellow-100 text-yellow-700',
+  ASSIGNED: 'bg-blue-100 text-blue-700',
   IN_PROGRESS: 'bg-blue-100 text-blue-700',
+  SUBMITTED: 'bg-purple-100 text-purple-700',
   COMPLETED: 'bg-emerald-100 text-emerald-700',
   CANCELLED: 'bg-red-100 text-red-700',
-  OPEN: 'bg-green-100 text-green-700',
-  ASSIGNED: 'bg-blue-100 text-blue-700',
+  EXPIRED: 'bg-gray-100 text-gray-700',
 };
 
 export default function MyGigsPage() {
@@ -70,7 +72,7 @@ export default function MyGigsPage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'DRAFT' | 'COMPLETED'>('ALL');
+  const [filter, setFilter] = useState<'ALL' | GigStatus>('ALL');
   const [refreshMessage, setRefreshMessage] = useState<string | null>(null);
 
   // Redirect if not authenticated or not a brand
@@ -161,21 +163,31 @@ export default function MyGigsPage() {
     }
   };
 
-  const handleStatusChange = async (gigId: string, newStatus: string) => {
+  const handleStatusChange = async (gigId: string, newStatus: GigStatus) => {
     try {
+      // Validate status transition
+      const validStatuses = Object.values(GigStatus);
+      if (!validStatuses.includes(newStatus)) {
+        alert(`Invalid status: ${newStatus}. Valid statuses are: ${validStatuses.join(', ')}`);
+        return;
+      }
+
       const response = await apiClient.put(`/api/gig/${gigId}/status`, {
         status: newStatus,
       });
       console.log(`Gig ${gigId} status updated to ${newStatus}`, response);
       if (response.success) {
         setGigs(prev => prev.map(gig =>
-          gig.id === gigId ? { ...gig, status: newStatus as any } : gig
+          gig.id === gigId ? { ...gig, status: newStatus } : gig
         ));
       } else {
-        alert('Failed to update gig status');
+        // Handle error response
+        const errorMessage = (response as any).error || 'Unknown error';
+        alert(`Failed to update gig status: ${errorMessage}`);
       }
     } catch (error: any) {
-      alert(error || 'Failed to update gig status');
+      console.error('Status update error:', error);
+      alert(`Failed to update gig status: ${error.message || error || 'Unknown error'}`);
     }
   };
 
@@ -282,16 +294,16 @@ export default function MyGigsPage() {
 
             {/* Filters */}
             <div className="mb-6 flex gap-1 overflow-x-auto">
-              {['ALL', 'OPEN', 'ASSIGNED', 'DRAFT', 'COMPLETED'].map((status) => (
+              {(['ALL', GigStatus.OPEN, GigStatus.ASSIGNED, GigStatus.IN_PROGRESS, GigStatus.DRAFT, GigStatus.COMPLETED] as const).map((status) => (
                 <button
                   key={status}
-                  onClick={() => setFilter(status as any)}
+                  onClick={() => setFilter(status)}
                   className={`px-1 py-1 rounded-none text-sm font-medium transition-colors ${filter === status
                     ? 'bg-brand-primary text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                     }`}
                 >
-                  {status === 'ALL' ? 'All Gigs' : status.charAt(0) + status.slice(1).toLowerCase()}
+                  {status === 'ALL' ? 'All Gigs' : status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ')}
                   {` (${getStatusCount(status)})`}
                 </button>
               ))}
@@ -392,31 +404,120 @@ export default function MyGigsPage() {
                           Applications ({gig._count.applications})
                         </Link>
 
-                        {gig.status === 'OPEN' && (
+                        {gig.status === GigStatus.OPEN && (
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, 'PAUSED')}
+                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_REVIEW)}
                               className="btn-ghost-sm text-yellow-600"
                             >
-                              Pause
+                              Review
                             </button>
+                            {gig._count.applications === 0 && (
+                              <>
+                                <span> | </span>
+                                <button
+                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  className="btn-ghost-sm text-red-600"
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
                           </>
                         )}
 
-                        {gig.status === 'PAUSED' && (
+                        {gig.status === GigStatus.IN_REVIEW && (
+                          <>
+                            <span> | </span>                           
+                            <button
+                              onClick={() => handleStatusChange(gig.id, GigStatus.OPEN)}
+                              className="btn-ghost-sm text-green-600"
+                            >
+                              Reopen
+                            </button>
+                            {gig._count.applications === 0 && (
+                              <>
+                                <span> | </span>
+                                <button
+                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  className="btn-ghost-sm text-red-600"
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+
+                        {gig.status === GigStatus.ASSIGNED && (
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, 'OPEN')}
-                              className="btn-ghost-sm text-green-600"
+                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_PROGRESS)}
+                              className="btn-ghost-sm text-blue-600"
                             >
-                              Open
+                              Start Work
+                            </button>
+                            {gig._count.applications === 0 && (
+                              <>
+                                <span> | </span>
+                                <button
+                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  className="btn-ghost-sm text-red-600"
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+
+                        {gig.status === GigStatus.IN_PROGRESS && (
+                          <>
+                            <span> | </span>
+                            <button
+                              onClick={() => handleStatusChange(gig.id, GigStatus.SUBMITTED)}
+                              className="btn-ghost-sm text-purple-600"
+                            >
+                              Submit
+                            </button>
+                            {gig._count.applications === 0 && (
+                              <>
+                                <span> | </span>
+                                <button
+                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  className="btn-ghost-sm text-red-600"
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+
+                        {gig.status === GigStatus.SUBMITTED && (
+                          <>
+                            <span> | </span>
+                            <button
+                              onClick={() => handleStatusChange(gig.id, GigStatus.COMPLETED)}
+                              className="btn-ghost-sm text-emerald-600"
+                            >
+                              Approve
+                            </button>
+                            <span> | </span>
+                            <button
+                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_PROGRESS)}
+                              className="btn-ghost-sm text-blue-600"
+                            >
+                              Request Revision
                             </button>
                           </>
                         )}
 
-                        {gig.status && ['DRAFT', 'PAUSED'].includes(gig.status) && (
+
+
+                        {gig.status === GigStatus.DRAFT && gig._count.applications === 0 && (
                           <>
                             <span> | </span>
                             <button
@@ -424,6 +525,13 @@ export default function MyGigsPage() {
                               className="btn-ghost-sm text-red-600"
                             >
                               Delete
+                            </button>
+                            <span> | </span>
+                            <button
+                              onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                              className="btn-ghost-sm text-red-600"
+                            >
+                              Cancel
                             </button>
                           </>
                         )}
@@ -436,7 +544,7 @@ export default function MyGigsPage() {
 
             {/* Stats Summary */}
             {gigs.length > 0 && (
-              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-1">
+              <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-1">
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-brand-primary">
                     {gigs.length}
@@ -446,23 +554,30 @@ export default function MyGigsPage() {
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {gigs.filter(g => g.status === 'OPEN').length + gigs.filter(g => g.status === 'ASSIGNED').length}
+                    {gigs.filter(g => g.status === GigStatus.OPEN).length}
                   </div>
                   <div className="text-sm text-gray-600">Open</div>
                 </div>
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {gigs.reduce((sum, g) => sum + g._count.applications, 0)}
+                    {gigs.filter(g => [GigStatus.ASSIGNED, GigStatus.IN_PROGRESS].includes(g.status)).length}
                   </div>
-                  <div className="text-sm text-gray-600">Applications</div>
+                  <div className="text-sm text-gray-600">In Progress</div>
+                </div>
+
+                <div className="card-glass p-4 text-center">
+                  <div className="text-2xl font-bold text-emerald-600">
+                    {gigs.filter(g => g.status === GigStatus.COMPLETED).length}
+                  </div>
+                  <div className="text-sm text-gray-600">Completed</div>
                 </div>
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-purple-600">
-                    {gigs.reduce((sum, g) => sum + g._count.submissions, 0)}
+                    {gigs.reduce((sum, g) => sum + g._count.applications, 0)}
                   </div>
-                  <div className="text-sm text-gray-600">Submissions</div>
+                  <div className="text-sm text-gray-600">Applications</div>
                 </div>
               </div>
             )}

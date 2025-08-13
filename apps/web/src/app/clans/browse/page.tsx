@@ -130,7 +130,7 @@ export default function ClansBrowsePage() {
 
     try {
       const response = await apiClient.post(`/api/clan/${clanId}/join`);
-
+      console.log('Join clan response:', response);
       if (response.success) {
         // Refresh clans to show updated membership
         loadClans();
@@ -138,7 +138,8 @@ export default function ClansBrowsePage() {
         alert('Failed to join clan. Please try again.');
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to join clan');
+      console.error('Error joining clan:', error);
+      alert(error.error || 'Failed to join clan');
     }
   };
 

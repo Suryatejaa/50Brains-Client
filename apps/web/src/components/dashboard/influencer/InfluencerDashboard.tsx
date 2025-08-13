@@ -11,7 +11,7 @@ import { Achievements } from '@/components/Achievements';
 import { DollarSignIcon, InstagramIcon, MegaphoneIcon, PartyPopperIcon, SmileIcon, TwitterIcon, UsersIcon, YoutubeIcon } from 'lucide-react';
 import { BarChartIcon, PhoneIcon, TargetIcon } from 'lucide-react';
 import { FileTextIcon, GlobeIcon, StarIcon } from 'lucide-react';
-import { TrophyIcon, TikTokIcon,    UserIcon } from 'lucide-react';
+import { TrophyIcon, TicketIcon, UserIcon } from 'lucide-react';
 import { LightbulbIcon } from 'lucide-react';
 import { TrendingUpIcon } from 'lucide-react';
 
@@ -77,13 +77,8 @@ export const InfluencerDashboard: React.FC = () => {
             <QuickActionsGrid
               actions={[
                 { label: 'Browse Gigs', href: '/marketplace', icon: <MegaphoneIcon className="w-6 h-6" /> },
-                {
-                  label: 'My Applications',
-                  href: '/my/applications',
-                  icon: <FileTextIcon className="w-6 h-6" />,
-                },
+                { label: 'View Portfolio', href: '/portfolio', icon: <FileTextIcon className="w-6 h-6" /> },
                 { label: 'Analytics', href: '/analytics', icon: <BarChartIcon className="w-6 h-6" /> },
-                { label: 'Profile', href: '/profile', icon: <UserIcon className="w-6 h-6" /> },
               ]}
             />
           </div>
@@ -225,7 +220,7 @@ export const InfluencerDashboard: React.FC = () => {
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="text-lg">
                           {platform.platform === 'Instagram' && <InstagramIcon className="w-6 h-6" />}
-                            {platform.platform === 'TikTok' && <TikTokIcon className="w-6 h-6" />}
+                          {platform.platform === 'TikTok' && <TicketIcon className="w-6 h-6" />}
                           {platform.platform === 'YouTube' && <YoutubeIcon className="w-6 h-6" />}
                           {platform.platform === 'Twitter' && <TwitterIcon className="w-6 h-6" />}
                           {![
@@ -410,7 +405,7 @@ export const InfluencerDashboard: React.FC = () => {
                     {data.influencerTier.current === 'DIAMOND' && <TrophyIcon className="w-6 h-6" />}
                     {!['BRONZE', 'SILVER', 'GOLD', 'DIAMOND'].includes(
                       data.influencerTier.current
-                      ) && <StarIcon className="w-6 h-6" />}
+                    ) && <StarIcon className="w-6 h-6" />}
                   </div>
                   <p className="text-muted mb-3 text-sm">
                     Score: {data.influencerTier.score}/100

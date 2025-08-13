@@ -407,10 +407,10 @@ export const useGigs = () => {
 
   // Application Management
   const applyToGig = useCallback(
-    async (data: CreateApplicationData) => {
+    async (gigId: string, data: CreateApplicationData) => {
       try {
         updateState({ applying: true, error: null });
-        const application = await GigAPI.applyToGig(data);
+        const application = await GigAPI.applyToGig(gigId, data);
         updateState({
           myApplications: [...state.myApplications, application],
           applying: false,

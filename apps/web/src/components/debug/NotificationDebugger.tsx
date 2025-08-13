@@ -15,9 +15,12 @@ export default function NotificationDebugger() {
         connectionStatus,
         notifications,
         unreadCount,
-        connect,
-        disconnect,
-        forceRefresh
+        fetchNotifications,
+        refreshNotifications,
+        handleMarkAsRead,
+        handleMarkAllAsRead,
+        debouncedMarkAllAsRead,
+        forceRefresh,
     } = useNotificationBell();
 
     const testAPIGateway = async () => {
@@ -193,50 +196,31 @@ export default function NotificationDebugger() {
                 </div>
             </div>
 
-            {/* Test Results */}
-            {Object.keys(testResults).length > 0 && (
-                <div className="mb-4">
-                    <h4 className="font-medium mb-2">Test Results</h4>
-                    <div className="space-y-2">
-                        {testResults.apiGateway && (
-                            <div className={`p-2 rounded text-sm ${testResults.apiGateway.success
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                                }`}>
-                                <strong>API Gateway:</strong> {testResults.apiGateway.message}
-                            </div>
-                        )}
-                        {testResults.websocket && (
-                            <div className={`p-2 rounded text-sm ${testResults.websocket.success
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                                }`}>
-                                <strong>WebSocket:</strong> {testResults.websocket.message}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
             {/* Manual Controls */}
             <div className="mb-4">
                 <h4 className="font-medium mb-2">Manual Controls</h4>
                 <div className="space-y-2">
                     <button
-                        onClick={connect}
+                        onClick={() => fetchNotifications(1, 20)}
                         className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
                     >
-                        Connect WebSocket
+                        Fetch Notifications
                     </button>
                     <button
-                        onClick={disconnect}
-                        className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 ml-2"
+                        onClick={refreshNotifications}
+                        className="px-3 py-1 bg-indigo-500 text-white rounded text-sm hover:bg-indigo-600 ml-2"
                     >
-                        Disconnect WebSocket
+                        Refresh Counts
+                    </button>
+                    <button
+                        onClick={debouncedMarkAllAsRead}
+                        className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 ml-2"
+                    >
+                        Mark All As Read (debounced)
                     </button>
                     <button
                         onClick={forceRefresh}
-                        className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 ml-2"
+                        className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-800 ml-2"
                     >
                         Force Refresh
                     </button>

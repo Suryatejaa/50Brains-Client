@@ -1,5 +1,6 @@
 // components/common/ConfirmDialog.tsx
 import React from 'react';
+import './ConfirmDialog.css';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -27,10 +28,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="confirm-dialog-overlay">
+    <div className="confirm-dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
       <div className="confirm-dialog">
         <div className="confirm-dialog__header">
-          <h3 className="confirm-dialog__title">{title}</h3>
+          <h3 id="confirm-title" className="confirm-dialog__title">{title}</h3>
         </div>
 
         <div className="confirm-dialog__body">
@@ -42,6 +43,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             className="btn btn--secondary"
             onClick={onCancel}
             disabled={loading}
+            aria-label="Cancel"
           >
             {cancelText}
           </button>
@@ -49,6 +51,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             className={`btn ${danger ? 'btn--danger' : 'btn--primary'}`}
             onClick={onConfirm}
             disabled={loading}
+            aria-label={confirmText}
           >
             {loading ? 'Processing...' : confirmText}
           </button>

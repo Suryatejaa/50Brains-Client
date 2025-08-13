@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { clanApiClient } from '@/lib/clan-api';
+import { getPublicProfile } from '@/lib/user-api';
 
 export interface Clan {
     id: string;
@@ -75,6 +76,8 @@ export interface Clan {
         }>;
         recentPortfolio: any[];
     };
+    memberIds?: string[];
+    pendingJoinUserIds?: string[];
 }
 
 export interface ClanMember {
@@ -316,6 +319,7 @@ export function useClans(initialFilters: ClanFilters = {}) {
         refetch,
         getClanFeed,
         getMyClans,
+        getPublicClans,
         setError
     };
 }
@@ -323,7 +327,7 @@ export function useClans(initialFilters: ClanFilters = {}) {
 export function useClan(clanId: string) {
     const { user, isAuthenticated } = useAuth();
     const [clan, setClan] = useState<Clan | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const fetchClan = useCallback(async () => {
@@ -336,7 +340,9 @@ export function useClan(clanId: string) {
             const response = await clanApiClient.getClan(clanId);
 
             if (response.success) {
-                setClan((response.data as any).clan);
+                const raw = (response.data as any);
+                const normalized = raw?.clan ?? raw;
+                setClan(normalized as Clan);
             } else {
                 setError('Failed to load clan');
             }
@@ -425,7 +431,7 @@ export function useClanMembers(clanId: string) {
             setError(null);
 
             const response = await clanApiClient.getClanMembers(clanId);
-
+            console.log('response', response);
             if (response.success) {
                 setMembers((response.data as any).members);
             } else {
@@ -565,4 +571,168 @@ export function useClanMembers(clanId: string) {
         leaveClan,
         setError
     };
-} 
+}
+
+export interface ClanJoinRequest {
+    id: string;
+    clanId: string;
+    userId: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    message?: string;
+    requestedRole?: 'HEAD' | 'CO_HEAD' | 'ADMIN' | 'SENIOR_MEMBER' | 'MEMBER' | 'TRAINEE';
+    portfolio?: any;
+    reviewMessage?: string | null;
+    reviewedAt?: string | null;
+    reviewedBy?: string | null;
+    createdAt: string;
+    user?: {
+        id: string;
+        name?: string;
+        email?: string;
+        avatar?: string;
+    };
+}
+
+export function useClanJoinRequests(clanId: string) {
+    const { isAuthenticated } = useAuth();
+    const [requests, setRequests] = useState<ClanJoinRequest[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchRequests = useCallback(async () => {
+        if (!clanId || !isAuthenticated) return;
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await clanApiClient.getJoinRequests(clanId);
+            if (response.success) {
+                const raw = (response.data as any)?.joinRequests ?? (response.data as any) ?? [];
+                const list: ClanJoinRequest[] = Array.isArray(raw) ? raw : [];
+
+                // Enrich with user public profile when available
+                const enriched = await Promise.all(
+                    list.map(async (req) => {
+                        try {
+                            const userRes = await getPublicProfile(req.userId);
+                            if (userRes?.success) {
+                                const profile: any = (userRes as any).data;
+                                return {
+                                    ...req,
+                                    user: {
+                                        id: profile?.id || req.userId,
+                                        name: profile.displayName || profile.username || [profile.firstName, profile.lastName].filter(Boolean).join(' ') || undefined,
+                                        email: profile.email,
+                                        avatar: profile.profilePicture,
+                                    },
+                                } as ClanJoinRequest;
+                            }
+                        } catch (e) {
+                            // Ignore enrichment failures; keep original
+                        }
+                        return req;
+                    })
+                );
+
+                setRequests(enriched);
+            } else {
+                setError('Failed to load join requests');
+                setRequests([]);
+            }
+        } catch (e: any) {
+            console.error('Error fetching join requests:', e);
+            setError(e?.message || 'Failed to load join requests');
+            setRequests([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [clanId, isAuthenticated]);
+
+    const approve = useCallback(async (requestId: string) => {
+        if (!clanId) return;
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await clanApiClient.approveJoinRequest(clanId, requestId);
+            console.log('res', res);
+            if (res.success) {
+                await fetchRequests();
+                return true;
+            }
+            setError('Failed to approve request');
+            return false;
+        } catch (e: any) {
+            console.error('Error approving join request:', e);
+            setError(e?.message || 'Failed to approve request');
+            throw e;
+        } finally {
+            setLoading(false);
+        }
+    }, [clanId, fetchRequests]);
+
+    const reject = useCallback(async (requestId: string, reason?: string) => {
+        if (!clanId) return;
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await clanApiClient.rejectJoinRequest(clanId, requestId, reason ? { reason } : {});
+            console.log('res', res);
+            if (res.success) {
+                await fetchRequests();
+                return true;
+            }
+            setError('Failed to reject request');
+            return false;
+        } catch (e: any) {
+            console.error('Error rejecting join request:', e);
+            setError(e?.message || 'Failed to reject request');
+            throw e;
+        } finally {
+            setLoading(false);
+        }
+    }, [clanId, fetchRequests]);
+
+    useEffect(() => {
+        fetchRequests();
+    }, [fetchRequests]);
+
+    return {
+        requests,
+        loading,
+        error,
+        refetch: fetchRequests,
+        approve,
+        reject,
+        setError,
+    };
+}
+
+export function useMyClans() {
+    const [clans, setClans] = useState<Clan[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchMyClans = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await clanApiClient.getMyClans();
+            if (response.success) {
+                setClans((response.data as any)?.clans || []);
+            } else {
+                setError(response.message || 'Failed to fetch clans');
+            }
+        } catch (err: any) {
+            setError(err?.message || 'Failed to fetch clans');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchMyClans();
+    }, [fetchMyClans]);
+
+    return { clans, loading, error, refetch: fetchMyClans };
+}

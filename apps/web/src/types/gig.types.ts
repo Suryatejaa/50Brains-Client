@@ -60,6 +60,7 @@ export interface Application {
   gigId: string;
   applicantId: string;
   applicantType: 'user' | 'clan';
+  clanId?: string;                    // New: For clan applications
   proposal?: string;
   quotedPrice?: number;
   estimatedTime?: string;
@@ -70,6 +71,10 @@ export interface Application {
   rejectionReason?: string;
   gig?: Gig;
   submissions?: Submission[];
+  // New GIG-CLAN workflow fields
+  teamPlan?: TeamPlan;               // New: Clan's team structure
+  milestonePlan?: MilestonePlan[];   // New: Milestone breakdown
+  payoutSplit?: PayoutSplit;         // New: Payment distribution
 }
 
 export interface CreateApplicationData {
@@ -78,6 +83,12 @@ export interface CreateApplicationData {
   quotedPrice?: number;
   estimatedTime?: string;
   portfolio?: string[];
+  // New GIG-CLAN workflow fields
+  applicantType?: 'user' | 'clan';
+  clanId?: string;                    // Required if applicantType is 'clan'
+  teamPlan?: TeamPlan;               // Required if applicantType is 'clan'
+  milestonePlan?: MilestonePlan[];   // Required if applicantType is 'clan'
+  payoutSplit?: PayoutSplit;         // Required if applicantType is 'clan'
 }
 
 export interface Submission {
@@ -229,3 +240,117 @@ export const URGENCY_LEVELS = {
   normal: 'Normal',
   flexible: 'Flexible',
 } as const;
+
+// New GIG-CLAN Workflow Types
+export interface TeamPlan {
+  members: TeamMember[];
+  roles: string[];
+  estimatedTotalHours: number;
+}
+
+export interface TeamMember {
+  userId: string;
+  userName: string;
+  role: string;
+  expectedHours: number;
+  deliverables: string[];
+}
+
+// API response uses this structure for teamPlanSnapshot
+export interface TeamPlanSnapshot {
+  role: string;
+  hours: number;
+  memberId: string;
+  deliverables: string[];
+}
+
+export interface MilestonePlan {
+  title: string;
+  description?: string;
+  dueAt: string; // ISO date string
+  amount: number;
+  deliverables: string[];
+}
+
+export interface PayoutSplit {
+  type: 'percentage' | 'fixed';
+  distribution: {
+    [userId: string]: number; // percentage or fixed amount
+  };
+}
+
+export interface GigAssignment {
+  id: string;
+  gigId: string;
+  applicationId: string;
+  assigneeType: 'user' | 'clan';
+  assigneeId: string;
+  clanId?: string;
+  teamPlanSnapshot?: TeamPlanSnapshot[];
+  milestonePlanSnapshot?: MilestonePlan[];
+  payoutSplitSnapshot?: {
+    memberId: string;
+    percentage: number;
+  }[];
+  status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  assignedAt: string;
+  completedAt?: string;
+  // API response includes these fields
+  gig?: {
+    id: string;
+    title: string;
+    description: string;
+    budgetMin?: number;
+    budgetMax?: number;
+    status: string;
+    category: string;
+    createdAt: string;
+  };
+  milestones: GigMilestone[];
+  tasks: GigTask[];
+}
+
+export interface GigMilestone {
+  id: string;
+  gigId: string;
+  assignmentId: string;
+  title: string;
+  description?: string;
+  dueAt: string;
+  amount: number;
+  deliverables: string[];
+  status: 'PENDING' | 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  submittedAt?: string;
+  approvedAt?: string;
+  paidAt?: string;
+  feedback?: string;
+  tasks: GigTask[];
+}
+
+export interface GigTask {
+  id: string;
+  gigId: string;
+  assignmentId: string;
+  milestoneId?: string;
+  title: string;
+  description?: string;
+  assigneeUserId: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'COMPLETED';
+  estimatedHours?: number;
+  actualHours?: number;
+  deliverables: string[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MemberAgreement {
+  id: string;
+  gigId: string;
+  applicationId: string;
+  assigneeId: string;
+  assigneeType: 'user' | 'clan';
+  clanId?: string;
+  teamPlanSnapshot?: TeamPlanSnapshot[];
+  milestonePlanSnapshot?: MilestonePlan[];
+}

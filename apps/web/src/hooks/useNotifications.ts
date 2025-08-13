@@ -10,13 +10,17 @@ import {
     clearAllNotifications,
     getUserPreferences,
     updateUserPreferences,
-    getUserAnalytics
+    getUserAnalytics,
+    subscribeToClanChannels,
+    unsubscribeFromClanChannels,
+    getClanNotificationChannels
 } from '@/lib/notification-api';
 import type {
     Notification,
     NotificationCounts,
     NotificationPreferences,
-    NotificationAnalytics
+    NotificationAnalytics,
+    ClanWebSocketMessage
 } from '@/types/notification.types';
 
 interface UseNotificationsOptions {
@@ -49,6 +53,10 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
     const reconnectAttemptsRef = useRef(0);
     const maxReconnectAttempts = 5;
 
+    // Clan notification state
+    const [clanChannels, setClanChannels] = useState<string[]>([]);
+    const [clanNotifications, setClanNotifications] = useState<ClanWebSocketMessage[]>([]);
+
     // Real-time polling interval (fallback)
     const pollingInterval = useRef<NodeJS.Timeout | null>(null);
     const lastNotificationCount = useRef(0);
@@ -57,6 +65,41 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
     const lastFetchTime = useRef<number>(0); // Track when we last fetched data
     const isInitialized = useRef<boolean>(false); // Track if we've done initial fetch
     const processedNotificationIds = useRef<Set<string>>(new Set()); // Track processed notification IDs
+
+    // Helper functions for clan notifications
+    const getClanNotificationTitle = useCallback((data: ClanWebSocketMessage): string => {
+        switch (data.type) {
+            case 'clan_gig_approved':
+                return `🎉 Gig Approved: ${data.data.gigTitle}`;
+            case 'clan_milestone_created':
+                return `📋 New Milestone: ${data.data.milestoneTitle}`;
+            case 'clan_milestone_approved':
+                return `✅ Milestone Approved: ${data.data.milestoneTitle}`;
+            case 'clan_task_assigned':
+                return `📝 Task Assigned: ${data.data.taskTitle}`;
+            case 'clan_task_status_updated':
+                return `🔄 Task Updated: ${data.data.taskTitle}`;
+            default:
+                return 'Clan Notification';
+        }
+    }, []);
+
+    const getClanNotificationMessage = useCallback((data: ClanWebSocketMessage): string => {
+        switch (data.type) {
+            case 'clan_gig_approved':
+                return `Your clan's application for "${data.data.gigTitle}" has been approved!`;
+            case 'clan_milestone_created':
+                return `New milestone "${data.data.milestoneTitle}" created for gig "${data.data.gigTitle}"`;
+            case 'clan_milestone_approved':
+                return `Milestone "${data.data.milestoneTitle}" has been approved for gig "${data.data.gigTitle}"`;
+            case 'clan_task_assigned':
+                return `You have been assigned task "${data.data.taskTitle}" for gig "${data.data.gigTitle}"`;
+            case 'clan_task_status_updated':
+                return `Task "${data.data.taskTitle}" status updated to ${data.data.newStatus}`;
+            default:
+                return 'You have a new clan notification';
+        }
+    }, []);
 
     // Core WebSocket connection logic
     const connect = useCallback(() => {
@@ -186,6 +229,52 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
                 // Mark that we received real-time data
                 lastWebSocketUpdate.current = Date.now();
                 console.log('🎯 Updated lastWebSocketUpdate to:', new Date().toISOString());
+
+                // Handle clan-specific WebSocket messages
+                if (data.type && data.type.startsWith('clan_')) {
+                    console.log('🏰 === CLAN NOTIFICATION MESSAGE ===');
+                    console.log('🏰 Clan notification data:', JSON.stringify(data, null, 2));
+
+                    // Add to clan notifications
+                    setClanNotifications(prev => {
+                        const newNotification = data as ClanWebSocketMessage;
+                        // Check for duplicates
+                        const isDuplicate = prev.some(n =>
+                            n.type === newNotification.type &&
+                            n.data.gigId === newNotification.data.gigId &&
+                            n.data.clanId === newNotification.data.clanId
+                        );
+
+                        if (isDuplicate) {
+                            console.log('🚫 Duplicate clan notification detected, skipping');
+                            return prev;
+                        }
+
+                        console.log('✅ Adding new clan notification:', newNotification.type);
+                        return [newNotification, ...prev];
+                    });
+
+                    // Show browser notification for clan events
+                    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+                        const title = getClanNotificationTitle(data);
+                        const message = getClanNotificationMessage(data);
+
+                        new Notification(title, {
+                            body: message,
+                            icon: '/favicon.ico',
+                            tag: `clan-${data.type}-${data.data.clanId}`
+                        });
+                    }
+
+                    // Play notification sound
+                    playNotificationSound();
+
+                    // Update notification counts for clan events
+                    setUnreadCount(prev => prev + 1);
+                    setCounts(prev => ({ ...prev, unread: prev.unread + 1 }));
+
+                    return; // Don't process clan notifications as regular notifications
+                }
 
                 if (data.type === 'notification') {
                     console.log('🔔 === NOTIFICATION MESSAGE ===');
@@ -844,6 +933,76 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
         }
     }, [user, fetchCounts, fetchNotifications, isConnected]);
 
+    // Subscribe to clan notification channels
+    const subscribeToClanNotifications = useCallback(async (clanIds: string[]) => {
+        if (!user?.id || clanIds.length === 0) return;
+
+        try {
+            console.log('🏰 Subscribing to clan notification channels:', clanIds);
+            const result = await subscribeToClanChannels(user.id, clanIds);
+
+            if (result.success) {
+                // Update clan channels state
+                const newChannels = clanIds.flatMap(clanId => [
+                    `clan:${clanId}:gig_approved`,
+                    `clan:${clanId}:milestone_created`,
+                    `clan:${clanId}:milestone_approved`,
+                    `clan:${clanId}:member:${user.id}:task_assigned`,
+                    `clan:${clanId}:member:${user.id}:task_updated`
+                ]);
+
+                setClanChannels(prev => Array.from(new Set([...prev, ...newChannels])));
+                console.log('✅ Successfully subscribed to clan channels');
+            } else {
+                console.error('❌ Failed to subscribe to clan channels:', result.message);
+            }
+        } catch (error) {
+            console.error('❌ Error subscribing to clan channels:', error);
+        }
+    }, [user?.id]);
+
+    // Unsubscribe from clan notification channels
+    const unsubscribeFromClanNotifications = useCallback(async (clanIds: string[]) => {
+        if (!user?.id || clanIds.length === 0) return;
+
+        try {
+            console.log('🏰 Unsubscribing from clan notification channels:', clanIds);
+            const result = await unsubscribeFromClanChannels(user.id, clanIds);
+
+            if (result.success) {
+                // Remove channels from state
+                const channelsToRemove = clanIds.flatMap(clanId => [
+                    `clan:${clanId}:gig_approved`,
+                    `clan:${clanId}:milestone_created`,
+                    `clan:${clanId}:milestone_approved`,
+                    `clan:${clanId}:member:${user.id}:task_assigned`,
+                    `clan:${clanId}:member:${user.id}:task_updated`
+                ]);
+
+                setClanChannels(prev => prev.filter(channel => !channelsToRemove.includes(channel)));
+                console.log('✅ Successfully unsubscribed from clan channels');
+            } else {
+                console.error('❌ Failed to unsubscribe from clan channels:', result.message);
+            }
+        } catch (error) {
+            console.error('❌ Error unsubscribing from clan channels:', error);
+        }
+    }, [user?.id]);
+
+    // Get current clan notification channels
+    const fetchClanNotificationChannels = useCallback(async () => {
+        if (!user?.id) return;
+
+        try {
+            const result = await getClanNotificationChannels(user.id);
+            if (result.success) {
+                setClanChannels(result.data.channels);
+            }
+        } catch (error) {
+            console.error('❌ Error fetching clan notification channels:', error);
+        }
+    }, [user?.id]);
+
     useEffect(() => {
         if (user?.id) {
             console.log('🚀 Initializing notifications for user:', user.id);
@@ -883,6 +1042,8 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
         analytics,
         isConnected,
         connectionStatus,
+        clanChannels,
+        clanNotifications,
 
         // Actions
         fetchNotifications,
@@ -902,6 +1063,9 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
         stopPolling,
         connect,
         disconnect,
+        subscribeToClanNotifications,
+        unsubscribeFromClanNotifications,
+        fetchClanNotificationChannels,
 
         // Utilities
         playNotificationSound,

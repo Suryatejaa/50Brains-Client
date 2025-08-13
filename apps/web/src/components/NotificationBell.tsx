@@ -140,13 +140,33 @@ export default function NotificationBell() {
             return `/gig/${notification.metadata.gigId}`;
         }
 
+        // Handle clan-specific notifications
+        if (notification.type === 'CLAN' || notification.category === 'CLAN') {
+            const clanId = notification.metadata?.clanId;
+            
+            // For join request notifications, take clan head to manage page
+            if (clanId && (
+                notification.title?.toLowerCase().includes('join request') ||
+                notification.message?.toLowerCase().includes('join request') ||
+                notification.metadata?.joinRequestId
+            )) {
+                return `/clan/${clanId}/manage`;
+            }
+            
+            // For other clan notifications, take to clan detail page
+            if (clanId) {
+                return `/clan/${clanId}`;
+            }
+            
+            // Fallback to clans page
+            return '/clans';
+        }
+
         switch (notification.type) {
             case 'GIG':
                 return '/my/gigs';
             case 'PAYMENT':
                 return '/credits/history';
-            case 'CLAN':
-                return '/clans';
             case 'MESSAGE':
                 return '/messages';
             case 'REVIEW':

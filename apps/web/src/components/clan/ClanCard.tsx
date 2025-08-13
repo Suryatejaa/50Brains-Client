@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { Clan } from '@/hooks/useClans';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ClanCardProps {
     clan: Clan;
@@ -8,6 +9,8 @@ interface ClanCardProps {
     onJoin?: (clanId: string) => void;
     onView?: (clanId: string) => void;
     onManage?: (clanId: string) => void;
+    onLeave?: (clanId: string) => void;
+    pendingRequestsCount?: number;
 }
 
 export const ClanCard: React.FC<ClanCardProps> = ({
@@ -15,8 +18,11 @@ export const ClanCard: React.FC<ClanCardProps> = ({
     showActions = true,
     onJoin,
     onView,
-    onManage
+    onManage,
+    onLeave,
+    pendingRequestsCount = 0
 }) => {
+    const { user } = useAuth();
     const getClanIcon = (category: string) => {
         const icons: { [key: string]: string } = {
             'Technology': '💻',
@@ -61,8 +67,19 @@ export const ClanCard: React.FC<ClanCardProps> = ({
         return `$${amount?.toLocaleString()}`;
     };
 
+    const canJoin = useMemo(() => {
+        const userId = user?.id ?? '';
+        return (
+            !!userId &&
+            !clan.memberIds?.includes(userId) &&
+            !clan.pendingJoinUserIds?.includes(userId)
+        );
+    }, [clan, user?.id]);
+
     return (
-        <div className="card-glass hover:bg-brand-light-blue/5 p-2 transition-all duration-200 h-80 flex flex-col">
+        <div className="card-glass hover:bg-brand-light-blue/5 p-2 transition-all duration-200 h-80 flex flex-col"
+            onClick={() => onView?.(clan.id)}
+        >
             <div className="mb-2 flex items-start space-x-2">
                 <div className="from-brand-primary/20 to-brand-light-blue/20 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br">
                     <span className="text-2xl">
@@ -72,12 +89,21 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                 <div className="flex-1">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h3 className="text-heading mb-1 text-lg font-semibold">
+                            <h3 className="flex flex-row items-center text-heading mb-1 text-lg font-semibold">
                                 {clan.name}
+                                {/* Notification dot for pending join requests */}
+                                {pendingRequestsCount > 0 && (
+                                    <div className="flex items-center space-x-1">
+                                        <span className="inline-block ml-2 h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
+                                        <span className="text-muted text-xs">
+                                            {pendingRequestsCount} pending requests
+                                        </span>
+                                    </div>
+                                )}
                             </h3>
                             <div className="text-muted flex items-center space-x-4 text-sm">
                                 <span>{clan.memberCount} members</span>
-                                <span>⭐ {clan.averageRating.toFixed(1)}</span>
+                                <span>⭐ {clan.averageRating?.toFixed(1)}</span>
                                 <span className={`px-2 py-1 rounded text-xs font-medium ${getTierColor(clan.reputationScore)}`}>
                                     {getTierName(clan.reputationScore)} Tier
                                 </span>
@@ -99,13 +125,13 @@ export const ClanCard: React.FC<ClanCardProps> = ({
 
             <div className="flex-1">
                 {clan.tagline && (
-                    <p className="text-muted mb-2 text-sm italic">
+                    <p className="text-muted mb-1 text-sm italic">
                         {clan.tagline}
                     </p>
                 )}
 
                 {clan.description && (
-                    <p className="text-muted mb-3 text-sm overflow-hidden" style={{
+                    <p className="text-muted mb-1 text-sm overflow-hidden" style={{
                         display: '-webkit-box',
                         WebkitLineClamp: 3,
                         WebkitBoxOrient: 'vertical'
@@ -176,7 +202,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                         Created {new Date(clan.createdAt).toLocaleDateString()}
                     </span>
                 </div>
-                {showActions && (
+                {/* {showActions && (
                     <div className="flex space-x-1">
                         <button
                             onClick={() => onView?.(clan.id)}
@@ -184,7 +210,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                         >
                             View Details
                         </button>
-                        {onJoin && (
+                        {onJoin && canJoin &&  (
                             <button
                                 onClick={() => onJoin(clan.id)}
                                 className="btn-primary px-1 py-1 text-sm"
@@ -200,6 +226,21 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                                 Manage
                             </button>
                         )}
+                    </div>
+                )} */}
+                {user?.id && clan.pendingJoinUserIds?.includes(user.id) && (
+                    <div className="text-muted text-xs">
+                        You have requested to join this clan, please wait for approval.
+                    </div>
+                )}
+                {user?.id && clan.memberIds?.includes(user.id) && (
+                    <div className="text-muted text-xs">
+                        You are a member of this clan.
+                    </div>
+                )}
+                {user?.id === clan.clanHeadId && (
+                    <div className="text-muted text-xs">
+                        You are the owner of this clan.
                     </div>
                 )}
             </div>

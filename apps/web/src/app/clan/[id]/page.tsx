@@ -1,13 +1,68 @@
+/**
+ * Clan Detail Page with Real-time WebSocket Integration
+ * 
+ * WebSocket Message Handling:
+ * - Normalizes payload structure: checks payload.data.metadata.clanId and payload.data.data.clanId
+ * - Extracts eventType from embedded.eventType || meta.eventType with fallback inference
+ * - Filters messages by clan ID to only process relevant notifications
+ * 
+ * WebSocket Events Handled:
+ * - clan.member.joined: Shows toast notification and refreshes member list
+ * - clan.member.role_changed: Shows toast and refreshes data  
+ * - clan.join_request.submitted: Notifies clan head of new requests
+ * - clan.join_request.approved: Notifies user of approval
+ * - clan.join_request.rejected: Notifies user of rejection
+ * - clan.invitation.sent: Shows invitation sent notification
+ * 
+ * Fallback Event Inference:
+ * - Uses title pattern matching when eventType is missing
+ * - Only processes CLAN category notifications for fallback
+ * 
+ * Connection: ws://localhost:4009?userId={userId}
+ * Auto-reconnection: 3 second delay on disconnect
+ * Real-time activity feed: Updates activity tab with live events
+ */
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotificationContext } from '@/components/NotificationProvider';
 import { clanApiClient } from '@/lib/clan-api';
 import { getClanJoinStatus, getClanJoinButtonInfo, canManageClan } from '@/lib/clan-utils';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import ConfirmDialog from '@/frontend-profile/components/common/ConfirmDialog';
+import {
+  ArrowLeftIcon,
+  UserGroupIcon,
+  EllipsisVerticalIcon,
+  PhoneIcon,
+  VideoCameraIcon,
+  MagnifyingGlassIcon,
+  FaceSmileIcon,
+  PaperClipIcon,
+  MicrophoneIcon,
+  PaperAirplaneIcon,
+  StarIcon,
+  TrophyIcon,
+  BriefcaseIcon,
+  ChartBarIcon,
+  UserIcon,
+  Cog6ToothIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  GlobeAltIcon
+} from '@heroicons/react/24/outline';
+import {
+  StarIcon as StarIconSolid,
+  TrophyIcon as TrophyIconSolid
+} from '@heroicons/react/24/solid';
+import { useClan, useClanJoinRequests } from '@/hooks/useClans';
+import { useClanGigWorkflow } from '@/hooks/useClanGigWorkflow';
 
 interface ClanMember {
   id: string;
@@ -122,6 +177,7 @@ interface ClanDetail {
     referralCount: number;
   };
   members: ClanMember[];
+  pendingJoinUserIds: string[];
   portfolio: any[];
   reviews: any[];
   // Additional properties for UI
@@ -210,132 +266,535 @@ export interface Clan {
   };
 }
 
-interface PageProps {
-  params: { id: string };
+interface ClanGig {
+  id: string;
+  title: string;
+  description: string;
+  budget: number;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  deadline: string;
+  requiredSkills: string[];
+  assignedMembers: string[];
+  createdAt: string;
+  createdBy: string;
 }
 
-export default function ClanDetailPage({ params }: PageProps) {
-  const { user, isAuthenticated } = useAuth();
+interface ActivityItem {
+  id: string;
+  type: 'member_joined' | 'gig_completed' | 'achievement' | 'announcement' | 'milestone';
+  title: string;
+  description: string;
+  timestamp: string;
+  actor: {
+    name: string;
+    avatar?: string;
+  };
+  metadata?: any;
+}
+
+export default function ClanDetailPage() {
+  const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
+  const { notifications, isConnected } = useNotificationContext();
 
   const [clan, setClan] = useState<ClanDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'projects' | 'requirements'>('overview');
+  const [activeTab, setActiveTab] = useState<'activity' | 'members' | 'gigs' | 'leaderboard'>('activity');
   const [joinLoading, setJoinLoading] = useState(false);
-  console.log(clan);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [joinRequests, setJoinRequests] = useState<any[]>([]);
+  const [joinRequestsLoading, setJoinRequestsLoading] = useState(false);
+
+  // Add the workflow hook to fetch gig assignments
+  const { assignments, activeAssignments, loading: workflowLoading, fetchAssignments, error: workflowError } = useClanGigWorkflow(params.id as string);
+
+  // Remove clan-specific WebSocket state since we're using the global one
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+
+  // Swipe refs for mobile tab navigation
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const lastTouchXRef = useRef<number | null>(null);
+  const lastTouchYRef = useRef<number | null>(null);
+  const tabOrder: Array<'activity' | 'members' | 'gigs' | 'leaderboard'> = ['activity', 'members', 'gigs', 'leaderboard'];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [leaveLoading, setLeaveLoading] = useState(false);
+
+  // Ref to track processed notification IDs to prevent duplicate handling
+  const processedNotificationIds = useRef<Set<string>>(new Set());
+  // Track if we've already processed initial notifications to prevent welcome messages on refresh
+  const hasProcessedInitialNotifications = useRef<boolean>(false);
+
+  // Load processed notification IDs from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`processedNotifications_${params.id}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        processedNotificationIds.current = new Set(parsed);
+      }
+    } catch (error) {
+      console.error('Error loading processed notifications from localStorage:', error);
+    }
+
+    // Cleanup old processed notifications (older than 24 hours)
+    const cleanupOldNotifications = () => {
+      try {
+        const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+        const currentProcessed = Array.from(processedNotificationIds.current);
+        const filtered = currentProcessed.filter(id => {
+          // Extract timestamp from notification ID if possible, or keep recent ones
+          const timestamp = parseInt(id.split('-')[1] || '0');
+          return timestamp > oneDayAgo;
+        });
+
+        if (filtered.length !== currentProcessed.length) {
+          processedNotificationIds.current = new Set(filtered);
+          localStorage.setItem(`processedNotifications_${params.id}`, JSON.stringify(filtered));
+        }
+      } catch (error) {
+        console.error('Error cleaning up old notifications:', error);
+      }
+    };
+
+    // Clean up every hour
+    const cleanupInterval = setInterval(cleanupOldNotifications, 60 * 60 * 1000);
+
+    return () => {
+      clearInterval(cleanupInterval);
+    };
+  }, [params.id]);
   useEffect(() => {
     loadClanDetail();
   }, [params.id]);
 
+  // Listen to global notifications for clan events
+  useEffect(() => {
+    if (!user?.id || !params.id) return;
+
+    // Update connection status based on global notification connection
+    setConnectionStatus(isConnected ? 'connected' : 'disconnected');
+
+    // Skip processing if we haven't loaded clan data yet
+    if (!clan) return;
+
+    // Process new notifications for this clan
+    notifications.forEach(notification => {
+      // Skip if already processed
+      if (processedNotificationIds.current.has(notification.id)) return;
+
+      // Only process clan notifications
+      if (notification.category !== 'CLAN') return;
+
+      // Skip notifications older than 5 minutes to prevent showing old messages on refresh
+      const notificationTime = new Date(notification.createdAt || Date.now()).getTime();
+      const currentTime = Date.now();
+      if (currentTime - notificationTime > 5 * 60 * 1000) {
+        // Mark old notifications as processed to avoid reprocessing
+        processedNotificationIds.current.add(notification.id);
+        return;
+      }
+
+      // Skip welcome messages if they're older than 1 minute to prevent showing on refresh
+      const isWelcomeMessage = notification.title?.toLowerCase().includes('welcome to the clan');
+      if (isWelcomeMessage && (currentTime - notificationTime > 1 * 60 * 1000)) {
+        processedNotificationIds.current.add(notification.id);
+        return;
+      }
+
+      // Skip notifications that were created before the user joined the clan
+      if (clan && clan.createdAt) {
+        const clanCreatedAt = new Date(clan.createdAt).getTime();
+        if (notificationTime < clanCreatedAt) {
+          processedNotificationIds.current.add(notification.id);
+          return;
+        }
+      }
+
+      // Check if notification is for this clan
+      const clanId = notification.metadata?.clanId;
+      if (!clanId || clanId !== params.id) return;
+
+      // For join request notifications, also check if it's for the current user
+      const isJoinRequestNotification = notification.title?.toLowerCase().includes('join request');
+      const notificationUserId = notification.metadata?.applicantId || notification.metadata?.userId;
+
+      // Process the notification if:
+      // 1. It's not a join request notification (general clan notifications)
+      // 2. It's a join request notification for the current user
+      // 3. It's a join request notification and current user is clan head
+      const shouldProcess = !isJoinRequestNotification ||
+        notificationUserId === user?.id ||
+        clan?.clanHeadId === user?.id;
+
+      if (!shouldProcess) return;
+
+      // Mark as processed
+      processedNotificationIds.current.add(notification.id);
+
+      // Save to localStorage to persist across page refreshes
+      try {
+        const processedArray = Array.from(processedNotificationIds.current);
+        localStorage.setItem(`processedNotifications_${params.id}`, JSON.stringify(processedArray));
+      } catch (error) {
+        console.error('Error saving processed notifications to localStorage:', error);
+      }
+
+      // Extract event type
+      const eventType =
+        notification.metadata?.eventType ||
+        inferClanEventFromNotification(notification);
+
+      console.log('Processing clan notification:', {
+        id: notification.id,
+        eventType,
+        title: notification.title,
+        clanId,
+        isForCurrentUser: notificationUserId === user?.id,
+        isCurrentUserClanHead: clan?.clanHeadId === user?.id
+      });
+
+      handleClanEvent({ eventType, notification });
+    });
+  }, [notifications, isConnected, user?.id, params.id, clan]);
+
+  // Helper function to infer clan event type from notification if eventType is missing
+  const inferClanEventFromNotification = (notification: any): string | null => {
+    // Optional fallback if eventType is absent; rely on category/title patterns
+    if (notification?.category !== 'CLAN') return null;
+    const title = (notification?.title || '').toLowerCase();
+
+    if (title.includes('welcome to the clan')) return 'clan.member.joined';
+    if (title.includes('role updated')) return 'clan.member.role_changed';
+    if (title.includes('new join request')) return 'clan.join_request.submitted';
+    if (title.includes('join request approved')) return 'clan.join_request.approved';
+    if (title.includes('join request rejected')) return 'clan.join_request.rejected';
+    if (title.includes('invitation')) return 'clan.invitation.sent';
+
+    return null;
+  };
+
+  // Handle clan events from WebSocket
+  const handleClanEvent = ({ eventType, notification }: { eventType: string | null; notification: any }) => {
+    const { title, message, metadata, category } = notification;
+
+    const effectiveType = eventType || inferClanEventFromNotification(notification);
+
+    switch (effectiveType) {
+      case 'clan.member.joined':
+        toast.success(title || 'New member joined the clan');
+        loadClanDetail(); // Refresh clan data to show new member
+        addActivityItem({
+          id: `act-${Date.now()}`,
+          type: 'member_joined',
+          title: 'New member joined',
+          description: message || 'A new member has joined the clan',
+          timestamp: new Date().toISOString(),
+          actor: { name: 'System' }
+        });
+        break;
+
+      case 'clan.member.role_changed':
+        toast.info(title || 'Member role updated');
+        loadClanDetail(); // Refresh to show updated roles
+        addActivityItem({
+          id: `act-${Date.now()}`,
+          type: 'announcement',
+          title: 'Role updated',
+          description: message || 'A member role has been changed',
+          timestamp: new Date().toISOString(),
+          actor: { name: 'System' }
+        });
+        break;
+
+      case 'clan.join_request.submitted':
+        if (clan?.clanHeadId === user?.id) {
+          toast.info(title || 'New join request received');
+        }
+        break;
+
+      case 'clan.join_request.approved':
+        toast.success(title || 'Join request approved');
+        // Refresh clan data to update membership status and hide join button
+        loadClanDetail();
+
+        // Add activity for approved request
+        addActivityItem({
+          id: `act-${Date.now()}`,
+          type: 'member_joined',
+          title: 'Join request approved',
+          description: message || 'Your join request has been approved',
+          timestamp: new Date().toISOString(),
+          actor: { name: 'System' }
+        });
+        break;
+
+      case 'clan.join_request.rejected':
+        toast.error(title || 'Join request rejected');
+        // Refresh clan data to update request status
+        loadClanDetail();
+
+        // Add activity for rejected request
+        addActivityItem({
+          id: `act-${Date.now()}`,
+          type: 'announcement',
+          title: 'Join request rejected',
+          description: message || 'Your join request has been rejected',
+          timestamp: new Date().toISOString(),
+          actor: { name: 'System' }
+        });
+        break;
+
+      case 'clan.invitation.sent':
+        toast.info(title || 'Invitation sent');
+        break;
+
+      default:
+        // Ignore unrelated or non-clan notifications
+        if (category === 'CLAN') {
+          console.log('Unhandled clan notification:', notification);
+        }
+    }
+  };
+
+  // Add activity item to local state
+  const addActivityItem = (activity: ActivityItem) => {
+    setActivities(prev => [activity, ...prev.slice(0, 9)]); // Keep only last 10 activities
+  };
+
   const loadClanDetail = async () => {
     try {
       setLoading(true);
-      setError(null);
-
-      const response = await clanApiClient.getClan(params.id);
-
+      const response = await clanApiClient.getClan(params.id as string);
       if (response.success) {
-        setClan(response.data as ClanDetail);
+        const clanData = response.data as ClanDetail;
+        setClan(clanData);
+        console.log('Clan data refreshed:', clanData);
+
+        // Fetch join requests if user can manage the clan
+        if (clanData.clanHeadId === user?.id ||
+          clanData.members?.some((member: any) =>
+            member.userId === user?.id &&
+            ['HEAD', 'CO_HEAD', 'ADMIN'].includes(member.role)
+          )) {
+          loadJoinRequests();
+        }
       } else {
         setError('Clan not found');
       }
-    } catch (error: any) {
-      if (error.status === 404) {
-        notFound();
-      } else {
-        setError(error.message || 'Failed to load clan details');
-      }
+    } catch (error) {
+      console.error('Error loading clan:', error);
+      setError('Failed to load clan details');
     } finally {
       setLoading(false);
     }
   };
-  const handleJoinClan = async () => {
-    if (!isAuthenticated) {
-      router.push('/auth/login' as any);
-      return;
-    }
 
+  const loadJoinRequests = async () => {
     try {
-      setJoinLoading(true);
-
-      // Use the new join request endpoint
-      const response = await clanApiClient.joinClan(params.id, {
-        message: `Hi! I'd like to join your clan. I'm excited to collaborate and contribute to your team.`
-      });
-
+      setJoinRequestsLoading(true);
+      const response = await clanApiClient.getJoinRequests(params.id as string);
       if (response.success) {
-        toast.success('Join request sent successfully! The clan leader will review your request.');
-        // Refresh clan data to show updated membership status
-        loadClanDetail();
-      } else {
-        toast.error('Failed to send join request. Please try again.');
+        setJoinRequests((response.data as any) || []);
       }
-    } catch (error: any) {
-      console.error('Error joining clan:', error);
-      toast.error(error.message || 'Failed to send join request');
+    } catch (error) {
+      console.error('Error loading join requests:', error);
     } finally {
-      setJoinLoading(false);
+      setJoinRequestsLoading(false);
     }
   };
 
-  // Use utility functions for join logic
-  const joinStatus = getClanJoinStatus(clan as Clan, user);
-  const joinButtonInfo = getClanJoinButtonInfo(joinStatus);
-  const canManage = canManageClan(clan as Clan, user);
+  // Swipe handlers
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    touchStartXRef.current = t.clientX;
+    touchStartYRef.current = t.clientY;
+    lastTouchXRef.current = t.clientX;
+    lastTouchYRef.current = t.clientY;
+  };
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    lastTouchXRef.current = t.clientX;
+    lastTouchYRef.current = t.clientY;
+  };
+  const handleTouchEnd = () => {
+    const startX = touchStartXRef.current;
+    const startY = touchStartYRef.current;
+    const endX = lastTouchXRef.current ?? startX;
+    const endY = lastTouchYRef.current ?? startY;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    lastTouchXRef.current = null;
+    lastTouchYRef.current = null;
 
-  const handleRequestToJoinClan = async () => {
-    if (!isAuthenticated) {
-      router.push('/auth/login' as any);
-      return;
+    if (startX == null || startY == null || endX == null || endY == null) return;
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const horizontalThreshold = 50;
+    const verticalGuard = 40;
+
+    if (absDx > horizontalThreshold && absDx > absDy && Math.abs(dy) < verticalGuard) {
+      const currentIndex = tabOrder.indexOf(activeTab);
+      if (dx < 0 && currentIndex < tabOrder.length - 1) {
+        setActiveTab(tabOrder[currentIndex + 1]);
+      } else if (dx > 0 && currentIndex > 0) {
+        setActiveTab(tabOrder[currentIndex - 1]);
+      }
     }
+  };
+
+  const handleJoinClan = async () => {
+    if (!clan || !user) return;
+
     try {
       setJoinLoading(true);
-      const response = await clanApiClient.joinClan(params.id, {
-        message: `Hi! I'd like to join your clan. I'm excited to collaborate and contribute to your team.`
-      });
-
-      if (response.success) {
-        toast.success('Join request sent successfully! The clan leader will review your request.');
-        loadClanDetail();
-      } else {
-        toast.error('Failed to send join request. Please try again.');
-      }
+      await clanApiClient.joinClan(clan.id);
+      toast.success('Join request sent successfully!');
+      await loadClanDetail(); // Refresh data
     } catch (error: any) {
-      console.error('Error requesting to join clan:', error);
-      toast.error(error.message || 'Failed to send join request');
+      console.error('Error joining clan - Full error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+
+      // Handle different error response structures with more comprehensive checking
+      let errorMessage = 'Failed to join clan';
+
+      if (error.response?.data) {
+        const data = error.response.data;
+        errorMessage =
+          data.error ||                         // Direct error field
+          data.message ||                       // Message field
+          data.details ||                       // Details field
+          data.errorMessage ||                  // ErrorMessage field
+          (typeof data === 'string' ? data : undefined) || // String response
+          errorMessage;                         // Fallback
+      } else if (error.message) {
+        errorMessage = error.message;           // Error object message
+      }
+
+      console.error('Final error message:', errorMessage);
+      toast.error(errorMessage);
     } finally {
       setJoinLoading(false);
     }
   };
 
   const handleLeaveClan = async () => {
-    if (confirm('Are you sure you want to leave this clan?')) {
-      try {
-        const response = await clanApiClient.leaveClan(params.id);
-
-        if (response.success) {
-          toast.success('Successfully left the clan.');
-          loadClanDetail();
-        } else {
-          toast.error('Failed to leave clan. Please try again.');
-        }
-      } catch (error: any) {
-        console.error('Error leaving clan:', error);
-        toast.error(error.message || 'Failed to leave clan');
+    if (!clan) return;
+    try {
+      setLeaveLoading(true);
+      await clanApiClient.leaveClan(clan.id);
+      setLeaveConfirmOpen(false);
+      toast.success('You have left the clan');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/clans?tab=my-clans';
       }
+    } catch (error: any) {
+      console.error('Error leaving clan - Full error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+
+      // Handle different error response structures with more comprehensive checking
+      let errorMessage = 'Failed to leave clan';
+
+      if (error.response?.data) {
+        const data = error.response.data;
+        errorMessage =
+          data.error ||                         // Direct error field
+          data.message ||                       // Message field
+          data.details ||                       // Details field
+          data.errorMessage ||                  // ErrorMessage field
+          (typeof data === 'string' ? data : undefined) || // String response
+          errorMessage;                         // Fallback
+      } else if (error.message) {
+        errorMessage = error.message;           // Error object message
+      }
+
+      console.error('Final error message:', errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLeaveLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !clan) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Clan Not Found</h2>
+          <p className="text-gray-600 mb-4">{error || 'The clan you\'re looking for doesn\'t exist.'}</p>
+          <button
+            onClick={() => router.back()}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // console.log('Clan:', clan)
+  // console.log('Current User:', user)
+  // console.log('User ID:', user?.id)
+  // console.log('Clan Head ID:', clan.clanHeadId)
+  // console.log('Members:', clan.members)
+
+  const isOwner = clan.clanHeadId === user?.id;
+
+  // Check if user is a member by looking in the members array
+  const isMemberInArray = clan.members?.some(member => member.userId === user?.id);
+
+  // Check userMembership status (fallback)
+  const isMemberByStatus = clan.userMembership?.status === 'member';
+
+  // User is considered a member if they're the owner, in the members array, or have member status
+  const isMember = isOwner || isMemberInArray || isMemberByStatus;
+  const isAlreadyRequested = user?.id ? clan.pendingJoinUserIds.includes(user.id) : false;
+  // console.log('Is Owner:', isOwner)
+  // console.log('Is Member in Array:', isMemberInArray)
+  // console.log('Is Member by Status:', isMemberByStatus)
+  // console.log('Final isMember:', isMember)
+
+  const canManage = isOwner || (isMemberInArray && ['HEAD', 'CO_HEAD', 'ADMIN'].includes(clan.members?.find(m => m.userId === user?.id)?.role || ''));
+
+  const getRoleColor = (role: string) => {
+    const colors = {
+      'HEAD': 'bg-purple-100 text-purple-800',
+      'CO_HEAD': 'bg-blue-100 text-blue-800',
+      'ADMIN': 'bg-green-100 text-green-800',
+      'SENIOR_MEMBER': 'bg-orange-100 text-orange-800',
+      'MEMBER': 'bg-gray-100 text-gray-800',
+      'TRAINEE': 'bg-yellow-100 text-yellow-800'
+    };
+    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const formatEarnings = (amount: number) => {
+  const getStatusColor = (status: string) => {
+    const colors = {
+      'OPEN': 'bg-green-100 text-green-800',
+      'IN_PROGRESS': 'bg-blue-100 text-blue-800',
+      'COMPLETED': 'bg-gray-100 text-gray-800',
+      'CANCELLED': 'bg-red-100 text-red-800'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
+
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -344,721 +803,505 @@ export default function ClanDetailPage({ params }: PageProps) {
     }).format(amount);
   };
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}>
-        ★
-      </span>
-    ));
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
-  const getStatusBadge = (status: ClanProject['status']) => {
-    const badges = {
-      planning: 'bg-blue-100 text-blue-700',
-      active: 'bg-green-100 text-green-700',
-      completed: 'bg-gray-100 text-gray-700',
-      cancelled: 'bg-red-100 text-red-700'
-    };
+  const timeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
-    return `px-2 py-1 rounded text-xs font-medium ${badges[status]}`;
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 48) return 'Yesterday';
+    return formatDate(dateString);
   };
+  console.log('Clan Detail:', clan);
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-1 py-1">
+          <div className="flex items-center justify-between">
+            {/* Left section */}
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <button
+                onClick={() => router.back()}
+                className="p-0 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+              >
+                <ArrowLeftIcon className="h-6 w-6 text-gray-600" />
+              </button>
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="page-container min-h-screen pt-16">
-          <div className="content-container py-8">
-            <div className="mx-auto max-w-6xl">
-              <div className="animate-pulse">
-                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <div className="card-glass p-3">
-                      <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="lg:col-span-1">
-                    <div className="card-glass p-3">
-                      <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
-                      <div className="space-y-4">
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Clan Avatar */}
+              <div className="relative flex-shrink-0">
+                <div className="h-10 w-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">
+                    {clan.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                {clan.isActive && (
+                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></div>
+                )}
+              </div>
+
+              {/* Clan Info */}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-semibold text-gray-900 truncate flex items-center space-x-2">
+                  <span>{clan.name}</span>
+                  {clan.isVerified && (
+                    <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                  )}
+                </h1>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <UserGroupIcon className="h-4 w-4 flex-shrink-0" />
+                  <span>{clan.memberCount} members</span>
+                  {clan.visibility === 'PRIVATE' && (
+                    <>
+                      <span>•</span>
+                      <span>Private</span>
+                    </>
+                  )}
                 </div>
               </div>
+            </div>
+
+            {/* Right section */}
+            <div className="relative flex items-center space-x-1 flex-shrink-0">
+              {(isMember || canManage) && (
+                <Link
+                  href={`/clan/${clan.id}/gig-workflow`}
+                  className="inline-flex items-center space-x-1 px-2 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                >
+                  <BriefcaseIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">Workflow</span>
+                </Link>
+              )}
+              <button
+                onClick={() => setMenuOpen(prev => !prev)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+              >
+                <EllipsisVerticalIcon className="h-6 w-6 text-gray-600" />
+                {/* Notification dot for pending join requests */}
+                {joinRequests.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 text-xs bg-red-500 rounded-full animate-pulse">{joinRequests.length}</span>
+                )}
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-10 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1">
+                  {canManage && (
+                    <Link
+                      href={`/clan/${clan.id}/manage`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex justify-between items-center space-x-2">
+                        <Cog6ToothIcon className="h-4 w-4" />
+                        <span>Manage Clan</span>
+                        {joinRequests.length > 0 && (
+                          <span className="h-4 w-4 text-center items-center text-xs bg-red-500 rounded-full animate-pulse">{joinRequests.length}</span>
+                        )}
+                      </span>
+                    </Link>
+                  )}
+                  {!canManage && isMember && (
+                    <button
+                      onClick={() => { setMenuOpen(false); setLeaveConfirmOpen(true); }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Leave Clan
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    );
-  }
 
-  if (error || !clan) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="page-container min-h-screen pt-16">
-          <div className="content-container py-8">
-            <div className="mx-auto max-w-6xl">
-              <div className="card-glass p-8 text-center">
-                <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-red-100 flex items-center justify-center">
-                    <span className="text-2xl">❌</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {error || 'Clan not found'}
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    The clan you're looking for doesn't exist or has been removed.
-                  </p>
+      <div className="max-w-4xl mx-auto">
+        {/* Leave confirmation dialog */}
+        <ConfirmDialog
+          isOpen={leaveConfirmOpen}
+          title="Leave Clan"
+          message="Are you sure you want to leave this clan? You will lose access to member-only content."
+          confirmText="Leave"
+          cancelText="Cancel"
+          danger
+          loading={leaveLoading}
+          onConfirm={handleLeaveClan}
+          onCancel={() => setLeaveConfirmOpen(false)}
+        />
+        {/* Active Gigs Notification Banner */}
+        {activeAssignments && activeAssignments.length > 0 && (
+          <div className="bg-green-50 border-b border-green-200 px-4 py-3">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">
+                    You have {activeAssignments.length} active gig{activeAssignments.length !== 1 ? 's' : ''}!
+                  </span>
                 </div>
-
-                <Link href="/clans/browse" className="btn-primary">
-                  Browse Other Clans
+                <Link
+                  href={`/clan/${clan.id}/gig-workflow`}
+                  className="text-sm text-green-700 hover:text-green-800 font-medium underline"
+                >
+                  Manage Workflow →
                 </Link>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
+        )}
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-1">
-        <div className="content-container py-1">
-          <div className="mx-auto max-w-6xl">
-            {/* Breadcrumb */}
-            <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-              <Link href="/clans" className="hover:text-brand-primary">
-                Clans
-              </Link>
-              <span>›</span>
-              <Link href="/clans/browse" className="hover:text-brand-primary">
-                Browse
-              </Link>
-              <span>›</span>
-              <span className="text-gray-900">{clan.name}</span>
-            </nav>
+        {/* Clan Cover/Hero Section */}
+        <div className="relative bg-gradient-to-br from-gray-300 to-gray-300 text-white">
+          <div className="px-2 sm:px-2 py-2 sm:py-2">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-gray-900 mb-2 max-w-2xl text-sm sm:text-base">
+                  {clan.description || 'A community of talented professionals working together.'}
+                </p>
 
-            {/* Header */}
-            <div className="card-glass p-1 mb-1">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex-1">
-                  <div className="flex flex-col items-start space-x-1 mb-2">
-                    <div className="flex flex-row items-center space-x-1">
-                      <h1 className="text-3xl font-bold text-gray-900">
-                        {clan.name}
-                      </h1>
-                      {clan.visibility === 'PRIVATE' && (
-                        <span className="px-1 py-1 bg-yellow-100 text-yellow-700 rounded-none text-sm font-medium">
-                          Private
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-row items-center space-x-1">
-                      {/* Button for manage clan */}
-                      {clan.clanHeadId === user?.id && (
-                        <Link href={`/clan/${clan.id}/manage` as any} className="btn-secondary">
-                          Manage Clan
-                        </Link>
-                      )}
-                    </div>
+                {/* Stats */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm">
+                  <div className="flex items-center space-x-1">
+                    <TrophyIconSolid className="h-4 w-4 text-gray-900 flex-shrink-0" />
+                    <span className="text-gray-900">{clan.completedGigs} completed</span>
                   </div>
-
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                    {clan.location && <span>📍 {clan.location}</span>}
-                    {clan.timezone && <span>⏰ {clan.timezone}</span>}
-                  </div>
-                  <div className="flex items-center space-x-2 border-b border-gray-500 pb-2">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">
-                      {clan.primaryCategory}
-                    </span>
-                    <span>📅 Created {formatDate(clan.createdAt)}</span>
-                  </div>
-
-                  <p className="text-gray-700 text-lg mb-4">
-                    {clan.description}
-                  </p>
-
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-none">
-                      <p className="text-2xl font-bold text-gray-900">{clan.memberCount}/{clan.maxMembers}</p>
-                      <p className="text-sm text-gray-600">Members</p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-none">
-                      <p className="text-2xl font-bold text-green-600">{formatEarnings(clan.totalRevenue)}</p>
-                      <p className="text-sm text-gray-600">Total Revenue</p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-none">
-                      <p className="text-2xl font-bold text-blue-600">{clan.completedGigs}</p>
-                      <p className="text-sm text-gray-600">Completed Gigs</p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-none">
-                      <div className="flex justify-center mb-1">
-                        {renderStars(clan.averageRating)}
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {clan.averageRating.toFixed(1)} Rating
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-1 lg:mt-0 lg:ml-1 flex flex-col space-y-1">
-                  {joinStatus.isMember ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 text-green-600">
-                        <span>✓</span>
-                        <span className="text-sm font-medium">Member</span>
-                      </div>
-                      <button
-                        onClick={handleLeaveClan}
-                        className="btn-danger w-full"
-                      >
-                        Leave Clan
-                      </button>
-                      {canManage && (
-                        <Link href={`/clan/${clan.id}/manage` as any} className="btn-secondary w-full text-center">
-                          Manage Clan
-                        </Link>
-                      )}
-                    </div>
-                  ) : joinStatus.hasPendingRequest ? (
-                    <div className="text-center">
-                      <div className="flex items-center space-x-2 text-yellow-600 mb-2">
-                        <span>⏳</span>
-                        <span className="text-sm font-medium">Request Pending</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Your join request is being reviewed by the clan leader
-                      </p>
-                    </div>
-                  ) : joinStatus.canRequestToJoin ? (
-                    <button
-                      onClick={handleRequestToJoinClan}
-                      disabled={joinLoading}
-                      className="btn-primary w-full"
-                    >
-                      {joinLoading ? 'Sending Request...' : joinButtonInfo.text}
-                    </button>
-                  ) : joinStatus.canJoin ? (
-                    <button
-                      onClick={handleJoinClan}
-                      disabled={joinLoading}
-                      className="btn-primary w-full"
-                    >
-                      {joinLoading ? 'Joining...' : joinButtonInfo.text}
-                    </button>
-                  ) : (
-                    <div className="text-center">
-                      {/* <p className="text-red-600 font-medium">Cannot Join</p> */}
-                      <p className="text-sm text-gray-600">
-                        {joinStatus.reason}
-                      </p>
+                  {activeAssignments && activeAssignments.length > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <BriefcaseIcon className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <span className="text-green-700 font-medium">{activeAssignments.length} active</span>
                     </div>
                   )}
+                  <div className="flex items-center space-x-1">
+                    <StarIconSolid className="h-4 w-4 text-gray-900 flex-shrink-0" />
+                    <span className="text-gray-900">{clan.averageRating?.toFixed(1) || '5.0'}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <ChartBarIcon className="h-4 w-4 text-gray-900 flex-shrink-0" />
+                    <span className="text-gray-900">{formatCurrency(clan.totalRevenue || 0)} revenue</span>
+                  </div>
+                </div>
+              </div>
 
+              {/* Action Button */}
+              {!isMember && !isAlreadyRequested && (
+                <div className="sm:ml-4 flex-shrink-0">
                   <button
-                    className="btn-secondary w-full"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(window.location.href);
-                        toast.success('Clan link copied to clipboard');
-                      } catch (err) {
-                        // fallback: alert if clipboard API is not available
-                        alert('Clan link copied to clipboard');
-                      }
-                    }}
+                    onClick={handleJoinClan}
+                    disabled={joinLoading}
+                    className="w-full sm:w-auto bg-white text-blue-600 px-4 sm:px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
                   >
-                    📥Share Clan
+                    {joinLoading ? 'Joining...' : 'Join Clan'}
                   </button>
                 </div>
-              </div>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="mb-1">
-              <nav className="flex space-x-1 border-b border-gray-200">
-                {[
-                  { id: 'overview', label: 'Overview' },
-                  { id: 'members', label: `Members (${clan.memberCount})` },
-                  { id: 'projects', label: `Projects (${clan.totalGigs})` },
-                  { id: 'requirements', label: 'Requirements' }
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                      ? 'border-brand-primary text-brand-primary'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            {/* Tab Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-1">
-              <div className="lg:col-span-2">
-                {activeTab === 'overview' && (
-                  <div className="space-y-1">
-                    {/* About */}
-                    <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">About This Clan</h3>
-                      <p className="text-gray-700 whitespace-pre-line">
-                        {clan.description}
-                      </p>
-                      {clan.tagline && (
-                        <p className="text-gray-600 italic mt-2">"{clan.tagline}"</p>
-                      )}
-                    </div>
-
-                    {/* Skills */}
-                    <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills & Expertise</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {clan.skills.map((skill) => (
-                          <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-none text-sm">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Categories */}
-                    <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {clan.categories.map((category) => (
-                          <span key={category} className="px-3 py-1 bg-green-100 text-green-700 rounded-none text-sm">
-                            {category}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Showcase Projects */}
-                    {clan.showcaseProjects && clan.showcaseProjects.length > 0 && (
-                      <div className="card-glass p-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Showcase Projects</h3>
-                        <div className="space-y-2">
-                          {clan.showcaseProjects.map((project, index) => (
-                            <div key={index} className="p-3 bg-gray-50 rounded-none">
-                              <p className="text-gray-700 font-medium">{project}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Portfolio */}
-                    {(clan.portfolioImages && clan.portfolioImages.length > 0) ||
-                      (clan.portfolioVideos && clan.portfolioVideos.length > 0) ? (
-                      <div className="card-glass p-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Portfolio</h3>
-                        {clan.portfolioImages && clan.portfolioImages.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-md font-medium text-gray-700 mb-2">Images</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                              {clan.portfolioImages.map((image, index) => (
-                                <div key={index} className="aspect-video bg-gray-200 rounded-none flex items-center justify-center">
-                                  <img src={image} alt={`Portfolio ${index + 1}`} className="w-full h-full object-cover rounded-none" />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {clan.portfolioVideos && clan.portfolioVideos.length > 0 && (
-                          <div>
-                            <h4 className="text-md font-medium text-gray-700 mb-2">Videos</h4>
-                            <div className="space-y-2">
-                              {clan.portfolioVideos.map((video, index) => (
-                                <div key={index} className="aspect-video bg-gray-200 rounded-none flex items-center justify-center">
-                                  <video src={video} controls className="w-full h-full object-cover rounded-none" />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : null}
-
-                    {/* Recent Projects */}
-                    <div className="card-glass p-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Projects</h3>
-                      {clan.recentProjects?.length === 0 ? (
-                        <p className="text-gray-600">No recent projects</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {clan.recentProjects?.map((project) => (
-                            <div key={project.id} className="border border-gray-200 rounded-none p-4">
-                              <div className="flex items-start justify-between mb-2">
-                                <h4 className="font-medium text-gray-900">{project.title}</h4>
-                                <span className={getStatusBadge(project.status)}>
-                                  {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                                </span>
-                              </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                                <div>
-                                  <span className="font-medium">Budget:</span> {formatEarnings(project.budget)}
-                                </div>
-                                <div>
-                                  <span className="font-medium">Deadline:</span> {formatDate(project.deadline)}
-                                </div>
-                                <div>
-                                  <span className="font-medium">Progress:</span> {project.completionPercentage}%
-                                </div>
-                              </div>
-
-                              {project.status === 'active' && (
-                                <div className="mt-2">
-                                  <div className="w-full bg-gray-200 rounded-none h-2">
-                                    <div
-                                      className="bg-blue-600 h-2 rounded-none transition-all"
-                                      style={{ width: `${project.completionPercentage}%` }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'members' && (
-                  <div className="card-glass p-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Clan Members</h3>
-                    <div className="space-y-4">
-                      {clan.members.length === 0 ? (
-                        <p className="text-gray-600 text-center py-8">No members yet</p>
-                      ) : (
-                        clan.members.map((member) => (
-                          <div key={member.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-none">
-                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold">
-                              {member.profilePicture ? (
-                                <img
-                                  src={member.profilePicture}
-                                  alt="Member"
-                                  className="w-12 h-12 rounded-none object-cover"
-                                />
-                              ) : (
-                                (member.firstName || member.displayName || 'U')[0]?.toUpperCase()
-                              )}
-                            </div>
-
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2">
-                                <h4 className="font-medium text-gray-900">
-                                  {member.displayName ||
-                                    `${member.firstName || ''} ${member.lastName || ''}`.trim() ||
-                                    'Anonymous User'}
-                                </h4>
-                                {member.isOwner && (
-                                  <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
-                                    👑 Owner
-                                  </span>
-                                )}
-                                {member.isAdmin && !member.isOwner && (
-                                  <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-                                    Admin
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="text-sm text-gray-600">
-                                <p className="capitalize">{member.role}</p>
-                                <p>Joined {formatDate(member.joinedAt)} • {member.completedProjects} projects completed</p>
-                              </div>
-
-                              {member.skills?.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                  {member.skills.slice(0, 3).map((skill) => (
-                                    <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                                      {skill}
-                                    </span>
-                                  ))}
-                                  {member.skills.length > 3 && (
-                                    <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                                      +{member.skills.length - 3} more
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="text-right">
-                              <div className="text-sm font-medium text-gray-900">
-                                ⭐ {member.reputation?.toLocaleString()}
-                              </div>
-                              <div className="text-xs text-gray-600">Reputation                            </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'projects' && (
-                  <div className="card-glass p-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">All Projects</h3>
-                    {clan.recentProjects?.length === 0 ? (
-                      <div className="text-center py-8">
-                        <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gray-100 flex items-center justify-center">
-                          <span className="text-2xl">📋</span>
-                        </div>
-                        <h4 className="text-lg font-medium text-gray-900 mb-2">No Projects Yet</h4>
-                        <p className="text-gray-600 mb-4">
-                          This clan hasn't started any projects yet.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {clan.recentProjects?.map((project) => (
-                          <div key={project.id} className="border border-gray-200 rounded-none p-4">
-                            <div className="flex items-start justify-between mb-3">
-                              <h4 className="text-lg font-medium text-gray-900">{project.title}</h4>
-                              <span className={getStatusBadge(project.status)}>
-                                {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                              </span>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
-                              <div>
-                                <span className="text-gray-600">Budget:</span>
-                                <div className="font-semibold text-green-600">{formatEarnings(project.budget)}</div>
-                              </div>
-                              <div>
-                                <span className="text-gray-600">Deadline:</span>
-                                <div className="font-medium">{formatDate(project.deadline)}</div>
-                              </div>
-                              <div>
-                                <span className="text-gray-600">Progress:</span>
-                                <div className="font-medium">{project.completionPercentage}%</div>
-                              </div>
-                              <div>
-                                <span className="text-gray-600">Team Size:</span>
-                                <div className="font-medium">{project.membersInvolved.length} members</div>
-                              </div>
-                            </div>
-
-                            {project.status === 'active' && (
-                              <div className="mb-3">
-                                <div className="w-full bg-gray-200 rounded-none h-3">
-                                  <div
-                                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-none transition-all"
-                                    style={{ width: `${project.completionPercentage}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex -space-x-2">
-                                {project.membersInvolved.slice(0, 5).map((memberId, index) => {
-                                  const member = clan.members.find(m => m.id === memberId);
-                                  return (
-                                    <div key={memberId} className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
-                                      {member?.profilePicture ? (
-                                        <img
-                                          src={member.profilePicture}
-                                          alt="Member"
-                                          className="w-8 h-8 rounded-none object-cover"
-                                        />
-                                      ) : (
-                                        (member?.firstName || 'U')[0]?.toUpperCase()
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                                {project.membersInvolved.length > 5 && (
-                                  <div className="w-8 h-8 bg-gray-400 rounded-none flex items-center justify-center text-white text-xs font-semibold border-2 border-white">
-                                    +{project.membersInvolved.length - 5}
-                                  </div>
-                                )}
-                              </div>
-
-                              <button className="btn-ghost-sm">
-                                View Details
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === 'requirements' && (
-                  <div className="card-glass p-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Joining Requirements</h3>
-                    {clan.requirements?.length === 0 ? (
-                      <p className="text-gray-600">No specific requirements</p>
-                    ) : (
-                      <ul className="space-y-3">
-                        {clan.requirements?.map((requirement, index) => (
-                          <li key={index} className="flex items-start space-x-3">
-                            <span className="text-green-500 mt-1">✓</span>
-                            <span className="text-gray-700">{requirement}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Sidebar */}
-              <div className="lg:col-span-1">
-                <div className="space-y-1">
-                  {/* Clan Leader */}
-                  <div className="card-glass p-1">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Clan Leader</h3>
-                    <div className="flex items-center space-x-3"
-                      onClick={() => {
-                        if (clan.clanHeadId && clan.clanHeadId !== user?.id) {
-                          router.push(`/profile/${clan.clanHeadId}`);
-                        } else if (clan.clanHeadId === user?.id) {
-                          router.push(`/profile`);
-                        } else {
-                          toast.error('Clan leader profile not available');
-                        }
-                      }}
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-none flex items-center justify-center text-white font-semibold">
-                        {clan.clanHeadId ? (
-                          <img
-                            src={clan.clanHeadId}
-                            alt="Owner"
-                            className="w-12 h-12 rounded-none object-cover"
-                          />
-                        ) : (
-                          'U'
-                        )}
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">
-                          {clan.clanHeadId || 'Anonymous User'}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          ⭐ {clan.clanHeadId?.toLocaleString()} reputation
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Quick Stats */}
-                  <div className="card-glass p-1">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Performance</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Score</span>
-                        <span className="font-semibold text-green-600">
-                          {clan.score?.toFixed(1)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Total Gigs</span>
-                        <span className="font-semibold text-blue-600">
-                          {clan.totalGigs}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Avg. Rating</span>
-                        <div className="flex items-center space-x-1">
-                          {renderStars(clan.averageRating)}
-                          <span className="text-sm text-gray-600">
-                            ({clan.averageRating.toFixed(1)})
-                          </span>
-                        </div>
-                      </div>
-                      {clan.rank && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Rank</span>
-                          <span className="font-semibold text-purple-600">
-                            #{clan.rank}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Analytics */}
-                  {clan.analytics && (
-                    <div className="card-glass p-1">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Analytics</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Profile Views</span>
-                          <span className="font-semibold text-blue-600">
-                            {clan.analytics.profileViews}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Market Ranking</span>
-                          <span className="font-semibold text-purple-600">
-                            #{clan.analytics.marketRanking}
-                          </span>
-                        </div>
-                        {clan.analytics.categoryRanking && (
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-600">Category Rank</span>
-                            <span className="font-semibold text-green-600">
-                              #{clan.analytics.categoryRanking}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Social Engagement</span>
-                          <span className="font-semibold text-orange-600">
-                            {clan.analytics.socialEngagement}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Join Requests (for clan head) */}
-                  {clan.clanHeadId === user?.id && clan.joinRequests && clan.joinRequests > 0 && (
-                    <div className="card-glass p-1">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Pending Requests</h3>
-                      <div className="text-center">
-                        <p className="text-2xl font-bold text-brand-primary mb-2">
-                          {clan.joinRequests}
-                        </p>
-                        <p className="text-sm text-gray-600 mb-4">
-                          Join requests waiting for approval
-                        </p>
-                        <Link
-                          href={`/clan/${clan.id}/manage` as any}
-                          className="btn-primary w-full text-center"
-                        >
-                          Review Requests
-                        </Link>
-                      </div>
-                    </div>
-                  )}
+              )}
+              {isAlreadyRequested && (
+                <div className="sm:ml-4 flex-shrink-0">
+                  <span className="text-sm text-gray-500">You have already requested to join this clan.</span>
                 </div>
-              </div>
+              )}
+
             </div>
           </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="bg-white border-b border-gray-200 sticky top-[73px] z-40">
+          <div className="px-16 sm:px-0">
+            <nav className="flex justify-between md:justify-center lg:justify-center overflow-x-auto">
+              {[
+                { id: 'activity', label: '', icon: ChartBarIcon },
+                { id: 'members', label: '', icon: UserGroupIcon },
+                { id: 'gigs', label: '', icon: BriefcaseIcon },
+                { id: 'leaderboard', label: '', icon: TrophyIcon }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  <tab.icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div
+          className="p-2 sm:p-2"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {activeTab === 'activity' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                <div className="flex items-center space-x-2">
+                  <div className={`h-2 w-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500' :
+                    connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}></div>
+                  <span className="text-xs text-gray-500">
+                    {connectionStatus === 'connected' ? 'Live' :
+                      connectionStatus === 'connecting' ? 'Connecting' : 'Offline'}
+                  </span>
+                </div>
+              </div>
+
+              {activities.length > 0 ? (
+                <div className="space-y-3">
+                  {activities.map(activity => (
+                    <div key={activity.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          {activity.type === 'member_joined' && <UserIcon className="h-5 w-5 text-blue-600" />}
+                          {activity.type === 'announcement' && <ChartBarIcon className="h-5 w-5 text-blue-600" />}
+                          {activity.type === 'achievement' && <TrophyIcon className="h-5 w-5 text-yellow-600" />}
+                          {activity.type === 'gig_completed' && <BriefcaseIcon className="h-5 w-5 text-green-600" />}
+                          {activity.type === 'milestone' && <StarIcon className="h-5 w-5 text-purple-600" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                          <p className="text-sm text-gray-600">{activity.description}</p>
+                          <p className="text-xs text-gray-500 mt-1">{timeAgo(activity.timestamp)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <ChartBarIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-lg font-medium mb-2">No recent activity</p>
+                  <p className="text-sm">Activity will appear here as members interact with the clan.</p>
+                  {connectionStatus === 'connected' && (
+                    <p className="text-xs text-green-600 mt-2">🟢 Live updates enabled</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'members' && (
+            <div className="space-y-1">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <h3 className="text-lg font-semibold text-gray-900">Members ({clan.memberCount})</h3>
+                <div className="flex items-center space-x-1">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search members..."
+                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-0">
+                {clan.members && clan.members.length > 0 ? clan.members.map(member => (
+                  <div key={member.id} className="bg-white border-t border-gray-200 p-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0">
+                      <div className="flex items-center space-x-2 cursor-pointer"
+                        onClick={() => {
+                          if (member.userId === user?.id)
+                            router.push(`/profile`)
+                          else
+                            router.push(`/profile/${member.userId}`)
+                        }}
+                      >
+                        <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <UserIcon className="h-6 w-6 text-gray-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium text-gray-900 truncate">Name: {member.user?.name || member.displayName}</h4>
+                          <div className="flex flex-row items-right sm:flex-row sm:items-right gap-2">
+                            <span className={`inline-flex items-right px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member.role)} w-fit`}>
+                              {member.role.replace('_', ' ')}
+                            </span>
+                            <span className="text-sm text-right sm:text-right text-gray-500">
+                              {member.gigsParticipated} gigs • {member.reputation} reputation
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left sm:text-right">
+                        <p className="text-sm text-gray-500">Joined {formatDate(member.joinedAt)}</p>
+                        {member.status === 'ACTIVE' && (
+                          <div className="flex items-center space-x-1 text-green-600">
+                            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                            <span className="text-xs">Active</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <UserGroupIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-medium mb-2">No members to display</p>
+                    <p className="text-sm">Members will appear here once they join the clan.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'gigs' && (
+            <div className="space-y-4">
+              <div className="flex flex-row sm:flex-row justify-between sm:items-center sm:justify-between gap-4">
+                <h3 className="text-lg font-semibold text-gray-900">Clan Gigs</h3>
+                <div className="flex items-center space-x-2">
+                  {canManage && (
+                    <button
+                      className="bg-blue-600 text-white px-2 py-1 rounded-xs text-sm font-medium hover:bg-blue-700 transition-colors sm:w-auto"
+                      onClick={() => {
+                        router.push('/marketplace');
+                      }}
+                    >
+                      Apply Gig
+                    </button>
+                  )}
+                  {activeAssignments && activeAssignments.length > 0 && (
+                    <Link
+                      href={`/clan/${clan.id}/gig-workflow`}
+                      className="bg-green-600 text-white px-2 py-1 rounded-xs text-sm font-medium hover:bg-green-700 transition-colors sm:w-auto"
+                    >
+                      Manage Workflow
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {workflowLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium">Debug Info:</p>
+                    <button
+                      onClick={() => fetchAssignments()}
+                      className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  <p>• Assignments loaded: {assignments?.length || 0}</p>
+                  <p>• Active assignments: {activeAssignments?.length || 0}</p>
+                  <p>• Workflow loading: {workflowLoading ? 'Yes' : 'No'}</p>
+                  <p>• Error: {workflowError || 'None'}</p>
+                  {assignments && assignments.length > 0 && (
+                    <>
+                      <p>• First assignment ID: {assignments[0].id}</p>
+                      <p>• First assignment gig: {assignments[0].gig?.title || 'No title'}</p>
+                      <p>• First assignment status: {assignments[0].status}</p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {activeAssignments && activeAssignments.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium text-green-800">
+                        {activeAssignments.length} Active Gig{activeAssignments.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  </div>
+
+                  {activeAssignments.map(assignment => (
+                    <div key={assignment.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 text-lg">
+                            {assignment.gig?.title || `Gig #${assignment.gigId.slice(-8)}`}
+                          </h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Status: <span className="font-medium text-green-600">{assignment.status}</span>
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Assigned: {new Date(assignment.assignedAt).toLocaleDateString()}
+                          </p>
+
+                          {assignment.milestonePlanSnapshot && (
+                            <div className="mt-3">
+                              <p className="text-sm font-medium text-gray-700">Milestones:</p>
+                              <div className="mt-2 space-y-1">
+                                {assignment.milestonePlanSnapshot.map((milestone, index) => (
+                                  <div key={index} className="text-sm text-gray-600">
+                                    • {milestone.title} - ${milestone.amount}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="ml-4 flex flex-col space-y-2">
+                          <Link
+                            href={`/clan/${clan.id}/gig-workflow?gigId=${assignment.gigId}`}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                          >
+                            Manage Tasks
+                          </Link>
+
+                          <button
+                            onClick={() => window.location.href = `/gig/${assignment.gigId}`}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          >
+                            View Gig Details
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <BriefcaseIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-lg font-medium mb-2">No active gigs</p>
+                  <p className="text-sm">When your clan applications get approved, they'll appear here.</p>
+                  {canManage && (
+                    <button
+                      className="mt-4 bg-blue-600 text-white px-3 py-1 rounded-xs text-sm font-medium hover:bg-blue-700 transition-colors"
+                      onClick={() => {
+                        router.push('/marketplace');
+                      }}
+                    >
+                      Apply for Gigs
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'leaderboard' && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Contributors</h3>
+              <div className="text-center py-12 text-gray-500">
+                <TrophyIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium mb-2">No leaderboard data</p>
+                <p className="text-sm">Member rankings will appear here based on their contributions.</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
