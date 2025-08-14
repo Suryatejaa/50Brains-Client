@@ -1059,6 +1059,9 @@ export default function GigDetailsPage() {
                       placeholder="Tell the brand why you're perfect for this campaign..."
                       style={{ maxWidth: '100%' }}
                     />
+                    <p className="text-xs text-gray-600 mt-1">
+                      {application.coverLetter.length < 10 ? 'Minimum 10 characters required' : `${application.coverLetter.length} / 1000 characters`}
+                    </p>
                   </div>
 
                   {/* Proposed Rate */}

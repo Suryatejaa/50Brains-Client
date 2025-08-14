@@ -354,6 +354,7 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
                     <div className="bg-white rounded-lg shadow p-2 md:p-0">
                         <ClanGigApplicationForm
                             clanId={clanId}
+                            clanSlug={clan?.slug}
                             gigId={selectedGigId}
                             clanMembers={(enrichedMembers as unknown as ClanMember[]) || []}
                             onSubmit={() => { }}

@@ -34,6 +34,7 @@ export interface Gig {
     daysOld: number;
     daysUntilDeadline: number;
   };
+  pendingApplicationsCount?: number;
 }
 
 export interface CreateGigData {

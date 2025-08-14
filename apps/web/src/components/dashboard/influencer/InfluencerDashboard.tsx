@@ -79,6 +79,7 @@ export const InfluencerDashboard: React.FC = () => {
                 { label: 'Browse Gigs', href: '/marketplace', icon: <MegaphoneIcon className="w-6 h-6" /> },
                 { label: 'View Portfolio', href: '/portfolio', icon: <FileTextIcon className="w-6 h-6" /> },
                 { label: 'Analytics', href: '/analytics', icon: <BarChartIcon className="w-6 h-6" /> },
+                { label: 'Clans', href: '/clans', icon: <UsersIcon className="w-6 h-6" /> },
               ]}
             />
           </div>

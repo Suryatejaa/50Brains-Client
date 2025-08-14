@@ -16,6 +16,7 @@ import { BarChartIcon, Building2Icon, FileTextIcon, GlobeIcon, HeadphonesIcon, M
 import { AlertCircleIcon, CheckCircleIcon, MailIcon, SearchIcon } from 'lucide-react';
 import { CreditCardIcon, EyeIcon } from 'lucide-react';
 import { DollarSignIcon } from 'lucide-react';
+import { Gig } from '@/types/gig.types';
 
 interface BrandDashboardData {
   profile: BrandProfile | null;
@@ -87,7 +88,7 @@ export const BrandDashboard: React.FC = () => {
         // Sum up applications from all gigs
         const gigs = gigsResponse.value.data.gigs;
         // console.log('Gigs array:', gigs);
-        console.log('First gig structure:', gigs[0]);
+        console.log('First gig structure:', gigs);
 
         applicationsStats.total = gigs.reduce((sum, gig) => {
 
@@ -105,8 +106,10 @@ export const BrandDashboard: React.FC = () => {
           const acceptedCount = gig.acceptedCount || 0;
           return sum + acceptedCount;
         }, 0);
-        applicationsStats.pending =
-          applicationsStats.total - applicationsStats.approved;
+        applicationsStats.pending = gigs.reduce((sum, gig) => {
+          const pendingCount = gig.pendingApplicationsCount || 0;
+          return sum + pendingCount;
+        }, 0);
       }
 
       const data: BrandDashboardData = {
@@ -163,7 +166,7 @@ export const BrandDashboard: React.FC = () => {
               .slice(0, 2) // Only show latest 3 gigs
             : [],
       };
-
+      console.log('Dashboard Data:', data.applications);
       setDashboardData(data);
     } catch (error) {
       console.error('Failed to load brand dashboard data:', error);

@@ -193,21 +193,19 @@ export function GigsTab({ userRole }: GigsTabProps) {
           <>
             <button
               onClick={() => setActiveSubTab('posted')}
-              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-                activeSubTab === 'posted'
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeSubTab === 'posted'
                   ? 'text-brand-primary bg-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               Posted Gigs ({myPostedGigs.length})
             </button>
             <button
               onClick={() => setActiveSubTab('drafts')}
-              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-                activeSubTab === 'drafts'
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeSubTab === 'drafts'
                   ? 'text-brand-primary bg-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               Drafts ({myDraftGigs.length})
             </button>
@@ -217,11 +215,10 @@ export function GigsTab({ userRole }: GigsTabProps) {
         {(userRole === 'INFLUENCER' || userRole === 'CREW') && (
           <button
             onClick={() => setActiveSubTab('applications')}
-            className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-              activeSubTab === 'applications'
+            className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeSubTab === 'applications'
                 ? 'text-brand-primary bg-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             My Applications ({myApplications.length})
           </button>
@@ -229,21 +226,19 @@ export function GigsTab({ userRole }: GigsTabProps) {
 
         <button
           onClick={() => setActiveSubTab('active')}
-          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-            activeSubTab === 'active'
+          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeSubTab === 'active'
               ? 'text-brand-primary bg-white shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
-          }`}
+            }`}
         >
           Active ({myActiveGigs.length})
         </button>
         <button
           onClick={() => setActiveSubTab('completed')}
-          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
-            activeSubTab === 'completed'
+          className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeSubTab === 'completed'
               ? 'text-brand-primary bg-white shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
-          }`}
+            }`}
         >
           Completed ({myCompletedGigs.length})
         </button>

@@ -21,6 +21,24 @@ interface Application {
   respondedAt?: string;
   rejectionReason?: string;
   submissionsCount: number;
+  // Clan-specific fields
+  teamPlan?: Array<{
+    role: string;
+    memberId: string;
+    hours?: number;
+    deliverables?: string[];
+  }>;
+  milestonePlan?: Array<{
+    title: string;
+    dueAt: string;
+    amount: number;
+    deliverables?: string[];
+  }>;
+  payoutSplit?: Array<{
+    memberId: string;
+    percentage?: number;
+    fixedAmount?: number;
+  }>;
   gig: {
     id: string;
     title: string;
@@ -54,6 +72,14 @@ export default function ApplicationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN'>('ALL');
 
+  // Modal states
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [approveApplication, setApproveApplication] = useState<Application | null>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectApplicationId, setRejectApplicationId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [processingApplicationId, setProcessingApplicationId] = useState<string | null>(null);
+
   const userType = getUserTypeForRole(currentRole);
 
   // Redirect if not authenticated or not a brand
@@ -76,11 +102,11 @@ export default function ApplicationsPage() {
       setLoading(true);
       setError(null);
       const response = await apiClient.get('/api/applications/received');
-      
+
       if (response.success) {
         // Handle the nested structure: response.data.applications
         const applicationsData = response.data as any;
-        console.log('Applications loaded successfully:', applicationsData?.applications?.length || 0, 'applications');
+        console.log('Applications loaded successfully:', applicationsData?.applications || 0, 'applications');
         setApplications(applicationsData?.applications || []);
       } else {
         console.error('Failed to load applications:', response);
@@ -94,25 +120,137 @@ export default function ApplicationsPage() {
     }
   };
 
-  const handleStatusChange = async (applicationId: string, newStatus: string) => {
+  const handleAcceptApplication = async (applicationId: string) => {
+    if (!confirm('Are you sure you want to accept this application?')) return;
+
     try {
-      console.log('Updating application status:', applicationId, 'to', newStatus);
-      const response = await apiClient.post(`/api/gig/applications/${applicationId}/${newStatus === 'APPROVED' ? 'approve' : 'reject'}`);
-      
+      console.log('Accepting application:', applicationId);
+      setProcessingApplicationId(applicationId);
+
+      const response = await apiClient.post(`/api/gig/applications/${applicationId}/approve`, {
+        notes: 'Application approved'
+      });
+
       if (response.success) {
-        console.log('Application status updated successfully, refreshing data...');
-        // Refresh the applications list to get updated data from server
-        await loadApplications();
-        console.log('Data refreshed successfully');
-        alert(`Application ${newStatus.toLowerCase()} successfully!`);
+        console.log('Application accepted successfully, updating UI...');
+
+        // Immediately update the application status in the local state
+        setApplications(prevApplications =>
+          prevApplications.map(app =>
+            app.id === applicationId
+              ? { ...app, status: 'APPROVED' as const }
+              : app
+          )
+        );
+
+        // Show success message
+        alert('Application accepted successfully!');
+
+        // Optionally refresh data in background to ensure consistency
+        setTimeout(() => {
+          loadApplications().catch(error => {
+            console.warn('Background refresh failed:', error);
+          });
+        }, 1000);
+
       } else {
-        console.error('Failed to update application status:', response);
-        alert('Failed to update application status');
+        console.error('Failed to accept application:', response);
+        alert('Failed to accept application. Please try again.');
       }
     } catch (error: any) {
-      console.error('Error updating application status:', error);
-      alert(error?.message || error || 'Failed to update application status');
+      console.error('Error accepting application:', error);
+
+      // Check if it's already approved
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = (error as any).message;
+        if (errorMessage && errorMessage.includes('already approved')) {
+          alert('This application has already been approved.');
+          // Refresh data to get current status
+          await loadApplications();
+        } else {
+          alert('Failed to accept application. Please try again.');
+        }
+      } else {
+        alert('Failed to accept application. Please try again.');
+      }
+    } finally {
+      setProcessingApplicationId(null);
     }
+  };
+
+  const handleRejectApplication = async () => {
+    if (!rejectApplicationId || !rejectionReason.trim()) return;
+
+    try {
+      console.log('Rejecting application:', rejectApplicationId);
+      setProcessingApplicationId(rejectApplicationId);
+
+      const response = await apiClient.post(`/api/gig/applications/${rejectApplicationId}/reject`, {
+        reason: rejectionReason,
+        feedback: rejectionReason
+      });
+
+      if (response.success) {
+        console.log('Application rejected successfully, updating UI...');
+
+        // Immediately update the application status in the local state
+        setApplications(prevApplications =>
+          prevApplications.map(app =>
+            app.id === rejectApplicationId
+              ? { ...app, status: 'REJECTED' as const, rejectionReason: rejectionReason }
+              : app
+          )
+        );
+
+        // Close modal and reset form
+        setShowRejectModal(false);
+        setRejectApplicationId(null);
+        setRejectionReason('');
+
+        // Show success message
+        alert('Application rejected successfully.');
+
+        // Optionally refresh data in background to ensure consistency
+        setTimeout(() => {
+          loadApplications().catch(error => {
+            console.warn('Background refresh failed:', error);
+          });
+        }, 1000);
+
+      } else {
+        console.error('Failed to reject application:', response);
+        alert('Failed to reject application. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Error rejecting application:', error);
+
+      // Check if it's already rejected
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = (error as any).message;
+        if (errorMessage && errorMessage.includes('already rejected')) {
+          alert('This application has already been rejected.');
+          // Refresh data to get current status
+          await loadApplications();
+        } else {
+          alert('Failed to reject application. Please try again.');
+        }
+      } else {
+        alert('Failed to reject application. Please try again.');
+      }
+    } finally {
+      setProcessingApplicationId(null);
+    }
+  };
+
+  const openRejectModal = (applicationId: string) => {
+    setRejectApplicationId(applicationId);
+    setShowRejectModal(true);
+  };
+
+  const openApproveModal = (app: Application) => {
+    console.log('Opening approve modal for application:', app);
+    setApproveApplication(app);
+    setShowApproveModal(true);
   };
 
   const filteredApplications = applications.filter(app => {
@@ -210,7 +348,7 @@ export default function ApplicationsPage() {
                 <option value="WITHDRAWN">Withdrawn</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-2 text-sm">
               <span className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
@@ -300,6 +438,55 @@ export default function ApplicationsPage() {
                   </div>
                 </div>
 
+                {/* Team Plan - Only for Clan Applications */}
+                {application.applicantType === 'clan' && application.teamPlan && application.teamPlan.length > 0 && (
+                  <div className="mb-2">
+                    <h4 className="font-semibold mb-2">Team Plan</h4>
+                    <div className="space-y-1 text-sm">
+                      {application.teamPlan.map((m, i) => (
+                        <div key={i} className="flex justify-between bg-gray-50 p-2 rounded-none">
+                          <span className="text-gray-600">{m.role}</span>
+                          <span className="text-gray-600">
+                            ID: {m.memberId?.slice(0, 8)}… • {m.hours || 0}h
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Milestones - Only for Clan Applications */}
+                {application.applicantType === 'clan' && application.milestonePlan && application.milestonePlan.length > 0 && (
+                  <div className="mb-2">
+                    <h4 className="font-semibold mb-2">Milestones</h4>
+                    <div className="space-y-1 text-sm">
+                      {application.milestonePlan.map((m, i) => (
+                        <div key={i} className="flex justify-between bg-gray-50 p-2 rounded-none">
+                          <span className="text-gray-600">{m.title} — {new Date(m.dueAt).toLocaleDateString()}</span>
+                          <span className="font-medium">₹{(m.amount || 0).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Payout Split - Only for Clan Applications */}
+                {application.applicantType === 'clan' && application.payoutSplit && application.payoutSplit.length > 0 && (
+                  <div className="mb-2">
+                    <h4 className="font-semibold mb-2">Payout Split</h4>
+                    <div className="space-y-1 text-sm">
+                      {application.payoutSplit.map((p, i) => (
+                        <div key={i} className="flex justify-between bg-gray-50 p-2 rounded-none">
+                          <span className="text-gray-600">Member ID: {p.memberId?.slice(0, 8)}…</span>
+                          <span className="font-medium">
+                            {p.percentage ? `${p.percentage}%` : `₹${(p.fixedAmount || 0).toLocaleString()}`}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Portfolio */}
                 {application.portfolio && application.portfolio.length > 0 && (
                   <div className="mb-2">
@@ -334,28 +521,41 @@ export default function ApplicationsPage() {
                 {application.status === 'PENDING' && (
                   <div className="flex items-center justify-end space-x-2">
                     <button
-                      onClick={() => handleStatusChange(application.id, 'REJECTED')}
+                      onClick={() => openRejectModal(application.id)}
+                      disabled={processingApplicationId === application.id}
                       className="btn-secondary text-red-600 hover:bg-red-50"
                     >
-                      Reject
+                      {processingApplicationId === application.id ? 'Processing...' : 'Reject'}
                     </button>
                     <button
-                      onClick={() => handleStatusChange(application.id, 'APPROVED')}
+                      onClick={() => openApproveModal(application)}
+                      disabled={processingApplicationId === application.id}
                       className="btn-primary"
                     >
-                      Approve
+                      {processingApplicationId === application.id ? 'Processing...' : 'Review & Approve'}
                     </button>
                   </div>
                 )}
 
+                {/* Status Display for Processed Applications */}
+                {application.status !== 'PENDING' && (
+                  <div className="flex items-center justify-end space-x-2">
+                    <div className="text-sm text-gray-600">
+                      {application.status === 'APPROVED' && '✅ Application Approved'}
+                      {application.status === 'REJECTED' && '❌ Application Rejected'}
+                      {application.status === 'WITHDRAWN' && '↩️ Application Withdrawn'}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
-                  <Link 
+                  <Link
                     href={`/gig/${application.gigId}`}
                     className="text-blue-600 hover:underline text-sm"
                   >
                     View Gig Details →
                   </Link>
-                  <Link 
+                  <Link
                     href={`/gig/${application.gigId}/applications`}
                     className="text-blue-600 hover:underline text-sm"
                   >
@@ -370,13 +570,183 @@ export default function ApplicationsPage() {
             <div className="text-6xl mb-2">📨</div>
             <h3 className="text-xl font-semibold mb-2">No Applications</h3>
             <p className="text-gray-600 mb-2">
-              {filter === 'ALL' 
-                ? 'No applications received yet.' 
+              {filter === 'ALL'
+                ? 'No applications received yet.'
                 : `No ${filter.toLowerCase()} applications found.`}
             </p>
             <Link href="/my-gigs" className="btn-primary">
               View My Gigs
             </Link>
+          </div>
+        )}
+
+        {/* Reject Modal */}
+        {showRejectModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-none max-w-md w-full p-2">
+              <h2 className="text-xl font-bold mb-2">Reject Application</h2>
+              <p className="text-gray-600 mb-2">
+                Please provide a reason for rejecting this application:
+              </p>
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+                className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Reason for rejection..."
+              />
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowRejectModal(false);
+                    setRejectApplicationId(null);
+                    setRejectionReason('');
+                  }}
+                  className="flex-1 btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRejectApplication}
+                  disabled={!rejectionReason.trim() || processingApplicationId === rejectApplicationId}
+                  className="flex-1 btn-primary bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                >
+                  {processingApplicationId === rejectApplicationId ? 'Rejecting...' : 'Reject Application'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approve Modal */}
+        {showApproveModal && approveApplication && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-none max-w-2xl w-full p-3">
+              <h2 className="text-xl font-bold mb-2">Review Application</h2>
+              <p className="text-sm text-gray-600 mb-2">Please review the plan before approving.</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                <div>
+                  <h3 className="font-semibold mb-1">Summary</h3>
+                  <div className="text-sm space-y-1">
+                    <div className="flex justify-between"><span className="text-gray-600">Quoted Price</span><span className="font-medium">₹{approveApplication.quotedPrice.toLocaleString()}</span></div>
+                    {approveApplication.estimatedTime && (
+                      <div className="flex justify-between"><span className="text-gray-600">Timeline</span><span className="font-medium">{approveApplication.estimatedTime}</span></div>
+                    )}
+                    <div className="flex justify-between"><span className="text-gray-600">Type</span><span className="font-medium capitalize">{approveApplication.applicantType}</span></div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Quick Checks</h3>
+                  {(() => {
+                    const msTotal = approveApplication.milestonePlan?.reduce((s: number, m: any) => s + (m.amount || 0), 0) || 0;
+                    const pctTotal = approveApplication.payoutSplit?.reduce((s: number, p: any) => s + (p.percentage || 0), 0) || 0;
+                    return (
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between"><span className="text-gray-600">Milestone Total</span><span className="font-medium">₹{msTotal.toLocaleString()}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Payout % Total</span><span className="font-medium">{pctTotal}%</span></div>
+                        {msTotal > approveApplication.quotedPrice && (
+                          <div className="text-xs text-red-600">Warning: milestones exceed quoted price</div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Proposal */}
+              <div className="mb-2">
+                <h3 className="font-semibold mb-1">Proposal</h3>
+                <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded-none whitespace-pre-wrap">
+                  {approveApplication.proposal}
+                </p>
+              </div>
+
+              {/* Portfolio */}
+              {approveApplication.portfolio && approveApplication.portfolio.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Portfolio</h3>
+                  <div className="space-y-1 text-sm">
+                    {approveApplication.portfolio.map((url, index) => (
+                      <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-blue-600 hover:underline text-sm"
+                      >
+                        Portfolio Item {index + 1}: {url}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Team Plan */}
+              {approveApplication.teamPlan && approveApplication.teamPlan.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Team Plan</h3>
+                  <div className="space-y-1 text-sm">
+                    {approveApplication.teamPlan.map((m, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600">{m.role}</span>
+                        <span className="text-gray-600 cursor-pointer" onClick={() => {
+                          router.push(`/profile/${m.memberId}`);
+                        }}>ID: {m.memberId?.slice(0, 8)}… • {m.hours || 0}h</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Milestones */}
+              {approveApplication.milestonePlan && approveApplication.milestonePlan.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Milestones</h3>
+                  <div className="space-y-1 text-sm">
+                    {approveApplication.milestonePlan.map((m, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600">{m.title} — {new Date(m.dueAt).toLocaleDateString()}</span>
+                        <span className="font-medium">₹{(m.amount || 0).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Payout Split */}
+              {approveApplication.payoutSplit && approveApplication.payoutSplit.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="font-semibold mb-1">Payout Split</h3>
+                  <div className="space-y-1 text-sm">
+                    {approveApplication.payoutSplit.map((p, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-gray-600 cursor-pointer" onClick={() => {
+                          router.push(`/profile/${p.memberId}`);
+                        }}>Member ID: {p.memberId?.slice(0, 8)}…</span>
+                        <span className="font-medium">{p.percentage ? `${p.percentage}%` : `₹${(p.fixedAmount || 0).toLocaleString()}`}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex space-x-3 mt-4">
+                <button
+                  onClick={() => { setShowApproveModal(false); setApproveApplication(null); }}
+                  className="flex-1 btn-secondary py-1 px-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { if (approveApplication) handleAcceptApplication(approveApplication.id); setShowApproveModal(false); }}
+                  disabled={processingApplicationId === approveApplication?.id}
+                  className="flex-1 btn-primary py-1 px-1"
+                >
+                  {processingApplicationId === approveApplication?.id ? 'Approving…' : 'Approve'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

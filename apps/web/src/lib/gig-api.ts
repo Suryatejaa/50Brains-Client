@@ -362,6 +362,7 @@ export class GigAPI {
   // Application Management
   static async applyToGig(gigId: string, data: CreateApplicationData): Promise<Application> {
     const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/apply`, data);
+    console.log('🎯 GigAPI: Apply to gig response:', response);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to apply to gig');
     }

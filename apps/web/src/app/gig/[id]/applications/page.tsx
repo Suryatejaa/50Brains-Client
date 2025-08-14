@@ -180,18 +180,47 @@ export default function GigApplicationsPage() {
       });
 
       if (response.success) {
-        console.log('Application accepted successfully, refreshing data...');
-        // Reload applications to get fresh data from server
-        await loadGigAndApplications();
-        console.log('Data refreshed successfully');
+        console.log('Application accepted successfully, updating UI...');
+
+        // Immediately update the application status in the local state
+        setApplications(prevApplications =>
+          prevApplications.map(app =>
+            app.id === applicationId
+              ? { ...app, status: 'APPROVED' as const }
+              : app
+          )
+        );
+
+        // Show success message
         alert('Application accepted successfully!');
+
+        // Optionally refresh data in background to ensure consistency
+        setTimeout(() => {
+          loadGigAndApplications().catch(error => {
+            console.warn('Background refresh failed:', error);
+          });
+        }, 1000);
+
       } else {
         console.error('Failed to accept application:', response);
         alert('Failed to accept application. Please try again.');
       }
     } catch (error) {
       console.error('Error accepting application:', error);
-      alert('Failed to accept application. Please try again.');
+
+      // Check if it's already approved
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = (error as any).message;
+        if (errorMessage && errorMessage.includes('already approved')) {
+          alert('This application has already been approved.');
+          // Refresh data to get current status
+          await loadGigAndApplications();
+        } else {
+          alert('Failed to accept application. Please try again.');
+        }
+      } else {
+        alert('Failed to accept application. Please try again.');
+      }
     } finally {
       setProcessingApplicationId(null);
     }
@@ -210,21 +239,52 @@ export default function GigApplicationsPage() {
       });
 
       if (response.success) {
-        console.log('Application rejected successfully, refreshing data...');
-        // Reload applications to get fresh data from server
-        await loadGigAndApplications();
+        console.log('Application rejected successfully, updating UI...');
+
+        // Immediately update the application status in the local state
+        setApplications(prevApplications =>
+          prevApplications.map(app =>
+            app.id === rejectApplicationId
+              ? { ...app, status: 'REJECTED' as const, rejectionReason: rejectionReason }
+              : app
+          )
+        );
+
+        // Close modal and reset form
         setShowRejectModal(false);
         setRejectApplicationId(null);
         setRejectionReason('');
-        console.log('Data refreshed successfully');
+
+        // Show success message
         alert('Application rejected successfully.');
+
+        // Optionally refresh data in background to ensure consistency
+        setTimeout(() => {
+          loadGigAndApplications().catch(error => {
+            console.warn('Background refresh failed:', error);
+          });
+        }, 1000);
+
       } else {
         console.error('Failed to reject application:', response);
         alert('Failed to reject application. Please try again.');
       }
     } catch (error) {
       console.error('Error rejecting application:', error);
-      alert('Failed to reject application. Please try again.');
+
+      // Check if it's already rejected
+      if (error && typeof error === 'object' && 'message' in error) {
+        const errorMessage = (error as any).message;
+        if (errorMessage && errorMessage.includes('already rejected')) {
+          alert('This application has already been rejected.');
+          // Refresh data to get current status
+          await loadGigAndApplications();
+        } else {
+          alert('Failed to reject application. Please try again.');
+        }
+      } else {
+        alert('Failed to reject application. Please try again.');
+      }
     } finally {
       setProcessingApplicationId(null);
     }
@@ -505,6 +565,17 @@ export default function GigApplicationsPage() {
                     >
                       {processingApplicationId === application.id ? 'Processing...' : 'Review & Approve'}
                     </button>
+                  </div>
+                )}
+
+                {/* Status Display for Processed Applications */}
+                {application.status !== 'PENDING' && (
+                  <div className="flex items-center justify-end space-x-3">
+                    <div className="text-sm text-gray-600">
+                      {application.status === 'APPROVED' && '✅ Application Approved'}
+                      {application.status === 'REJECTED' && '❌ Application Rejected'}
+                      {application.status === 'WITHDRAWN' && '↩️ Application Withdrawn'}
+                    </div>
                   </div>
                 )}
               </div>

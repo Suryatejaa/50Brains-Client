@@ -91,6 +91,7 @@ export interface BrandGig {
   campaignObjectives: string[];
   applicationsCount: number;
   acceptedCount: number;
+  pendingApplicationsCount: number;
   viewsCount: number;
   createdAt: string;
   updatedAt?: string; // Optional since it might not always be present

@@ -16,6 +16,7 @@ export const useGigApplication = () => {
 
         try {
             const result = await GigAPI.applyToGig(gigId, data);
+            console.log('🎯 useGigApplication: Application:', result);
             return result;
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to apply to gig');
