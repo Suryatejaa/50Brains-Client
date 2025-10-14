@@ -36,7 +36,7 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
 
     // Check if user can manage the clan (owner, co-head, or admin)
     const canManageClan = user?.id && clan && (
-        clan.clanHeadId === user.id ||
+        clan.headId === user.id ||
         (enrichedMembers && enrichedMembers.some((member: any) =>
             member.userId === user.id &&
             ['HEAD', 'CO_HEAD', 'ADMIN'].includes(member.role)
@@ -96,6 +96,8 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
     const handleTouchMove = (e: React.TouchEvent) => {
         touchEndXRef.current = e.changedTouches[0].clientX;
     };
+
+    console.log('activeTab', activeAssignments[0]?.gig?.title);
 
     const handleTouchEnd = () => {
         const startX = touchStartXRef.current;
@@ -180,7 +182,7 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
                                     {activeAssignments.slice(0, 3).map((assignment) => (
                                         <div key={assignment.id} className="border-l-4 border-blue-500 pl-3 md:pl-4 py-2">
                                             <h4 className="font-medium text-gray-900 text-sm md:text-base">
-                                                Gig #{assignment.gigId.slice(-8)}
+                                                {assignment?.gig?.title}
                                             </h4>
                                             <p className="text-sm text-gray-600">
                                                 Status: {assignment.status} |
@@ -265,7 +267,7 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
                                                     <h3 className="font-semibold text-gray-900 text-lg">
-                                                        Gig #{assignment.gigId.slice(-8)}
+                                                        {assignment.gig?.title}
                                                     </h3>
                                                     <p className="text-sm text-gray-600 mt-1">
                                                         Status: <span className="font-medium text-blue-600">{assignment.status}</span>
@@ -297,7 +299,7 @@ const GIG_CLAN_WORKFLOW_PAGE: React.FC = () => {
                                                     </button>
 
                                                     <button
-                                                        onClick={() => window.location.href = `/gigs/${assignment.gigId}`}
+                                                        onClick={() => window.location.href = `/gig/${assignment.gigId}`}
                                                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                                     >
                                                         View Gig Details

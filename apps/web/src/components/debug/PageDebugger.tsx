@@ -77,7 +77,7 @@ export function PageDebugger({
                   onClick={() => window.location.reload()}
                   className="bg-brand-light-blue/20 hover:bg-brand-light-blue/40 w-full rounded px-2 py-1 text-left text-sm transition-colors"
                 >
-                  🔄 Reload Page
+                  ↻ Reload Page
                 </button>
                 <button
                   onClick={() => (window.location.href = '/')}

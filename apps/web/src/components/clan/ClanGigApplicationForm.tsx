@@ -88,7 +88,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
 
     // Load available gigs on component mount
     useEffect(() => {
-        console.log('🔄 ClanGigApplicationForm: Loading gigs on mount...');
+        console.log('↻ ClanGigApplicationForm: Loading gigs on mount...');
         console.log('📋 Current filters:', gigFilters);
         console.log('🔗 loadPublicGigs function:', typeof loadPublicGigs);
         loadPublicGigs(gigFilters).then(() => {
@@ -431,7 +431,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
             />
 
             {/* Debug info */}
-            {process.env.NODE_ENV === 'development' && (
+            {/* {process.env.NODE_ENV === 'production' && (
                 <div className="mt-4 p-4 bg-gray-100 rounded text-xs">
                     <h4 className="font-bold mb-2">🔍 Debug Info:</h4>
                     <p>Current Step: {currentStep}</p>
@@ -442,7 +442,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
                     <p>Selected Gig ID: {selectedGigId || 'None'}</p>
                     <p>Step Component: {steps[currentStep - 1]?.component?.name || 'Unknown'}</p>
                 </div>
-            )}
+            )} */}
 
             {error && (
                 <div className="mt-3 md:mt-4 p-2.5 md:p-4 bg-red-50 border border-red-200 rounded-md">
@@ -583,7 +583,7 @@ const GigSelectionStep: React.FC<{
 
                 <button
                     onClick={() => {
-                        console.log('🔄 GigSelectionStep: Refreshing gigs with filters:', gigFilters);
+                        console.log('↻ GigSelectionStep: Refreshing gigs with filters:', gigFilters);
                         loadPublicGigs(gigFilters).then(() => {
                             console.log('✅ Refresh completed successfully');
                         }).catch((error) => {
@@ -902,7 +902,7 @@ const TeamPlanStep: React.FC<{
         newMembers[index] = { ...newMembers[index], [field]: value };
         setMembers(newMembers);
 
-        console.log(`🔄 Updated member ${index}.${field}:`, {
+        console.log(`↻ Updated member ${index}.${field}:`, {
             from: oldValue,
             to: value,
             member: newMembers[index]
@@ -1056,14 +1056,14 @@ const TeamPlanStep: React.FC<{
                                 </span>
 
                                 {/* Debug Info */}
-                                {process.env.NODE_ENV === 'development' && (
+                                {/* {process.env.NODE_ENV === 'production' && (
                                     <div className="text-xs text-gray-500">
                                         <div>userId: {member.userId || 'EMPTY'}</div>
                                         <div>role: {member.role || 'EMPTY'}</div>
                                         <div>hours: {member.expectedHours}</div>
                                         <div>deliverables: {member.deliverables?.length || 0}</div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
                                 <div>

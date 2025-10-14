@@ -13,7 +13,7 @@ interface CreditTransaction {
   balance: number;
   description: string;
   createdAt: string;
-  
+
   // Related entity info
   relatedEntity?: {
     type: 'GIG' | 'CAMPAIGN' | 'APPLICATION' | 'WITHDRAWAL' | 'SYSTEM';
@@ -21,7 +21,7 @@ interface CreditTransaction {
     title?: string;
     url?: string;
   };
-  
+
   // Transaction metadata
   metadata?: {
     gigId?: string;
@@ -31,7 +31,7 @@ interface CreditTransaction {
     bonusReason?: string;
     penaltyReason?: string;
   };
-  
+
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 }
 
@@ -41,7 +41,7 @@ interface CreditSummary {
   totalSpent: number;
   totalWithdrawn: number;
   pendingAmount: number;
-  
+
   // Monthly breakdown
   monthlyBreakdown: {
     month: string;
@@ -49,7 +49,7 @@ interface CreditSummary {
     spent: number;
     withdrawn: number;
   }[];
-  
+
   // Transaction type breakdown
   typeBreakdown: {
     type: string;
@@ -80,7 +80,7 @@ export default function CreditsHistoryPage() {
   const loadCreditsHistory = async () => {
     try {
       setIsLoading(true);
-      
+
       const [transactionsResponse, summaryResponse] = await Promise.allSettled([
         apiClient.get(`/api/credits/history?type=${typeFilter}&timeframe=${timeFilter}&page=${currentPage}&limit=20`),
         apiClient.get(`/api/credits/summary?timeframe=${timeFilter}`)
@@ -332,7 +332,7 @@ export default function CreditsHistoryPage() {
                           <div className="w-10 h-10 bg-gray-100 rounded-none flex items-center justify-center text-lg">
                             {getTransactionTypeIcon(transaction.type)}
                           </div>
-                          
+
                           <div>
                             <div className="flex items-center space-x-3">
                               <h3 className="font-semibold text-gray-900">{transaction.description}</h3>
@@ -439,7 +439,7 @@ export default function CreditsHistoryPage() {
                   <div className="text-6xl mb-4">💳</div>
                   <h3 className="text-xl font-semibold mb-2">No Transactions Yet</h3>
                   <p className="text-gray-600 mb-6">
-                    {typeFilter === 'all' 
+                    {typeFilter === 'all'
                       ? 'You haven\'t made any credit transactions yet. Start by applying for gigs or creating campaigns!'
                       : `No transactions of type "${typeFilter.toLowerCase()}" found.`}
                   </p>
@@ -460,7 +460,7 @@ export default function CreditsHistoryPage() {
                       onClick={() => setTypeFilter('all')}
                       className="btn-secondary"
                     >
-                      🔄 Show All Transactions
+                      ↻ Show All Transactions
                     </button>
                   )}
                 </div>

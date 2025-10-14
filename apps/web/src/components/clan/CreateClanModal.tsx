@@ -17,22 +17,20 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
         description: '',
         tagline: '',
         visibility: 'PUBLIC' as 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY',
-        isVerified: false,
-        isActive: true,
-        email: '',
-        website: '',
-        instagramHandle: '',
-        twitterHandle: '',
-        linkedinHandle: '',
-        requiresApproval: true,
-        isPaidMembership: false,
-        membershipFee: 0,
-        maxMembers: 50,
         primaryCategory: '',
         categories: [] as string[],
         skills: [] as string[],
         location: '',
         timezone: '',
+        maxMembers: 50,
+        requiresApproval: true,
+        isPaidMembership: false,
+        membershipFee: 0,
+        email: '',
+        website: '',
+        instagramHandle: '',
+        twitterHandle: '',
+        linkedinHandle: '',
         portfolioImages: [] as string[],
         portfolioVideos: [] as string[],
         showcaseProjects: [] as string[]
@@ -62,32 +60,117 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
 
+        // Name validation (required, 2-100 chars, alphanumeric + spaces/hyphens/underscores/dots)
         if (!formData.name.trim()) {
             newErrors.name = 'Clan name is required';
         } else if (formData.name.length < 2) {
             newErrors.name = 'Clan name must be at least 2 characters';
-        } else if (formData.name.length > 50) {
-            newErrors.name = 'Clan name cannot exceed 50 characters';
+        } else if (formData.name.length > 100) {
+            newErrors.name = 'Clan name cannot exceed 100 characters';
+        } else if (!/^[a-zA-Z0-9\s\-_\.]+$/.test(formData.name)) {
+            newErrors.name = 'Clan name can only contain letters, numbers, spaces, hyphens, underscores, and dots';
         }
 
-        if (formData.description && formData.description.length > 500) {
-            newErrors.description = 'Description cannot exceed 500 characters';
+        // Description validation (required, 10-1000 chars)
+        if (!formData.description.trim()) {
+            newErrors.description = 'Description is required';
+        } else if (formData.description.length < 10) {
+            newErrors.description = 'Description must be at least 10 characters';
+        } else if (formData.description.length > 1000) {
+            newErrors.description = 'Description cannot exceed 1000 characters';
         }
 
-        if (formData.tagline && formData.tagline.length > 100) {
-            newErrors.tagline = 'Tagline cannot exceed 100 characters';
+        // Tagline validation (optional, 5-200 chars)
+        if (formData.tagline && formData.tagline.length < 5) {
+            newErrors.tagline = 'Tagline must be at least 5 characters';
+        } else if (formData.tagline && formData.tagline.length > 200) {
+            newErrors.tagline = 'Tagline cannot exceed 200 characters';
         }
 
+        // Primary category validation (optional, 2-50 chars)
+        if (formData.primaryCategory && formData.primaryCategory.length < 2) {
+            newErrors.primaryCategory = 'Primary category must be at least 2 characters';
+        } else if (formData.primaryCategory && formData.primaryCategory.length > 50) {
+            newErrors.primaryCategory = 'Primary category cannot exceed 50 characters';
+        }
+
+        // Categories validation (max 10 items, each 2-50 chars)
+        if (formData.categories.length > 10) {
+            newErrors.categories = 'Maximum 10 categories allowed';
+        } else {
+            for (const category of formData.categories) {
+                if (category.length < 2 || category.length > 50) {
+                    newErrors.categories = 'Each category must be between 2 and 50 characters';
+                    break;
+                }
+            }
+        }
+
+        // Skills validation (max 20 items, each 2-50 chars)
+        if (formData.skills.length > 20) {
+            newErrors.skills = 'Maximum 20 skills allowed';
+        } else {
+            for (const skill of formData.skills) {
+                if (skill.length < 2 || skill.length > 50) {
+                    newErrors.skills = 'Each skill must be between 2 and 50 characters';
+                    break;
+                }
+            }
+        }
+
+        // Location validation (optional, 2-100 chars)
+        if (formData.location && formData.location.length < 2) {
+            newErrors.location = 'Location must be at least 2 characters';
+        } else if (formData.location && formData.location.length > 100) {
+            newErrors.location = 'Location cannot exceed 100 characters';
+        }
+
+        // Timezone validation (optional, valid format)
+        if (formData.timezone && !/^[A-Za-z_]+(\/[A-Za-z_]+)*$/.test(formData.timezone)) {
+            newErrors.timezone = 'Timezone must be in valid format (e.g., UTC, America/New_York)';
+        }
+
+        // Max members validation (2-255)
+        if (formData.maxMembers < 2) {
+            newErrors.maxMembers = 'Max members must be at least 2';
+        } else if (formData.maxMembers > 255) {
+            newErrors.maxMembers = 'Max members cannot exceed 255';
+        }
+
+        // Email validation (optional, valid email)
         if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email address';
         }
 
+        // Website validation (optional, valid URL)
         if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
             newErrors.website = 'Please enter a valid website URL';
         }
 
-        if (formData.maxMembers < 1 || formData.maxMembers > 1000) {
-            newErrors.maxMembers = 'Max members must be between 1 and 1000';
+        // Social media handle validations
+        if (formData.instagramHandle && !/^[a-zA-Z0-9._]+$/.test(formData.instagramHandle)) {
+            newErrors.instagramHandle = 'Instagram handle can only contain letters, numbers, dots, and underscores';
+        }
+
+        if (formData.twitterHandle && !/^[a-zA-Z0-9_]+$/.test(formData.twitterHandle)) {
+            newErrors.twitterHandle = 'Twitter handle can only contain letters, numbers, and underscores';
+        }
+
+        if (formData.linkedinHandle && !/^[a-zA-Z0-9\-]+$/.test(formData.linkedinHandle)) {
+            newErrors.linkedinHandle = 'LinkedIn handle can only contain letters, numbers, and hyphens';
+        }
+
+        // Portfolio arrays validation
+        if (formData.portfolioImages.length > 20) {
+            newErrors.portfolioImages = 'Maximum 20 portfolio images allowed';
+        }
+
+        if (formData.portfolioVideos.length > 10) {
+            newErrors.portfolioVideos = 'Maximum 10 portfolio videos allowed';
+        }
+
+        if (formData.showcaseProjects.length > 15) {
+            newErrors.showcaseProjects = 'Maximum 15 showcase projects allowed';
         }
 
         setErrors(newErrors);
@@ -101,6 +184,10 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
 
         try {
             setLoading(true);
+
+            // Log the data being sent to help debug
+            console.log('Sending clan data to server:', JSON.stringify(formData, null, 2));
+
             const response = await clanApiClient.createClan(formData);
             console.log('Clan creation response:', response);
 
@@ -114,33 +201,49 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                     description: '',
                     tagline: '',
                     visibility: 'PUBLIC',
-                    isVerified: false,
-                    isActive: true,
-                    email: '',
-                    website: '',
-                    instagramHandle: '',
-                    twitterHandle: '',
-                    linkedinHandle: '',
-                    requiresApproval: true,
-                    isPaidMembership: false,
-                    membershipFee: 0,
-                    maxMembers: 50,
                     primaryCategory: '',
                     categories: [],
                     skills: [],
                     location: '',
                     timezone: '',
+                    maxMembers: 50,
+                    requiresApproval: true,
+                    isPaidMembership: false,
+                    membershipFee: 0,
+                    email: '',
+                    website: '',
+                    instagramHandle: '',
+                    twitterHandle: '',
+                    linkedinHandle: '',
                     portfolioImages: [],
                     portfolioVideos: [],
                     showcaseProjects: []
                 });
                 setErrors({});
             } else {
+                console.log('Clan creation failed with response:', response);
                 setErrors({ submit: 'Failed to create clan' });
             }
         } catch (error: any) {
-            console.error('Error creating clan:', error);
-            setErrors({ submit: error.message || 'Failed to create clan' });
+            // 🚨 DEBUGGING: Check the console for "🔴 Clan Creation API Call - Server Response Details"
+            // This shows the actual server response, not just "APIError"
+            // The detailed error logging is now handled by clanApiClient.createClan()
+            // We just need to extract the user-friendly message
+
+            let errorMessage = 'Failed to create clan';
+
+            if (error.details && Array.isArray(error.details)) {
+                // Handle validation error details array
+                const detailMessages = error.details.map((d: any) => d.message || d.msg || 'Unknown validation error').join(', ');
+                errorMessage = `Validation failed: ${detailMessages}`;
+            } else if (error.message) {
+                errorMessage = error.message;
+            } else if (error.errors && Array.isArray(error.errors)) {
+                // Handle errors array
+                errorMessage = `Errors: ${error.errors.join(', ')}`;
+            }
+
+            setErrors({ submit: errorMessage });
         } finally {
             setLoading(false);
         }
@@ -157,12 +260,33 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
         const newCategories = formData.categories.includes(category)
             ? formData.categories.filter(c => c !== category)
             : [...formData.categories, category];
+
+        if (newCategories.length > 10) {
+            setErrors(prev => ({ ...prev, categories: 'Maximum 10 categories allowed' }));
+            return;
+        }
+
         handleChange('categories', newCategories);
+        setErrors(prev => ({ ...prev, categories: '' }));
     };
 
     const handleSkillAdd = (skill: string) => {
-        if (skill.trim() && !formData.skills.includes(skill.trim())) {
-            handleChange('skills', [...formData.skills, skill.trim()]);
+        const trimmedSkill = skill.trim();
+        if (trimmedSkill && !formData.skills.includes(trimmedSkill)) {
+            if (trimmedSkill.length < 2) {
+                setErrors(prev => ({ ...prev, skills: 'Each skill must be at least 2 characters' }));
+                return;
+            }
+            if (trimmedSkill.length > 50) {
+                setErrors(prev => ({ ...prev, skills: 'Each skill cannot exceed 50 characters' }));
+                return;
+            }
+            if (formData.skills.length >= 20) {
+                setErrors(prev => ({ ...prev, skills: 'Maximum 20 skills allowed' }));
+                return;
+            }
+            handleChange('skills', [...formData.skills, trimmedSkill]);
+            setErrors(prev => ({ ...prev, skills: '' }));
         }
     };
 
@@ -213,7 +337,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                             onChange={(e) => handleChange('tagline', e.target.value)}
                             className={`input w-full ${errors.tagline ? 'border-red-500' : ''}`}
                             placeholder="Brief tagline for your clan"
-                            maxLength={100}
+                            maxLength={200}
                         />
                         {errors.tagline && <p className="text-red-500 text-xs mt-1">{errors.tagline}</p>}
                     </div>
@@ -226,7 +350,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                             id="primaryCategory"
                             value={formData.primaryCategory}
                             onChange={(e) => handleChange('primaryCategory', e.target.value)}
-                            className="input w-full"
+                            className={`input w-full ${errors.primaryCategory ? 'border-red-500' : ''}`}
                         >
                             <option value="">Select a category</option>
                             {categories.map((category) => (
@@ -235,11 +359,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 </option>
                             ))}
                         </select>
+                        {errors.primaryCategory && <p className="text-red-500 text-xs mt-1">{errors.primaryCategory}</p>}
                     </div>
 
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                            Description
+                            Description *
                         </label>
                         <textarea
                             id="description"
@@ -248,7 +373,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                             className={`input w-full ${errors.description ? 'border-red-500' : ''}`}
                             placeholder="Describe your clan's mission and goals"
                             rows={3}
-                            maxLength={500}
+                            maxLength={1000}
                         />
                         {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                     </div>
@@ -281,8 +406,8 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 value={formData.maxMembers}
                                 onChange={(e) => handleChange('maxMembers', parseInt(e.target.value))}
                                 className={`input w-full ${errors.maxMembers ? 'border-red-500' : ''}`}
-                                min={1}
-                                max={1000}
+                                min={2}
+                                max={255}
                             />
                             {errors.maxMembers && <p className="text-red-500 text-xs mt-1">{errors.maxMembers}</p>}
                         </div>
@@ -378,9 +503,10 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 id="instagramHandle"
                                 value={formData.instagramHandle}
                                 onChange={(e) => handleChange('instagramHandle', e.target.value)}
-                                className="input w-full"
+                                className={`input w-full ${errors.instagramHandle ? 'border-red-500' : ''}`}
                                 placeholder="clanhandle"
                             />
+                            {errors.instagramHandle && <p className="text-red-500 text-xs mt-1">{errors.instagramHandle}</p>}
                         </div>
 
                         <div>
@@ -392,9 +518,10 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 id="twitterHandle"
                                 value={formData.twitterHandle}
                                 onChange={(e) => handleChange('twitterHandle', e.target.value)}
-                                className="input w-full"
+                                className={`input w-full ${errors.twitterHandle ? 'border-red-500' : ''}`}
                                 placeholder="clanhandle"
                             />
+                            {errors.twitterHandle && <p className="text-red-500 text-xs mt-1">{errors.twitterHandle}</p>}
                         </div>
 
                         <div>
@@ -406,9 +533,10 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 id="linkedinHandle"
                                 value={formData.linkedinHandle}
                                 onChange={(e) => handleChange('linkedinHandle', e.target.value)}
-                                className="input w-full"
+                                className={`input w-full ${errors.linkedinHandle ? 'border-red-500' : ''}`}
                                 placeholder="clanhandle"
                             />
+                            {errors.linkedinHandle && <p className="text-red-500 text-xs mt-1">{errors.linkedinHandle}</p>}
                         </div>
                     </div>
 
@@ -423,9 +551,11 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 id="location"
                                 value={formData.location}
                                 onChange={(e) => handleChange('location', e.target.value)}
-                                className="input w-full"
+                                className={`input w-full ${errors.location ? 'border-red-500' : ''}`}
                                 placeholder="City, Country"
+                                maxLength={100}
                             />
+                            {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
                         </div>
 
                         <div>
@@ -436,9 +566,10 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 id="timezone"
                                 value={formData.timezone}
                                 onChange={(e) => handleChange('timezone', e.target.value)}
-                                className="input w-full"
+                                className={`input w-full ${errors.timezone ? 'border-red-500' : ''}`}
                             >
                                 <option value="">Select timezone</option>
+                                <option value="UTC">UTC</option>
                                 <option value="America/New_York">Eastern Time (ET)</option>
                                 <option value="America/Chicago">Central Time (CT)</option>
                                 <option value="America/Denver">Mountain Time (MT)</option>
@@ -449,6 +580,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 <option value="Asia/Shanghai">Shanghai (CST)</option>
                                 <option value="Australia/Sydney">Sydney (AEST)</option>
                             </select>
+                            {errors.timezone && <p className="text-red-500 text-xs mt-1">{errors.timezone}</p>}
                         </div>
                     </div>
 
@@ -470,6 +602,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 </label>
                             ))}
                         </div>
+                        {errors.categories && <p className="text-red-500 text-xs mt-1">{errors.categories}</p>}
                     </div>
 
                     {/* Skills */}
@@ -502,8 +635,11 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                         e.preventDefault();
-                                        handleSkillAdd((e.target as HTMLInputElement).value);
-                                        (e.target as HTMLInputElement).value = '';
+                                        const skill = (e.target as HTMLInputElement).value;
+                                        if (skill.trim()) {
+                                            handleSkillAdd(skill);
+                                            (e.target as HTMLInputElement).value = '';
+                                        }
                                     }
                                 }}
                             />
@@ -519,6 +655,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 Add
                             </button>
                         </div>
+                        {errors.skills && <p className="text-red-500 text-xs mt-1">{errors.skills}</p>}
                     </div>
 
                     {/* Portfolio Images */}
@@ -553,7 +690,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                         e.preventDefault();
                                         const url = (e.target as HTMLInputElement).value;
                                         if (url.trim()) {
+                                            if (formData.portfolioImages.length >= 20) {
+                                                setErrors(prev => ({ ...prev, portfolioImages: 'Maximum 20 portfolio images allowed' }));
+                                                return;
+                                            }
                                             handleChange('portfolioImages', [...formData.portfolioImages, url.trim()]);
+                                            setErrors(prev => ({ ...prev, portfolioImages: '' }));
                                             (e.target as HTMLInputElement).value = '';
                                         }
                                     }
@@ -565,7 +707,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                     const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                                     const url = input.value.trim();
                                     if (url) {
+                                        if (formData.portfolioImages.length >= 20) {
+                                            setErrors(prev => ({ ...prev, portfolioImages: 'Maximum 20 portfolio images allowed' }));
+                                            return;
+                                        }
                                         handleChange('portfolioImages', [...formData.portfolioImages, url]);
+                                        setErrors(prev => ({ ...prev, portfolioImages: '' }));
                                         input.value = '';
                                     }
                                 }}
@@ -574,6 +721,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 Add
                             </button>
                         </div>
+                        {errors.portfolioImages && <p className="text-red-500 text-xs mt-1">{errors.portfolioImages}</p>}
                     </div>
 
                     {/* Portfolio Videos */}
@@ -608,7 +756,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                         e.preventDefault();
                                         const url = (e.target as HTMLInputElement).value;
                                         if (url.trim()) {
+                                            if (formData.portfolioVideos.length >= 10) {
+                                                setErrors(prev => ({ ...prev, portfolioVideos: 'Maximum 10 portfolio videos allowed' }));
+                                                return;
+                                            }
                                             handleChange('portfolioVideos', [...formData.portfolioVideos, url.trim()]);
+                                            setErrors(prev => ({ ...prev, portfolioVideos: '' }));
                                             (e.target as HTMLInputElement).value = '';
                                         }
                                     }
@@ -620,7 +773,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                     const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                                     const url = input.value.trim();
                                     if (url) {
+                                        if (formData.portfolioVideos.length >= 10) {
+                                            setErrors(prev => ({ ...prev, portfolioVideos: 'Maximum 10 portfolio videos allowed' }));
+                                            return;
+                                        }
                                         handleChange('portfolioVideos', [...formData.portfolioVideos, url]);
+                                        setErrors(prev => ({ ...prev, portfolioVideos: '' }));
                                         input.value = '';
                                     }
                                 }}
@@ -629,6 +787,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 Add
                             </button>
                         </div>
+                        {errors.portfolioVideos && <p className="text-red-500 text-xs mt-1">{errors.portfolioVideos}</p>}
                     </div>
 
                     {/* Showcase Projects */}
@@ -663,7 +822,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                         e.preventDefault();
                                         const project = (e.target as HTMLInputElement).value;
                                         if (project.trim()) {
+                                            if (formData.showcaseProjects.length >= 15) {
+                                                setErrors(prev => ({ ...prev, showcaseProjects: 'Maximum 15 showcase projects allowed' }));
+                                                return;
+                                            }
                                             handleChange('showcaseProjects', [...formData.showcaseProjects, project.trim()]);
+                                            setErrors(prev => ({ ...prev, showcaseProjects: '' }));
                                             (e.target as HTMLInputElement).value = '';
                                         }
                                     }
@@ -675,7 +839,12 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                     const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                                     const project = input.value.trim();
                                     if (project) {
+                                        if (formData.showcaseProjects.length >= 15) {
+                                            setErrors(prev => ({ ...prev, showcaseProjects: 'Maximum 15 showcase projects allowed' }));
+                                            return;
+                                        }
                                         handleChange('showcaseProjects', [...formData.showcaseProjects, project]);
+                                        setErrors(prev => ({ ...prev, showcaseProjects: '' }));
                                         input.value = '';
                                     }
                                 }}
@@ -684,6 +853,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                                 Add
                             </button>
                         </div>
+                        {errors.showcaseProjects && <p className="text-red-500 text-xs mt-1">{errors.showcaseProjects}</p>}
                     </div>
 
                     {/* Error Message */}

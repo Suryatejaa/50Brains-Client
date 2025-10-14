@@ -1,0 +1,428 @@
+/* WhatsApp-style Clan Chat */
+
+/* Ensure input section is always visible above navigation */
+.clan-chat-input {
+    position: relative;
+    z-index: 60;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Date separators - WhatsApp style */
+.date-separator {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.date-separator-content {
+    background: rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.6);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Dark mode support for date separators */
+@media (prefers-color-scheme: dark) {
+    .date-separator-content {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+/* Custom scrollbar */
+.messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Message bubble animations */
+.message-bubble {
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing indicator animation */
+.typing-dot {
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typingBounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Message status checkmarks */
+.message-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+}
+
+/* Read receipt modal styles */
+.read-receipt-modal {
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+    backdrop-filter: blur(2px);
+}
+
+/* User avatar in read receipt modal */
+.read-receipt-avatar {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Hover effects for clickable messages */
+.message-bubble.clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Read receipt button hover effect */
+.read-receipt-button:hover {
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* Message status checkmarks */
+.message-status.sent {
+    color: #34b7f1;
+}
+
+.message-status.delivered {
+    color: #34b7f1;
+}
+
+.message-status.read {
+    color: #4fc3f7;
+}
+
+/* Hover effects for message actions */
+.message-actions {
+    transition: all 0.2s ease;
+}
+
+.message-actions:hover {
+    transform: scale(1.05);
+}
+
+/* Input field focus effect */
+.input-field:focus-within {
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Send button hover effect */
+.send-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Connection status indicator */
+.connection-indicator {
+    transition: all 0.3s ease;
+}
+
+.connection-indicator.connected {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Message grouping */
+.message-group {
+    margin-bottom: 8px;
+}
+
+.message-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Username styling */
+.username-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+/* Empty state styling */
+.empty-state {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+    .message-bubble {
+        max-width: 85%;
+    }
+
+    .header-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .header-title {
+        font-size: 16px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bg-gray-100 {
+        background-color: #1f2937;
+    }
+
+    .bg-white {
+        background-color: #374151;
+    }
+
+    .text-gray-800 {
+        color: #e5e7eb;
+    }
+
+    .border-gray-200 {
+        border-color: #4b5563;
+    }
+}
+
+/* Messages container */
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Message group spacing and alignment */
+.message-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Right-aligned messages (own messages) */
+.message-group:has(.message-bubble.ml-auto) {
+    align-items: flex-end;
+}
+
+/* Message container width constraints */
+.message-group>div {
+    max-width: 70%;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+/* Ensure message bubbles don't exceed container width */
+.message-bubble>div {
+    max-width: 100%;
+    min-width: 0;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Message bubble sizing */
+.message-bubble>div.px-4 {
+    flex-shrink: 0;
+    min-width: fit-content;
+    max-width: 100%;
+    width: fit-content;
+}
+
+/* Ensure proper sizing on small screens */
+@media (max-width: 768px) {
+    .message-group>div {
+        max-width: 70%;
+        min-width: fit-content;
+        flex-shrink: 0;
+    }
+
+    .message-bubble>div.px-4 {
+        min-width: fit-content;
+        width: fit-content;
+        flex-shrink: 0;
+    }
+}
+
+/* Force content-based sizing on very small screens */
+@media (max-width: 480px) {
+    .message-bubble>div.px-4 {
+        width: fit-content !important;
+        min-width: fit-content !important;
+        max-width: 100% !important;
+    }
+}
+
+/* Prevent timestamp wrapping */
+.message-bubble .text-xs {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Message metadata container */
+.message-bubble .flex.items-center.justify-end {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+/* Mobile-specific context menu positioning */
+@media (max-width: 768px) {
+    .context-menu-mobile {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90vw !important;
+        max-width: 300px !important;
+        z-index: 9999 !important;
+    }
+
+    .context-menu-mobile .menu-option {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+        min-height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .context-menu-mobile .menu-icon {
+        width: 20px !important;
+        height: 20px !important;
+    }
+}
+
+/* Ensure context menu is always visible */
+.context-menu {
+    max-width: 280px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.context-menu .menu-option {
+    transition: background-color 0.2s ease;
+    border-radius: 8px;
+    margin: 2px 4px;
+}
+
+.context-menu .menu-option:hover {
+    background-color: #f3f4f6;
+}
+
+.context-menu .menu-option:active {
+    background-color: #e5e7eb;
+}
+
+/* Mobile context menu positioning fix */
+@media (max-width: 768px) {
+    .context-menu {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90vw !important;
+        max-width: 300px !important;
+        z-index: 9999 !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .context-menu .menu-option {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+        min-height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .context-menu svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+}

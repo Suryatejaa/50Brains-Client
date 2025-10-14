@@ -59,7 +59,7 @@ export default function ClanNotificationCenter({ className = '', showBadge = tru
             case 'clan_task_assigned':
                 return '📝';
             case 'clan_task_status_updated':
-                return '🔄';
+                return '↻';
             default:
                 return '🏰';
         }
@@ -169,7 +169,11 @@ export default function ClanNotificationCenter({ className = '', showBadge = tru
                                                 </p>
                                                 <div className="flex items-center justify-between mt-2">
                                                     <span className="text-xs text-gray-400">
-                                                        {formatTimeAgo(notification.data.createdAt || new Date().toISOString())}
+                                                        {formatTimeAgo(
+                                                            'createdAt' in notification.data ? notification.data.createdAt :
+                                                                'assignedAt' in notification.data ? notification.data.assignedAt :
+                                                                    new Date().toISOString()
+                                                        )}
                                                     </span>
                                                     <span className="text-xs text-blue-600 hover:text-blue-800">
                                                         View Details →

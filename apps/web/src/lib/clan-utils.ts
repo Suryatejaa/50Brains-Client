@@ -37,24 +37,24 @@ export function getClanJoinStatus(clan: Clan | null, user: User | null): ClanJoi
 
   // Check if user is already a member
   const isAlreadyMember = clan.members?.some(member => member.userId === user.id) || false;
-  
+
   // Check if user is the clan head
-  const isClanHead = clan.clanHeadId === user.id;
-  
+  const isClanHead = clan.headId === user.id;
+
   // Check if user has pending join request
   const hasPendingRequest = clan.userMembership?.status === 'pending' || false;
 
   // Check if clan is active
   const isClanActive = clan.isActive;
-  
+
   // Check if clan is full
   const isClanFull = clan.memberCount >= clan.maxMembers;
-  
+
   // Check clan visibility
   const isPublic = clan.visibility === 'PUBLIC';
   const isPrivate = clan.visibility === 'PRIVATE';
   const isInviteOnly = clan.visibility === 'INVITE_ONLY';
-  
+
   // Check if clan requires approval
   const requiresApproval = clan.requiresApproval;
 
@@ -64,7 +64,7 @@ export function getClanJoinStatus(clan: Clan | null, user: User | null): ClanJoi
   let reason = '';
 
   // User cannot join if already a member
-  if (isAlreadyMember ) {
+  if (isAlreadyMember) {
     reason = 'You are already a member of this clan';
   }
   // User cannot join if they are the clan head
@@ -130,7 +130,7 @@ export function getClanJoinButtonInfo(joinStatus: ClanJoinStatus) {
       variant: 'danger' as const
     };
   }
-  
+
   if (joinStatus.hasPendingRequest) {
     return {
       text: 'Request Pending',
@@ -138,7 +138,7 @@ export function getClanJoinButtonInfo(joinStatus: ClanJoinStatus) {
       variant: 'disabled' as const
     };
   }
-  
+
   if (joinStatus.canJoin) {
     return {
       text: 'Join Clan',
@@ -146,7 +146,7 @@ export function getClanJoinButtonInfo(joinStatus: ClanJoinStatus) {
       variant: 'primary' as const
     };
   }
-  
+
   if (joinStatus.canRequestToJoin) {
     return {
       text: 'Request to Join',
@@ -154,7 +154,7 @@ export function getClanJoinButtonInfo(joinStatus: ClanJoinStatus) {
       variant: 'secondary' as const
     };
   }
-  
+
   return {
     text: 'Cannot Join',
     action: 'none',
@@ -170,14 +170,14 @@ export function getClanJoinButtonInfo(joinStatus: ClanJoinStatus) {
  */
 export function canManageClan(clan: Clan | null, user: User | null): boolean {
   if (!clan || !user) return false;
-  
+
   // Clan head can always manage
-  if (clan.clanHeadId === user.id) return true;
-  
+  if (clan.headId === user.id) return true;
+
   // Check if user is a member with management role
   const member = clan.members?.find(m => m.userId === user.id);
   if (!member) return false;
-  
+
   // Co-head, admin, and senior members can manage
   return ['CO_HEAD', 'ADMIN', 'SENIOR_MEMBER'].includes(member.role);
 }
@@ -190,7 +190,7 @@ export function canManageClan(clan: Clan | null, user: User | null): boolean {
  */
 export function getUserClanRole(clan: Clan | null, user: User | null): string | null {
   if (!clan || !user) return null;
-  
+
   const member = clan.members?.find(m => m.userId === user.id);
   return member?.role || null;
 } 

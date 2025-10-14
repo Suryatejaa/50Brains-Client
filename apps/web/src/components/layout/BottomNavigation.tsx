@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
+import { useClans } from '@/hooks/useClans';
 import {
   Home,
   Search,
@@ -34,6 +35,25 @@ export const BottomNavigation: React.FC = () => {
   const { hasPermission, hasRole } = usePermissions();
   const { currentRole, getUserTypeForRole } = useRoleSwitch();
   const pathname = usePathname();
+  const { clans } = useClans();
+
+  // Calculate total pending applications across all user's clans
+  const totalPendingApplications = React.useMemo(() => {
+    if (!clans || clans.length === 0) return 0;
+
+    // For now, we'll return 0 since we need to implement the full pending applications fetching
+    // In a real implementation, you'd want to:
+    // 1. Fetch pending applications for each clan the user owns/manages
+    // 2. Sum up all pending counts
+    // 3. Cache this data to avoid excessive API calls
+
+    // This is a placeholder - the actual implementation would require:
+    // - A hook to fetch pending applications for multiple clans
+    // - Proper caching and state management
+    // - Real-time updates when applications are approved/rejected
+
+    return 0;
+  }, [clans]);
 
   // Always show bottom nav for authenticated users (mobile-first approach)
   if (!isAuthenticated || !user) {
@@ -143,30 +163,32 @@ export const BottomNavigation: React.FC = () => {
             <Link
               key={item.path}
               href={item.path as any}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center py-2 transition-all duration-200 ${
-                active
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center py-2 transition-all duration-200 relative ${active
                   ? 'scale-105 text-[#6BC5F2]'
                   : 'text-gray-600 hover:text-[#6BC5F2]'
-              }`}
+                }`}
             >
               <div
-                className={`mb-1 transition-transform duration-200 ${
-                  active ? 'scale-110' : ''
-                }`}
+                className={`mb-1 transition-transform duration-200 ${active ? 'scale-110' : ''
+                  }`}
               >
                 <IconComponent
-                  className={`h-6 w-6 ${
-                    active ? 'text-[#437ebe]' : 'text-gray-600'
-                  }`}
+                  className={`h-6 w-6 ${active ? 'text-[#437ebe]' : 'text-gray-600'
+                    }`}
                 />
               </div>
               <span
-                className={`max-w-full truncate text-xs font-bold leading-none ${
-                  active ? 'text-[#437ebe]' : 'text-gray-600'
-                }`}
+                className={`max-w-full truncate text-xs font-bold leading-none ${active ? 'text-[#437ebe]' : 'text-gray-600'
+                  }`}
               >
                 {item.label}
               </span>
+              {/* Pending Applications Badge for Clans tab */}
+              {item.path === '/clans' && totalPendingApplications > 0 && (
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {totalPendingApplications > 99 ? '99+' : totalPendingApplications}
+                </div>
+              )}
               {active && (
                 <div className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full bg-[#437ebe]"></div>
               )}

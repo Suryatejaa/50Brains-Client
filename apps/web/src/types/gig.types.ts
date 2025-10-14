@@ -14,6 +14,10 @@ export interface Gig {
   skillsRequired: string[];
   isClanAllowed: boolean;
   location?: string;
+  latitude?: number;
+  longitude?: number;
+  gigType?: 'PRODUCT' | 'VISIT' | 'REMOTE';
+  address?: string;
   duration?: string;
   urgency: 'urgent' | 'normal' | 'flexible';
   status: GigStatus;
@@ -37,6 +41,32 @@ export interface Gig {
   pendingApplicationsCount?: number;
 }
 
+// Enhanced Deliverable Types
+export interface EnhancedDeliverable {
+  type: 'social_post' | 'image' | 'video' | 'article' | 'website' | 'other';
+  platform?: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube' | 'other';
+  content?: string;
+  url?: string;
+  file?: File;
+  description: string;
+}
+
+export interface EnhancedSubmissionData {
+  gigId: string;
+  applicationId?: string;
+  title: string;
+  description?: string;
+  deliverables: EnhancedDeliverable[];
+  notes?: string;
+  estimatedHours?: number;
+  challenges?: string;
+  improvements?: string;
+  qualityChecks?: string[];
+  testingDone?: string;
+  brandGuidelinesFollowed?: boolean;
+  guidelinesNotes?: string;
+}
+
 export interface CreateGigData {
   title: string;
   description: string;
@@ -49,6 +79,10 @@ export interface CreateGigData {
   skillsRequired?: string[];
   isClanAllowed?: boolean;
   location?: string;
+  latitude?: number;
+  longitude?: number;
+  gigType?: 'PRODUCT' | 'VISIT' | 'REMOTE';
+  address?: string;
   duration?: string;
   urgency?: 'urgent' | 'normal' | 'flexible';
   deliverables?: string[];
@@ -100,7 +134,7 @@ export interface Submission {
   submittedByType: 'user' | 'clan';
   title: string;
   description?: string;
-  deliverables: string[];
+  deliverables: EnhancedDeliverable[]; // Changed from string[] to EnhancedDeliverable[]
   notes?: string;
   status: SubmissionStatus;
   submittedAt: string;
@@ -109,15 +143,31 @@ export interface Submission {
   rating?: number;
   gig?: Gig;
   application?: Application;
+  // Removed old complex fields:
+  // estimatedHours?: number;
+  // challenges?: string;
+  // improvements?: string;
+  // qualityChecks?: string[];
+  // testingDone?: string;
+  // brandGuidelinesFollowed?: boolean;
+  // guidelinesNotes?: string;
 }
 
 export interface CreateSubmissionData {
-  gigId: string;
+  // gigId is not included - it comes from URL params
   applicationId?: string;
   title: string;
   description?: string;
-  deliverables: string[];
+  deliverables: EnhancedDeliverable[]; // Changed from string[] to EnhancedDeliverable[]
   notes?: string;
+  // Removed old complex fields:
+  // estimatedHours?: number;
+  // challenges?: string;
+  // improvements?: string;
+  // qualityChecks?: string[];
+  // testingDone?: string;
+  // brandGuidelinesFollowed?: boolean;
+  // guidelinesNotes?: string;
 }
 
 export interface GigFilters {
@@ -241,6 +291,39 @@ export const URGENCY_LEVELS = {
   normal: 'Normal',
   flexible: 'Flexible',
 } as const;
+
+// Enhanced Deliverable Constants
+export const DELIVERABLE_TYPES = {
+  social_post: 'Social Media Post',
+  image: 'Image/Graphic',
+  video: 'Video Content',
+  article: 'Article/Blog Post',
+  website: 'Website/App',
+  other: 'Other',
+} as const;
+
+export const SOCIAL_PLATFORMS = {
+  instagram: 'Instagram',
+  twitter: 'Twitter/X',
+  linkedin: 'LinkedIn',
+  facebook: 'Facebook',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+  other: 'Other',
+} as const;
+
+export const QUALITY_CHECK_OPTIONS = [
+  'Content Review',
+  'Spell Check',
+  'Grammar Check',
+  'Brand Compliance',
+  'Technical Testing',
+  'User Testing',
+  'Performance Testing',
+  'Cross-platform Testing',
+  'Accessibility Check',
+  'SEO Optimization',
+] as const;
 
 // New GIG-CLAN Workflow Types
 export interface TeamPlan {

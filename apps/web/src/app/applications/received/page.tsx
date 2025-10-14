@@ -14,7 +14,7 @@ interface Application {
   proposedRate?: number;
   appliedAt: string;
   reviewedAt?: string;
-  
+
   // Applicant info
   applicant: {
     id: string;
@@ -24,7 +24,7 @@ interface Application {
     verified: boolean;
     rating?: number;
     ratingCount?: number;
-    
+
     // Social media stats
     socialMedia?: {
       platform: string;
@@ -32,7 +32,7 @@ interface Application {
       followers: number;
       engagementRate: number;
     }[];
-    
+
     // Profile stats
     stats?: {
       completedCampaigns: number;
@@ -41,7 +41,7 @@ interface Application {
       totalEarnings: number;
     };
   };
-  
+
   // Gig info
   gig: {
     id: string;
@@ -52,17 +52,17 @@ interface Application {
     deadline?: string;
     status: string;
   };
-  
+
   // Portfolio items submitted with application
   portfolio?: {
     title: string;
     url: string;
     description?: string;
   }[];
-  
+
   // Application quality score (AI-generated)
   qualityScore?: number;
-  
+
   // Notes from brand
   notes?: string;
 }
@@ -105,7 +105,7 @@ export default function ReceivedApplicationsPage() {
   const loadApplications = async () => {
     try {
       setIsLoading(true);
-      
+
       const [applicationsResponse, statsResponse] = await Promise.allSettled([
         apiClient.get(`/api/applications/received?status=${statusFilter}&sort=${sortBy}&page=${currentPage}&limit=20`),
         apiClient.get('/api/applications/received/stats')
@@ -309,9 +309,8 @@ export default function ReceivedApplicationsPage() {
                   {applications.map((application) => (
                     <div
                       key={application.id}
-                      className={`border border-gray-200 rounded-none p-3 hover:border-blue-300 transition-colors cursor-pointer ${
-                        selectedApplication === application.id ? 'border-blue-500 bg-blue-50' : ''
-                      }`}
+                      className={`border border-gray-200 rounded-none p-3 hover:border-blue-300 transition-colors cursor-pointer ${selectedApplication === application.id ? 'border-blue-500 bg-blue-50' : ''
+                        }`}
                       onClick={() => setSelectedApplication(selectedApplication === application.id ? null : application.id)}
                     >
                       <div className="flex items-start justify-between">
@@ -349,7 +348,7 @@ export default function ReceivedApplicationsPage() {
                             </div>
 
                             <p className="text-gray-600 mb-2">Applied for: <strong>{application.gig.title}</strong></p>
-                            
+
                             <div className="flex items-center space-x-6 text-sm text-gray-600">
                               <span>📅 Applied {new Date(application.appliedAt).toLocaleDateString()}</span>
                               {application.applicant.rating && (
@@ -535,7 +534,7 @@ export default function ReceivedApplicationsPage() {
                   <div className="text-6xl mb-4">📥</div>
                   <h3 className="text-xl font-semibold mb-2">No Applications Yet</h3>
                   <p className="text-gray-600 mb-6">
-                    {statusFilter === 'all' 
+                    {statusFilter === 'all'
                       ? 'You haven\'t received any applications yet. Create some campaigns to start receiving applications!'
                       : `No applications with status "${statusFilter.toLowerCase()}" found.`}
                   </p>
@@ -548,7 +547,7 @@ export default function ReceivedApplicationsPage() {
                       onClick={() => setStatusFilter('all')}
                       className="btn-secondary"
                     >
-                      🔄 Show All Applications
+                      ↻ Show All Applications
                     </button>
                   )}
                 </div>

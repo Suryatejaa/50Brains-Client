@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { clanApiClient } from '@/lib/clan-api';
-import { getPublicProfile } from '@/lib/user-api';
+import { getPublicProfiles } from '@/lib/user-api';
 
 export interface Clan {
     id: string;
@@ -12,7 +12,7 @@ export interface Clan {
     visibility: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
     isVerified: boolean;
     isActive: boolean;
-    clanHeadId: string;
+    headId?: string; // Made optional since getMyClans response doesn't include it
     userMembership?: {
         status: 'pending' | 'member' | 'rejected';
         role: 'admin' | 'member';
@@ -193,7 +193,7 @@ export function useClans(initialFilters: ClanFilters = {}) {
     // Get clans where user is the head
     const getUserHeadClans = useCallback(() => {
         if (!user || !Array.isArray(clans)) return [];
-        return clans.filter(clan => clan.clanHeadId === user.id);
+        return clans.filter(clan => clan.headId === user.id);
     }, [clans, user]);
 
     // Get public clans for discovery
@@ -286,11 +286,11 @@ export function useClans(initialFilters: ClanFilters = {}) {
             const response = await clanApiClient.getMyClans();
 
             if (response.success) {
-                // Handle the basic clan data structure from /api/clan/my
+                // Handle the new API response structure where clans are in response.data.clans
                 const responseData = response.data as any;
-                const clansData = responseData?.clans || response.data;
+                const clansData = responseData || [];
                 const data = Array.isArray(clansData) ? clansData : [];
-                console.log('Setting my clans:', data);
+                console.log('Setting my clans data:', data);
                 setClans(data);
                 setPagination(responseData?.pagination || (response as any).meta || null);
             } else {
@@ -458,9 +458,22 @@ export function useClanMembers(clanId: string) {
             setLoading(true);
             setError(null);
 
+            // Map role to API-accepted values
+            const { role, ...restInvitationData } = invitationData;
+            let mappedRole: 'ADMIN' | 'MEMBER' | 'OWNER' | undefined = undefined;
+            if (role === 'ADMIN' || role === 'MEMBER') {
+                mappedRole = role;
+            } else if (role === 'HEAD') {
+                mappedRole = 'OWNER';
+            } else if (role) {
+                // All other roles map to MEMBER
+                mappedRole = 'MEMBER';
+            }
+
             const response = await clanApiClient.inviteMember({
                 clanId,
-                ...invitationData
+                ...restInvitationData,
+                role: mappedRole,
             });
 
             if (response.success) {
@@ -512,7 +525,27 @@ export function useClanMembers(clanId: string) {
             setLoading(true);
             setError(null);
 
-            const response = await clanApiClient.updateMemberRole(clanId, userId, roleData);
+            // Map custom roles to API roles
+            const apiRoleMap: Record<string, 'ADMIN' | 'MEMBER' | 'OWNER'> = {
+                HEAD: 'OWNER',
+                CO_HEAD: 'ADMIN',
+                ADMIN: 'ADMIN',
+                SENIOR_MEMBER: 'MEMBER',
+                MEMBER: 'MEMBER',
+                TRAINEE: 'MEMBER',
+            };
+
+            const apiRole = apiRoleMap[roleData.role];
+            if (!apiRole) {
+                setError('Invalid role');
+                setLoading(false);
+                return;
+            }
+
+            const response = await clanApiClient.updateMemberRole(clanId, userId, {
+                role: apiRole,
+                customRole: roleData.customRole,
+            });
 
             if (response.success) {
                 setMembers(prev => prev.map(member =>
@@ -587,9 +620,23 @@ export interface ClanJoinRequest {
     createdAt: string;
     user?: {
         id: string;
-        name?: string;
+        username?: string;
+        firstName?: string;
+        lastName?: string;
         email?: string;
         avatar?: string;
+        profilePicture?: string;
+        location?: string;
+        roles?: string[];
+        bio?: string;
+        website?: string;
+        instagramHandle?: string;
+        twitterHandle?: string;
+        linkedinHandle?: string;
+        youtubeHandle?: string;
+        phone?: string;
+        showContact?: boolean;
+        createdAt?: string;
     };
 }
 
@@ -600,7 +647,10 @@ export function useClanJoinRequests(clanId: string) {
     const [error, setError] = useState<string | null>(null);
 
     const fetchRequests = useCallback(async () => {
-        if (!clanId || !isAuthenticated) return;
+        if (!clanId || !isAuthenticated) {
+            console.log('Skipping join requests fetch - missing clanId or not authenticated');
+            return;
+        }
 
         try {
             setLoading(true);
@@ -608,41 +658,79 @@ export function useClanJoinRequests(clanId: string) {
 
             const response = await clanApiClient.getJoinRequests(clanId);
             if (response.success) {
-                const raw = (response.data as any)?.joinRequests ?? (response.data as any) ?? [];
-                const list: ClanJoinRequest[] = Array.isArray(raw) ? raw : [];
+                const raw = (response.data as any) ?? [];
+                const list = Array.isArray(raw) ? raw : [];
 
-                // Enrich with user public profile when available
-                const enriched = await Promise.all(
-                    list.map(async (req) => {
-                        try {
-                            const userRes = await getPublicProfile(req.userId);
-                            if (userRes?.success) {
-                                const profile: any = (userRes as any).data;
-                                return {
-                                    ...req,
-                                    user: {
-                                        id: profile?.id || req.userId,
-                                        name: profile.displayName || profile.username || [profile.firstName, profile.lastName].filter(Boolean).join(' ') || undefined,
-                                        email: profile.email,
-                                        avatar: profile.profilePicture,
-                                    },
-                                } as ClanJoinRequest;
-                            }
-                        } catch (e) {
-                            // Ignore enrichment failures; keep original
-                        }
-                        return req;
-                    })
+                // Check if the backend already provides user data in the join requests
+                const hasUserData = list.length > 0 && list[0] && (
+                    list[0].username ||
+                    list[0].firstName ||
+                    list[0].lastName ||
+                    list[0].email
                 );
 
-                setRequests(enriched);
+                if (hasUserData) {
+                    // Backend already provides user data, just format it correctly
+                    const formattedRequests = list.map((request: any) => ({
+                        id: request.id,
+                        clanId: request.clanId || clanId,
+                        userId: request.userId || request.id, // Use request.id as fallback
+                        status: request.status || 'PENDING',
+                        message: request.message,
+                        requestedRole: request.requestedRole,
+                        portfolio: request.portfolio,
+                        reviewMessage: request.reviewMessage,
+                        reviewedAt: request.reviewedAt,
+                        reviewedBy: request.reviewedBy,
+                        createdAt: request.createdAt,
+                        user: {
+                            id: request.id,
+                            username: request.username,
+                            firstName: request.firstName,
+                            lastName: request.lastName,
+                            email: request.email,
+                            avatar: request.avatar,
+                            profilePicture: request.profilePicture,
+                            location: request.location,
+                            roles: request.roles,
+                            bio: request.bio,
+                            website: request.website,
+                            instagramHandle: request.instagramHandle,
+                            twitterHandle: request.twitterHandle,
+                            linkedinHandle: request.linkedinHandle,
+                            youtubeHandle: request.youtubeHandle,
+                            phone: request.phone,
+                            showContact: request.showContact,
+                            createdAt: request.createdAt
+                        }
+                    }));
+                    setRequests(formattedRequests);
+                } else {
+                    // Backend only provides user IDs, need to fetch user data separately
+                    console.log('list', list);
+                    setRequests(list);
+                }
             } else {
-                setError('Failed to load join requests');
+                // Handle API errors more gracefully
+                const errorMessage = (response as any).error || (response as any).message || 'Failed to load join requests';
+                if (errorMessage.includes('not authorized')) {
+                    console.warn('User not authorized to view join requests for this clan');
+                    setError('Not authorized to view join requests');
+                } else {
+                    setError(errorMessage);
+                }
                 setRequests([]);
             }
         } catch (e: any) {
             console.error('Error fetching join requests:', e);
-            setError(e?.message || 'Failed to load join requests');
+            // Handle specific error types
+            if (e?.statusCode === 400) {
+                setError('Not authorized to view join requests for this clan');
+            } else if (e?.statusCode === 403) {
+                setError('Access denied');
+            } else {
+                setError(e?.message || 'Failed to load join requests');
+            }
             setRequests([]);
         } finally {
             setLoading(false);
@@ -693,9 +781,10 @@ export function useClanJoinRequests(clanId: string) {
         }
     }, [clanId, fetchRequests]);
 
-    useEffect(() => {
-        fetchRequests();
-    }, [fetchRequests]);
+    // Don't automatically fetch on mount - let the component decide when to fetch
+    // useEffect(() => {
+    //     fetchRequests();
+    // }, [fetchRequests]);
 
     return {
         requests,
@@ -705,6 +794,8 @@ export function useClanJoinRequests(clanId: string) {
         approve,
         reject,
         setError,
+        // Add a note that this hook should only be used when user has permission
+        hasPermission: isAuthenticated && !!clanId,
     };
 }
 

@@ -89,7 +89,7 @@ export default function MyGigsPage() {
       const shouldRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
 
       if (shouldRefresh) {
-        console.log('🔄 Detected refresh flag, will force refresh gigs data');
+        console.log('↻ Detected refresh flag, will force refresh gigs data');
         setRefreshMessage('✅ Gig published successfully! Updating your gigs list...');
 
         // Clear the refresh flag
@@ -267,7 +267,7 @@ export default function MyGigsPage() {
                   className="btn-secondary"
                   title="Refresh gigs data"
                 >
-                  {loading ? '🔄' : '↻'} Refresh
+                  {loading ? '↻' : '↻'} Refresh
                 </button>
                 <Link
                   href="/create-gig"
@@ -344,7 +344,8 @@ export default function MyGigsPage() {
             ) : (
               <div className="space-y-1">
                 {filteredGigs.map((gig) => (
-                  <div key={gig.id} className="card-glass p-2">
+                  <div key={gig.id} className="card-glass p-2 cursor-pointer"
+                    onClick={() => router.push(`/gig/${gig.id}`)}>
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -429,7 +430,7 @@ export default function MyGigsPage() {
 
                         {gig.status === GigStatus.IN_REVIEW && (
                           <>
-                            <span> | </span>                           
+                            <span> | </span>
                             <button
                               onClick={() => handleStatusChange(gig.id, GigStatus.OPEN)}
                               className="btn-ghost-sm text-green-600"

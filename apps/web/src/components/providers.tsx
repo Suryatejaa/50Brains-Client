@@ -16,10 +16,14 @@ import { RouteGuard } from './auth/RouteGuard';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: 3,
+      staleTime: 10 * 60 * 1000, // 10 minutes (increased from 5)
+      gcTime: 20 * 60 * 1000, // 20 minutes (increased from 10)
+      retry: 1, // Reduced from 3
       refetchOnWindowFocus: false,
+      refetchOnMount: false, // Prevent refetch on component mount
+      refetchOnReconnect: false, // Prevent refetch on network reconnect
+      refetchInterval: false, // Disable automatic polling
+      refetchIntervalInBackground: false, // Disable background polling
     },
     mutations: {
       retry: 1,

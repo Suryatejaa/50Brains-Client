@@ -391,7 +391,7 @@ class BrandApiClient {
   ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const response = await apiClient.post(
-        `/api/gig/submissions/${submissionId}/approve`,
+        `/api/gig/submissions/${submissionId}/review`,
         data
       );
       return response;

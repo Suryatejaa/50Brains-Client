@@ -129,60 +129,60 @@ export const AdminDashboard: React.FC = () => {
       const data: AdminDashboardData = {
         systemStats:
           systemStatsResponse.status === 'fulfilled' &&
-          systemStatsResponse.value.success
+            systemStatsResponse.value.success
             ? (systemStatsResponse.value.data as AdminDashboardData['systemStats'])
             : {
-                totalUsers: 0,
-                activeUsers: 0,
-                totalGigs: 0,
-                totalClans: 0,
-                totalTransactions: 0,
-                systemUptime: 0,
-              },
+              totalUsers: 0,
+              activeUsers: 0,
+              totalGigs: 0,
+              totalClans: 0,
+              totalTransactions: 0,
+              systemUptime: 0,
+            },
 
         userAnalytics:
           userAnalyticsResponse.status === 'fulfilled' &&
-          userAnalyticsResponse.value.success
+            userAnalyticsResponse.value.success
             ? (userAnalyticsResponse.value.data as AdminDashboardData['userAnalytics'])
             : {
-                newUsers: 0,
-                userGrowth: 0,
-                activeToday: 0,
-                topUserCountries: [],
-              },
+              newUsers: 0,
+              userGrowth: 0,
+              activeToday: 0,
+              topUserCountries: [],
+            },
 
         platformMetrics:
           platformMetricsResponse.status === 'fulfilled' &&
-          platformMetricsResponse.value.success
+            platformMetricsResponse.value.success
             ? (platformMetricsResponse.value.data as AdminDashboardData['platformMetrics'])
             : {
-                activeGigs: 0,
-                completedGigs: 0,
-                totalRevenue: 0,
-                dailyRevenue: 0,
-                conversionRate: 0,
-                averageOrderValue: 0,
-              },
+              activeGigs: 0,
+              completedGigs: 0,
+              totalRevenue: 0,
+              dailyRevenue: 0,
+              conversionRate: 0,
+              averageOrderValue: 0,
+            },
 
         moderationQueue:
           moderationResponse.status === 'fulfilled' &&
-          moderationResponse.value.success
+            moderationResponse.value.success
             ? (moderationResponse.value.data as AdminDashboardData['moderationQueue'])
             : [],
 
         systemHealth:
           systemHealthResponse.status === 'fulfilled' &&
-          systemHealthResponse.value.success
+            systemHealthResponse.value.success
             ? (systemHealthResponse.value.data as AdminDashboardData['systemHealth'])
             : {
-                status: 'warning',
-                services: [],
-                lastChecked: new Date().toISOString(),
-              },
+              status: 'warning',
+              services: [],
+              lastChecked: new Date().toISOString(),
+            },
 
         recentActivities:
           activitiesResponse.status === 'fulfilled' &&
-          activitiesResponse.value.success
+            activitiesResponse.value.success
             ? (activitiesResponse.value.data as AdminDashboardData['recentActivities'])
             : [],
       };
@@ -374,8 +374,8 @@ export const AdminDashboard: React.FC = () => {
                 Last checked:{' '}
                 {dashboardData?.systemHealth?.lastChecked
                   ? new Date(
-                      dashboardData.systemHealth.lastChecked
-                    ).toLocaleTimeString()
+                    dashboardData.systemHealth.lastChecked
+                  ).toLocaleTimeString()
                   : 'Unknown'}
               </span>
             </div>
@@ -411,10 +411,10 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             )) || (
-              <div className="col-span-4 py-4 text-center">
-                <span className="text-muted">No service data available</span>
-              </div>
-            )}
+                <div className="col-span-4 py-4 text-center">
+                  <span className="text-muted">No service data available</span>
+                </div>
+              )}
           </div>
         </div>
 
@@ -490,15 +490,14 @@ export const AdminDashboard: React.FC = () => {
                         {report.title}
                       </h4>
                       <span
-                        className={`rounded px-2 py-1 text-xs ${
-                          report.priority === 'urgent'
-                            ? 'bg-red-100 text-red-600'
-                            : report.priority === 'high'
-                              ? 'bg-orange-100 text-orange-600'
-                              : report.priority === 'medium'
-                                ? 'bg-yellow-100 text-yellow-600'
-                                : 'bg-gray-100 text-gray-600'
-                        }`}
+                        className={`rounded px-2 py-1 text-xs ${report.priority === 'urgent'
+                          ? 'bg-red-100 text-red-600'
+                          : report.priority === 'high'
+                            ? 'bg-orange-100 text-orange-600'
+                            : report.priority === 'medium'
+                              ? 'bg-yellow-100 text-yellow-600'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
                       >
                         {report.priority}
                       </span>
@@ -511,11 +510,11 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                 )) || (
-                  <div className="py-4 text-center">
-                    <span className="mb-2 block text-2xl">✅</span>
-                    <p className="text-muted">No pending reports</p>
-                  </div>
-                )}
+                    <div className="py-4 text-center">
+                      <span className="mb-2 block text-2xl">✅</span>
+                      <p className="text-muted">No pending reports</p>
+                    </div>
+                  )}
 
                 {dashboardData?.moderationQueue &&
                   dashboardData.moderationQueue.length > 5 && (
@@ -540,7 +539,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="mb-8 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="card-glass p-3">
             <h3 className="text-heading mb-6 text-lg font-semibold">
-              🔄 Recent System Activities
+              ↻ Recent System Activities
             </h3>
 
             <div className="space-y-3">
@@ -564,11 +563,11 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               )) || (
-                <div className="py-4 text-center">
-                  <span className="mb-2 block text-2xl">📋</span>
-                  <p className="text-muted">No recent activities</p>
-                </div>
-              )}
+                  <div className="py-4 text-center">
+                    <span className="mb-2 block text-2xl">📋</span>
+                    <p className="text-muted">No recent activities</p>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -595,11 +594,10 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-body">User Growth</span>
                 <span
-                  className={`font-semibold ${
-                    (dashboardData?.userAnalytics?.userGrowth || 0) > 0
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}
+                  className={`font-semibold ${(dashboardData?.userAnalytics?.userGrowth || 0) > 0
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                    }`}
                 >
                   {dashboardData?.userAnalytics?.userGrowth || 0}%
                 </span>
@@ -620,8 +618,8 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       </div>
                     )) || (
-                    <p className="text-muted text-sm">No data available</p>
-                  )}
+                      <p className="text-muted text-sm">No data available</p>
+                    )}
                 </div>
               </div>
             </div>

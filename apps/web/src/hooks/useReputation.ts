@@ -124,7 +124,7 @@ export const useReputation = (userId?: string): UseReputationReturn => {
   // Force refresh (bypasses cache)
   const forceRefreshReputation = useCallback(async () => {
     console.log(
-      `🔄 [useReputation] Force refreshing reputation for ${targetUserId}`
+      `↻ [useReputation] Force refreshing reputation for ${targetUserId}`
     );
     clearUser(targetUserId);
     await fetchReputation(true);

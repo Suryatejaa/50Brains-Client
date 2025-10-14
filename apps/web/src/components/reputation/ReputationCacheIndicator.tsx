@@ -27,7 +27,7 @@ const ReputationCacheIndicator: React.FC<ReputationCacheIndicatorProps> = ({
           className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
           title="Force refresh reputation"
         >
-          🔄 Refresh
+          ↻ Refresh
         </button>
       </div>
     );
@@ -40,11 +40,10 @@ const ReputationCacheIndicator: React.FC<ReputationCacheIndicatorProps> = ({
   return (
     <div className={`${className} flex flex-col gap-1`}>
       <div
-        className={`rounded border px-2 py-1 text-xs ${
-          isExpiring
-            ? 'border-yellow-300 bg-yellow-100 text-yellow-700'
-            : 'border-green-300 bg-green-100 text-green-700'
-        }`}
+        className={`rounded border px-2 py-1 text-xs ${isExpiring
+          ? 'border-yellow-300 bg-yellow-100 text-yellow-700'
+          : 'border-green-300 bg-green-100 text-green-700'
+          }`}
       >
         <div className="font-medium">
           {isExpiring ? '⚠️' : '✅'} Reputation Cache
@@ -57,7 +56,7 @@ const ReputationCacheIndicator: React.FC<ReputationCacheIndicatorProps> = ({
         className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
         title="Force refresh reputation"
       >
-        🔄 Refresh
+        ↻ Refresh
       </button>
     </div>
   );

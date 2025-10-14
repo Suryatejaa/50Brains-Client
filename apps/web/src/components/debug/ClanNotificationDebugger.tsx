@@ -190,7 +190,7 @@ export default function ClanNotificationDebugger() {
                                 <div className="flex items-center justify-between">
                                     <span className="font-medium">{notification.type}</span>
                                     <span className="text-xs text-gray-500">
-                                        {new Date(notification.data.createdAt || Date.now()).toLocaleTimeString()}
+                                        {new Date(notification.data.assignedAt || notification.data.createdAt || Date.now()).toLocaleTimeString()}
                                     </span>
                                 </div>
                                 <div className="text-xs text-gray-600 mt-1">

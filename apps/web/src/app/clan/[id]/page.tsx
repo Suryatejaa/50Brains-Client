@@ -25,7 +25,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationContext } from '@/components/NotificationProvider';
@@ -34,6 +34,7 @@ import { getClanJoinStatus, getClanJoinButtonInfo, canManageClan } from '@/lib/c
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { apiClient } from '@/lib/api-client';
 import ConfirmDialog from '@/frontend-profile/components/common/ConfirmDialog';
 import {
   ArrowLeftIcon,
@@ -55,14 +56,17 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ChatBubbleLeftIcon
 } from '@heroicons/react/24/outline';
 import {
   StarIcon as StarIconSolid,
   TrophyIcon as TrophyIconSolid
 } from '@heroicons/react/24/solid';
 import { useClan, useClanJoinRequests } from '@/hooks/useClans';
-import { useClanGigWorkflow } from '@/hooks/useClanGigWorkflow';
+import { CrownIcon, EyeIcon } from 'lucide-react';
+import ClanChatAdvanced from '@/components/ClanChat/ClanChatAdvanced';
+
 
 interface ClanMember {
   id: string;
@@ -115,7 +119,7 @@ interface ClanDetail {
   visibility: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
   isActive: boolean;
   isVerified: boolean;
-  clanHeadId: string;
+  headId: string;
   email?: string;
   website?: string;
   instagramHandle?: string;
@@ -176,8 +180,9 @@ interface ClanDetail {
     socialEngagement: number;
     referralCount: number;
   };
-  members: ClanMember[];
-  pendingJoinUserIds: string[];
+  memberIds: string[];
+  pendingRequests: string[];
+  admins: string[];
   portfolio: any[];
   reviews: any[];
   // Additional properties for UI
@@ -200,7 +205,7 @@ export interface Clan {
   visibility: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
   isVerified: boolean;
   isActive: boolean;
-  clanHeadId: string;
+  headId: string;
   userMembership?: {
     status: 'pending' | 'member' | 'rejected';
     role: 'admin' | 'member';
@@ -266,59 +271,108 @@ export interface Clan {
   };
 }
 
-interface ClanGig {
-  id: string;
-  title: string;
-  description: string;
-  budget: number;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  deadline: string;
-  requiredSkills: string[];
-  assignedMembers: string[];
-  createdAt: string;
-  createdBy: string;
-}
 
-interface ActivityItem {
-  id: string;
-  type: 'member_joined' | 'gig_completed' | 'achievement' | 'announcement' | 'milestone';
-  title: string;
-  description: string;
-  timestamp: string;
-  actor: {
-    name: string;
-    avatar?: string;
-  };
-  metadata?: any;
-}
+
+
 
 export default function ClanDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { notifications, isConnected } = useNotificationContext();
+
+  // Safely get notification context
+  let notifications: any[] = [];
+  let isConnected = false;
+
+  try {
+    const notificationContext = useNotificationContext();
+    notifications = notificationContext.notifications || [];
+    isConnected = notificationContext.isConnected || false;
+  } catch (error) {
+    console.error('Error accessing notification context:', error);
+  }
 
   const [clan, setClan] = useState<ClanDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'activity' | 'members' | 'gigs' | 'leaderboard'>('activity');
+  const [activeTab, setActiveTab] = useState<'chat' | 'members' | 'gigs' | 'leaderboard'>('chat');
   const [joinLoading, setJoinLoading] = useState(false);
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
   const [joinRequests, setJoinRequests] = useState<any[]>([]);
   const [joinRequestsLoading, setJoinRequestsLoading] = useState(false);
+  const [pendingApplicationsCount, setPendingApplicationsCount] = useState(0);
+  const memberDetailsRef = useRef<any>([]);
+  const [memberDetails, setMemberDetails] = useState<any>([]);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [showShareGigModal, setShowShareGigModal] = useState(false);
+  const [sharedGigs, setSharedGigs] = useState<any[]>([]);
+  const [sharedGigsLoading, setSharedGigsLoading] = useState(false);
 
-  // Add the workflow hook to fetch gig assignments
-  const { assignments, activeAssignments, loading: workflowLoading, fetchAssignments, error: workflowError } = useClanGigWorkflow(params.id as string);
+
 
   // Remove clan-specific WebSocket state since we're using the global one
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+
+  // Fetch shared gigs
+  const fetchSharedGigs = useCallback(async () => {
+    if (!clan?.id) return;
+
+    try {
+      setSharedGigsLoading(true);
+      const response = await clanApiClient.getSharedGigs(clan.id);
+      if (response.success) {
+        setSharedGigs((response.data as any)?.sharedGigs || []);
+      }
+    } catch (error) {
+      console.error('Error fetching shared gigs:', error);
+    } finally {
+      setSharedGigsLoading(false);
+    }
+  }, [clan?.id]);
+
+  // Load pending applications count for clan owners/admins
+  const loadPendingApplicationsCount = async () => {
+    if (!clan || !user) return;
+
+    try {
+      const response = await clanApiClient.getJoinRequests(params.id as string);
+      if (response.success) {
+        const requests = (response.data as any) || [];
+        const pendingCount = requests.length;
+        setPendingApplicationsCount(pendingCount);
+      }
+    } catch (error) {
+      console.error('Error loading pending applications count:', error);
+    }
+  };
+
+  // This function should only be called when the user explicitly requests to view join requests
+  // (e.g., when navigating to the manage clan page), not automatically on clan load
+  const loadJoinRequests = async () => {
+    try {
+      setJoinRequestsLoading(true);
+      const response = await clanApiClient.getJoinRequests(params.id as string);
+      if (response.success) {
+        const requests = (response.data as any) || [];
+        setJoinRequests(requests);
+        // Count pending applications
+        const pendingCount = requests.length;
+        setPendingApplicationsCount(pendingCount);
+      }
+    } catch (error) {
+      console.error('Error loading join requests:', error);
+    } finally {
+      setJoinRequestsLoading(false);
+    }
+  };
 
   // Swipe refs for mobile tab navigation
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const lastTouchXRef = useRef<number | null>(null);
   const lastTouchYRef = useRef<number | null>(null);
-  const tabOrder: Array<'activity' | 'members' | 'gigs' | 'leaderboard'> = ['activity', 'members', 'gigs', 'leaderboard'];
+  const tabOrder: Array<'chat' | 'members' | 'gigs' | 'leaderboard'> = ['chat', 'members', 'gigs', 'leaderboard'];
   const [menuOpen, setMenuOpen] = useState(false);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [leaveLoading, setLeaveLoading] = useState(false);
@@ -368,8 +422,10 @@ export default function ClanDetailPage() {
     };
   }, [params.id]);
   useEffect(() => {
-    loadClanDetail();
-  }, [params.id]);
+    if (params.id && user?.id) {
+      loadClanDetail();
+    }
+  }, [params.id, user?.id]);
 
   // Listen to global notifications for clan events
   useEffect(() => {
@@ -428,7 +484,7 @@ export default function ClanDetailPage() {
       // 3. It's a join request notification and current user is clan head
       const shouldProcess = !isJoinRequestNotification ||
         notificationUserId === user?.id ||
-        clan?.clanHeadId === user?.id;
+        clan?.headId === user?.id;
 
       if (!shouldProcess) return;
 
@@ -454,7 +510,7 @@ export default function ClanDetailPage() {
         title: notification.title,
         clanId,
         isForCurrentUser: notificationUserId === user?.id,
-        isCurrentUserClanHead: clan?.clanHeadId === user?.id
+        isCurrentUserClanHead: clan?.headId === user?.id
       });
 
       handleClanEvent({ eventType, notification });
@@ -487,31 +543,15 @@ export default function ClanDetailPage() {
       case 'clan.member.joined':
         toast.success(title || 'New member joined the clan');
         loadClanDetail(); // Refresh clan data to show new member
-        addActivityItem({
-          id: `act-${Date.now()}`,
-          type: 'member_joined',
-          title: 'New member joined',
-          description: message || 'A new member has joined the clan',
-          timestamp: new Date().toISOString(),
-          actor: { name: 'System' }
-        });
         break;
 
       case 'clan.member.role_changed':
         toast.info(title || 'Member role updated');
         loadClanDetail(); // Refresh to show updated roles
-        addActivityItem({
-          id: `act-${Date.now()}`,
-          type: 'announcement',
-          title: 'Role updated',
-          description: message || 'A member role has been changed',
-          timestamp: new Date().toISOString(),
-          actor: { name: 'System' }
-        });
         break;
 
       case 'clan.join_request.submitted':
-        if (clan?.clanHeadId === user?.id) {
+        if (clan?.headId === user?.id) {
           toast.info(title || 'New join request received');
         }
         break;
@@ -520,32 +560,12 @@ export default function ClanDetailPage() {
         toast.success(title || 'Join request approved');
         // Refresh clan data to update membership status and hide join button
         loadClanDetail();
-
-        // Add activity for approved request
-        addActivityItem({
-          id: `act-${Date.now()}`,
-          type: 'member_joined',
-          title: 'Join request approved',
-          description: message || 'Your join request has been approved',
-          timestamp: new Date().toISOString(),
-          actor: { name: 'System' }
-        });
         break;
 
       case 'clan.join_request.rejected':
         toast.error(title || 'Join request rejected');
         // Refresh clan data to update request status
         loadClanDetail();
-
-        // Add activity for rejected request
-        addActivityItem({
-          id: `act-${Date.now()}`,
-          type: 'announcement',
-          title: 'Join request rejected',
-          description: message || 'Your join request has been rejected',
-          timestamp: new Date().toISOString(),
-          actor: { name: 'System' }
-        });
         break;
 
       case 'clan.invitation.sent':
@@ -560,10 +580,8 @@ export default function ClanDetailPage() {
     }
   };
 
-  // Add activity item to local state
-  const addActivityItem = (activity: ActivityItem) => {
-    setActivities(prev => [activity, ...prev.slice(0, 9)]); // Keep only last 10 activities
-  };
+
+
 
   const loadClanDetail = async () => {
     try {
@@ -571,17 +589,22 @@ export default function ClanDetailPage() {
       const response = await clanApiClient.getClan(params.id as string);
       if (response.success) {
         const clanData = response.data as ClanDetail;
+        console.log('Clan data loaded:', {
+          memberIds: clanData.memberIds,
+          pendingRequests: clanData.pendingRequests,
+          userId: user?.id
+        });
         setClan(clanData);
-        console.log('Clan data refreshed:', clanData);
 
-        // Fetch join requests if user can manage the clan
-        if (clanData.clanHeadId === user?.id ||
-          clanData.members?.some((member: any) =>
-            member.userId === user?.id &&
-            ['HEAD', 'CO_HEAD', 'ADMIN'].includes(member.role)
-          )) {
-          loadJoinRequests();
-        }
+        // Note: Join requests are now loaded on-demand when user clicks to view them
+        // This prevents unnecessary API calls and permission errors
+
+        // Clear the array first to avoid duplicates
+        memberDetailsRef.current = clanData.memberIds;
+
+
+        loadMemberDetails();
+
       } else {
         setError('Clan not found');
       }
@@ -593,19 +616,36 @@ export default function ClanDetailPage() {
     }
   };
 
-  const loadJoinRequests = async () => {
+  // Fetch shared gigs when clan loads
+  useEffect(() => {
+    if (clan?.id) {
+      fetchSharedGigs();
+    }
+  }, [clan?.id, fetchSharedGigs]);
+
+  // Load pending applications count when clan loads (for owners/admins)
+  useEffect(() => {
+    if (clan?.id && user?.id) {
+      loadPendingApplicationsCount();
+    }
+  }, [clan?.id, user?.id]);
+
+  const loadMemberDetails = async () => {
     try {
-      setJoinRequestsLoading(true);
-      const response = await clanApiClient.getJoinRequests(params.id as string);
-      if (response.success) {
-        setJoinRequests((response.data as any) || []);
-      }
+      const response = await apiClient.post('/api/public/profiles/internal/by-ids', {
+        userIds: memberDetailsRef.current
+      });
+      setMemberDetails(response.data as any);
     } catch (error) {
-      console.error('Error loading join requests:', error);
-    } finally {
-      setJoinRequestsLoading(false);
+      console.error('Error loading member details:', error);
     }
   };
+
+  useEffect(() => {
+    if (memberDetailsRef.current && memberDetailsRef.current.length > 0) {
+      loadMemberDetails();
+    }
+  }, [memberDetailsRef.current]);
 
   // Swipe handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -654,7 +694,7 @@ export default function ClanDetailPage() {
     try {
       setJoinLoading(true);
       await clanApiClient.joinClan(clan.id);
-      toast.success('Join request sent successfully!');
+      toast.success('Join request sent successfully! The clan owner will review it.');
       await loadClanDetail(); // Refresh data
     } catch (error: any) {
       console.error('Error joining clan - Full error:', error);
@@ -751,26 +791,29 @@ export default function ClanDetailPage() {
   // console.log('Clan:', clan)
   // console.log('Current User:', user)
   // console.log('User ID:', user?.id)
-  // console.log('Clan Head ID:', clan.clanHeadId)
+  // console.log('Clan Head ID:', clan.headId)
   // console.log('Members:', clan.members)
 
-  const isOwner = clan.clanHeadId === user?.id;
+  const isOwner = clan.headId === user?.id;
 
-  // Check if user is a member by looking in the members array
-  const isMemberInArray = clan.members?.some(member => member.userId === user?.id);
+  // Check if user is a member by looking in the memberIds array (array of user IDs)
+  const isMemberInArray = clan.memberIds && Array.isArray(clan.memberIds) ?
+    clan.memberIds.includes(user?.id || '') :
+    false;
 
   // Check userMembership status (fallback)
   const isMemberByStatus = clan.userMembership?.status === 'member';
 
   // User is considered a member if they're the owner, in the members array, or have member status
   const isMember = isOwner || isMemberInArray || isMemberByStatus;
-  const isAlreadyRequested = user?.id ? clan.pendingJoinUserIds.includes(user.id) : false;
-  // console.log('Is Owner:', isOwner)
-  // console.log('Is Member in Array:', isMemberInArray)
-  // console.log('Is Member by Status:', isMemberByStatus)
-  // console.log('Final isMember:', isMember)
+  // Check if user has already requested to join
+  const isAlreadyRequested = user?.id && clan?.pendingRequests ?
+    (Array.isArray(clan.pendingRequests) ?
+      clan.pendingRequests.includes(user.id) :
+      false) :
+    false;
 
-  const canManage = isOwner || (isMemberInArray && ['HEAD', 'CO_HEAD', 'ADMIN'].includes(clan.members?.find(m => m.userId === user?.id)?.role || ''));
+  const canManage = isOwner || (isMemberInArray && (clan.headId === user?.id || clan.admins?.includes(user?.id || '')));
 
   const getRoleColor = (role: string) => {
     const colors = {
@@ -806,7 +849,6 @@ export default function ClanDetailPage() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric',
       year: 'numeric'
     });
   };
@@ -821,48 +863,92 @@ export default function ClanDetailPage() {
     if (diffInHours < 48) return 'Yesterday';
     return formatDate(dateString);
   };
-  console.log('Clan Detail:', clan);
+
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-1 py-1">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-2 py-2">
           <div className="flex items-center justify-between">
             {/* Left section */}
             <div className="flex items-center space-x-2 flex-1 min-w-0">
               <button
                 onClick={() => router.back()}
-                className="p-0 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
               >
-                <ArrowLeftIcon className="h-6 w-6 text-gray-600" />
+                <ArrowLeftIcon className="h-5 w-5 text-gray-600" />
               </button>
 
               {/* Clan Avatar */}
               <div className="relative flex-shrink-0">
-                <div className="h-10 w-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm sm:text-lg">
                     {clan.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 {clan.isActive && (
-                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 h-2 w-2 sm:h-3 sm:w-3 bg-green-500 border-2 border-white rounded-full"></div>
                 )}
               </div>
 
               {/* Clan Info */}
               <div className="flex-1 min-w-0">
-                <h1 className="text-lg font-semibold text-gray-900 truncate flex items-center space-x-2">
+                <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate flex items-center space-x-1 sm:space-x-2">
                   <span>{clan.name}</span>
                   {clan.isVerified && (
-                    <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                    <CheckCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
                   )}
                 </h1>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <UserGroupIcon className="h-4 w-4 flex-shrink-0" />
-                  <span>{clan.memberCount} members</span>
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500">
+                  <div className="flex items-center space-x-1">
+                    <UserGroupIcon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                    <span>{clan.memberCount} members</span>
+                  </div>
+                  {canManage && pendingApplicationsCount > 0 && (
+                    <>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                        <span className="inline-block mr-1 h-1.5 w-1.5 sm:h-2 sm:w-2 bg-orange-500 rounded-full animate-pulse"></span>
+                        <span className="hidden sm:inline">{pendingApplicationsCount} pending</span>
+                        <span className="sm:hidden">{pendingApplicationsCount}</span>
+                      </span>
+                    </>
+                  )}
                   {clan.visibility === 'PRIVATE' && (
                     <>
-                      <span>•</span>
-                      <span>Private</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="hidden sm:inline">Private</span>
+                    </>
+                  )}
+                  {/* User Status Badge */}
+                  {user?.id && (
+                    <>
+                      <span className="hidden sm:inline">•</span>
+                      {isOwner ? (
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                          <CrownIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Owner</span>
+                          <span className="sm:hidden">Owner</span>
+                        </span>
+                      ) : isMember ? (
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Member</span>
+                          <span className="sm:hidden">✅</span>
+                        </span>
+                      ) : isAlreadyRequested ? (
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                          <ClockIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Pending</span>
+                          <span className="sm:hidden">Pending</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                          <EyeIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Visitor</span>
+                          <span className="sm:hidden">Visitor</span>
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
@@ -871,27 +957,19 @@ export default function ClanDetailPage() {
 
             {/* Right section */}
             <div className="relative flex items-center space-x-1 flex-shrink-0">
-              {(isMember || canManage) && (
-                <Link
-                  href={`/clan/${clan.id}/gig-workflow`}
-                  className="inline-flex items-center space-x-1 px-2 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-                >
-                  <BriefcaseIcon className="h-4 w-4" />
-                  <span className="hidden sm:inline">Workflow</span>
-                </Link>
-              )}
               <button
                 onClick={() => setMenuOpen(prev => !prev)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors relative"
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
               >
-                <EllipsisVerticalIcon className="h-6 w-6 text-gray-600" />
-                {/* Notification dot for pending join requests */}
-                {joinRequests.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 text-xs bg-red-500 rounded-full animate-pulse">{joinRequests.length}</span>
-                )}
+                <EllipsisVerticalIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
               </button>
+              {pendingApplicationsCount > 0 && (
+                <span className="inline-flex items-center absolute right-1 top-1 px-1 py-0 h-2.5 w-2 text-xs font-medium bg-orange-500 text-orange-500 rounded-full border border-orange-500 animate-pulse">
+                  {/* {pendingApplicationsCount} */}
+                </span>
+              )}
               {menuOpen && (
                 <div className="absolute right-0 top-10 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1">
                   {canManage && (
@@ -900,21 +978,33 @@ export default function ClanDetailPage() {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <span className="inline-flex justify-between items-center space-x-2">
-                        <Cog6ToothIcon className="h-4 w-4" />
-                        <span>Manage Clan</span>
-                        {joinRequests.length > 0 && (
-                          <span className="h-4 w-4 text-center items-center text-xs bg-red-500 rounded-full animate-pulse">{joinRequests.length}</span>
+                      <span className="inline-flex justify-between items-center space-x-2 w-full">
+                        <span className="inline-flex items-center space-x-2">
+                          <Cog6ToothIcon className="h-4 w-4" />
+                          <span>Manage Clan</span>
+                        </span>
+                        {pendingApplicationsCount > 0 && (
+                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded-full border border-orange-200">
+                            {pendingApplicationsCount}
+                          </span>
                         )}
                       </span>
                     </Link>
                   )}
-                  {!canManage && isMember && (
+                  {isMember && !isOwner && (
                     <button
                       onClick={() => { setMenuOpen(false); setLeaveConfirmOpen(true); }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       Leave Clan
+                    </button>
+                  )}
+                  {!isMember && !isAlreadyRequested && (
+                    <button
+                      onClick={() => { setMenuOpen(false); handleJoinClan(); }}
+                      className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                    >
+                      Request to Join
                     </button>
                   )}
                 </div>
@@ -937,27 +1027,7 @@ export default function ClanDetailPage() {
           onConfirm={handleLeaveClan}
           onCancel={() => setLeaveConfirmOpen(false)}
         />
-        {/* Active Gigs Notification Banner */}
-        {activeAssignments && activeAssignments.length > 0 && (
-          <div className="bg-green-50 border-b border-green-200 px-4 py-3">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-800">
-                    You have {activeAssignments.length} active gig{activeAssignments.length !== 1 ? 's' : ''}!
-                  </span>
-                </div>
-                <Link
-                  href={`/clan/${clan.id}/gig-workflow`}
-                  className="text-sm text-green-700 hover:text-green-800 font-medium underline"
-                >
-                  Manage Workflow →
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Clan Cover/Hero Section */}
         <div className="relative bg-gradient-to-br from-gray-300 to-gray-300 text-white">
@@ -974,12 +1044,7 @@ export default function ClanDetailPage() {
                     <TrophyIconSolid className="h-4 w-4 text-gray-900 flex-shrink-0" />
                     <span className="text-gray-900">{clan.completedGigs} completed</span>
                   </div>
-                  {activeAssignments && activeAssignments.length > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <BriefcaseIcon className="h-4 w-4 text-green-600 flex-shrink-0" />
-                      <span className="text-green-700 font-medium">{activeAssignments.length} active</span>
-                    </div>
-                  )}
+
                   <div className="flex items-center space-x-1">
                     <StarIconSolid className="h-4 w-4 text-gray-900 flex-shrink-0" />
                     <span className="text-gray-900">{clan.averageRating?.toFixed(1) || '5.0'}</span>
@@ -991,7 +1056,8 @@ export default function ClanDetailPage() {
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Action Buttons */}
+
               {!isMember && !isAlreadyRequested && (
                 <div className="sm:ml-4 flex-shrink-0">
                   <button
@@ -999,26 +1065,27 @@ export default function ClanDetailPage() {
                     disabled={joinLoading}
                     className="w-full sm:w-auto bg-white text-blue-600 px-4 sm:px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
                   >
-                    {joinLoading ? 'Joining...' : 'Join Clan'}
+                    {joinLoading ? 'Sending Request...' : 'Request to Join'}
                   </button>
                 </div>
               )}
               {isAlreadyRequested && (
                 <div className="sm:ml-4 flex-shrink-0">
-                  <span className="text-sm text-gray-500">You have already requested to join this clan.</span>
+                  <div className="text-center">
+                    <span className="text-sm text-gray-500 block mb-2">You have already requested to join this clan.</span>
+                    <span className="text-xs text-gray-400">Please wait for approval from the clan owner.</span>
+                  </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white border-b border-gray-200 sticky top-[73px] z-40">
+        <div className="bg-white border-b border-gray-200 sticky top-[65px] z-40">
           <div className="px-16 sm:px-0">
             <nav className="flex justify-between md:justify-center lg:justify-center overflow-x-auto">
               {[
-                { id: 'activity', label: '', icon: ChartBarIcon },
+                { id: 'chat', label: '', icon: ChatBubbleLeftIcon },
                 { id: 'members', label: '', icon: UserGroupIcon },
                 { id: 'gigs', label: '', icon: BriefcaseIcon },
                 { id: 'leaderboard', label: '', icon: TrophyIcon }
@@ -1042,15 +1109,15 @@ export default function ClanDetailPage() {
 
         {/* Tab Content */}
         <div
-          className="p-2 sm:p-2"
+          className="p-0 sm:p-0"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {activeTab === 'activity' && (
-            <div className="space-y-4">
+          {activeTab === 'chat' && (
+            <div className="space-y-0 p-0">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Clan Chat</h3>
                 <div className="flex items-center space-x-2">
                   <div className={`h-2 w-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500' :
                     connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'
@@ -1062,35 +1129,15 @@ export default function ClanDetailPage() {
                 </div>
               </div>
 
-              {activities.length > 0 ? (
-                <div className="space-y-3">
-                  {activities.map(activity => (
-                    <div key={activity.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          {activity.type === 'member_joined' && <UserIcon className="h-5 w-5 text-blue-600" />}
-                          {activity.type === 'announcement' && <ChartBarIcon className="h-5 w-5 text-blue-600" />}
-                          {activity.type === 'achievement' && <TrophyIcon className="h-5 w-5 text-yellow-600" />}
-                          {activity.type === 'gig_completed' && <BriefcaseIcon className="h-5 w-5 text-green-600" />}
-                          {activity.type === 'milestone' && <StarIcon className="h-5 w-5 text-purple-600" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                          <p className="text-sm text-gray-600">{activity.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{timeAgo(activity.timestamp)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <ChartBarIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg font-medium mb-2">No recent activity</p>
-                  <p className="text-sm">Activity will appear here as members interact with the clan.</p>
-                  {connectionStatus === 'connected' && (
-                    <p className="text-xs text-green-600 mt-2">🟢 Live updates enabled</p>
-                  )}
+              {/* Real Clan Chat Interface */}
+              {user && clan && (
+                <div className="h-[calc(100vh-150px)] w-full">
+                  <ClanChatAdvanced
+                    userId={user.id}
+                    clanId={clan.id}
+                    clanName={clan.name}
+                    memberDetails={memberDetails}
+                  />
                 </div>
               )}
             </div>
@@ -1111,26 +1158,24 @@ export default function ClanDetailPage() {
               </div>
 
               <div className="grid gap-0">
-                {clan.members && clan.members.length > 0 ? clan.members.map(member => (
+                {memberDetails && memberDetails.length > 0 ? memberDetails.map((member: any) => (
                   <div key={member.id} className="bg-white border-t border-gray-200 p-1">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0">
                       <div className="flex items-center space-x-2 cursor-pointer"
                         onClick={() => {
-                          if (member.userId === user?.id)
-                            router.push(`/profile`)
-                          else
-                            router.push(`/profile/${member.userId}`)
+                          setSelectedMember(member);
+                          setShowMemberModal(true);
                         }}
                       >
                         <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                           <UserIcon className="h-6 w-6 text-gray-600" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-medium text-gray-900 truncate">Name: {member.user?.name || member.displayName}</h4>
+                          <h4 className="font-medium text-gray-900 truncate">{member.username || member.displayName}</h4>
                           <div className="flex flex-row items-right sm:flex-row sm:items-right gap-2">
-                            <span className={`inline-flex items-right px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member.role)} w-fit`}>
-                              {member.role.replace('_', ' ')}
-                            </span>
+                            {/* <span className={`inline-flex items-right px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(member?.role)} w-fit`}> */}
+                            {/* {member.role.replace('_', ' ')} */}
+                            {/* </span> */}
                             <span className="text-sm text-right sm:text-right text-gray-500">
                               {member.gigsParticipated} gigs • {member.reputation} reputation
                             </span>
@@ -1138,7 +1183,7 @@ export default function ClanDetailPage() {
                         </div>
                       </div>
                       <div className="text-left sm:text-right">
-                        <p className="text-sm text-gray-500">Joined {formatDate(member.joinedAt)}</p>
+                        <p className="text-sm text-gray-500">Joined: {formatDate(member.createdAt)}</p>
                         {member.status === 'ACTIVE' && (
                           <div className="flex items-center space-x-1 text-green-600">
                             <div className="h-2 w-2 bg-green-500 rounded-full"></div>
@@ -1162,133 +1207,73 @@ export default function ClanDetailPage() {
           {activeTab === 'gigs' && (
             <div className="space-y-4">
               <div className="flex flex-row sm:flex-row justify-between sm:items-center sm:justify-between gap-4">
-                <h3 className="text-lg font-semibold text-gray-900">Clan Gigs</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Gig Sharing</h3>
                 <div className="flex items-center space-x-2">
-                  {canManage && (
-                    <button
-                      className="bg-blue-600 text-white px-2 py-1 rounded-xs text-sm font-medium hover:bg-blue-700 transition-colors sm:w-auto"
-                      onClick={() => {
-                        router.push('/marketplace');
-                      }}
-                    >
-                      Apply Gig
-                    </button>
-                  )}
-                  {activeAssignments && activeAssignments.length > 0 && (
-                    <Link
-                      href={`/clan/${clan.id}/gig-workflow`}
-                      className="bg-green-600 text-white px-2 py-1 rounded-xs text-sm font-medium hover:bg-green-700 transition-colors sm:w-auto"
-                    >
-                      Manage Workflow
-                    </Link>
-                  )}
+                  <button
+                    className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    onClick={() => {
+                      router.push('/marketplace');
+                    }}
+                  >
+                    Browse Gigs
+                  </button>
                 </div>
               </div>
 
-              {workflowLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              {/* Gig Sharing Interface */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Shared Gigs</h3>
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    onClick={() => setShowShareGigModal(true)}
+                  >
+                    Share New Gig
+                  </button>
                 </div>
-              ) : (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium">Debug Info:</p>
-                    <button
-                      onClick={() => fetchAssignments()}
-                      className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
-                    >
-                      Refresh
-                    </button>
+
+                {sharedGigsLoading ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mb-4"></div>
+                    <p className="text-sm">Loading shared gigs...</p>
                   </div>
-                  <p>• Assignments loaded: {assignments?.length || 0}</p>
-                  <p>• Active assignments: {activeAssignments?.length || 0}</p>
-                  <p>• Workflow loading: {workflowLoading ? 'Yes' : 'No'}</p>
-                  <p>• Error: {workflowError || 'None'}</p>
-                  {assignments && assignments.length > 0 && (
-                    <>
-                      <p>• First assignment ID: {assignments[0].id}</p>
-                      <p>• First assignment gig: {assignments[0].gig?.title || 'No title'}</p>
-                      <p>• First assignment status: {assignments[0].status}</p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {activeAssignments && activeAssignments.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                      <span className="text-sm font-medium text-green-800">
-                        {activeAssignments.length} Active Gig{activeAssignments.length !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  </div>
-
-                  {activeAssignments.map(assignment => (
-                    <div key={assignment.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900 text-lg">
-                            {assignment.gig?.title || `Gig #${assignment.gigId.slice(-8)}`}
-                          </h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Status: <span className="font-medium text-green-600">{assignment.status}</span>
-                          </p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Assigned: {new Date(assignment.assignedAt).toLocaleDateString()}
-                          </p>
-
-                          {assignment.milestonePlanSnapshot && (
-                            <div className="mt-3">
-                              <p className="text-sm font-medium text-gray-700">Milestones:</p>
-                              <div className="mt-2 space-y-1">
-                                {assignment.milestonePlanSnapshot.map((milestone, index) => (
-                                  <div key={index} className="text-sm text-gray-600">
-                                    • {milestone.title} - ${milestone.amount}
-                                  </div>
-                                ))}
-                              </div>
+                ) : sharedGigs.length > 0 ? (
+                  <div className="space-y-3">
+                    {sharedGigs.map((gig) => (
+                      <div key={gig.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              {gig.metadata?.gigTitle || 'Untitled Gig'}
+                            </h4>
+                            <p className="text-sm text-gray-600 mb-2">
+                              {gig.metadata?.gigDescription || 'No description available'}
+                            </p>
+                            <div className="flex items-center space-x-4 text-xs text-gray-500">
+                              <span>Shared by {gig.user?.username || 'Unknown'}</span>
+                              <span>{new Date(gig.createdAt).toLocaleDateString()}</span>
                             </div>
-                          )}
-                        </div>
-
-                        <div className="ml-4 flex flex-col space-y-2">
-                          <Link
-                            href={`/clan/${clan.id}/gig-workflow?gigId=${assignment.gigId}`}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                          >
-                            Manage Tasks
-                          </Link>
-
-                          <button
-                            onClick={() => window.location.href = `/gig/${assignment.gigId}`}
+                          </div>
+                          <a
+                            href={gig.metadata?.gigUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                           >
-                            View Gig Details
-                          </button>
+                            View Gig →
+                          </a>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <BriefcaseIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg font-medium mb-2">No active gigs</p>
-                  <p className="text-sm">When your clan applications get approved, they'll appear here.</p>
-                  {canManage && (
-                    <button
-                      className="mt-4 bg-blue-600 text-white px-3 py-1 rounded-xs text-sm font-medium hover:bg-blue-700 transition-colors"
-                      onClick={() => {
-                        router.push('/marketplace');
-                      }}
-                    >
-                      Apply for Gigs
-                    </button>
-                  )}
-                </div>
-              )}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <BriefcaseIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-medium mb-2">No Gigs Shared Yet</p>
+                    <p className="text-sm">Be the first to share interesting gigs with your clan!</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -1304,6 +1289,324 @@ export default function ClanDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Member Details Modal */}
+      {showMemberModal && selectedMember && (
+        <div className="fixed inset-0 bg-black rounded-none bg-opacity-50 flex items-center justify-center z-50 p-1">
+          <div className="bg-white rounded-lg max-w-md rounded-none w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-bold text-gray-900">Member Details</h2>
+                <button
+                  onClick={() => {
+                    setShowMemberModal(false);
+                    setSelectedMember(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Member Avatar */}
+              <div className="flex justify-center mb-2">
+                <div className="h-20 w-20 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl">
+                    {(selectedMember.username || selectedMember.firstName || 'U').charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Member Info */}
+              <div className="space-y-2">
+                {/* Basic Info */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Basic Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Username:</span>
+                      <span className="font-medium text-gray-900">{selectedMember.username || 'Not set'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Name:</span>
+                      <span className="font-medium text-gray-900">
+                        {selectedMember.firstName && selectedMember.lastName
+                          ? `${selectedMember.firstName} ${selectedMember.lastName}`
+                          : selectedMember.firstName || selectedMember.lastName || 'Not set'
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Location:</span>
+                      <span className="font-medium text-gray-900">{selectedMember.location || 'Not set'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                {selectedMember.bio && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Bio</h3>
+                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                      {selectedMember.bio}
+                    </p>
+                  </div>
+                )}
+
+                {/* Roles */}
+                {selectedMember.roles && selectedMember.roles.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Roles</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.roles.map((role: string, index: number) => {
+                        //filter out the role "USER" is not included  
+                        if (role !== 'USER') {
+                          console.log('role', role);
+                          return (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+                            >
+                              {role}
+                            </span>
+                          )
+                        }
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Social Links */}
+                {(selectedMember.instagramHandle || selectedMember.twitterHandle || selectedMember.linkedinHandle || selectedMember.youtubeHandle || selectedMember.website) && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Social & Links</h3>
+                    <div className="space-y-2 text-sm">
+                      {selectedMember.website && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Website:</span>
+                          <a
+                            href={selectedMember.website.startsWith('http') ? selectedMember.website : `https://${selectedMember.website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline font-medium"
+                          >
+                            Visit
+                          </a>
+                        </div>
+                      )}
+                      {selectedMember.instagramHandle && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Instagram:</span>
+                          <span className="font-medium text-gray-900 cursor-pointer"
+                            onClick={() => window.open(`https://www.instagram.com/${selectedMember.instagramHandle}`, '_blank')}
+                          >@{selectedMember.instagramHandle}</span>
+                        </div>
+                      )}
+                      {selectedMember.twitterHandle && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Twitter:</span>
+                          <span className="font-medium text-gray-900 cursor-pointer"
+                            onClick={() => window.open(`https://www.twitter.com/${selectedMember.twitterHandle}`, '_blank')}
+                          >@{selectedMember.twitterHandle}</span>
+                        </div>
+                      )}
+                      {selectedMember.linkedinHandle && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">LinkedIn:</span>
+                          <span className="font-medium text-gray-900 cursor-pointer"
+                            onClick={() => window.open(`https://www.linkedin.com/in/${selectedMember.linkedinHandle}`, '_blank')}
+                          >@{selectedMember.linkedinHandle}</span>
+                        </div>
+                      )}
+                      {selectedMember.youtubeHandle && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">YouTube:</span>
+                          <span className="font-medium text-gray-900 cursor-pointer"
+                            onClick={() => window.open(`https://www.youtube.com/${selectedMember.youtubeHandle}`, '_blank')}
+                          >{selectedMember.youtubeHandle}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Member Since */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Member Since</h3>
+                  <p className="text-sm text-gray-700">
+                    {new Date(selectedMember.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+
+                {/* Contact Settings */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Contact Settings</h3>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">Show contact info:</span>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${selectedMember.showContact
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}>
+                      {selectedMember.showContact ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 mt-6 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setShowMemberModal(false);
+                    setSelectedMember(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setShowMemberModal(false);
+                    setSelectedMember(null);
+                    if (selectedMember.id === user?.id) {
+                      router.push('/profile');
+                    } else {
+                      router.push(`/profile/${selectedMember.id}`);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Gig Modal */}
+      {showShareGigModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Share Gig with Clan</h2>
+                <button
+                  onClick={() => setShowShareGigModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const gigData = {
+                  gigId: formData.get('gigId') as string,
+                  gigTitle: formData.get('gigTitle') as string,
+                  gigDescription: formData.get('gigDescription') as string,
+                  gigUrl: formData.get('gigUrl') as string,
+                };
+
+                try {
+                  const response = await clanApiClient.shareGig(clan!.id, gigData);
+                  if (response.success) {
+                    toast.success('Gig shared successfully!');
+                    setShowShareGigModal(false);
+                    fetchSharedGigs(); // Refresh the list
+                  } else {
+                    toast.error('Failed to share gig');
+                  }
+                } catch (error) {
+                  console.error('Error sharing gig:', error);
+                  toast.error('Failed to share gig');
+                }
+              }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gig ID
+                  </label>
+                  <input
+                    type="text"
+                    name="gigId"
+                    required
+                    className="input w-full"
+                    placeholder="Enter gig ID"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gig Title
+                  </label>
+                  <input
+                    type="text"
+                    name="gigTitle"
+                    required
+                    className="input w-full"
+                    placeholder="Enter gig title"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="gigDescription"
+                    required
+                    rows={3}
+                    className="input w-full"
+                    placeholder="Brief description of the gig"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gig URL
+                  </label>
+                  <input
+                    type="url"
+                    name="gigUrl"
+                    required
+                    className="text-gray-900 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="https://example.com/gig/123"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowShareGigModal(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Share Gig
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

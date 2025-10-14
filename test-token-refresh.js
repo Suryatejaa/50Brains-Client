@@ -4,7 +4,7 @@ const axios = require('axios');
 const baseURL = 'http://localhost:3000';
 
 async function testTokenRefresh() {
-    console.log('🔄 Testing Token Refresh Functionality');
+    console.log('↻ Testing Token Refresh Functionality');
     console.log(`🌐 Backend URL: ${baseURL}`);
 
     try {

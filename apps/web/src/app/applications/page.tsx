@@ -146,12 +146,8 @@ export default function ApplicationsPage() {
         // Show success message
         alert('Application accepted successfully!');
 
-        // Optionally refresh data in background to ensure consistency
-        setTimeout(() => {
-          loadApplications().catch(error => {
-            console.warn('Background refresh failed:', error);
-          });
-        }, 1000);
+        // Reload the page to get fresh data
+        window.location.reload();
 
       } else {
         console.error('Failed to accept application:', response);
@@ -210,12 +206,8 @@ export default function ApplicationsPage() {
         // Show success message
         alert('Application rejected successfully.');
 
-        // Optionally refresh data in background to ensure consistency
-        setTimeout(() => {
-          loadApplications().catch(error => {
-            console.warn('Background refresh failed:', error);
-          });
-        }, 1000);
+        // Reload the page to get fresh data
+        window.location.reload();
 
       } else {
         console.error('Failed to reject application:', response);
@@ -322,7 +314,7 @@ export default function ApplicationsPage() {
                 className="btn-secondary"
                 disabled={loading}
               >
-                {loading ? 'Refreshing...' : '🔄 Refresh'}
+                {loading ? 'Refreshing...' : '↻ Refresh'}
               </button>
               <Link href="/my-gigs" className="btn-primary">
                 View My Gigs

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, type APIResponse } from '@/lib/api-client';
 
@@ -27,11 +27,11 @@ interface User {
   role: string; // Updated to match API response
   roles?: UserRole[]; // Keep for backward compatibility
   status:
-    | 'PENDING_VERIFICATION'
-    | 'ACTIVE'
-    | 'INACTIVE'
-    | 'SUSPENDED'
-    | 'BANNED';
+  | 'PENDING_VERIFICATION'
+  | 'ACTIVE'
+  | 'INACTIVE'
+  | 'SUSPENDED'
+  | 'BANNED';
   isEmailVerified: boolean;
   isProfileVerified?: boolean;
   lastLogin?: string;
@@ -157,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
+  const authCheckInProgress = useRef(false);
 
   // Cache key for localStorage
   const CACHE_KEY = '50brains_user_cache';
@@ -165,11 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load user from cache on mount
   useEffect(() => {
     if (isInitialized) {
-      console.log('🔄 Auth already initialized, skipping...');
+      console.log('↻ Auth already initialized, skipping...');
       return;
     }
 
-    console.log('🔄 AuthProvider initializing...');
+    console.log('↻ AuthProvider initializing...');
 
     let isMounted = true; // Prevent state updates if component unmounts
 
@@ -197,8 +198,93 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []); // Empty dependency array to ensure this only runs once
 
+  // Global error handler for 401 errors
+  useEffect(() => {
+    const handleGlobalError = (event: ErrorEvent) => {
+      // Check if this is an authentication error
+      if (event.error?.message?.includes('Authentication token is required') ||
+        event.error?.message?.includes('401') ||
+        event.error?.message?.includes('Unauthorized') ||
+        event.error?.error === 'REFRESH_EXPIRED') {
+
+        console.log('🔒 Global auth error detected:', event.error);
+
+        // Don't show these errors to users, just log them
+        event.preventDefault();
+
+        // If it's a refresh token expired error, clear auth state gracefully
+        if (event.error?.error === 'REFRESH_EXPIRED') {
+          console.log('🔒 Handling expired refresh token globally');
+          setUser(null);
+          clearUserCache();
+
+          // Redirect to login if not already on an auth page
+          if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            const authPages = ['/login', '/register', '/forgot-password'];
+            const isOnAuthPage = authPages.some(page => currentPath.startsWith(page));
+
+            if (!isOnAuthPage) {
+              console.log('🔄 Global redirect to login due to expired refresh token');
+              router.push('/login');
+            }
+          }
+        }
+      }
+    };
+
+    // Add unhandled rejection handler for async errors
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason?.message?.includes('Authentication token is required') ||
+        event.reason?.message?.includes('401') ||
+        event.reason?.message?.includes('Unauthorized') ||
+        event.reason?.error === 'REFRESH_EXPIRED') {
+
+        console.log('🔒 Global auth promise rejection detected:', event.reason);
+
+        // Don't show these errors to users, just log them
+        event.preventDefault();
+
+        // If it's a refresh token expired error, clear auth state gracefully
+        if (event.reason?.error === 'REFRESH_EXPIRED') {
+          console.log('🔒 Handling expired refresh token globally (promise rejection)');
+          setUser(null);
+          clearUserCache();
+
+          // Redirect to login if not already on an auth page
+          if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            const authPages = ['/login', '/register', '/forgot-password'];
+            const isOnAuthPage = authPages.some(page => currentPath.startsWith(page));
+
+            if (!isOnAuthPage) {
+              console.log('🔄 Global redirect to login due to expired refresh token (promise rejection)');
+              router.push('/login');
+            }
+          }
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleGlobalError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
   // Save user to cache whenever user state changes
   useEffect(() => {
+    console.log(`🔄 [useAuth] User state changed:`, {
+      hasUser: !!user,
+      userId: user?.id,
+      userEmail: user?.email,
+      isAuthenticated: !!user
+    });
+
     if (user) {
       saveUserToCache(user);
     } else {
@@ -289,13 +375,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuthStatus = async () => {
     // Prevent multiple simultaneous auth checks
-    if (isLoading && isInitialized) {
-      console.log('🔄 Auth check already in progress, skipping...');
+    if (authCheckInProgress.current) {
+      console.log('↻ Auth check already in progress, skipping...');
       return;
     }
 
+    if (isLoading && isInitialized) {
+      console.log('↻ Auth already loading and initialized, skipping...');
+      return;
+    }
+
+    authCheckInProgress.current = true;
+
     try {
-      console.log('🔄 Starting auth status check...');
+      console.log('↻ Starting auth status check...');
 
       // First try to load from cache immediately and keep user state stable
       const cachedUser = loadUserFromCache();
@@ -303,16 +396,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // If cached user data is available, set it immediately and keep auth stable
       if (cachedUser) {
         console.log('📱 Using cached auth data - maintaining authentication');
-        console.log('👤 Cached user:', { 
-          id: cachedUser.id, 
-          email: cachedUser.email, 
-          displayName: cachedUser.displayName 
+        console.log('👤 Cached user:', {
+          id: cachedUser.id,
+          email: cachedUser.email,
+          displayName: cachedUser.displayName
         });
         setUser(cachedUser);
-        // Set loading to false immediately when using cache to prevent redirects
-        setIsLoading(false);
+        // Don't set loading to false here - let the finally block handle it
         console.log('✅ Auth restored from cache, user is authenticated');
-        
+
         // For demo mode, don't even try to contact server
         if (cachedUser.id === 'demo-user-id') {
           console.log('🎭 Demo mode detected, skipping server verification');
@@ -320,8 +412,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } else {
         // Keep loading true until API call completes
-        console.log('🔄 No cached user, checking with server...');
-        setIsLoading(true);
+        console.log('↻ No cached user, checking with server...');
+        // Don't set loading here - it should already be true from initialization
       }
 
       // Then try to verify with server in background (only if we have a backend)
@@ -353,17 +445,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const isConnectionError = anyError.message?.includes('Failed to fetch') ||
           anyError.message?.includes('ECONNREFUSED') ||
           anyError.code === 'ECONNREFUSED';
+        const isRefreshExpired = anyError.error === 'REFRESH_EXPIRED' ||
+          anyError.message?.includes('Session expired') ||
+          anyError.message?.includes('Refresh token has expired');
 
         console.log('🔍 Error analysis:', {
           isNetworkError,
           isCorsError,
           is404Error,
           isConnectionError,
+          isRefreshExpired,
           hasCachedUser: !!cachedUser,
           errorCode: anyError.code,
           errorStatus: anyError.status || anyError.statusCode,
           errorMessage: anyError.message
         });
+
+        // If refresh token is expired, clear auth state gracefully
+        if (isRefreshExpired) {
+          console.log('🔒 Refresh token expired - clearing auth state gracefully');
+          setUser(null);
+          clearUserCache();
+          // Don't show error to user, just log it
+          console.log('✅ Auth state cleared due to expired refresh token');
+
+          // Redirect to login if not already on an auth page
+          if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            const authPages = ['/login', '/register', '/forgot-password'];
+            const isOnAuthPage = authPages.some(page => currentPath.startsWith(page));
+
+            if (!isOnAuthPage) {
+              console.log('🔄 Redirecting to login due to expired refresh token');
+              router.push('/login');
+            }
+          }
+
+          return;
+        }
 
         // If it's any kind of network/connection issue, keep cached auth
         if (isNetworkError || isCorsError || is404Error || isConnectionError) {
@@ -379,7 +498,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             console.log('✅ Keeping cached user despite network error');
           }
         } else if (anyError.statusCode === 401) {
-          // Only logout on explicit 401 Unauthorized
+          // Only logout on explicit 401 Unauthorized (not refresh expired)
           console.log('❌ 401 Unauthorized - clearing auth state');
           setUser(null);
           clearUserCache();
@@ -396,11 +515,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Always set loading to false after API call completes
       console.log('✅ Auth initialization complete');
       setIsLoading(false);
+      authCheckInProgress.current = false;
       console.log('🏁 Auth verification complete, loading set to false');
     }
   };
 
   const login = async (credentials: LoginRequest) => {
+    // Prevent login if auth check is in progress
+    if (authCheckInProgress.current) {
+      console.log('↻ Auth check in progress, waiting before login...');
+      // Wait a bit for the auth check to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     try {
       setError(null);
 
@@ -443,9 +570,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (error: any) {
       // Handle case where backend is not available
-      if (error.message?.includes('Failed to fetch') || 
-          error.message?.includes('fetch') ||
-          error.code === 'ERR_NETWORK') {
+      if (error.message?.includes('Failed to fetch') ||
+        error.message?.includes('fetch') ||
+        error.code === 'ERR_NETWORK') {
         console.log('⚠️ Backend not available, using demo login');
         // For demo purposes when backend is not available
         const demoUser: User = {
@@ -643,7 +770,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log('🚪 Logout complete, redirecting to home');
         router.push('/');
       } else {
-        console.log('🔄 Silent logout during auth check, not redirecting');
+        console.log('↻ Silent logout during auth check, not redirecting');
       }
     }
   };
@@ -807,3 +934,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+

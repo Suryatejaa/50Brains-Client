@@ -87,7 +87,7 @@ export default function NotificationBell() {
         if (open) {
             // Only refresh if WebSocket is not connected or no recent data
             if (!isConnected) {
-                console.log('🔄 Bell opened - refreshing (WebSocket disconnected)');
+                console.log('↻ Bell opened - refreshing (WebSocket disconnected)');
                 forceRefresh();
             } else {
                 console.log('🚫 Bell opened - skipping refresh (WebSocket connected)');
@@ -143,7 +143,7 @@ export default function NotificationBell() {
         // Handle clan-specific notifications
         if (notification.type === 'CLAN' || notification.category === 'CLAN') {
             const clanId = notification.metadata?.clanId;
-            
+
             // For join request notifications, take clan head to manage page
             if (clanId && (
                 notification.title?.toLowerCase().includes('join request') ||
@@ -152,12 +152,12 @@ export default function NotificationBell() {
             )) {
                 return `/clan/${clanId}/manage`;
             }
-            
+
             // For other clan notifications, take to clan detail page
             if (clanId) {
                 return `/clan/${clanId}`;
             }
-            
+
             // Fallback to clans page
             return '/clans';
         }
@@ -189,7 +189,7 @@ export default function NotificationBell() {
 
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={dropdownRef} style={{ zIndex: 99999 }}>
             <button
                 className="relative p-2  hover:bg-gray-100 rounded-full transition-colors"
                 onClick={handleBellClick}
@@ -224,7 +224,7 @@ export default function NotificationBell() {
             </button>
 
             {open && (
-                <div className="absolute -right-8 mt-2 w-80 bg-white shadow-xl rounded-lg z-50 border border-gray-200">
+                <div className="absolute -right-8 mt-2 w-80 bg-white shadow-xl rounded-lg border border-gray-200" style={{ zIndex: 999999 }}>
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                         <span className="font-semibold text-gray-900">Notifications</span>

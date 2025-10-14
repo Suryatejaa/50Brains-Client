@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,12 +24,8 @@ export default function RegisterPage() {
   const { register, isAuthenticated, clearError } = useAuth();
   const router = useRouter();
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, router]);
+  // Remove the useEffect that was causing the redirect loop
+  // RouteGuard will handle redirecting authenticated users away from register page
 
   // Available roles for client-side registration (excluding admin roles)
   const availableRoles = [
@@ -86,10 +82,11 @@ export default function RegisterPage() {
       const hasUpperCase = /[A-Z]/.test(formData.password);
       const hasLowerCase = /[a-z]/.test(formData.password);
       const hasNumbers = /\d/.test(formData.password);
+      const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
 
-      if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChars) {
         setError(
-          'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
+          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
         );
         return;
       }

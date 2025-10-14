@@ -412,10 +412,12 @@ export class UserAPI {
   /**
    * Discovery & Search
    */
-  static async getPublicProfile(
-    userId: string
-  ): Promise<APIResponse<UserProfile>> {
-    return apiClient.get<UserProfile>(`/api/public/users/${userId}`);
+  static async getPublicProfiles(
+    userIds: string[]
+  ): Promise<APIResponse<UserProfile[]>> {
+    return apiClient.post<UserProfile[]>(`/api/public/profiles/internal/by-ids`, {
+      userIds: userIds,
+    });
   }
 
   static async searchUsers(params: {
@@ -502,7 +504,7 @@ export const {
   getUserSettings,
   updateUserSettings,
   getUserAnalytics,
-  getPublicProfile,
+  getPublicProfiles,
   searchUsers,
   requestVerification,
   getAchievements,

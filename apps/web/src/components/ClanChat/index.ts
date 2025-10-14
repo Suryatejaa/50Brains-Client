@@ -1,0 +1,1 @@
+export { ClanChat } from './ClanChat';

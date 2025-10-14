@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Bid {
   id: string;
@@ -51,7 +52,7 @@ export default function MyBidsPage() {
     limit: 20,
     search: ''
   });
-
+  const router = useRouter();
   useEffect(() => {
     loadBids();
     loadStats();
@@ -199,7 +200,8 @@ export default function MyBidsPage() {
         ) : (
           <div className="space-y-1">
             {bids.map((bid) => (
-              <div key={bid.id} className="card-glass p-2">
+              <div key={bid.id} className="card-glass p-2"
+                onClick={() => router.push(`/gig/${bid.projectId}`)}>
                 <div className="flex items-start justify-between mb-1">
                   <div className="flex-1">
                     <div className="flex items-center space-x-1 mb-1">
@@ -246,12 +248,12 @@ export default function MyBidsPage() {
                   </div>
 
                   <div className="ml-4 flex flex-col space-y-2">
-                    <Link
+                    {/* <Link
                       href={`/gig/${bid.projectId}` as any}
                       className="btn-ghost-sm"
                     >
                       View Project
-                    </Link>
+                    </Link> */}
 
                     {bid.status === 'PENDING' && (
                       <button

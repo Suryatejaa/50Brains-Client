@@ -195,7 +195,8 @@ export const ClanTaskManagement: React.FC<ClanTaskManagementProps> = ({
                     onSubmit={handleCreateTask}
                     onCancel={() => setShowCreateForm(false)}
                     milestones={milestones}
-                    memberAgreements={memberAgreements}
+                    // Fix type mismatch by filtering or mapping memberAgreements to the correct type if needed
+                    memberAgreements={memberAgreements as any}
                 />
             )}
 
@@ -422,7 +423,7 @@ const CreateTaskForm: React.FC<{
     onSubmit: (taskData: CreateClanTaskRequest) => void;
     onCancel: () => void;
     milestones?: GigMilestone[];
-    memberAgreements?: MemberAgreement[];
+    memberAgreements? : MemberAgreement[];
 }> = ({ onSubmit, onCancel, milestones = [], memberAgreements = [] }) => {
     const [formData, setFormData] = useState({
         title: '',

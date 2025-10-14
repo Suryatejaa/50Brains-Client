@@ -2,18 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getPublicProfile } from '@/lib/user-api';
+import { getPublicProfiles } from '@/lib/user-api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-interface ProfilePageProps {
-  params: {
-    userId: string;
-  };
-}
-
-export default function ProfilePage({ params }: ProfilePageProps) {
-  const { userId } = params;
+export default function ProfilePage() {
+  const params = useParams();
+  const userId = params.userId as string;
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +17,10 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     const loadProfile = async () => {
       try {
         setLoading(true);
-        const response = await getPublicProfile(userId);
+        const response = await getPublicProfiles([userId]);
         console.log(response);
-        if (response.success && 'data' in response) {
-          setProfile(response.data.user);
+        if (response.success && 'data' in response && Array.isArray(response.data) && response.data.length > 0) {
+          setProfile(response.data[0]);
         } else {
           setError('Profile not found');
         }

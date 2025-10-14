@@ -9,7 +9,7 @@ interface TaskItemProps {
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, memberAgreements }) => {
-    const assignee = memberAgreements.find(ma => ma.userId === task.assigneeUserId);
+    const assignee = memberAgreements.find(ma => ma.assigneeId === task.assigneeUserId);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -34,7 +34,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onUpdate, memberAgreem
                     )}
 
                     <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
-                        <span>Assignee: {assignee?.user?.name || 'Unknown'}</span>
+                        <span>Assignee: {assignee?.assigneeId || 'Unknown'}</span>
                         {task.estimatedHours && (
                             <span>Est. Hours: {task.estimatedHours}</span>
                         )}

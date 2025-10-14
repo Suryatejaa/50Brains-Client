@@ -23,6 +23,8 @@ import {
   CrewOpportunity,
 } from '@50brains/shared-types';
 
+
+
 export class APIError extends Error {
   constructor(
     public statusCode: number,
@@ -97,6 +99,17 @@ export class APIClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
+    console.log('🌐 === FETCH DEBUG ===');
+    console.log('🔗 Making fetch request to:', url);
+    console.log('📋 Request options:', {
+      method: options.method || 'GET',
+      headers: { ...this.getHeaders(), ...options.headers },
+      body: options.body,
+      credentials: 'include'
+    });
+    console.log('⏱️ Timeout:', this.timeout, 'ms');
+    console.log('========================');
+
     try {
       const response = await fetch(url, {
         ...options,
@@ -112,13 +125,13 @@ export class APIClient {
 
       // Handle 401 Unauthorized - attempt token refresh
       if (response.status === 401 && endpoint !== '/api/auth/refresh') {
-        console.log('🔄 401 detected, attempting token refresh...');
+        console.log('↻ 401 detected, attempting token refresh...');
 
         try {
           await this.handleTokenRefresh();
 
           // Retry the original request with refreshed token
-          console.log('🔄 Retrying original request after token refresh...');
+          console.log('↻ Retrying original request after token refresh...');
           const retryResponse = await fetch(url, {
             ...options,
             headers: {
@@ -133,8 +146,8 @@ export class APIClient {
             const retryError: APIErrorResponse = await retryResponse.json();
             throw new APIError(
               retryError.statusCode,
-              retryError.error,
-              retryError.message,
+              retryError.message || 'Unknown error',
+              retryError.message || 'Unknown error',
               retryError.details
             );
           }
@@ -152,12 +165,29 @@ export class APIClient {
           return retryData;
         } catch (refreshError) {
           console.error('❌ Token refresh failed:', refreshError);
-          // If refresh fails, throw the original 401 error
+
+          // If refresh fails, check if it's a network error or server error
+          if (refreshError instanceof APIError) {
+            // If it's a 401 from refresh, the user needs to re-authenticate
+            if (refreshError.statusCode === 401) {
+              console.log('🔒 Refresh token expired, user needs to re-login');
+              // Don't throw the error, let the calling code handle it gracefully
+              // This prevents the cascade of 401 errors
+              throw new APIError(
+                401,
+                'REFRESH_EXPIRED',
+                'Session expired. Please sign in again.',
+                false
+              );
+            }
+          }
+
+          // For other refresh errors, throw the original 401 error
           const error: APIErrorResponse = await response.json();
           throw new APIError(
             error.statusCode,
-            error.error,
-            error.message,
+            error.message || 'Unknown error',
+            error.message || 'Unknown error',
             error.details
           );
         }
@@ -165,15 +195,24 @@ export class APIClient {
 
       if (!response.ok) {
         const error: APIErrorResponse = await response.json();
+        console.log('error:', error);
         throw new APIError(
           error.statusCode,
-          error.error,
-          error.message,
+          error.message || 'Unknown error',
+          error.message || 'Unknown error',
           error.details
         );
       }
 
+      console.log('📥 === RESPONSE DEBUG ===');
+      console.log('✅ Response status:', response.status);
+      console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log('🔗 Response URL:', response.url);
+      console.log('========================');
+
       const data: APISuccessResponse<T> = await response.json();
+
+      console.log('📄 Response data:', data);
 
       // Update cache for GET requests
       if (options.method === 'GET' || !options.method) {
@@ -186,6 +225,13 @@ export class APIClient {
       return data;
     } catch (error) {
       clearTimeout(timeoutId);
+
+      console.log('❌ === ERROR DEBUG ===');
+      console.log('🚨 Error occurred:', error);
+      console.log('🔍 Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
+      console.log('📝 Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.log('📊 Error details:', error);
+      console.log('=====================');
 
       if (error instanceof APIError) {
         throw error;
@@ -203,7 +249,7 @@ export class APIClient {
   private async handleTokenRefresh(): Promise<void> {
     // If a refresh is already in progress, wait for it
     if (this.refreshPromise) {
-      console.log('🔄 Token refresh already in progress, waiting...');
+      console.log('↻ Token refresh already in progress, waiting...');
       return this.refreshPromise;
     }
 
@@ -221,28 +267,70 @@ export class APIClient {
 
   // Perform the actual token refresh
   private async performTokenRefresh(): Promise<void> {
-    console.log('🔄 Calling refresh token endpoint...');
+    console.log('↻ Calling refresh token endpoint...');
 
-    const refreshResponse = await fetch(`${this.baseURL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      credentials: 'include', // Include cookies with refresh token
-    });
+    try {
+      const refreshResponse = await fetch(`${this.baseURL}/api/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        credentials: 'include', // Include cookies with refresh token
+      });
 
-    if (!refreshResponse.ok) {
-      const refreshError = await refreshResponse.json();
+      if (!refreshResponse.ok) {
+        const refreshError = await refreshResponse.json();
+        console.error('❌ Refresh token request failed:', {
+          status: refreshResponse.status,
+          statusText: refreshResponse.statusText,
+          error: refreshError
+        });
+
+        // If refresh token is expired (401), this is a critical auth failure
+        if (refreshResponse.status === 401) {
+          throw new APIError(
+            401,
+            'REFRESH_TOKEN_EXPIRED',
+            'Refresh token has expired. User needs to re-authenticate.',
+            false
+          );
+        }
+
+        // For other errors, provide more context
+        throw new APIError(
+          refreshResponse.status,
+          refreshError.error || 'REFRESH_FAILED',
+          refreshError.message || `Token refresh failed: ${refreshResponse.status} ${refreshResponse.statusText}`
+        );
+      }
+
+      console.log('✅ Token refresh successful');
+      // The new tokens are automatically set in cookies by the server
+    } catch (error) {
+      console.error('❌ Token refresh failed with error:', error);
+
+      // Re-throw APIError instances as-is
+      if (error instanceof APIError) {
+        throw error;
+      }
+
+      // Wrap other errors in APIError
+      if (error instanceof Error) {
+        throw new APIError(
+          500,
+          'REFRESH_ERROR',
+          `Token refresh failed: ${error.message}`
+        );
+      }
+
+      // Fallback for unknown errors
       throw new APIError(
-        refreshResponse.status,
-        refreshError.error || 'REFRESH_FAILED',
-        refreshError.message || 'Token refresh failed'
+        500,
+        'REFRESH_ERROR',
+        'Token refresh failed due to an unknown error'
       );
     }
-
-    console.log('✅ Token refresh successful');
-    // The new tokens are automatically set in cookies by the server
   }
 
   async get<T>(
@@ -253,6 +341,13 @@ export class APIClient {
   }
 
   async post<T>(endpoint: string, data?: any): Promise<APISuccessResponse<T>> {
+    console.log('📡 === API CLIENT POST DEBUG ===');
+    console.log('🎯 Endpoint:', endpoint);
+    console.log('📤 Data being sent:', data);
+    console.log('🔗 Full URL:', `${this.baseURL}${endpoint}`);
+    console.log('📋 Request body:', data ? JSON.stringify(data, null, 2) : 'undefined');
+    console.log('================================');
+
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -655,26 +750,27 @@ export class ClanService {
   }
 
   async createClan(clanData: Partial<Clan>): Promise<Clan> {
-    const response = await this.client.post<Clan>('/api/clan', clanData);
+    const response = await this.client.post<Clan>('/api/clans', clanData);
+    console.log('createClan response:', response);
     return response.data;
   }
 
   async getClanById(clanId: string): Promise<Clan> {
-    const response = await this.client.get<Clan>(`/api/clan/${clanId}`);
+    const response = await this.client.get<Clan>(`/api/clans/${clanId}`);
     return response.data;
   }
 
   async updateClan(clanId: string, data: Partial<Clan>): Promise<Clan> {
-    const response = await this.client.put<Clan>(`/api/clan/${clanId}`, data);
+    const response = await this.client.put<Clan>(`/api/clans/${clanId}`, data);
     return response.data;
   }
 
   async deleteClan(clanId: string): Promise<void> {
-    await this.client.delete(`/api/clan/${clanId}`);
+    await this.client.delete(`/api/clans/${clanId}`);
   }
 
   async getClanMembers(clanId: string): Promise<any[]> {
-    const response = await this.client.get<any[]>(`/api/members/${clanId}`);
+    const response = await this.client.get<any[]>(`/api/clans/${clanId}/members`);
     return response.data;
   }
 
@@ -683,7 +779,7 @@ export class ClanService {
     userId: string;
     role?: string;
   }): Promise<void> {
-    await this.client.post('/api/members/invite', data);
+    await this.client.post('/api/clans/invite', data);
   }
 
   async updateMemberRole(
@@ -691,17 +787,17 @@ export class ClanService {
     userId: string,
     role: string
   ): Promise<void> {
-    await this.client.put(`/api/members/${clanId}/members/${userId}/role`, {
+    await this.client.put(`/api/clans/${clanId}/members/${userId}/role`, {
       role,
     });
   }
 
   async removeMember(clanId: string, userId: string): Promise<void> {
-    await this.client.delete(`/api/members/${clanId}/members/${userId}`);
+    await this.client.delete(`/api/clans/${clanId}/members/${userId}`);
   }
 
   async leaveClan(clanId: string): Promise<void> {
-    await this.client.post(`/api/members/${clanId}/leave`);
+    await this.client.post(`/api/clans/${clanId}/leave`);
   }
 }
 

@@ -39,7 +39,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   // Update editData when user data changes or when entering edit mode
   React.useEffect(() => {
     // Update the state whenever user data changes, regardless of edit mode
-    console.log('🔄 Updating social links edit data (user data changed):', {
+    console.log('↻ Updating social links edit data (user data changed):', {
       instagramHandle: user.instagramHandle,
       twitterHandle: user.twitterHandle,
       linkedinHandle: user.linkedinHandle,
@@ -91,7 +91,7 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   const handleToggleContact = async () => {
     if (!isOwner) return;
 
-    console.log('🔄 Toggling contact privacy from:', showContact, 'to:', !showContact);
+    console.log('↻ Toggling contact privacy from:', showContact, 'to:', !showContact);
     console.log('🎯 Current showContact value:', showContact);
 
     // Optimistically update the UI immediately

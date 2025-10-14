@@ -50,6 +50,7 @@ export const DynamicNavigation: React.FC = () => {
           permission: 'gig.view',
         },
         { path: '/my/applications', label: 'My Applications', icon: '📨' },
+        { path: '/my/submissions', label: 'My Submissions', icon: '📝' },
         {
           path: '/portfolio',
           label: 'Portfolio',
@@ -75,6 +76,7 @@ export const DynamicNavigation: React.FC = () => {
           permission: 'gig.create',
         },
         { path: '/my-gigs', label: 'My Gigs', icon: '📢' },
+        { path: '/my/submissions', label: 'Review Submissions', icon: '📝' },
         {
           path: '/influencers/search',
           label: 'Find Influencers',

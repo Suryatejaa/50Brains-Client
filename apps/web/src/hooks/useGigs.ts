@@ -526,10 +526,10 @@ export const useGigs = () => {
 
   // Submission Management
   const createSubmission = useCallback(
-    async (data: CreateSubmissionData) => {
+    async (gigId: string, data: CreateSubmissionData) => {
       try {
         updateState({ submitting: true, error: null });
-        const submission = await GigAPI.createSubmission(data);
+        const submission = await GigAPI.createSubmission(gigId, data);
         updateState({
           gigSubmissions: [...state.gigSubmissions, submission],
           submitting: false,

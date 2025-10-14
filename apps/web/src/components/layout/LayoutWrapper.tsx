@@ -29,7 +29,7 @@ export const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
       <main
         className={`
         ${showHeader ? 'pt-16' : ''} 
-        ${showBottomNav ? 'pb-20' : ''} 
+        ${showBottomNav ? 'pb-16' : ''} 
         min-h-screen
       `}
       >

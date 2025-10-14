@@ -77,7 +77,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
     }, [clan, user?.id]);
 
     return (
-        <div className="card-glass hover:bg-brand-light-blue/5 p-2 transition-all duration-200 h-80 flex flex-col"
+        <div className="card-glass hover:bg-brand-light-blue/5 p-2 transition-all duration-200 h-auto flex flex-col"
             onClick={() => onView?.(clan.id)}
         >
             <div className="mb-2 flex items-start space-x-2">
@@ -91,22 +91,22 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                         <div>
                             <h3 className="flex flex-row items-center text-heading mb-1 text-lg font-semibold">
                                 {clan.name}
-                                {/* Notification dot for pending join requests */}
-                                {pendingRequestsCount > 0 && (
-                                    <div className="flex items-center space-x-1">
-                                        <span className="inline-block ml-2 h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
-                                        <span className="text-muted text-xs">
-                                            {pendingRequestsCount} pending requests
-                                        </span>
-                                    </div>
-                                )}
                             </h3>
+                            {/* Pending Applications Badge */}
+                            {pendingRequestsCount > 0 && (
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                                        <span className="inline-block mr-1 h-2 w-2 bg-orange-500 rounded-full animate-pulse"></span>
+                                        {pendingRequestsCount} pending application{pendingRequestsCount !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
+                            )}
                             <div className="text-muted flex items-center space-x-4 text-sm">
-                                <span>{clan.memberCount} members</span>
-                                <span>⭐ {clan.averageRating?.toFixed(1)}</span>
-                                <span className={`px-2 py-1 rounded text-xs font-medium ${getTierColor(clan.reputationScore)}`}>
-                                    {getTierName(clan.reputationScore)} Tier
-                                </span>
+                                <span>{clan.memberCount || clan._count?.members || 0} members</span>
+                                {/* <span>⭐ {clan.averageRating?.toFixed(1) || '0.0'}</span> */}
+                                {/* <span className={`px-2 py-1 rounded text-xs font-medium ${getTierColor(clan.reputationScore || 0)}`}>
+                                    {getTierName(clan.reputationScore || 0)} Tier
+                                </span> */}
                             </div>
                         </div>
                         <div className="flex flex-col items-end">
@@ -116,7 +116,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                                 </span>
                             )}
                             <span className="text-muted text-xs">
-                                {clan.totalGigs} active gigs
+                                Created {new Date(clan.createdAt).toLocaleDateString()}
                             </span>
                         </div>
                     </div>
@@ -161,7 +161,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
 
                 {/* Categories */}
                 {clan.categories && clan.categories.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {clan.categories.slice(0, 2).map((category) => (
                             <span
                                 key={category}
@@ -173,77 +173,63 @@ export const ClanCard: React.FC<ClanCardProps> = ({
                     </div>
                 )}
 
-                {/* Stats */}
-                <div className="mb-4 grid grid-cols-3 gap-2 text-xs">
-                    <div className="text-center">
-                        <div className="text-muted">Revenue</div>
-                        <div className="font-semibold">{formatCurrency(clan.totalRevenue)}</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-muted">Success Rate</div>
-                        <div className="font-semibold">
-                            {clan.totalGigs > 0 ? Math.round((clan.completedGigs / clan.totalGigs) * 100) : 0}%
-                        </div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-muted">Score</div>
-                        <div className="font-semibold">{clan.reputationScore}</div>
-                    </div>
-                </div>
             </div>
 
             {/* Footer */}
-            <div className="grid grid-cols-1 items-start justify-start mt-auto">
-                <div className="flex items-center space-x-3 mb-1">
-                    {clan.location && (
-                        <span className="text-muted text-xs">📍 {clan.location}</span>
-                    )}
-                    <span className="text-muted text-xs">
-                        Created {new Date(clan.createdAt).toLocaleDateString()}
-                    </span>
-                </div>
-                {/* {showActions && (
-                    <div className="flex space-x-1">
-                        <button
-                            onClick={() => onView?.(clan.id)}
-                            className="btn-secondary px-1 py-1 text-sm"
-                        >
-                            View Details
-                        </button>
-                        {onJoin && canJoin &&  (
+            {/* <div className="grid grid-cols-1 items-start justify-start">
+                {showActions && (
+                    <div className="flex space-x-1 mt-2">
+                        {onJoin && canJoin && (
                             <button
-                                onClick={() => onJoin(clan.id)}
-                                className="btn-primary px-1 py-1 text-sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onJoin(clan.id);
+                                }}
+                                className="btn-primary px-2 py-1 text-sm"
                             >
                                 Request to Join
                             </button>
                         )}
+                        {onLeave && clan.memberIds?.includes(user?.id || '') && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onLeave(clan.id);
+                                }}
+                                className="btn-secondary px-2 py-1 text-sm"
+                            >
+                                Leave Clan
+                            </button>
+                        )}
                         {onManage && (
                             <button
-                                onClick={() => onManage(clan.id)}
-                                className="btn-primary px-1 py-1 text-sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onManage(clan.id);
+                                }}
+                                className="btn-primary px-2 py-1 text-sm"
                             >
                                 Manage
                             </button>
                         )}
                     </div>
-                )} */}
+                )}
                 {user?.id && clan.pendingJoinUserIds?.includes(user.id) && (
-                    <div className="text-muted text-xs">
+                    <div className="text-muted text-xs mt-2">
                         You have requested to join this clan, please wait for approval.
                     </div>
                 )}
                 {user?.id && clan.memberIds?.includes(user.id) && (
-                    <div className="text-muted text-xs">
+                    <div className="text-muted text-xs mt-2">
                         You are a member of this clan.
                     </div>
                 )}
-                {user?.id === clan.clanHeadId && (
-                    <div className="text-muted text-xs">
+                {user?.id === clan.headId && (
+                    <div className="text-muted text-xs mt-2">
                         You are the owner of this clan.
                     </div>
                 )}
-            </div>
+            </div> */}
         </div>
     );
 }; 

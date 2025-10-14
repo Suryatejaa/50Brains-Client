@@ -34,6 +34,7 @@ interface Application {
   applicantType: 'user' | 'clan';
   portfolio: string[];
   appliedAt: string;
+  address?: string;
   acceptedAt?: string;
   rejectedAt?: string;
   rejectionReason?: string;
@@ -101,7 +102,7 @@ export default function GigApplicationsPage() {
 
   const loadGigAndApplications = async () => {
     try {
-      console.log('🔄 Starting loadGigAndApplications for gigId:', gigId);
+      console.log('↻ Starting loadGigAndApplications for gigId:', gigId);
       setIsLoading(true);
 
       // Load gig details and applications in parallel
@@ -128,6 +129,12 @@ export default function GigApplicationsPage() {
         }
 
         console.log('✅ Ownership check passed - Setting gig data');
+        console.log('🔍 Gig Data Debug:', {
+          gigId: gigDetails.id,
+          title: gigDetails.title,
+          applicationCount: gigDetails.applicationCount,
+          fullGigData: gigDetails
+        });
         setGig(gigData as Gig);
       } else {
         console.error('❌ Failed to load gig:', gigResponse.status === 'fulfilled' ? gigResponse.value : gigResponse.reason);
@@ -139,7 +146,7 @@ export default function GigApplicationsPage() {
       if (applicationsResponse.status === 'fulfilled' && applicationsResponse.value.success) {
         const applicationsData = applicationsResponse.value.data as any;
         console.log('📊 Applications data structure:', Object.keys(applicationsData || {}));
-
+        console.log('Applications:', applicationsData);
         // Try different possible structures
         let extractedApplications = [];
         if (applicationsData?.applications) {
@@ -149,6 +156,14 @@ export default function GigApplicationsPage() {
         }
 
         console.log('✅ Setting', extractedApplications.length, 'applications');
+        console.log('🔍 Data Mismatch Debug:', {
+          gigApplicationCount: gig?.applicationCount,
+          actualApplicationsLength: extractedApplications.length,
+          applicationsDataKeys: Object.keys(applicationsData || {}),
+          applicationsDataType: typeof applicationsData,
+          applicationsDataIsArray: Array.isArray(applicationsData),
+          rawApplicationsResponse: applicationsResponse.value
+        });
         setApplications(extractedApplications);
       } else {
         console.error('❌ Failed to load applications:', applicationsResponse.status === 'fulfilled' ? applicationsResponse.value : applicationsResponse.reason);
@@ -200,6 +215,8 @@ export default function GigApplicationsPage() {
             console.warn('Background refresh failed:', error);
           });
         }, 1000);
+
+        window.location.reload();
 
       } else {
         console.error('Failed to accept application:', response);
@@ -299,8 +316,9 @@ export default function GigApplicationsPage() {
     setApproveApplication(app);
     setShowApproveModal(true);
   };
-
+  console.log('Applications:', applications);
   const filteredApplications = applications.filter(app => {
+    console.log('App:', app);
     if (selectedStatus === 'all') return true;
     return app.status.toLowerCase() === selectedStatus.toLowerCase();
   });
@@ -512,6 +530,11 @@ export default function GigApplicationsPage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Application Type:</span>
                           <span className="font-medium capitalize">{application.applicantType}</span>
+                        </div>
+                        {/* Address */}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Address:</span>
+                          <span className="font-medium">{application.address || 'N/A'}</span>
                         </div>
                       </div>
                     </div>

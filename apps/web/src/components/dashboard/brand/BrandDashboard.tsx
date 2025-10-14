@@ -106,10 +106,7 @@ export const BrandDashboard: React.FC = () => {
           const acceptedCount = gig.acceptedCount || 0;
           return sum + acceptedCount;
         }, 0);
-        applicationsStats.pending = gigs.reduce((sum, gig) => {
-          const pendingCount = gig.pendingApplicationsCount || 0;
-          return sum + pendingCount;
-        }, 0);
+        applicationsStats.pending = (gigsResponse.value.data as any).summary.totalPendingApplicationsAcrossAllGigs || 0;
       }
 
       const data: BrandDashboardData = {
@@ -122,22 +119,13 @@ export const BrandDashboard: React.FC = () => {
         gigsStats:
           gigsResponse.status === 'fulfilled' &&
             gigsResponse.value.success &&
-            gigsResponse.value.data?.gigs
-            ? gigsResponse.value.data.gigs.reduce(
-              (acc, gig) => {
-                acc.totalGigs += 1;
-                if (gig.status === 'OPEN' || gig.status === 'ASSIGNED') acc.activeGigs += 1;
-                if (gig.status === 'COMPLETED') acc.completedGigs += 1;
-                acc.totalBudget += gig.budgetMax;
-                return acc;
-              },
-              {
-                totalGigs: 0,
-                activeGigs: 0,
-                completedGigs: 0,
-                totalBudget: 0,
-              }
-            )
+            (gigsResponse.value.data as any).summary ?
+            {
+              totalGigs: (gigsResponse.value.data as any).summary.totalGigs,
+              activeGigs: (gigsResponse.value.data as any).summary.totalActiveGigs,
+              completedGigs: (gigsResponse.value.data as any).summary.totalCompletedGigs,
+              totalBudget: (gigsResponse.value.data as any).summary.totalBudget,
+            }
             : {
               totalGigs: 0,
               activeGigs: 0,

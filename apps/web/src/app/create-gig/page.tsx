@@ -13,7 +13,11 @@ interface FormData {
   skillsRequired: string[];
   experienceLevel: 'beginner' | 'intermediate' | 'expert';
   location?: string;
+  latitude?: number;
+  longitude?: number;
   isRemote: boolean;
+  gigType: 'PRODUCT' | 'VISIT' | 'REMOTE';
+  address?: string;
   deadline?: string;
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin?: number;
@@ -35,6 +39,7 @@ interface FormErrors {
   budgetMax?: string;
   budget?: string;
   deliverables?: string;
+  address?: string;
   general?: string;
 }
 
@@ -59,7 +64,11 @@ export default function CreateGigPage() {
     skillsRequired: [],
     experienceLevel: 'intermediate',
     location: '',
+    latitude: undefined,
+    longitude: undefined,
     isRemote: true,
+    gigType: 'REMOTE',
+    address: '',
     deadline: '',
     budgetType: 'fixed',
     budgetMin: undefined,
@@ -136,6 +145,11 @@ export default function CreateGigPage() {
       newErrors.deliverables = 'Please add at least one deliverable';
     }
 
+    // Address validation when gigType is VISIT
+    if (formData.gigType === 'VISIT' && !formData.address?.trim()) {
+      newErrors.address = 'Address is required for visit-type gigs';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -153,7 +167,8 @@ export default function CreateGigPage() {
     }
 
     try {
-      const gigData: CreateGigData = {
+      // Prepare base gig data (without new fields that might cause backend issues)
+      const baseGigData: CreateGigData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
@@ -180,12 +195,61 @@ export default function CreateGigPage() {
         isClanAllowed: formData.isClanAllowed,
       };
 
-      console.log('Creating gig:', gigData);
+      // Add new optional fields only if they have values
+      const gigData: CreateGigData = {
+        ...baseGigData,
+        ...(formData.gigType && { gigType: formData.gigType }),
+        ...(formData.gigType === 'VISIT' &&
+          formData.address?.trim() && { address: formData.address.trim() }),
+        ...(formData.latitude !== undefined && { latitude: formData.latitude }),
+        ...(formData.longitude !== undefined && {
+          longitude: formData.longitude,
+        }),
+      };
+
+      console.log('Creating gig with data:', JSON.stringify(gigData, null, 2));
 
       // Use appropriate API call based on draft status
-      const gig = asDraft
-        ? await createDraftGig(gigData)
-        : await createGig(gigData);
+      let gig;
+      try {
+        gig = asDraft
+          ? await createDraftGig(gigData)
+          : await createGig(gigData);
+      } catch (apiError) {
+        console.warn(
+          'API call failed with new fields, trying with legacy format:',
+          apiError
+        );
+
+        // If the API call fails, try again without the new fields
+        const legacyGigData: CreateGigData = {
+          title: baseGigData.title,
+          description: baseGigData.description,
+          category: baseGigData.category,
+          roleRequired: baseGigData.roleRequired,
+          skillsRequired: baseGigData.skillsRequired,
+          experienceLevel: baseGigData.experienceLevel,
+          location: baseGigData.location,
+          deadline: baseGigData.deadline,
+          budgetType: baseGigData.budgetType,
+          budgetMin: baseGigData.budgetMin,
+          budgetMax: baseGigData.budgetMax,
+          requirements: baseGigData.requirements,
+          duration: baseGigData.duration,
+          urgency: baseGigData.urgency,
+          deliverables: baseGigData.deliverables,
+          isClanAllowed: baseGigData.isClanAllowed,
+        };
+
+        console.log(
+          'Retrying with legacy format:',
+          JSON.stringify(legacyGigData, null, 2)
+        );
+
+        gig = asDraft
+          ? await createDraftGig(legacyGigData)
+          : await createGig(legacyGigData);
+      }
 
       if (asDraft) {
         alert('Gig saved as draft successfully!');
@@ -196,9 +260,31 @@ export default function CreateGigPage() {
       }
     } catch (error) {
       console.error('Error creating gig:', error);
+
+      // Try to extract more detailed error information
+      let errorMessage = 'Unknown error occurred';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // If it's an API error, try to get more details
+        if (
+          error.message.includes('500') ||
+          error.message.includes('Internal Server Error')
+        ) {
+          errorMessage =
+            'Server error: Please check if all required fields are properly formatted. The backend may not support some new fields yet.';
+        }
+      }
+
+      console.error('Detailed error analysis:', {
+        errorType: typeof error,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : 'No stack trace',
+        formData: formData,
+      });
+
       setErrors({
-        general:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+        general: errorMessage,
       });
     }
   };
@@ -211,10 +297,29 @@ export default function CreateGigPage() {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+
+      // Special handling for gigType changes
+      if (name === 'gigType') {
+        if (value === 'REMOTE') {
+          newData.isRemote = true;
+        } else if (value === 'VISIT' || value === 'PRODUCT') {
+          newData.isRemote = false;
+          // Clear location coordinates when switching away from VISIT
+          if (value === 'PRODUCT') {
+            newData.latitude = undefined;
+            newData.longitude = undefined;
+            newData.address = '';
+          }
+        }
+      }
+
+      return newData;
+    });
 
     // Clear field error when user starts typing
     if (errors[name as keyof FormErrors]) {
@@ -537,42 +642,489 @@ export default function CreateGigPage() {
                     </select>
                   </div>
 
-                  {/* Location */}
+                  {/* Gig Type */}
                   <div>
-                    <div className="mb-3 flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="isRemote"
-                          checked={formData.isRemote}
-                          onChange={handleChange}
-                          className="border-brand-border text-brand-primary focus:ring-brand-primary/20 rounded"
-                        />
-                        <span className="text-body ml-2 text-sm">
-                          Remote work allowed
-                        </span>
-                      </label>
+                    <label className="text-body mb-3 block text-sm font-medium">
+                      Gig Type *
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        {
+                          value: 'REMOTE',
+                          label: 'Remote',
+                          description: 'Work from anywhere',
+                        },
+                        {
+                          value: 'VISIT',
+                          label: 'Visit',
+                          description: 'On-site work required',
+                        },
+                        {
+                          value: 'PRODUCT',
+                          label: 'Product',
+                          description: 'Product-based delivery',
+                        },
+                      ].map((type) => (
+                        <label
+                          key={type.value}
+                          className={`
+                            cursor-pointer rounded-none border p-3 transition-all duration-200
+                            ${
+                              formData.gigType === type.value
+                                ? 'border-brand-primary bg-brand-light-blue/20'
+                                : 'border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/10'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="gigType"
+                            value={type.value}
+                            checked={formData.gigType === type.value}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="text-body text-sm font-medium">
+                            {type.label}
+                          </div>
+                          <div className="text-muted text-xs">
+                            {type.description}
+                          </div>
+                        </label>
+                      ))}
                     </div>
-                    {!formData.isRemote && (
+                  </div>
+
+                  {/* Address and Location - only show when gigType is VISIT */}
+                  {formData.gigType === 'VISIT' && (
+                    <div className="space-y-4">
+                      {/* Address */}
+                      <div>
+                        <label
+                          htmlFor="address"
+                          className="text-body mb-2 block text-sm font-medium"
+                        >
+                          Address *
+                        </label>
+                        <textarea
+                          id="address"
+                          name="address"
+                          rows={3}
+                          className={`input w-full ${
+                            errors.address
+                              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                              : ''
+                          }`}
+                          placeholder="Enter the complete address where the work needs to be done..."
+                          value={formData.address}
+                          onChange={handleChange}
+                        />
+                        {errors.address && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.address}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Location Name */}
                       <div>
                         <label
                           htmlFor="location"
                           className="text-body mb-2 block text-sm font-medium"
                         >
-                          Location
+                          Location Name
                         </label>
                         <input
                           id="location"
                           name="location"
                           type="text"
                           className="input w-full"
-                          placeholder="e.g., San Francisco, CA"
+                          placeholder="e.g., Downtown Office, Client's Studio"
                           value={formData.location}
                           onChange={handleChange}
                         />
                       </div>
-                    )}
-                  </div>
+
+                      {/* Location Picker */}
+                      <div>
+                        <label className="text-body mb-2 block text-sm font-medium">
+                          Exact Location (Required for Visit Gigs)
+                        </label>
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(
+                                  (position) => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      latitude: position.coords.latitude,
+                                      longitude: position.coords.longitude,
+                                      location:
+                                        prev.location ||
+                                        `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`,
+                                    }));
+                                  },
+                                  (error) => {
+                                    console.error(
+                                      'Error getting location:',
+                                      error
+                                    );
+                                    alert(
+                                      'Unable to get your current location. Please ensure location permissions are enabled.'
+                                    );
+                                  }
+                                );
+                              } else {
+                                alert(
+                                  'Geolocation is not supported by this browser.'
+                                );
+                              }
+                            }}
+                            className="btn-ghost px-4 py-2 text-sm"
+                          >
+                            📍 Use Current Location
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Create a simple location picker using OpenStreetMap (no API key required)
+                              const mapWindow = window.open(
+                                '',
+                                '_blank',
+                                'width=800,height=600,scrollbars=yes,resizable=yes'
+                              );
+
+                              if (mapWindow) {
+                                const searchQuery = encodeURIComponent(
+                                  formData.address ||
+                                    formData.location ||
+                                    'Delhi, India'
+                                );
+
+                                mapWindow.document.write(`
+                                  <!DOCTYPE html>
+                                  <html>
+                                    <head>
+                                      <title>Select Location</title>
+                                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                                      <style>
+                                        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                                        #map { height: 500px; width: 100%; border: 1px solid #ccc; border-radius: 8px; }
+                                        .controls { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+                                        .btn { 
+                                          background: #007bff; color: white; border: none; 
+                                          padding: 10px 16px; cursor: pointer; border-radius: 6px; 
+                                          font-size: 14px; transition: background 0.2s;
+                                        }
+                                        .btn:hover { background: #0056b3; }
+                                        .btn.success { background: #28a745; }
+                                        .btn.success:hover { background: #1e7e34; }
+                                        .info { 
+                                          background: #f8f9fa; padding: 15px; border-radius: 8px; 
+                                          margin-top: 15px; border-left: 4px solid #007bff; 
+                                        }
+                                        .coordinates { font-family: monospace; font-weight: bold; color: #28a745; }
+                                        .search-container { margin-bottom: 10px; }
+                                        .search-input { 
+                                          padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; 
+                                          width: 300px; margin-right: 10px; 
+                                        }
+                                        .status { 
+                                          padding: 10px; margin: 10px 0; border-radius: 4px; 
+                                          background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; 
+                                        }
+                                      </style>
+                                    </head>
+                                    <body>
+                                      <h3>🗺️ Select Location for Your Gig</h3>
+                                      
+                                      <div class="search-container">
+                                        <input type="text" id="searchInput" class="search-input" placeholder="Search for an address..." value="${formData.address || formData.location || ''}" />
+                                        <button class="btn" onclick="searchAddress()">🔍 Search</button>
+                                      </div>
+                                      
+                                      <div class="controls">
+                                        <button class="btn" onclick="getCurrentLocation()">📍 Use My Location</button>
+                                        <button class="btn" onclick="centerOnIndia()">🇮🇳 Center on India</button>
+                                      </div>
+                                      
+                                      
+                                      <div class="info">
+                                        <div class="status">
+                                          <p><strong>Instructions:</strong> Click anywhere on the map to select a location for your gig.</p>
+                                        </div>
+                                        
+                                        <div id="selectedCoords" style="display: none;">
+                                          <p>📍 <strong>Selected Location:</strong> <span class="coordinates" id="coordsDisplay"></span></p>
+                                          <button class="btn success" onclick="confirmLocation()">✓ Use This Location</button>
+                                          <button class="btn" onclick="clearSelection()" style="background: #dc3545; margin-left: 10px;">✕ Clear</button>
+                                        </div>
+                                      </div>
+
+                                      <div id="map"></div>
+                                      
+                                      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                                      <script>
+                                        let map, marker, selectedLat, selectedLng;
+                                        
+                                        // Initialize map
+                                        function initMap() {
+                                          // Default to Delhi, India
+                                          map = L.map('map').setView([28.6139, 77.2090], 10);
+                                          
+                                          // Add OpenStreetMap tiles
+                                          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            attribution: '© OpenStreetMap contributors',
+                                            maxZoom: 19
+                                          }).addTo(map);
+                                          
+                                          // Add click listener
+                                          map.on('click', function(e) {
+                                            placeMarker(e.latlng.lat, e.latlng.lng);
+                                          });
+                                          
+                                          // Search for initial location if provided
+                                          const initialSearch = '${searchQuery}';
+                                          if (initialSearch && initialSearch !== 'location') {
+                                            searchAddress(initialSearch);
+                                          }
+                                        }
+                                        
+                                        function placeMarker(lat, lng) {
+                                          // Remove existing marker
+                                          if (marker) {
+                                            map.removeLayer(marker);
+                                          }
+                                          
+                                          // Add new marker
+                                          marker = L.marker([lat, lng]).addTo(map);
+                                          
+                                          selectedLat = lat;
+                                          selectedLng = lng;
+                                          
+                                          document.getElementById('coordsDisplay').textContent = 
+                                            lat.toFixed(6) + ', ' + lng.toFixed(6);
+                                          document.getElementById('selectedCoords').style.display = 'block';
+                                        }
+                                        
+                                        function getCurrentLocation() {
+                                          if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition(function(position) {
+                                              const lat = position.coords.latitude;
+                                              const lng = position.coords.longitude;
+                                              map.setView([lat, lng], 15);
+                                              placeMarker(lat, lng);
+                                            }, function(error) {
+                                              alert('Unable to get your location: ' + error.message);
+                                            });
+                                          } else {
+                                            alert('Geolocation is not supported by this browser.');
+                                          }
+                                        }
+                                        
+                                        function centerOnIndia() {
+                                          map.setView([20.5937, 78.9629], 5);
+                                        }
+                                        
+                                        function searchAddress(query) {
+                                          const searchQuery = query || document.getElementById('searchInput').value;
+                                          if (!searchQuery) return;
+                                          
+                                          // Use Nominatim API for geocoding (free)
+                                          fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(searchQuery)}&limit=1\`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                              if (data && data.length > 0) {
+                                                const result = data[0];
+                                                const lat = parseFloat(result.lat);
+                                                const lng = parseFloat(result.lon);
+                                                map.setView([lat, lng], 15);
+                                                placeMarker(lat, lng);
+                                              } else {
+                                                alert('Location not found. Please try a different search term.');
+                                              }
+                                            })
+                                            .catch(error => {
+                                              console.error('Search error:', error);
+                                              alert('Search failed. Please try again.');
+                                            });
+                                        }
+                                        
+                                        function clearSelection() {
+                                          if (marker) {
+                                            map.removeLayer(marker);
+                                            marker = null;
+                                          }
+                                          selectedLat = null;
+                                          selectedLng = null;
+                                          document.getElementById('selectedCoords').style.display = 'none';
+                                        }
+                                        
+                                        function confirmLocation() {
+                                          if (selectedLat && selectedLng) {
+                                            // Send coordinates back to parent window
+                                            if (window.opener && !window.opener.closed) {
+                                              window.opener.postMessage({
+                                                type: 'LOCATION_SELECTED',
+                                                latitude: selectedLat,
+                                                longitude: selectedLng
+                                              }, '*');
+                                              window.close();
+                                            } else {
+                                              alert('Parent window not found. Please copy these coordinates manually:\\n' + 
+                                                    'Latitude: ' + selectedLat.toFixed(6) + '\\n' +
+                                                    'Longitude: ' + selectedLng.toFixed(6));
+                                            }
+                                          } else {
+                                            alert('Please select a location on the map first.');
+                                          }
+                                        }
+                                        
+                                        // Enter key support for search
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                          document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                                            if (e.key === 'Enter') {
+                                              searchAddress();
+                                            }
+                                          });
+                                        });
+                                        
+                                        // Initialize the map when page loads
+                                        window.onload = initMap;
+                                      </script>
+                                    </body>
+                                  </html>
+                                `);
+
+                                mapWindow.document.close();
+
+                                // Listen for location selection message
+                                const messageHandler = (
+                                  event: MessageEvent
+                                ) => {
+                                  if (
+                                    event.data &&
+                                    event.data.type === 'LOCATION_SELECTED'
+                                  ) {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      latitude: event.data.latitude,
+                                      longitude: event.data.longitude,
+                                      location:
+                                        prev.location ||
+                                        `${event.data.latitude.toFixed(6)}, ${event.data.longitude.toFixed(6)}`,
+                                    }));
+
+                                    // Remove event listener
+                                    window.removeEventListener(
+                                      'message',
+                                      messageHandler
+                                    );
+                                  }
+                                };
+
+                                window.addEventListener(
+                                  'message',
+                                  messageHandler
+                                );
+
+                                // Cleanup when map window is closed
+                                const checkClosed = setInterval(() => {
+                                  if (mapWindow.closed) {
+                                    window.removeEventListener(
+                                      'message',
+                                      messageHandler
+                                    );
+                                    clearInterval(checkClosed);
+                                  }
+                                }, 1000);
+                              } else {
+                                alert(
+                                  'Please allow popups for this site to use the map selector.'
+                                );
+                              }
+                            }}
+                            className="btn-ghost ml-2 px-4 py-2 text-sm"
+                          >
+                            🗺️ Select on Map
+                          </button>
+                        </div>
+
+                        {/* Coordinate Display */}
+                        {formData.latitude !== undefined &&
+                          formData.longitude !== undefined && (
+                            <div className="mt-2 rounded border border-green-200 bg-green-50 p-3">
+                              <p className="text-sm text-green-700">
+                                📍 Selected coordinates:{' '}
+                                {formData.latitude.toFixed(6)},{' '}
+                                {formData.longitude.toFixed(6)}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    latitude: undefined,
+                                    longitude: undefined,
+                                  }));
+                                }}
+                                className="mt-1 text-xs text-red-600 hover:text-red-800"
+                              >
+                                Clear coordinates
+                              </button>
+                            </div>
+                          )}
+
+                        <p className="mt-2 text-xs text-gray-500">
+                          💡 Providing exact coordinates helps creators find the
+                          location easily
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Remote Work Option - only show when gigType is not VISIT */}
+                  {formData.gigType !== 'VISIT' && (
+                    <div>
+                      <div className="mb-3 flex items-center space-x-4">
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            name="isRemote"
+                            checked={formData.isRemote}
+                            onChange={handleChange}
+                            className="border-brand-border text-brand-primary focus:ring-brand-primary/20 rounded"
+                          />
+                          <span className="text-body ml-2 text-sm">
+                            Remote work allowed
+                          </span>
+                        </label>
+                      </div>
+                      {!formData.isRemote && (
+                        <div>
+                          <label
+                            htmlFor="location"
+                            className="text-body mb-2 block text-sm font-medium"
+                          >
+                            Preferred Location
+                          </label>
+                          <input
+                            id="location"
+                            name="location"
+                            type="text"
+                            className="input w-full"
+                            placeholder="e.g., San Francisco, CA"
+                            value={formData.location}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Expected Deliverables */}
                   <div>
@@ -843,13 +1395,17 @@ export default function CreateGigPage() {
                     >
                       Project Deadline
                     </label>
+                    {/* past date not allowed */}
+
                     <input
                       id="deadline"
                       name="deadline"
                       type="date"
+                      min={new Date().toISOString().split('T')[0]}
                       className="input w-full"
                       value={formData.deadline}
                       onChange={handleChange}
+
                     />
                   </div>
                   {/* Duration */}
@@ -964,6 +1520,24 @@ export default function CreateGigPage() {
                       {formData.roleRequired || 'Not selected'}
                     </p>
                   </div>
+                  <div>
+                    <h4 className="text-body text-sm font-medium">Gig Type</h4>
+                    <p className="text-muted capitalize">
+                      {formData.gigType.toLowerCase()}
+                    </p>
+                  </div>
+                  {formData.latitude !== undefined &&
+                    formData.longitude !== undefined && (
+                      <div>
+                        <h4 className="text-body text-sm font-medium">
+                          Location
+                        </h4>
+                        <p className="text-muted text-xs">
+                          📍 {formData.latitude.toFixed(4)},{' '}
+                          {formData.longitude.toFixed(4)}
+                        </p>
+                      </div>
+                    )}
                   <div>
                     <h4 className="text-body text-sm font-medium">Budget</h4>
                     <p className="text-heading">

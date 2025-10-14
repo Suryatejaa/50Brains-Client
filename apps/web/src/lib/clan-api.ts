@@ -1,5 +1,46 @@
 import { apiClient } from './api-client';
 
+/**
+ * 🚨 IMPORTANT: When debugging API errors, look for the console group:
+ * "🔴 [Context] - Server Response Details"
+ * 
+ * This will show you:
+ * - HTTP Status Code and Error Type
+ * - Server Error Message
+ * - Validation Errors (if any)
+ * - Full error object (collapsed for readability)
+ * 
+ * The error is still thrown as an APIError, but now you get clear server response details!
+ */
+// Utility function to get detailed error information for debugging
+const logDetailedError = (error: any, context: string) => {
+  console.group(`🔴 ${context} - Server Response Details`);
+
+  // Show the most important information first
+  if (error.statusCode) {
+    console.error(`Status: ${error.statusCode} ${error.error || 'Error'}`);
+    console.error(`Message: ${error.message || 'No message'}`);
+
+    if (error.details && Array.isArray(error.details)) {
+      console.error('Validation Errors:');
+      error.details.forEach((detail: any, index: number) => {
+        console.error(`  ${index + 1}. ${detail.message || detail.msg || 'Unknown error'}`);
+      });
+    } else if (error.errors && Array.isArray(error.errors)) {
+      console.error('Errors:', error.errors);
+    }
+  } else {
+    console.error('Error:', error.message || error);
+  }
+
+  // Show full error object in collapsed group
+  console.groupCollapsed('Full Error Object (click to expand)');
+  console.error(error);
+  console.groupEnd();
+
+  console.groupEnd();
+};
+
 // Clan API client for all clan-related operations
 export const clanApiClient = {
   // Get all clans with filtering and pagination
@@ -22,9 +63,11 @@ export const clanApiClient = {
       }
     });
 
-    const endpoint = `/api/clan?${queryParams}`;
+    const endpoint = `/api/clans?${queryParams}`;
     console.log('Calling getClans with URL:', endpoint);
-    return apiClient.get(endpoint);
+    const res = await apiClient.get(endpoint);
+    console.log('getClans response:', res);
+    return res;
   },
 
   // Get clan feed (enhanced with reputation)
@@ -47,14 +90,14 @@ export const clanApiClient = {
       }
     });
 
-    const endpoint = `/api/clan/feed?${queryParams}`;
+    const endpoint = `/api/clans/feed?${queryParams}`;
     console.log('Calling getClanFeed with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get single clan by ID
   async getClan(clanId: string) {
-    const endpoint = `/api/clan/${clanId}`;
+    const endpoint = `/api/clans/${clanId}`;
     console.log('Calling getClan with URL:', endpoint);
     return apiClient.get(endpoint);
   },
@@ -85,9 +128,20 @@ export const clanApiClient = {
     portfolioVideos?: string[];
     showcaseProjects?: string[];
   }) {
-    const endpoint = '/api/clan';
+    const endpoint = '/api/clans';
     console.log('Calling createClan with URL:', endpoint);
-    return apiClient.post(endpoint, clanData);
+
+    try {
+      const res = await apiClient.post(endpoint, clanData);
+      console.log('createClan response:', res);
+      return res;
+    } catch (error: any) {
+      // Use the utility function for detailed error logging
+      logDetailedError(error, 'Clan Creation API Call');
+
+      // Re-throw the error so the calling code can handle it
+      throw error;
+    }
   },
 
   // Update clan
@@ -112,14 +166,14 @@ export const clanApiClient = {
     location: string;
     timezone: string;
   }>) {
-    const endpoint = `/api/clan/${clanId}`;
+    const endpoint = `/api/clans/${clanId}`;
     console.log('Calling updateClan with URL:', endpoint);
     return apiClient.put(endpoint, clanData);
   },
 
   // Delete clan
   async deleteClan(clanId: string) {
-    const endpoint = `/api/clan/${clanId}`;
+    const endpoint = `/api/clans/${clanId}`;
     console.log('Calling deleteClan with URL:', endpoint);
     return apiClient.delete(endpoint);
   },
@@ -131,12 +185,20 @@ export const clanApiClient = {
     return apiClient.get(endpoint);
   },
 
+  async getClanMemberDetails(userIds: string[]) {
+    const endpoint = `/api/public/profiles/internal/by-ids`;
+    console.log('Calling getClanMemberDetails with URL:', endpoint);
+    return apiClient.post(endpoint, {
+      userIds: userIds,
+    });
+  },
+
   // Invite member to clan
   async inviteMember(invitationData: {
     clanId: string;
     invitedUserId?: string;
     invitedEmail?: string;
-    role?: 'HEAD' | 'CO_HEAD' | 'ADMIN' | 'SENIOR_MEMBER' | 'MEMBER' | 'TRAINEE';
+    role?: 'OWNER' | 'ADMIN' | 'MEMBER';
     customRole?: string;
     message?: string;
   }) {
@@ -154,17 +216,17 @@ export const clanApiClient = {
 
   // Remove member from clan
   async removeMember(clanId: string, userId: string) {
-    const endpoint = `/api/members/${clanId}/members/${userId}`;
+    const endpoint = `/api/members/${clanId}/${userId}`;
     console.log('Calling removeMember with URL:', endpoint);
     return apiClient.delete(endpoint);
   },
 
   // Update member role
   async updateMemberRole(clanId: string, userId: string, roleData: {
-    role: 'HEAD' | 'CO_HEAD' | 'ADMIN' | 'SENIOR_MEMBER' | 'MEMBER' | 'TRAINEE';
+    role: 'OWNER' | 'ADMIN' | 'MEMBER';
     customRole?: string;
   }) {
-    const endpoint = `/api/members/${clanId}/members/${userId}/role`;
+    const endpoint = `/api/members/${clanId}/${userId}/role`;
     console.log('Calling updateMemberRole with URL:', endpoint);
     return apiClient.put(endpoint, roleData);
   },
@@ -222,35 +284,35 @@ export const clanApiClient = {
       }
     });
 
-    const endpoint = `/api/clan/public?${queryParams}`;
+    const endpoint = `/api/clans?${queryParams}`;
     console.log('Calling getPublicClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get featured clans
   async getFeaturedClans() {
-    const endpoint = '/api/clan/featured';
+    const endpoint = '/api/clans/featured';
     console.log('Calling getFeaturedClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get user's clans (my clans)
   async getMyClans() {
-    const endpoint = '/api/clan/my';
+    const endpoint = '/api/clans/my';
     console.log('Calling getMyClans with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get user's clan memberships (owner + member)
   async getMyClanMemberships() {
-    const endpoint = '/api/clan/my-memberships';
+    const endpoint = '/api/clans/my-memberships';
     console.log('Calling getMyClanMemberships with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Health check
   async getHealth() {
-    const endpoint = '/api/health';
+    const endpoint = '/api/clans/health';
     console.log('Calling getHealth with URL:', endpoint);
     return apiClient.get(endpoint);
   },
@@ -258,108 +320,119 @@ export const clanApiClient = {
   // Join Request Endpoints
   // Request to join a clan
   async joinClan(clanId: string, data: { message?: string } = {}) {
-    const endpoint = `/api/clan/${clanId}/join`;
+    const endpoint = `/api/members/${clanId}/join-requests`;
     console.log('Calling joinClan with URL:', endpoint);
     const res = await apiClient.post(endpoint, data);
     console.log('joinClan response:', res);
     return res;
   },
 
-  // Get join requests (clan head only)
+  // Get join requests (clan owner only)
   async getJoinRequests(clanId: string) {
-    const endpoint = `/api/members/${clanId}/join-requests`;
+    const endpoint = `/api/clans/${clanId}/pending-requests`;
     console.log('Calling getJoinRequests with URL:', endpoint);
-    return apiClient.get(endpoint);
+    const res = await apiClient.get(endpoint);
+    console.log('getJoinRequests response:', res);
+    return res;
   },
 
   // Approve join request
   async approveJoinRequest(clanId: string, requestId: string) {
-    const endpoint = `/api/members/${clanId}/join-requests/${requestId}/approve`;
+    const usedId = requestId;
+    const endpoint = `/api/clans/${clanId}/join-requests/${usedId}/approve`;
     console.log('Calling approveJoinRequest with URL:', endpoint);
-    return apiClient.post(endpoint);
+    const res = await apiClient.post(endpoint, {
+      headers: {
+        'x-user-id': clanId,
+      },
+    });
+    console.log('approveJoinRequest response:', res);
+    return res;
   },
 
   // Reject join request
   async rejectJoinRequest(clanId: string, requestId: string, data: { reason?: string } = {}) {
-    const endpoint = `/api/members/${clanId}/join-requests/${requestId}/reject`;
+    const endpoint = `/api/clans/${clanId}/join-requests/${requestId}/reject`;
     console.log('Calling rejectJoinRequest with URL:', endpoint);
-    return apiClient.post(endpoint, data);
+    const res = await apiClient.post(endpoint, data);
+    console.log('rejectJoinRequest response:', res);
+    return res;
   },
 
   // Announcements
   async getAnnouncements(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/announcements`;
+    const endpoint = `/api/clans/${clanId}/announcements`;
     console.log('Calling getAnnouncements with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async createAnnouncement(clanId: string, data: { title: string; body: string; pinned?: boolean }) {
-    const endpoint = `/api/clan/${clanId}/announcements`;
+    const endpoint = `/api/clans/${clanId}/announcements`;
     console.log('Calling createAnnouncement with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
   async reactToAnnouncement(clanId: string, announcementId: string, data: { emoji: string }) {
-    const endpoint = `/api/clan/${clanId}/announcements/${announcementId}/react`;
+    const endpoint = `/api/clans/${clanId}/announcements/${announcementId}/react`;
     console.log('Calling reactToAnnouncement with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
 
   // Polls
   async getPolls(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/polls`;
+    const endpoint = `/api/clans/${clanId}/polls`;
     console.log('Calling getPolls with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async createPoll(clanId: string, data: { question: string; options: string[]; multipleChoice?: boolean; closesAt?: string }) {
-    const endpoint = `/api/clan/${clanId}/polls`;
+    const endpoint = `/api/clans/${clanId}/polls`;
     console.log('Calling createPoll with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
   async votePoll(clanId: string, pollId: string, data: { optionId: string }) {
-    const endpoint = `/api/clan/${clanId}/polls/${pollId}/vote`;
+    const endpoint = `/api/clans/${clanId}/polls/${pollId}/vote`;
     console.log('Calling votePoll with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
 
   // Resources
   async getResources(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/resources`;
+    const endpoint = `/api/clans/${clanId}/resources`;
     console.log('Calling getResources with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async submitResource(clanId: string, data: { title: string; url: string }) {
-    const endpoint = `/api/clan/${clanId}/resources`;
+    const endpoint = `/api/clans/${clanId}/resources`;
     console.log('Calling submitResource with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
   async approveResource(clanId: string, resourceId: string) {
-    const endpoint = `/api/clan/${clanId}/resources/${resourceId}/approve`;
+    const endpoint = `/api/clans/${clanId}/resources/${resourceId}/approve`;
     console.log('Calling approveResource with URL:', endpoint);
     return apiClient.post(endpoint);
   },
   async rejectResource(clanId: string, resourceId: string) {
-    const endpoint = `/api/clan/${clanId}/resources/${resourceId}/reject`;
+    const endpoint = `/api/clans/${clanId}/resources/${resourceId}/reject`;
     console.log('Calling rejectResource with URL:', endpoint);
     return apiClient.post(endpoint);
   },
 
   // Join code
   async getJoinCode(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/join-code`;
+    const endpoint = `/api/clans/${clanId}/join-code`;
     console.log('Calling getJoinCode with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async rotateJoinCode(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/join-code/rotate`;
+    const endpoint = `/api/clans/${clanId}/join-code/rotate`;
     console.log('Calling rotateJoinCode with URL:', endpoint);
     return apiClient.post(endpoint);
   },
   async disableJoinCode(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/join-code/disable`;
+    const endpoint = `/api/clans/${clanId}/join-code/disable`;
     console.log('Calling disableJoinCode with URL:', endpoint);
     return apiClient.post(endpoint);
   },
   async joinWithCode(clanId: string, data: { code: string }) {
-    const endpoint = `/api/clan/${clanId}/join-with-code`;
+    const endpoint = `/api/clans/${clanId}/join-with-code`;
     console.log('Calling joinWithCode with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
@@ -369,37 +442,37 @@ export const clanApiClient = {
     const query = new URLSearchParams();
     if (params.cursor) query.append('cursor', params.cursor);
     if (params.filter) query.append('filter', params.filter);
-    const endpoint = `/api/clan/${clanId}/feed?${query.toString()}`;
+    const endpoint = `/api/clans/${clanId}/feed?${query.toString()}`;
     console.log('Calling getFeed with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async createPost(clanId: string, data: any) {
-    const endpoint = `/api/clan/${clanId}/posts`;
+    const endpoint = `/api/clans/${clanId}/posts`;
     return apiClient.post(endpoint, data);
   },
   async reactToPost(clanId: string, postId: string, data: { emoji: string }) {
-    const endpoint = `/api/clan/${clanId}/posts/${postId}/react`;
+    const endpoint = `/api/clans/${clanId}/posts/${postId}/react`;
     return apiClient.post(endpoint, data);
   },
   async commentOnPost(clanId: string, postId: string, data: { text: string }) {
-    const endpoint = `/api/clan/${clanId}/posts/${postId}/comments`;
+    const endpoint = `/api/clans/${clanId}/posts/${postId}/comments`;
     return apiClient.post(endpoint, data);
   },
 
   // Clan gigs
   async getClanGigs(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/gigs`;
+    const endpoint = `/api/clans/${clanId}/gigs`;
     console.log('Calling getClanGigs with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async assignGig(clanId: string, gigId: string, userId: string) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/assign`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/assign`;
     return apiClient.post(endpoint, { userId });
   },
 
   // Credits
   async getClanCredits(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/credits`;
+    const endpoint = `/api/clans/${clanId}/credits`;
     console.log('Calling getClanCredits with URL:', endpoint);
     return apiClient.get(endpoint);
   },
@@ -409,28 +482,28 @@ export const clanApiClient = {
     const qs = new URLSearchParams();
     if (params.cursor) qs.append('cursor', params.cursor);
     if (params.filter) qs.append('filter', params.filter);
-    const endpoint = `/api/clan/${clanId}/activity${qs.toString() ? `?${qs.toString()}` : ''}`;
+    const endpoint = `/api/clans/${clanId}/activity${qs.toString() ? `?${qs.toString()}` : ''}`;
     console.log('Calling getActivities with URL:', endpoint);
     return apiClient.get(endpoint);
   },
   async createActivity(clanId: string, data: any) {
-    const endpoint = `/api/clan/${clanId}/activity`;
+    const endpoint = `/api/clans/${clanId}/activity`;
     return apiClient.post(endpoint, data);
   },
   async updateActivity(activityId: string, data: any) {
-    const endpoint = `/api/clan/activity/${activityId}`;
+    const endpoint = `/api/clans/activity/${activityId}`;
     return apiClient.patch(endpoint, data);
   },
   async deleteActivity(activityId: string) {
-    const endpoint = `/api/clan/activity/${activityId}`;
+    const endpoint = `/api/clans/activity/${activityId}`;
     return apiClient.delete(endpoint);
   },
   async togglePinActivity(activityId: string, pinned: boolean) {
-    const endpoint = `/api/clan/activity/${activityId}/pin`;
+    const endpoint = `/api/clans/activity/${activityId}/pin`;
     return apiClient.patch(endpoint, { pinned });
   },
   async voteActivity(activityId: string, data: { optionId: string }) {
-    const endpoint = `/api/clan/activity/${activityId}/vote`;
+    const endpoint = `/api/clans/activity/${activityId}/vote`;
     return apiClient.post(endpoint, data);
   },
 
@@ -447,7 +520,7 @@ export const clanApiClient = {
       payoutFixedAmount?: number;
     }[];
   }) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/plan`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/plan`;
     console.log('Calling createClanGigPlan with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
@@ -461,7 +534,7 @@ export const clanApiClient = {
     deliverables: string[];
     dueDate?: string;
   }) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/tasks`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/tasks`;
     console.log('Calling createClanTask with URL:', endpoint);
     return apiClient.post(endpoint, data);
   },
@@ -478,29 +551,48 @@ export const clanApiClient = {
     notes?: string;
     dueDate?: string;
   }) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/tasks/${taskId}`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/tasks/${taskId}`;
     console.log('Calling updateClanTask with URL:', endpoint);
     return apiClient.patch(endpoint, data);
   },
 
   // Get clan tasks
   async getClanTasks(clanId: string, gigId: string) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/tasks`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/tasks`;
     console.log('Calling getClanTasks with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get clan gig assignments
   async getClanGigAssignments(clanId: string) {
-    const endpoint = `/api/clan/${clanId}/gig-assignments`;
+    const endpoint = `/api/clans/${clanId}/gig-assignments`;
     console.log('Calling getClanGigAssignments with URL:', endpoint);
     return apiClient.get(endpoint);
   },
 
   // Get clan member agreements for a gig
   async getClanMemberAgreements(clanId: string, gigId: string) {
-    const endpoint = `/api/clan/${clanId}/gigs/${gigId}/member-agreements`;
+    const endpoint = `/api/clans/${clanId}/gigs/${gigId}/member-agreements`;
     console.log('Calling getClanMemberAgreements with URL:', endpoint);
     return apiClient.get(endpoint);
+  },
+
+  // Get shared gigs for a clan
+  async getSharedGigs(clanId: string) {
+    const endpoint = `/api/clans/${clanId}/shared-gigs`;
+    console.log('Calling getSharedGigs with URL:', endpoint);
+    return apiClient.get(endpoint);
+  },
+
+  // Share a gig with clan
+  async shareGig(clanId: string, gigData: {
+    gigId: string;
+    gigTitle: string;
+    gigDescription: string;
+    gigUrl: string;
+  }) {
+    const endpoint = `/api/clans/${clanId}/share-gig`;
+    console.log('Calling shareGig with URL:', endpoint);
+    return apiClient.post(endpoint, gigData);
   },
 }; 

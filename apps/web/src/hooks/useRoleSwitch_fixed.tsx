@@ -73,7 +73,7 @@ export const RoleSwitchProvider: React.FC<{ children: React.ReactNode }> = ({
       const primaryRole = getPrimaryRole();
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 Initializing role from localStorage:', {
+        console.log('↻ Initializing role from localStorage:', {
           savedRole,
           availableRoles,
           currentRole,
@@ -104,7 +104,7 @@ export const RoleSwitchProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Always set the target role (no condition check since we start with 'USER')
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 Setting initial role to:', targetRole);
+        console.log('↻ Setting initial role to:', targetRole);
       }
       setCurrentRole(targetRole);
       hasInitialized.current = true;

@@ -78,7 +78,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
             case 'clan_task_assigned':
                 return `📝 Task Assigned: ${data.data.taskTitle}`;
             case 'clan_task_status_updated':
-                return `🔄 Task Updated: ${data.data.taskTitle}`;
+                return `↻ Task Updated: ${data.data.taskTitle}`;
             default:
                 return 'Clan Notification';
         }
@@ -164,7 +164,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
                 // This helps prevent count discrepancies after page refresh
                 setTimeout(() => {
                     if (!isInitialized.current) {
-                        console.log('🔄 Requesting initial notification sync');
+                        console.log('↻ Requesting initial notification sync');
                         fetchCounts();
                         fetchNotifications();
                         isInitialized.current = true;
@@ -325,7 +325,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
 
                         // If server doesn't send counts automatically, request them after a short delay
                         setTimeout(() => {
-                            console.log('🔄 Requesting updated counts from server');
+                            console.log('↻ Requesting updated counts from server');
                             fetchCounts();
                         }, 1000);
 
@@ -420,7 +420,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectTimeoutRef.current = null;
                         if (user?.id && wsRef.current !== null) { // Double check conditions
-                            console.log('🔄 Attempting reconnection...');
+                            console.log('↻ Attempting reconnection...');
                             connect();
                         }
                     }, delay);
@@ -437,7 +437,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
                             fetchNotifications();
                             fetchCounts();
                         }, refreshInterval);
-                        console.log('🔄 Started polling fallback due to WebSocket failure');
+                        console.log('↻ Started polling fallback due to WebSocket failure');
                     }
                 }
             };
@@ -840,7 +840,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
                         fetchCounts();
                     }, refreshInterval);
 
-                    console.log('🔄 Resumed polling after delay (WebSocket disconnected)');
+                    console.log('↻ Resumed polling after delay (WebSocket disconnected)');
                 }
             }, 3000);
         } else {
@@ -858,7 +858,7 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
 
     // Manual refresh function
     const refresh = useCallback(() => {
-        console.log('🔄 Manual refresh triggered');
+        console.log('↻ Manual refresh triggered');
         // Always allow manual refresh
         lastWebSocketUpdate.current = 0; // Reset WebSocket timestamp to allow polling
         lastFetchTime.current = 0; // Reset fetch timing to allow immediate fetch

@@ -23,7 +23,7 @@ const implementedPages = [
   { path: '/privacy', name: 'Privacy Policy', category: 'Legal' },
   { path: '/contact', name: 'Contact Us', category: 'Support' },
   { path: '/about', name: 'About Us', category: 'Company' },
-  
+
   // Medium Priority Pages (Completed in Phase 2)
   { path: '/clans/browse', name: 'Clan Browse', category: 'Clans' },
   { path: '/users/discover', name: 'User Discovery', category: 'Discovery' },
@@ -39,18 +39,18 @@ export default function TestingPage() {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isTestingAll, setIsTestingAll] = useState(false);
 
-  const filteredPages = selectedCategory === 'All' 
-    ? implementedPages 
+  const filteredPages = selectedCategory === 'All'
+    ? implementedPages
     : implementedPages.filter(page => page.category === selectedCategory);
 
   const testPage = async (page: typeof implementedPages[0]): Promise<TestResult> => {
     const startTime = Date.now();
-    
+
     try {
       // Simulate page load test
       const response = await fetch(page.path, { method: 'HEAD' });
       const loadTime = Date.now() - startTime;
-      
+
       return {
         page: page.name,
         status: 'pass',
@@ -58,7 +58,7 @@ export default function TestingPage() {
       };
     } catch (error: any) {
       const loadTime = Date.now() - startTime;
-      
+
       return {
         page: page.name,
         status: 'fail',
@@ -71,26 +71,26 @@ export default function TestingPage() {
   const testAllPages = async () => {
     setIsTestingAll(true);
     setTestResults([]);
-    
+
     for (const page of filteredPages) {
       setTestResults(prev => [...prev, { page: page.name, status: 'testing' }]);
-      
+
       const result = await testPage(page);
-      
-      setTestResults(prev => 
+
+      setTestResults(prev =>
         prev.map(r => r.page === page.name ? result : r)
       );
-      
+
       // Add small delay between tests
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    
+
     setIsTestingAll(false);
   };
 
   const getStatusIcon = (status: TestResult['status']) => {
     switch (status) {
-      case 'testing': return '🔄';
+      case 'testing': return '↻';
       case 'pass': return '✅';
       case 'fail': return '❌';
       default: return '⏳';
@@ -138,7 +138,7 @@ export default function TestingPage() {
                   <div className="text-2xl">📄</div>
                 </div>
               </div>
-              
+
               <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -149,7 +149,7 @@ export default function TestingPage() {
                   <div className="text-2xl">🎯</div>
                 </div>
               </div>
-              
+
               <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -160,7 +160,7 @@ export default function TestingPage() {
                   <div className="text-2xl">🚀</div>
                 </div>
               </div>
-              
+
               <div className="card-glass p-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -185,7 +185,7 @@ export default function TestingPage() {
                     <div className="text-2xl">✅</div>
                   </div>
                 </div>
-                
+
                 <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -195,7 +195,7 @@ export default function TestingPage() {
                     <div className="text-2xl">❌</div>
                   </div>
                 </div>
-                
+
                 <div className="card-glass p-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -232,7 +232,7 @@ export default function TestingPage() {
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="flex space-x-3">
                   <button
                     onClick={testAllPages}
@@ -241,7 +241,7 @@ export default function TestingPage() {
                   >
                     {isTestingAll ? 'Testing...' : `Test ${filteredPages.length} Pages`}
                   </button>
-                  
+
                   <button
                     onClick={() => setTestResults([])}
                     className="btn-ghost"
@@ -259,11 +259,11 @@ export default function TestingPage() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   📋 Implementation Status ({filteredPages.length} pages)
                 </h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredPages.map((page) => {
                     const testResult = testResults.find(r => r.page === page.name);
-                    
+
                     return (
                       <div key={page.path} className="border border-gray-200 rounded-none p-4 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-2">
@@ -271,14 +271,14 @@ export default function TestingPage() {
                             <h3 className="font-medium text-gray-900">{page.name}</h3>
                             <p className="text-sm text-gray-600">{page.category}</p>
                           </div>
-                          
+
                           {testResult && (
                             <div className={`text-lg ${getStatusColor(testResult.status)}`}>
                               {getStatusIcon(testResult.status)}
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <Link
                             href={page.path as any}
@@ -287,14 +287,14 @@ export default function TestingPage() {
                           >
                             {page.path} ↗
                           </Link>
-                          
+
                           {testResult?.loadTime && (
                             <span className="text-xs text-gray-500">
                               {testResult.loadTime}ms
                             </span>
                           )}
                         </div>
-                        
+
                         {testResult?.error && (
                           <p className="text-xs text-red-600 mt-2">
                             {testResult.error}
@@ -311,7 +311,7 @@ export default function TestingPage() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   📈 Implementation Progress
                 </h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -322,7 +322,7 @@ export default function TestingPage() {
                       <div className="bg-green-500 h-3 rounded-none w-full"></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">Phase 2: Medium Priority Pages</span>
@@ -332,7 +332,7 @@ export default function TestingPage() {
                       <div className="bg-blue-500 h-3 rounded-none w-full"></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">Overall Implementation</span>
@@ -350,7 +350,7 @@ export default function TestingPage() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
                   🎯 Next Steps & Optimization
                 </h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">🔧 Performance Optimization</h3>
@@ -361,7 +361,7 @@ export default function TestingPage() {
                       <li>• Bundle size optimization</li>
                     </ul>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">🧪 Testing & QA</h3>
                     <ul className="space-y-2 text-sm text-gray-600">
@@ -371,7 +371,7 @@ export default function TestingPage() {
                       <li>• Cross-browser compatibility</li>
                     </ul>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">📱 Mobile Optimization</h3>
                     <ul className="space-y-2 text-sm text-gray-600">
@@ -381,7 +381,7 @@ export default function TestingPage() {
                       <li>• Offline functionality</li>
                     </ul>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">🚀 Advanced Features</h3>
                     <ul className="space-y-2 text-sm text-gray-600">

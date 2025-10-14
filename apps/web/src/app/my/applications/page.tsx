@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 
 interface Gig {
   id: string;
@@ -87,7 +89,7 @@ export default function MyApplicationsPage() {
   const filteredApplications = applications.filter(app =>
     filter === 'ALL' || app.status === filter
   );
-
+  const router = useRouter();
   const withdrawApplication = async (applicationId: string) => {
     try {
       const response = await apiClient.delete(`/api/applications/${applicationId}`);
@@ -199,7 +201,10 @@ export default function MyApplicationsPage() {
               const config = statusConfig[application.status as keyof typeof statusConfig];
               const isWithdrawable = application.status === 'PENDING';
               return (
-                <div key={application.id} className="card-glass p-2">
+                <div key={application.id} className="card-glass p-2"
+                  onClick={() => router.push(`/gig/${application.gigId}`)}
+
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">
@@ -290,13 +295,7 @@ export default function MyApplicationsPage() {
                     <div className="text-sm text-gray-500">
                       Application ID: {application.id}
                     </div>
-                    <div className="space-x-2">
-                      <Link
-                        href={`/gig/${application.gigId}` as any}
-                        className="btn-ghost btn-sm"
-                      >
-                        View Gig
-                      </Link>
+                    <div className="space-x-2">                     
                       {application.status === 'ACCEPTED' && (
                         <Link
                           href={`/collaboration/${application.id}` as any}

@@ -73,8 +73,8 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
                             >
                                 <option value="">Select Member</option>
                                 {memberAgreements.map(agreement => (
-                                    <option key={agreement.userId} value={agreement.userId}>
-                                        {agreement.user?.name || agreement.userId}
+                                    <option key={agreement.assigneeId} value={agreement.assigneeId}>
+                                        {agreement.assigneeId}
                                     </option>
                                 ))}
                             </select>
