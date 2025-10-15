@@ -442,6 +442,7 @@ export default function WorkSubmissionForm({
       toast.success('Work submitted successfully!');
       onSuccess();
       clearSavedData(); // Clear saved data on successful submission
+      window.location.reload();
     } catch (error) {
       console.error('Failed to submit work:', error);
       toast.error('Failed to submit work. Please try again.');
@@ -892,11 +893,11 @@ export default function WorkSubmissionForm({
     const isLastStep = currentStep === 'review';
 
     return (
-      <div className="flex gap-3 pt-4">
+      <div className="flex gap-1 pt-4 justify-between sm:justify-end">
         <button
           type="button"
           onClick={onCancel}
-          className="btn-secondary flex-1"
+          className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
           disabled={isSubmitting}
         >
           Cancel
@@ -906,17 +907,17 @@ export default function WorkSubmissionForm({
         <button
           type="button"
           onClick={saveFormData}
-          className="btn-secondary flex-1"
+          className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
           disabled={isSubmitting}
         >
-          💾 Save Progress
+          Save
         </button>
 
         {!isFirstStep && (
           <button
             type="button"
             onClick={prevStep}
-            className="btn-secondary flex-1"
+            className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
             disabled={isSubmitting}
           >
             Previous
@@ -927,7 +928,7 @@ export default function WorkSubmissionForm({
           <button
             type="button"
             onClick={nextStep}
-            className="btn-primary flex-1"
+            className="bg-[#2563eb] border border-1 border-gray-600 text-white p-3"
             disabled={isSubmitting}
           >
             Next
@@ -936,10 +937,10 @@ export default function WorkSubmissionForm({
           <button
             type="button"
             onClick={handleSubmit}
-            className="btn-primary flex-1"
+            className="bg-[#2563eb] border border-1 border-gray-600 text-white p-2"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Work'}
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         )}
       </div>

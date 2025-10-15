@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkHistory } from '@/hooks/useWorkHistory';
 
 // Influencer Dashboard Data Types
 export interface InfluencerDashboardData {
@@ -138,9 +139,71 @@ export interface CrewDashboardData {
 // Influencer Dashboard Hook
 export const useInfluencerDashboard = () => {
   const { user } = useAuth();
+  const {
+    workHistory,
+    workSummary,
+    loading: workHistoryLoading,
+  } = useWorkHistory(user?.id);
   const [data, setData] = useState<InfluencerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to calculate earnings from work history
+  const calculateEarningsMetrics = (workHistoryData: any[]) => {
+    if (!Array.isArray(workHistoryData) || workHistoryData.length === 0) {
+      return {
+        monthlyEarnings: 0,
+        totalEarnings: 0,
+        avgGigPayment: 0,
+        pendingPayments: 0,
+      };
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Calculate total earnings
+    const totalEarnings = workHistoryData.reduce((sum, record) => {
+      const budget =
+        typeof record.actualBudget === 'string'
+          ? parseFloat(record.actualBudget)
+          : record.actualBudget || 0;
+      return sum + budget;
+    }, 0);
+
+    // Calculate monthly earnings (current month)
+    const monthlyEarnings = workHistoryData
+      .filter((record) => {
+        if (!record.completedAt) return false;
+        const completedDate = new Date(record.completedAt);
+        return (
+          completedDate.getMonth() === currentMonth &&
+          completedDate.getFullYear() === currentYear
+        );
+      })
+      .reduce((sum, record) => {
+        const budget =
+          typeof record.actualBudget === 'string'
+            ? parseFloat(record.actualBudget)
+            : record.actualBudget || 0;
+        return sum + budget;
+      }, 0);
+
+    // Calculate average gig payment
+    const avgGigPayment =
+      workHistoryData.length > 0 ? totalEarnings / workHistoryData.length : 0;
+
+    // For now, assume no pending payments (would need different API endpoint)
+    const pendingPayments = 0;
+
+    return {
+      monthlyEarnings,
+      totalEarnings,
+      avgGigPayment,
+      pendingPayments,
+    };
+  };
 
   const fetchInfluencerData = async () => {
     if (!user) return;
@@ -155,14 +218,12 @@ export const useInfluencerDashboard = () => {
         applicationsResponse,
         reputationResponse,
         socialResponse,
-        workHistoryResponse,
         gigsResponse,
       ] = await Promise.allSettled([
         apiClient.get('/api/user/profile'),
         apiClient.get('/api/my/applications'),
         apiClient.get('/api/reputation/profile'),
         apiClient.get('/api/social-media/analytics'),
-        apiClient.get('/api/work-history/profile/summary'),
         apiClient.get('/api/gig/feed?limit=5'),
       ]);
 
@@ -182,10 +243,6 @@ export const useInfluencerDashboard = () => {
       const socialData =
         socialResponse.status === 'fulfilled'
           ? (socialResponse.value.data as any)
-          : null;
-      const workHistory =
-        workHistoryResponse.status === 'fulfilled'
-          ? (workHistoryResponse.value.data as any)
           : null;
       const gigs =
         gigsResponse.status === 'fulfilled'
@@ -237,16 +294,7 @@ export const useInfluencerDashboard = () => {
               ? socialHandles[0]?.platform
               : '',
         },
-        earningsMetrics: {
-          monthlyEarnings:
-            workHistory?.monthlyEarnings || workHistory?.earnings?.monthly || 0,
-          totalEarnings:
-            workHistory?.totalEarnings || workHistory?.earnings?.total || 0,
-          avgGigPayment:
-            workHistory?.avgPayment || workHistory?.averageGigValue || 0,
-          pendingPayments:
-            workHistory?.pendingPayments || workHistory?.pending || 0,
-        },
+        earningsMetrics: calculateEarningsMetrics(workHistory || []),
         campaignMetrics: {
           activeCollaborations: activeApps.length,
           completedCampaigns: completedApps.length,
@@ -329,21 +377,82 @@ export const useInfluencerDashboard = () => {
     fetchInfluencerData();
   };
 
+  // Update loading state to include work history loading
+  const isLoading = loading || workHistoryLoading;
+
   useEffect(() => {
-    if (user) {
+    if (user && !workHistoryLoading) {
       fetchInfluencerData();
     }
-  }, [user]);
+  }, [user, workHistory, workHistoryLoading]);
 
-  return { data, loading, error, refresh };
+  return { data, loading: isLoading, error, refresh };
 };
 
 // Crew Dashboard Hook
 export const useCrewDashboard = () => {
   const { user } = useAuth();
+  const {
+    workHistory,
+    workSummary,
+    loading: workHistoryLoading,
+  } = useWorkHistory(user?.id);
   const [data, setData] = useState<CrewDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to calculate earnings from work history (same as influencer)
+  const calculateCrewEarningsMetrics = (workHistoryData: any[]) => {
+    if (!Array.isArray(workHistoryData) || workHistoryData.length === 0) {
+      return {
+        monthlyRevenue: 0,
+        totalRevenue: 0,
+        avgProjectValue: 0,
+      };
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Calculate total revenue
+    const totalRevenue = workHistoryData.reduce((sum, record) => {
+      const budget =
+        typeof record.actualBudget === 'string'
+          ? parseFloat(record.actualBudget)
+          : record.actualBudget || 0;
+      return sum + budget;
+    }, 0);
+
+    // Calculate monthly revenue (current month)
+    console.log('Calculating monthly revenue from work history:', workHistoryData);
+    const monthlyRevenue = workHistoryData
+      .filter((record) => {
+        if (!record.completedAt) return false;
+        const completedDate = new Date(record.completedAt);
+        return (
+          completedDate.getMonth() === currentMonth &&
+          completedDate.getFullYear() === currentYear
+        );
+      })
+      .reduce((sum, record) => {
+        const budget =
+          typeof record.actualBudget === 'string'
+            ? parseFloat(record.actualBudget)
+            : record.actualBudget || 0;
+        return sum + budget;
+      }, 0);
+
+    // Calculate average project value
+    const avgProjectValue =
+      workHistoryData.length > 0 ? totalRevenue / workHistoryData.length : 0;
+
+    return {
+      monthlyRevenue,
+      totalRevenue,
+      avgProjectValue,
+    };
+  };
 
   const fetchCrewData = async () => {
     if (!user) return;
@@ -357,14 +466,12 @@ export const useCrewDashboard = () => {
         profileResponse,
         applicationsResponse,
         reputationResponse,
-        workHistoryResponse,
         gigsResponse,
         portfolioResponse,
       ] = await Promise.allSettled([
         apiClient.get('/api/user/profile'),
         apiClient.get('/api/my/applications'),
         apiClient.get('/api/reputation/profile'),
-        apiClient.get('/api/work-history/profile/summary'),
         apiClient.get('/api/gig/feed?limit=5'),
         apiClient.get('/api/work-history/profile'),
       ]);
@@ -381,10 +488,6 @@ export const useCrewDashboard = () => {
       const reputation =
         reputationResponse.status === 'fulfilled'
           ? (reputationResponse.value.data as any)
-          : null;
-      const workHistory =
-        workHistoryResponse.status === 'fulfilled'
-          ? (workHistoryResponse.value.data as any)
           : null;
       const gigs =
         gigsResponse.status === 'fulfilled'
@@ -419,30 +522,21 @@ export const useCrewDashboard = () => {
           activeProjects: activeProjects.length,
           completedProjects: completedProjects.length,
           pendingBids: pendingBids.length,
-          successRate:
-            applications.length > 0
-              ? Math.round(
-                  (completedProjects.length / applications.length) * 100
-                )
-              : 0,
-          onTimeDelivery:
-            workHistory?.onTimeDelivery || workHistory?.completionRate || 0,
-          avgProjectValue:
-            workHistory?.avgProjectValue || workHistory?.averagePayment || 0,
+          successRate: workSummary?.successRate || 0,
+          onTimeDelivery: workSummary?.onTimeDeliveryRate || 0,
+          avgProjectValue: calculateCrewEarningsMetrics(workHistory || [])
+            .avgProjectValue,
         },
         businessMetrics: {
-          monthlyRevenue:
-            workHistory?.monthlyRevenue || workHistory?.earnings?.monthly || 0,
-          totalRevenue:
-            workHistory?.totalRevenue || workHistory?.earnings?.total || 0,
+          ...calculateCrewEarningsMetrics(workHistory || []),
           avgHourlyRate: profile?.hourlyRate || profile?.rate || 0,
           clientSatisfaction:
             reputation?.clientSatisfaction || reputation?.rating || 0,
-          utilizationRate: workHistory?.utilizationRate || 0,
-          clientRetentionRate: workHistory?.clientRetentionRate || 0,
-          repeatClientPercentage: workHistory?.repeatClientPercentage || 0,
-          avgProjectDuration: workHistory?.avgProjectDuration || 0,
-          profitMargin: workHistory?.profitMargin || 0,
+          utilizationRate: 0, // Would need separate API endpoint
+          clientRetentionRate: 0, // Would need separate API endpoint
+          repeatClientPercentage: 0, // Would need separate API endpoint
+          avgProjectDuration: 0, // Would need separate API endpoint
+          profitMargin: 0, // Would need separate API endpoint
         },
         skillMetrics: {
           totalSkills: Array.isArray(crewSkills) ? crewSkills.length : 0,
@@ -471,17 +565,7 @@ export const useCrewDashboard = () => {
           budget: app.quotedPrice || app.payment || 0,
           completion: app.progress || 0,
         })),
-        clientHistory: (workHistory?.clients || [])
-          .slice(0, 5)
-          .map((client: any) => ({
-            id: client.id || '',
-            name: client.name || client.clientName || '',
-            projectsCompleted: client.projectsCompleted || client.projects || 0,
-            projectsCount: client.projectsCompleted || client.projects || 0,
-            totalValue: client.totalValue || client.revenue || 0,
-            rating: client.rating || 0,
-            lastProject: client.lastProject || client.lastProjectDate || '',
-          })),
+        clientHistory: [], // Would need separate client history API endpoint
         equipmentPortfolio: Array.isArray(equipmentOwned)
           ? equipmentOwned.reduce((acc: any[], eq: any) => {
               const category = eq.category || 'Other';
@@ -547,11 +631,14 @@ export const useCrewDashboard = () => {
     fetchCrewData();
   };
 
+  // Update loading state to include work history loading
+  const isCrewLoading = loading || workHistoryLoading;
+
   useEffect(() => {
-    if (user) {
+    if (user && !workHistoryLoading) {
       fetchCrewData();
     }
-  }, [user]);
+  }, [user, workHistory, workHistoryLoading]);
 
-  return { data, loading, error, refresh };
+  return { data, loading: isCrewLoading, error, refresh };
 };

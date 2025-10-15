@@ -78,6 +78,7 @@ export interface BrandGig {
   budget: number;
   budgetMin: number;
   budgetMax: number;
+  applications:any[];
   budgetType: 'FIXED' | 'HOURLY';
   category: string;
   subcategory?: string;

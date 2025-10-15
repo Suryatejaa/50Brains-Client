@@ -16,7 +16,7 @@ interface Application {
   quotedPrice: number;
   estimatedTime: string;
   portfolio: string[];
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED';
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED' | 'CLOSED';
   appliedAt: string;
   respondedAt?: string;
   rejectionReason?: string;
@@ -61,6 +61,7 @@ const statusColors = {
   REJECTED: 'bg-red-100 text-red-700',
   WITHDRAWN: 'bg-gray-100 text-gray-700',
   APPROVED: 'bg-blue-100 text-blue-700',
+  CLOSED: 'bg-purple-100 text-purple-700',
 };
 
 export default function ApplicationsPage() {
@@ -354,6 +355,10 @@ export default function ApplicationsPage() {
                 <div className="w-3 h-3 bg-red-100 rounded-none"></div>
                 <span>Rejected: {applications.filter(a => a.status === 'REJECTED').length}</span>
               </span>
+              <span className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-gray-300 rounded-none"></div>
+                <span>Closed: {applications.filter(a => a.status === 'CLOSED').length}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -364,14 +369,17 @@ export default function ApplicationsPage() {
             {filteredApplications.map((application) => (
               <div key={application.id} className="card-glass p-2">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-start space-x-2">
+                  <div className="flex items-start space-x-2"
+                      onClick={()=>router.push(`/profile/${application.applicantId}`)}                  
+                  >
                     <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
                       <span className="text-gray-500 font-medium">
                         {getApplicantName(application.applicantId)[0]?.toUpperCase() || 'A'}
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">
+                      <h3 className="font-semibold text-lg cursor-pointer hover:underline"
+                      >
                         {getApplicantName(application.applicantId)}
                       </h3>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">

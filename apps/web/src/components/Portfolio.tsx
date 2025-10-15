@@ -10,27 +10,33 @@ interface PortfolioProps {
 
 export const Portfolio: React.FC<PortfolioProps> = ({
   userId,
-  showPublicOnly = true
+  showPublicOnly = true,
 }) => {
   const { portfolio, loading, error } = useWorkHistory(userId);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
 
-  const filteredPortfolio = portfolio.filter(item => {
-    if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
+  const filteredPortfolio = portfolio.filter((item) => {
+    if (
+      selectedCategory !== 'all' &&
+      item.workContext.category !== selectedCategory
+    )
+      return false;
     if (selectedType !== 'all' && item.type !== selectedType) return false;
     if (showPublicOnly && !item.isPublic) return false;
     return true;
   });
 
-  const categories = Array.from(new Set(portfolio.map(item => item.category)));
-  const types = Array.from(new Set(portfolio.map(item => item.type)));
+  const categories = Array.from(
+    new Set(portfolio.map((item) => item.workContext.category))
+  );
+  const types = Array.from(new Set(portfolio.map((item) => item.type)));
 
   if (loading) {
     return (
       <div className="card-glass p-1">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="text-center text-gray-600 mt-2">Loading portfolio...</p>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+        <p className="mt-2 text-center text-gray-600">Loading portfolio...</p>
       </div>
     );
   }
@@ -38,7 +44,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
   if (error) {
     return (
       <div className="card-glass p-1">
-        <p className="text-red-600 text-center">{error}</p>
+        <p className="text-center text-red-600">{error}</p>
       </div>
     );
   }
@@ -53,8 +59,10 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           className="input text-sm"
         >
           <option value="all">All Categories</option>
-          {categories.map(category => (
-            <option key={category} value={category}>{category}</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
           ))}
         </select>
 
@@ -64,8 +72,10 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           className="input text-sm"
         >
           <option value="all">All Types</option>
-          {types.map(type => (
-            <option key={type} value={type}>{type}</option>
+          {types.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
           ))}
         </select>
       </div>
@@ -73,38 +83,46 @@ export const Portfolio: React.FC<PortfolioProps> = ({
       {/* Portfolio Grid */}
       {filteredPortfolio.length === 0 ? (
         <div className="card-glass p-1 text-center">
-          <div className="text-4xl mb-1">📁</div>
-          <h3 className="text-lg font-semibold mb-1">No Portfolio Items</h3>
-          <p className="text-gray-600">No portfolio items found for the selected filters.</p>
+          <div className="mb-1 text-4xl">📁</div>
+          <h3 className="mb-1 text-lg font-semibold">No Portfolio Items</h3>
+          <p className="text-gray-600">
+            No portfolio items found for the selected filters.
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
+        <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredPortfolio.map((item) => (
-            <div key={item.id} className="card-glass p-1 hover:shadow-lg transition-shadow">
+            <div
+              key={item.id}
+              className="card-glass p-1 transition-shadow hover:shadow-lg"
+            >
               {/* Media Preview */}
-              {item.mediaUrls && item.mediaUrls.length > 0 && (
-                <div className="mb-1 h-48 bg-gray-100 rounded-lg overflow-hidden">
+              {(item.thumbnailUrl || item.url !== '#') && (
+                <div className="mb-1 h-48 overflow-hidden rounded-lg bg-gray-100">
                   <img
-                    src={item.mediaUrls[0]}
+                    src={item.thumbnailUrl || item.url}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
 
               {/* Content */}
               <div>
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm mb-1 line-clamp-2">
+                <h3 className="mb-2 text-lg font-semibold">{item.title}</h3>
+                <p className="mb-1 line-clamp-2 text-sm text-gray-600">
                   {item.description}
                 </p>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-1">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                    {item.category}
+                <div className="mb-1 flex flex-wrap gap-1">
+                  <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                    {item.workContext.category}
                   </span>
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                  <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
                     {item.type}
                   </span>
                 </div>
@@ -112,7 +130,12 @@ export const Portfolio: React.FC<PortfolioProps> = ({
                 {/* Work Context */}
                 <div className="text-xs text-gray-500">
                   <p>Project: {item.workContext.title}</p>
-                  <p>Completed: {new Date(item.workContext.completedAt).toLocaleDateString()}</p>
+                  <p>
+                    Completed:{' '}
+                    {new Date(
+                      item.workContext.completedAt
+                    ).toLocaleDateString()}
+                  </p>
                   {item.workContext.clientRating && (
                     <p>Rating: ⭐ {item.workContext.clientRating}/5</p>
                   )}

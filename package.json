@@ -35,6 +35,7 @@
   },
   "packageManager": "npm@9.8.1",
   "dependencies": {
-    "lucide-react": "^0.542.0"
+    "lucide-react": "^0.542.0",
+    "react-icons": "^5.5.0"
   }
 }

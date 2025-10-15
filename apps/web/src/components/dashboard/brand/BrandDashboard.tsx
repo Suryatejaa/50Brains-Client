@@ -101,9 +101,12 @@ export const BrandDashboard: React.FC = () => {
           return sum + appCount;
         }, 0);
 
-
+        //gig.applications will have applications array, if application.status is Approved or CLosed them increase the accepted count
         applicationsStats.approved = gigs.reduce((sum, gig) => {
-          const acceptedCount = gig.acceptedCount || 0;
+          const acceptedCount = gig.applications.filter((app) =>
+            app.status === 'APPROVED' || app.status === 'CLOSED'
+          ).length;
+          console.log(`Gig ${gig.id} approved applications:`, gig.applications);
           return sum + acceptedCount;
         }, 0);
         applicationsStats.pending = (gigsResponse.value.data as any).summary.totalPendingApplicationsAcrossAllGigs || 0;
@@ -192,32 +195,32 @@ export const BrandDashboard: React.FC = () => {
       description: 'Review applications',
       permission: 'applications.manage',
     },
-    {
-      href: '/analytics',
-      icon: <BarChartIcon className="w-6 h-6" />,
-      label: 'Analytics',
-      description: 'Campaign insights',
-      permission: 'analytics.view',
-    },
-    {
-      href: '/credits/purchase',
-      icon: <CreditCardIcon className="w-6 h-6" />,
-      label: 'Buy Credits',
-      description: 'Add budget',
-      permission: 'credits.purchase',
-    },
-    {
-      href: '/brand/profile',
-      icon: <Building2Icon className="w-6 h-6" />,
-      label: 'Brand Profile',
-      description: 'Update brand info',
-    },
-    {
-      href: '/support',
-      icon: <HeadphonesIcon className="w-6 h-6" />,
-      label: 'Support',
-      description: 'Get help',
-    },
+    // {
+    //   href: '/analytics',
+    //   icon: <BarChartIcon className="w-6 h-6" />,
+    //   label: 'Analytics',
+    //   description: 'Campaign insights',
+    //   permission: 'analytics.view',
+    // },
+    // {
+    //   href: '/credits/purchase',
+    //   icon: <CreditCardIcon className="w-6 h-6" />,
+    //   label: 'Buy Credits',
+    //   description: 'Add budget',
+    //   permission: 'credits.purchase',
+    // },
+    // {
+    //   href: '/brand/profile',
+    //   icon: <Building2Icon className="w-6 h-6" />,
+    //   label: 'Brand Profile',
+    //   description: 'Update brand info',
+    // },
+    // {
+    //   href: '/support',
+    //   icon: <HeadphonesIcon className="w-6 h-6" />,
+    //   label: 'Support',
+    //   description: 'Get help',
+    // },
   ];
 
   if (error) {
@@ -248,7 +251,7 @@ export const BrandDashboard: React.FC = () => {
         />
 
         {/* Key Metrics */}
-        <div className="mb-1 grid grid-cols-2 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
+        <div className="mb-1 grid grid-cols-1 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-2">
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
@@ -266,20 +269,20 @@ export const BrandDashboard: React.FC = () => {
               (window.location.href = '/applications?status=pending')
             }
           />
-          <MetricCard
+          {/* <MetricCard
             title="Profile Views"
             value={dashboardData.profile?.profileViews || 0}
             icon={<EyeIcon className="w-6 h-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/profile')}
-          />
-          <MetricCard
+          /> */}
+          {/* <MetricCard
             title="Credits Balance"
             value={`₹${dashboardData.wallet?.balance || 0}`}
             icon={<DollarSignIcon className="w-6 h-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/credits')}
-          />
+          /> */}
         </div>
 
         {/* Main Dashboard Grid */}

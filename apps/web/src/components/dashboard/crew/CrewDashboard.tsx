@@ -7,12 +7,114 @@ import { QuickActionsGrid } from '../shared/QuickActions';
 import { WorkHistorySummary } from '@/components/WorkHistorySummary';
 import { WorkHistoryList } from '@/components/WorkHistoryList';
 import { Portfolio } from '@/components/Portfolio';
+import { useRouter } from 'next/navigation';
 import { Achievements } from '@/components/Achievements';
-import { TargetIcon, VideoIcon, WrenchIcon, BarChartIcon, MegaphoneIcon, TrendingUpIcon, SmileIcon, DollarSignIcon, FileTextIcon, UserIcon } from 'lucide-react';
+import { useEffect } from 'react';
+import { useWorkHistory } from '@/hooks/useWorkHistory';
+import { apiClient } from '@/lib/api-client';
+import {
+  TargetIcon,
+  VideoIcon,
+  WrenchIcon,
+  BarChartIcon,
+  MegaphoneIcon,
+  TrendingUpIcon,
+  IndianRupeeIcon,
+  SmileIcon,
+  DollarSignIcon,
+  FileTextIcon,
+  UserIcon,
+} from 'lucide-react';
+
+interface Application {
+  id: string;
+  gigId: string;
+  applicantId: string;
+  applicantType: string;
+  proposal: string;
+  quotedPrice: number;
+  estimatedTime: string;
+  portfolio: string[] | { title: string; url: string }[];
+  status: string;
+  appliedAt: string;
+  respondedAt: string;
+  rejectionReason: string | null;
+  gig: Gig;
+}
+
+interface Gig {
+  id: string;
+  title: string;
+  description: string;
+  budgetMin: number;
+  budgetMax: number;
+  budgetType: string;
+  status: string;
+  deadline: string;
+  createdAt: string;
+}
 
 export const CrewDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { data, loading, error, refresh } = useCrewDashboard();
+  const router = useRouter();
+
+  const { workSummary, skills, reputation } = useWorkHistory(user?.id);
+
+  console.log('Work Summary:', workSummary);
+  console.log('Business Metrics:', data?.businessMetrics);
+
+  const [applications, setApplications] = React.useState<Application[]>([]);
+  const [stats, setStats] = React.useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    completed: 0,
+  });
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadApplications();
+    }
+  }, [isAuthenticated, user]);
+
+  const loadApplications = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.get('/api/my/applications');
+
+      console.log(response);
+      if (response.success && response.data) {
+        const { applications = [] } = response.data as {
+          applications: Application[];
+        };
+        setApplications(applications);
+        console.log(applications);
+        // Calculate stats
+        setStats({
+          total: applications.length,
+          pending: applications.filter(
+            (app: Application) => app.status === 'PENDING'
+          ).length,
+          approved: applications.filter(
+            (app: Application) => app.status === 'APPROVED'
+          ).length,
+          completed: applications.filter(
+            (app: Application) => app.status === 'COMPLETED'
+          ).length,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load applications:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const activeApplications = applications.filter(
+    (app) => app.status === 'PENDING' || app.status === 'APPROVED'
+  );
 
   if (loading) {
     return (
@@ -54,7 +156,7 @@ export const CrewDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-10 px-1 py-0 md:p-1">
+    <div className="bg-gray-10 min-h-screen px-1 py-0 md:p-1">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-1 md:mb-1">
@@ -63,35 +165,56 @@ export const CrewDashboard: React.FC = () => {
               <h1 className="text-heading text-xl font-bold md:text-2xl">
                 Crew Dashboard
               </h1>
-              <p className="flex items-center gap-1 text-muted text-sm md:text-base">
-                Welcome back, {user?.username || user?.email || 'Crew Member'}! <SmileIcon className="w-4 h-4" />
+              <p className="text-muted flex items-center gap-1 text-sm md:text-base">
+                Welcome back, {user?.username || user?.email || 'Crew Member'}!{' '}
+                <SmileIcon className="h-4 w-4" />
               </p>
             </div>
             <QuickActionsGrid
               actions={[
-                { label: 'Browse Projects', href: '/marketplace', icon: <VideoIcon className="w-6 h-6" /> },
-                { label: 'My Bids', href: '/my-bids', icon: <FileTextIcon className="w-6 h-6" /> },
-                { label: 'Equipment', href: '/equipment', icon: <VideoIcon className="w-6 h-6" /> },
-                { label: 'Profile', href: '/profile', icon: <UserIcon className="w-6 h-6" /> },
+                {
+                  label: 'Browse Projects',
+                  href: '/marketplace',
+                  icon: <VideoIcon className="h-6 w-6" />,
+                },
+                {
+                  label: 'My Bids',
+                  href: '/my-bids',
+                  icon: <FileTextIcon className="h-6 w-6" />,
+                },
+                {
+                  label: 'Equipment',
+                  href: '/equipment',
+                  icon: <VideoIcon className="h-6 w-6" />,
+                },
+                {
+                  label: 'Profile',
+                  href: '/profile',
+                  icon: <UserIcon className="h-6 w-6" />,
+                },
               ]}
             />
           </div>
         </div>
 
         {/* Key Metrics Row */}
-        <div className="mb-1 grid grid-cols-2 gap-1 md:mb-1 md:grid-cols-2 md:gap-1 lg:grid-cols-4">
-          <div className="card-glass p-3 md:p-4">
+        <div className="mb-1 grid grid-cols-1 gap-1 md:mb-1 md:grid-cols-3 md:gap-1 lg:grid-cols-3">
+          <div className="card-glass p-3 md:p-4"
+          onClick={()=>router.push('/my-bids')}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted text-xs md:text-sm">Active Projects</p>
                 <p className="text-heading text-lg font-semibold md:text-xl">
-                  {data?.projectMetrics?.activeProjects || 0}
+                  {activeApplications.length || 0}
                 </p>
                 <p className="text-muted text-xs">
                   {data?.projectMetrics?.pendingBids || 0} pending bids
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl"><VideoIcon className="w-6 h-6" /></div>
+              <div className="text-2xl md:text-3xl">
+                <VideoIcon className="h-6 w-6" />
+              </div>
             </div>
           </div>
 
@@ -100,17 +223,19 @@ export const CrewDashboard: React.FC = () => {
               <div>
                 <p className="text-muted text-xs md:text-sm">Monthly Revenue</p>
                 <p className="text-heading text-lg font-semibold md:text-xl">
-                  $
+                  ₹
                   {data?.businessMetrics?.monthlyRevenue?.toLocaleString() ||
                     '0'}
                 </p>
                 <p className="text-muted text-xs">
-                  Avg: $
+                  Avg: ₹
                   {data?.projectMetrics?.avgProjectValue?.toLocaleString() ||
                     '0'}
                 </p>
               </div>
-                  <div className="text-2xl md:text-3xl"><DollarSignIcon className="w-6 h-6" /></div>
+              <div className="text-2xl md:text-3xl">
+                <IndianRupeeIcon className="h-6 w-6" />
+              </div>
             </div>
           </div>
 
@@ -125,11 +250,13 @@ export const CrewDashboard: React.FC = () => {
                   {data?.projectMetrics?.onTimeDelivery || 0}% on time
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl"><TargetIcon className="w-6 h-6" /></div>
+              <div className="text-2xl md:text-3xl">
+                <TargetIcon className="h-6 w-6" />
+              </div>
             </div>
           </div>
 
-          <div className="card-glass p-3 md:p-4">
+          <div className="card-glass hidden p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted text-xs md:text-sm">Skills</p>
@@ -140,7 +267,9 @@ export const CrewDashboard: React.FC = () => {
                   {data?.skillMetrics?.expertiseLevel || 'Beginner'}
                 </p>
               </div>
-              <div className="text-2xl md:text-3xl"><WrenchIcon className="w-6 h-6" /></div>
+              <div className="text-2xl md:text-3xl">
+                <WrenchIcon className="h-6 w-6" />
+              </div>
             </div>
           </div>
         </div>
@@ -150,42 +279,73 @@ export const CrewDashboard: React.FC = () => {
           {/* Left Column - Projects & Performance */}
           <div className="space-y-1 md:space-y-1 lg:col-span-2">
             {/* Project Performance */}
-            <div className="card-glass p-1 md:p-1">
-              <div className="mb-1 flex items-center justify-between md:mb-1">
-                <h3 className="text-heading text-lg font-semibold">
-                  Project Performance
-                </h3>
-                <div className="text-xl"><BarChartIcon className="w-6 h-6" /></div>
+            <div className="card-glass relative p-1 md:p-1">
+              <div className="blur-sm">
+                <div className="mb-1 flex items-center justify-between md:mb-1">
+                  <h3 className="text-heading text-lg font-semibold">
+                    Project Performance
+                  </h3>
+                  <div className="text-xl">
+                    <BarChartIcon className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
+                  <div className="text-center">
+                    <p className="text-muted text-xs md:text-sm">Completed</p>
+                    <p className="text-heading text-lg font-semibold">
+                      {data?.projectMetrics?.completedProjects || 0}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-muted text-xs md:text-sm">Utilization</p>
+                    <p className="text-heading text-lg font-semibold">
+                      {data?.businessMetrics?.utilizationRate || 0}%
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-muted text-xs md:text-sm">
+                      Client Retention
+                    </p>
+                    <p className="text-heading text-lg font-semibold">
+                      {data?.businessMetrics?.clientRetentionRate || 0}%
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 rounded-none bg-green-50 p-2 md:mt-4">
+                  <p className="text-xs text-green-800 md:text-sm">
+                    🏆 Repeat Clients:{' '}
+                    {data?.businessMetrics?.repeatClientPercentage || 0}% • Avg
+                    Duration: {data?.businessMetrics?.avgProjectDuration || 0}{' '}
+                    days
+                  </p>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
+
+              {/* Coming Soon Overlay */}
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
                 <div className="text-center">
-                  <p className="text-muted text-xs md:text-sm">Completed</p>
-                  <p className="text-heading text-lg font-semibold">
-                    {data?.projectMetrics?.completedProjects || 0}
+                  <div className="mb-2 flex justify-center">
+                    <svg
+                      className="h-8 w-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Coming Soon
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Content Performance Analytics
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="text-muted text-xs md:text-sm">Utilization</p>
-                  <p className="text-heading text-lg font-semibold">
-                    {data?.businessMetrics?.utilizationRate || 0}%
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-muted text-xs md:text-sm">
-                    Client Retention
-                  </p>
-                  <p className="text-heading text-lg font-semibold">
-                    {data?.businessMetrics?.clientRetentionRate || 0}%
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 rounded-none bg-green-50 p-2 md:mt-4">
-                <p className="text-xs text-green-800 md:text-sm">
-                  🏆 Repeat Clients:{' '}
-                  {data?.businessMetrics?.repeatClientPercentage || 0}% • Avg
-                  Duration: {data?.businessMetrics?.avgProjectDuration || 0}{' '}
-                  days
-                </p>
               </div>
             </div>
 
@@ -196,7 +356,9 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Recent Projects
                   </h3>
-                  <div className="text-xl"><MegaphoneIcon className="w-6 h-6" /></div>
+                  <div className="text-xl">
+                    <MegaphoneIcon className="h-6 w-6" />
+                  </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.recentProjects.map((project) => (
@@ -231,14 +393,15 @@ export const CrewDashboard: React.FC = () => {
                           ${project.budget.toLocaleString()}
                         </p>
                         <span
-                          className={`inline-block rounded-none px-2 py-1 text-xs ${project.status === 'COMPLETED'
-                            ? 'bg-green-100 text-green-800'
-                            : project.status === 'ACTIVE'
-                              ? 'bg-blue-100 text-blue-800'
-                              : project.status === 'PENDING'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
+                          className={`inline-block rounded-none px-2 py-1 text-xs ${
+                            project.status === 'COMPLETED'
+                              ? 'bg-green-100 text-green-800'
+                              : project.status === 'ACTIVE'
+                                ? 'bg-blue-100 text-blue-800'
+                                : project.status === 'PENDING'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                          }`}
                         >
                           {project.status}
                         </span>
@@ -256,7 +419,9 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Work History & Portfolio
                   </h3>
-                  <div className="text-xl"><BarChartIcon className="w-6 h-6" /></div>
+                  <div className="text-xl">
+                    <BarChartIcon className="h-6 w-6" />
+                  </div>
                 </div>
 
                 {/* Work History Summary */}
@@ -271,7 +436,11 @@ export const CrewDashboard: React.FC = () => {
                       Recent Work
                     </h4>
                     <div className="max-h-64 overflow-y-auto">
-                      <WorkHistoryList userId={user?.id} showFilters={false} limit={3} />
+                      <WorkHistoryList
+                        userId={user?.id}
+                        showFilters={false}
+                        limit={3}
+                      />
                     </div>
                   </div>
 
@@ -280,7 +449,10 @@ export const CrewDashboard: React.FC = () => {
                       Recent Achievements
                     </h4>
                     <div className="max-h-64 overflow-y-auto">
-                      <Achievements userId={user?.id} showVerifiedOnly={false} />
+                      <Achievements
+                        userId={user?.id}
+                        showVerifiedOnly={false}
+                      />
                     </div>
                   </div>
                 </div>
@@ -345,97 +517,193 @@ export const CrewDashboard: React.FC = () => {
           {/* Right Column - Skills & Business */}
           <div className="space-y-1 md:space-y-1">
             {/* Skills Overview */}
-            <div className="card-glass p-2 md:p-2">
-              <div className="mb-1 flex items-center justify-between md:mb-1">
-                <h3 className="text-heading text-lg font-semibold">Skills</h3>
-                <div className="text-xl"><WrenchIcon className="w-6 h-6" /></div>
-              </div>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Total Skills</span>
-                  <span className="text-heading font-semibold">
-                    {data?.skillMetrics?.totalSkills || 0}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Expertise</span>
-                  <span className="text-heading font-semibold">
-                    {data?.skillMetrics?.expertiseLevel || 'Beginner'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Hourly Rate</span>
-                  <span className="text-heading font-semibold">
-                    ${data?.skillMetrics?.hourlyRate || 0}/hr
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Equipment</span>
-                  <span className="text-heading font-semibold">
-                    {data?.skillMetrics?.equipmentCount || 0} items
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Certifications</span>
-                  <span className="text-heading font-semibold">
-                    {data?.skillMetrics?.certifications || 0}
-                  </span>
+            <div className="card-glass relative p-3 md:p-4">
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+                <div className="text-center">
+                  <div className="mb-2 flex justify-center">
+                    <svg
+                      className="h-8 w-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Coming Soon
+                  </p>
+                  {/* <p className="mt-1 text-xs text-gray-500">
+                    Content Performance Analytics
+                  </p> */}
                 </div>
               </div>
-              {data?.skillMetrics?.specializations &&
-                data.skillMetrics.specializations.length > 0 && (
-                  <div className="mt-3 md:mt-4">
-                    <h4 className="text-heading mb-2 text-sm font-medium">
-                      Specializations
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                      {data.skillMetrics.specializations.map(
-                        (spec: string, index: number) => (
-                          <span
-                            key={index}
-                            className="bg-brand-primary/10 text-brand-primary rounded-none px-2 py-1 text-xs"
-                          >
-                            {spec}
-                          </span>
-                        )
-                      )}
+
+              <div className="sm blur">
+                <div className="card-glass p-2 md:p-2">
+                  <div className="mb-1 flex items-center justify-between md:mb-1">
+                    <h3 className="text-heading text-lg font-semibold">
+                      Skills
+                    </h3>
+                    <div className="text-xl">
+                      <WrenchIcon className="h-6 w-6" />
                     </div>
                   </div>
-                )}
+                  <div className="space-y-2 md:space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Total Skills</span>
+                      <span className="text-heading font-semibold">
+                        {data?.skillMetrics?.totalSkills || 0}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Expertise</span>
+                      <span className="text-heading font-semibold">
+                        {data?.skillMetrics?.expertiseLevel || 'Beginner'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Hourly Rate</span>
+                      <span className="text-heading font-semibold">
+                        ${data?.skillMetrics?.hourlyRate || 0}/hr
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Equipment</span>
+                      <span className="text-heading font-semibold">
+                        {data?.skillMetrics?.equipmentCount || 0} items
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Certifications</span>
+                      <span className="text-heading font-semibold">
+                        {data?.skillMetrics?.certifications || 0}
+                      </span>
+                    </div>
+                  </div>
+                  {data?.skillMetrics?.specializations &&
+                    data.skillMetrics.specializations.length > 0 && (
+                      <div className="mt-3 md:mt-4">
+                        <h4 className="text-heading mb-2 text-sm font-medium">
+                          Specializations
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                          {data.skillMetrics.specializations.map(
+                            (spec: string, index: number) => (
+                              <span
+                                key={index}
+                                className="bg-brand-primary/10 text-brand-primary rounded-none px-2 py-1 text-xs"
+                              >
+                                {spec}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+                  <div className="text-center">
+                    <div className="mb-2 flex justify-center">
+                      <svg
+                        className="h-8 w-8 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-medium text-gray-600">
+                      Coming Soon
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Content Performance Analytics
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Business Metrics */}
-            <div className="card-glass p-2 md:p-4">
-              <div className="mb-1 flex items-center justify-between md:mb-1">
-                <h3 className="text-heading text-lg font-semibold">Business</h3>
-                <div className="text-xl"><TrendingUpIcon className="w-6 h-6" /></div>
+            <div className="card-glass relative p-3 md:p-4">
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+                <div className="text-center">
+                  <div className="mb-2 flex justify-center">
+                    <svg
+                      className="h-8 w-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Coming Soon
+                  </p>
+                  {/* <p className="mt-1 text-xs text-gray-500">
+                    Content Performance Analytics
+                  </p> */}
+                </div>
               </div>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Monthly Revenue</span>
-                  <span className="text-heading font-semibold">
-                    $
-                    {data?.businessMetrics?.monthlyRevenue?.toLocaleString() ||
-                      '0'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Profit Margin</span>
-                  <span className="font-semibold text-green-600">
-                    {data?.businessMetrics?.profitMargin || 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Utilization</span>
-                  <span className="font-semibold text-blue-600">
-                    {data?.businessMetrics?.utilizationRate || 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted text-sm">Client Retention</span>
-                  <span className="font-semibold text-purple-600">
-                    {data?.businessMetrics?.clientRetentionRate || 0}%
-                  </span>
+              <div className="sm blur">
+                <div className="card-glass p-2 md:p-4">
+                  <div className="mb-1 flex items-center justify-between md:mb-1">
+                    <h3 className="text-heading text-lg font-semibold">
+                      Business
+                    </h3>
+                    <div className="text-xl">
+                      <TrendingUpIcon className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 md:space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">
+                        Monthly Revenue
+                      </span>
+                      <span className="text-heading font-semibold">
+                        ₹
+                        {data?.businessMetrics?.monthlyRevenue?.toLocaleString() ||
+                          '0'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Profit Margin</span>
+                      <span className="font-semibold text-green-600">
+                        {data?.businessMetrics?.profitMargin || 0}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">Utilization</span>
+                      <span className="font-semibold text-blue-600">
+                        {data?.businessMetrics?.utilizationRate || 0}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted text-sm">
+                        Client Retention
+                      </span>
+                      <span className="font-semibold text-purple-600">
+                        {data?.businessMetrics?.clientRetentionRate || 0}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -447,7 +715,9 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Equipment
                   </h3>
-                  <div className="text-xl"><VideoIcon className="w-6 h-6" /></div>
+                  <div className="text-xl">
+                    <VideoIcon className="h-6 w-6" />
+                  </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {data.equipmentPortfolio.map((category, index) => (
@@ -493,7 +763,9 @@ export const CrewDashboard: React.FC = () => {
                   <h3 className="text-heading text-lg font-semibold">
                     Opportunities
                   </h3>
-                  <div className="text-xl"><TargetIcon className="w-6 h-6" /></div>
+                  <div className="text-xl">
+                    <TargetIcon className="h-6 w-6" />
+                  </div>
                 </div>
                 {data.opportunities.matchedProjects?.length > 0 && (
                   <div className="mb-3 md:mb-4">
@@ -535,8 +807,6 @@ export const CrewDashboard: React.FC = () => {
               </div>
             )}
           </div>
-
-
         </div>
       </div>
     </div>

@@ -5,6 +5,13 @@ import React from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';
 import { apiClient } from '@/lib/api-client';
+import {
+  FaInstagram,
+  FaTwitter,
+  FaLinkedin,
+  FaYoutube,
+  FaGlobeAsia,
+} from 'react-icons/fa';
 
 interface SocialLinksSectionProps {
   user: UserProfileData;
@@ -33,7 +40,9 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
     website: user.website || '',
   });
 
-  const [showContact, setShowContact] = React.useState(user.showContact ?? true);
+  const [showContact, setShowContact] = React.useState(
+    user.showContact ?? true
+  );
   const [togglingContact, setTogglingContact] = React.useState(false);
 
   // Update editData when user data changes or when entering edit mode
@@ -85,13 +94,23 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
 
   // Debug toggle state
   React.useEffect(() => {
-    console.log('🎨 Toggle state changed - showContact:', showContact, 'translate-x-5:', showContact ? 'translate-x-5' : 'translate-x-0');
+    console.log(
+      '🎨 Toggle state changed - showContact:',
+      showContact,
+      'translate-x-5:',
+      showContact ? 'translate-x-5' : 'translate-x-0'
+    );
   }, [showContact]);
 
   const handleToggleContact = async () => {
     if (!isOwner) return;
 
-    console.log('↻ Toggling contact privacy from:', showContact, 'to:', !showContact);
+    console.log(
+      '↻ Toggling contact privacy from:',
+      showContact,
+      'to:',
+      !showContact
+    );
     console.log('🎯 Current showContact value:', showContact);
 
     // Optimistically update the UI immediately
@@ -108,7 +127,10 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
 
       if (response.success) {
         const responseData = response.data as { showContact: boolean };
-        console.log('✅ Contact visibility toggled to:', responseData.showContact);
+        console.log(
+          '✅ Contact visibility toggled to:',
+          responseData.showContact
+        );
 
         // Update local state with server response
         setShowContact(responseData.showContact);
@@ -173,16 +195,20 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
           <div className="flex items-center space-x-2">
             {/* Contact Privacy Toggle */}
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-600">Contact Privacy: {showContact ? 'Public' : 'Private'}</span>
+              <span className="text-xs text-gray-600">
+                Contact Privacy: {showContact ? 'Public' : 'Private'}
+              </span>
               <button
                 onClick={handleToggleContact}
                 disabled={togglingContact}
-                className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 ${showContact ? 'bg-green-500' : 'bg-gray-300'
-                  } ${togglingContact ? 'opacity-50' : ''}`}
+                className={`focus:ring-brand-primary relative inline-flex h-6 w-10 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  showContact ? 'bg-green-500' : 'bg-gray-300'
+                } ${togglingContact ? 'opacity-50' : ''}`}
               >
                 <span
-                  className={`absolute h-4 w-4 transform rounded-full bg-white transition-all duration-200 ease-in-out ${showContact ? 'translate-x-5' : 'translate-x-0'
-                    }`}
+                  className={`absolute h-4 w-4 transform rounded-full bg-white transition-all duration-200 ease-in-out ${
+                    showContact ? 'translate-x-5' : 'translate-x-0'
+                  }`}
                   style={{
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     left: showContact ? '20px' : '2px',
@@ -270,57 +296,63 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
         ) : (
           <>
             {hasAnySocialLinks ? (
-              <div className="social-links">
-                {user.instagramHandle && (
-                  <a
-                    href={`https://instagram.com/${user.instagramHandle.replace('@', '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link"
-                  >
-                    📸 Instagram
-                  </a>
-                )}
-                {user.twitterHandle && (
-                  <a
-                    href={`https://twitter.com/${user.twitterHandle.replace('@', '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link"
-                  >
-                    🐦 Twitter
-                  </a>
-                )}
-                {user.linkedinHandle && (
-                  <a
-                    href={`https://linkedin.com/in/${user.linkedinHandle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link"
-                  >
-                    💼 LinkedIn
-                  </a>
-                )}
-                {user.youtubeHandle && (
-                  <a
-                    href={`https://youtube.com/${user.youtubeHandle[0] !== '@' ? '@' : ''}${user.youtubeHandle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link"
-                  >
-                    📺 YouTube
-                  </a>
-                )}
-                {user.website && (
-                  <a
-                    href={user.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-link"
-                  >
-                    🌐 Website
-                  </a>
-                )}
+              <div className='space-y-1'>
+                <div className="social-link gap-2">
+                  <span className="font-medium">Tip:</span>{' '}
+                  <span className="text-sm text-gray-600">Always keep your social contacts PUBLIC, it will make it easier for brands to verify your identity while accepting collaboration requests.</span>
+                </div>
+                <div className="social-links">
+                  {user.instagramHandle && (
+                    <a
+                      href={`https://instagram.com/${user.instagramHandle.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link flex items-center gap-1"
+                    >
+                      <FaInstagram /> Instagram
+                    </a>
+                  )}
+                  {user.twitterHandle && (
+                    <a
+                      href={`https://twitter.com/${user.twitterHandle.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link flex items-center gap-1"
+                    >
+                      <FaTwitter /> Twitter
+                    </a>
+                  )}
+                  {user.linkedinHandle && (
+                    <a
+                      href={`https://linkedin.com/in/${user.linkedinHandle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link flex items-center gap-1"
+                    >
+                      <FaLinkedin /> LinkedIn
+                    </a>
+                  )}
+                  {user.youtubeHandle && (
+                    <a
+                      href={`https://youtube.com/${user.youtubeHandle[0] !== '@' ? '@' : ''}${user.youtubeHandle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link flex items-center gap-1"
+                    >
+                      <FaYoutube /> YouTube
+                    </a>
+                  )}
+                  {user.website && (
+                    <a
+                      href={user.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link flex items-center gap-1"
+                    >
+                      <FaGlobeAsia /> Website
+                    </a>
+                  )}
+                </div>
               </div>
             ) : (
               <p className="no-social-links">No social links added</p>

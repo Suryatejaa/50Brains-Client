@@ -59,11 +59,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
         />
 
         {/* Stats Overview */}
-        <StatsOverviewSection
+        {/* <StatsOverviewSection
           user={user}
           analytics={analytics}
           reputation={reputation}
-        />
+        /> */}
 
         {/* Social Links */}
         <SocialLinksSection

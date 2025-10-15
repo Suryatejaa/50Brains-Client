@@ -39,11 +39,11 @@ const statusConfig = {
   PENDING: { color: 'bg-yellow-100 text-yellow-800', icon: '⏳', label: 'Under Review' },
   APPROVED: { color: 'bg-green-100 text-green-800', icon: '✅', label: 'Approved' },
   REJECTED: { color: 'bg-red-100 text-red-800', icon: '❌', label: 'Rejected' },
-  COMPLETED: { color: 'bg-blue-100 text-blue-800', icon: '🎉', label: 'Completed' },
+  CLOSED: { color: 'bg-blue-100 text-blue-800', icon: '🎉', label: 'Completed' },
   CANCELLED: { color: 'bg-gray-100 text-gray-800', icon: '⚪', label: 'Cancelled' }
 };
 
-export default function MyApplicationsPage() {
+export default function MyApplicationsPage() {``
   const { user, isAuthenticated } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);

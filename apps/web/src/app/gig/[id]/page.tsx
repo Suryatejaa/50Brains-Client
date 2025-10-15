@@ -976,7 +976,7 @@ export default function GigDetailsPage() {
   const canApply =
     isAuthenticated &&
     !gig.isApplied &&
-    gig.status === 'OPEN' &&
+    (gig.status === 'OPEN' || gig.status === 'ASSIGNED') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
   console.log('🔍 Gig details:', gig);
@@ -997,7 +997,8 @@ export default function GigDetailsPage() {
                 ←
               </button>
               <button
-                onClick={() => loadGigDetails(true)}
+              // reload window not working with router.reload()              
+                onClick={() => window.location.reload()}
                 className="btn-secondary text-sm"
                 disabled={isLoading}
                 title="Refresh gig data"
@@ -1463,7 +1464,7 @@ export default function GigDetailsPage() {
                       Sign In
                     </Link>
                   </div>
-                ) : isOwner && gig.status === 'OPEN' ? (
+                ) : isOwner ? (
                   <div className="text-center">
                     <div className="mb-2 text-4xl">📝</div>
                     <p className="mb-2 font-semibold text-gray-600">
@@ -1710,7 +1711,7 @@ export default function GigDetailsPage() {
                 </div>
               </div>
               <Link
-                href={`/brand/${gig.brand?.id}` as any}
+                href={`/profile/${gig.brand?.id}` as any}
                 className="btn-secondary w-full"
               >
                 View Brand Profile
@@ -1786,7 +1787,7 @@ export default function GigDetailsPage() {
                   {/* Proposed Rate */}
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Proposed Rate (optional)
+                      Proposed Rate
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-sm text-gray-500">
@@ -1803,6 +1804,8 @@ export default function GigDetailsPage() {
                               : undefined,
                           }))
                         }
+                        required
+                        max={gig.budgetMax}
                         className="w-full rounded-none border border-gray-300 py-2 pl-8 pr-3 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
                         placeholder="Your rate for this campaign"
                         style={{ maxWidth: '100%' }}
@@ -1995,6 +1998,10 @@ export default function GigDetailsPage() {
                       disabled={
                         application.coverLetter.trim().length < 10 ||
                         !application.estimatedTime ||
+                        !application.proposedRate ||
+                        application.proposedRate! < gig.budgetMin! ||
+                        application.proposedRate! >
+                          (gig.budgetMax || Number.MAX_SAFE_INTEGER) ||
                         (gig.gigType === 'PRODUCT' &&
                           (!application.address ||
                             application.address.trim().length < 15)) ||

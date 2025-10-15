@@ -30,8 +30,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '👤' },
-    { id: 'work-history', label: 'Work History', icon: '💼' },
-    { id: 'portfolio', label: 'Portfolio', icon: '🎨' },
+    // { id: 'work-history', label: 'Work History', icon: '💼' },
+    // { id: 'portfolio', label: 'Portfolio', icon: '🎨' },
     ...(isOwner ? [{ id: 'settings', label: 'Settings', icon: '⚙️' }] : [])
   ]
 
@@ -51,24 +51,24 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           />
         )
       
-      case 'work-history':
-        return (
-          <WorkHistoryTab
-            user={profile.user}
-            workHistory={profile.workHistory}
-            isOwner={isOwner}
-            onRefresh={() => onRefreshSection('workHistory')}
-          />
-        )
+      // case 'work-history':
+      //   return (
+      //     <WorkHistoryTab
+      //       user={profile.user}
+      //       workHistory={profile.workHistory}
+      //       isOwner={isOwner}
+      //       onRefresh={() => onRefreshSection('workHistory')}
+      //     />
+      //   )
       
-      case 'portfolio':
-        return (
-          <PortfolioTab
-            user={profile.user}
-            workHistory={profile.workHistory}
-            isOwner={isOwner}
-          />
-        )
+      // case 'portfolio':
+      //   return (
+      //     <PortfolioTab
+      //       user={profile.user}
+      //       workHistory={profile.workHistory}
+      //       isOwner={isOwner}
+      //     />
+      //   )
       
       case 'settings':
         return isOwner ? (

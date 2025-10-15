@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { getPublicProfiles } from '@/lib/user-api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { FaInstagram, FaTwitter, FaLinkedin,FaMapMarkerAlt,FaGlobeAsia, FaBullseye } from 'react-icons/fa';
+
 
 export default function ProfilePage() {
   const params = useParams();
@@ -87,13 +89,13 @@ export default function ProfilePage() {
         <div className="content-container py-1">
           <div className="mx-auto max-w-4xl">
             {/* Breadcrumb */}
-            <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+            {/* <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
               <Link href="/clans" className="hover:text-brand-primary">
                 Clans
               </Link>
               <span>›</span>
               <span className="text-gray-900">{profile.displayName || profile.firstName || 'User'}</span>
-            </nav>
+            </nav> */}
 
             {/* Profile Header */}
             <div className="card-glass p-1 mb-1">
@@ -121,10 +123,10 @@ export default function ProfilePage() {
                   )}
                   <div className="flex items-center space-x-1 text-xs text-gray-600">
                     {profile.location && (
-                      <span>📍 {profile.location}</span>
+                      <span className='flex gap-1 relative' ><FaMapMarkerAlt /> {profile.location}</span>
                     )}
                     {profile.totalGigs > 0 && (
-                      <span>🎯 {profile.totalGigs} gigs</span>
+                      <span><FaBullseye /> {profile.totalGigs} gigs</span>
                     )}
                     {profile.averageRating > 0 && (
                       <span>⭐ {profile.averageRating.toFixed(1)} rating</span>
@@ -152,7 +154,7 @@ export default function ProfilePage() {
                 )}
 
                 {/* Stats */}
-                <div className="card-glass p-1">
+                <div className="card-glass p-1 hidden">
                   <h2 className="text-sm font-semibold text-gray-900 mb-1">Performance</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
                     <div className="text-center">
@@ -184,7 +186,7 @@ export default function ProfilePage() {
                     <div className="space-y-1">
                       {profile.website && (
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">🌐</span>
+                          <span className="text-gray-600"><FaGlobeAsia /></span>
                           <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                             Website
                           </a>
@@ -192,7 +194,7 @@ export default function ProfilePage() {
                       )}
                       {profile.location && (
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">📍</span>
+                          <span className="text-gray-600"><FaMapMarkerAlt /></span>
                           <span>{profile.location}</span>
                         </div>
                       )}
@@ -207,23 +209,23 @@ export default function ProfilePage() {
                     <div className="space-y-1">
                       {profile.instagramHandle && (
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">📷</span>
+                          <span className="text-gray-600"><FaInstagram /></span>
                           <a href={`https://instagram.com/${profile.instagramHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            @{profile.instagramHandle}
+                            {profile.instagramHandle}
                           </a>
                         </div>
                       )}
                       {profile.twitterHandle && (
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">🐦</span>
+                          <span className="text-gray-600"><FaTwitter /></span>
                           <a href={`https://twitter.com/${profile.twitterHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            @{profile.twitterHandle}
+                            {profile.twitterHandle}
                           </a>
                         </div>
                       )}
                       {profile.linkedinHandle && (
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">💼</span>
+                          <span className="text-gray-600"><FaLinkedin /></span>
                           <a href={`https://linkedin.com/in/${profile.linkedinHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                             {profile.linkedinHandle}
                           </a>
