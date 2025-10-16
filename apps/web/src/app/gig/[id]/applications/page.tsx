@@ -13,6 +13,7 @@ interface Applicant {
   id: string;
   firstName: string;
   lastName: string;
+  upiId?: string;
   email: string;
   profilePicture?: string;
   primaryPlatform?: string;
@@ -36,6 +37,7 @@ interface Application {
   appliedAt: string;
   address?: string;
   acceptedAt?: string;
+  upiId?: string;
   rejectedAt?: string;
   rejectionReason?: string;
   respondedAt?: string;
@@ -482,16 +484,16 @@ export default function GigApplicationsPage() {
               <h2 className="mb-2 text-xl font-semibold">{gig.title}</h2>
               {/* width of status should be as per the content */}
               <p
-              className={`rounded-none w-fit px-2 py-0 text-sm font-medium ${
-                gig.status === 'ACTIVE'
-                  ? 'bg-green-100 text-green-800'
-                  : gig.status === 'PAUSED'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {gig.status}
-            </p>
+                className={`w-fit rounded-none px-2 py-0 text-sm font-medium ${
+                  gig.status === 'ACTIVE'
+                    ? 'bg-green-100 text-green-800'
+                    : gig.status === 'PAUSED'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}
+              >
+                {gig.status}
+              </p>
               <p className="mb-2 line-clamp-2 text-gray-600">
                 {gig.description}
               </p>
@@ -509,7 +511,6 @@ export default function GigApplicationsPage() {
                 )}
               </div>
             </div>
-            
           </div>
         </div>
 
@@ -604,6 +605,7 @@ export default function GigApplicationsPage() {
                 {/* Application Details */}
                 <div className="mb-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                   <div>
+                    <h6><b>UPI Id:</b> {application.upiId}</h6>
                     <h4 className="mb-2 font-semibold">Proposal</h4>
                     <p className="whitespace-pre-wrap rounded-none bg-gray-50 p-2 text-gray-700">
                       {application.proposal}
@@ -681,28 +683,29 @@ export default function GigApplicationsPage() {
                   )}
 
                 {/* Actions */}
-                {application.status === 'PENDING' && application.applicantType !== 'owner' && (
-                  <div className="flex items-center justify-end space-x-3">
-                    <button
-                      onClick={() => openRejectModal(application.id)}
-                      disabled={processingApplicationId === application.id}
-                      className="btn-secondary text-red-600 hover:bg-red-50"
-                    >
-                      {processingApplicationId === application.id
-                        ? 'Processing...'
-                        : 'Reject'}
-                    </button>
-                    <button
-                      onClick={() => openApproveModal(application)}
-                      disabled={processingApplicationId === application.id}
-                      className="btn-primary"
-                    >
-                      {processingApplicationId === application.id
-                        ? 'Processing...'
-                        : 'Review & Approve'}
-                    </button>
-                  </div>
-                )}
+                {application.status === 'PENDING' &&
+                  application.applicantType !== 'owner' && (
+                    <div className="flex items-center justify-end space-x-3">
+                      <button
+                        onClick={() => openRejectModal(application.id)}
+                        disabled={processingApplicationId === application.id}
+                        className="btn-secondary text-red-600 hover:bg-red-50"
+                      >
+                        {processingApplicationId === application.id
+                          ? 'Processing...'
+                          : 'Reject'}
+                      </button>
+                      <button
+                        onClick={() => openApproveModal(application)}
+                        disabled={processingApplicationId === application.id}
+                        className="btn-primary"
+                      >
+                        {processingApplicationId === application.id
+                          ? 'Processing...'
+                          : 'Review & Approve'}
+                      </button>
+                    </div>
+                  )}
 
                 {/* Status Display for Processed Applications */}
                 {application.status !== 'PENDING' && (

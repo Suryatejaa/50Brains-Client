@@ -87,6 +87,7 @@ interface Application {
   clanId?: string;
   clanSlug?: string;
   address?: string;
+  upiId?: string;
   teamPlan?: Array<{
     role: string;
     memberId: string;
@@ -125,7 +126,7 @@ export default function GigDetailsPage() {
   const [gig, setGig] = useState<Gig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [alreadyAppliedMessage, setAlreadyAppliedMessage] = useState<
     string | null
@@ -167,6 +168,10 @@ export default function GigDetailsPage() {
     estimatedTime: '',
     proposal: '',
   });
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [pendingBidId, setPendingBidId] = useState<string | null>(null);
+  const [upiId, setUpiId] = useState('');
+  const [upiValidationError, setUpiValidationError] = useState('');
   const userType = getUserTypeForRole(currentRole);
 
   // Extract gigId from params with debugging and fallback
@@ -277,8 +282,6 @@ export default function GigDetailsPage() {
     }
   };
 
-  
-
   // Handle submission success
   const handleSubmissionSuccess = () => {
     setShowSubmissionForm(false);
@@ -291,17 +294,44 @@ export default function GigDetailsPage() {
 
   const handleAcceptAssignment = async (bidId: string) => {
     console.log('Accepting assignment for bidId:', bidId);
+    // Show UPI modal first to collect payment details
+    setPendingBidId(bidId);
+    setUpiId('');
+    setUpiValidationError('');
+    setShowUpiModal(true);
+  };
+
+  const handleUpiSubmit = async () => {
+    if (!pendingBidId) return;
+
+    // Validate UPI ID format
+    const upiRegex = /^[\w.-]+@[\w.-]+$/;
+    if (!upiId.trim()) {
+      setUpiValidationError('UPI ID is required');
+      return;
+    }
+    if (!upiRegex.test(upiId.trim())) {
+      setUpiValidationError('Please enter a valid UPI ID (e.g., user@paytm)');
+      return;
+    }
+
     try {
       const response = await apiClient.post(
-        `/api/gig/applications/${bidId}/accept-invitation`
+        `/api/gig/applications/${pendingBidId}/accept-invitation`,
+        { upiId: upiId.trim() }
       );
       if (response.success) {
+        showToast('success', 'Assignment accepted successfully!');
+        setShowUpiModal(false);
+        setPendingBidId(null);
+        setUpiId('');
         // Refresh bids and stats
         await loadGigDetails(true);
         window.location.reload();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to accept assignment:', error);
+      showToast('error', error.message || 'Failed to accept assignment');
     }
   };
 
@@ -729,6 +759,7 @@ export default function GigDetailsPage() {
         proposal: application.coverLetter.trim(),
         portfolio: portfolioUrls,
         quotedPrice: application.proposedRate || 0,
+        upiId: application.upiId?.trim() || undefined,
         estimatedTime: application.estimatedTime,
         applicantType: application.applicantType,
         address: application.address?.trim() || undefined,
@@ -1746,7 +1777,9 @@ export default function GigDetailsPage() {
                       <button
                         className="btn-primary "
                         onClick={() =>
-                          handleAcceptAssignment((myApplications as any)?.applicationId)
+                          handleAcceptAssignment(
+                            (myApplications as any)?.applicationId
+                          )
                         }
                       >
                         Accept
@@ -1805,10 +1838,15 @@ export default function GigDetailsPage() {
                   <div className="text-center">
                     <div className="mb-2 text-4xl">❌</div>
                     <p className="mb-2 font-semibold text-red-600">
-                      {(myApplications as any)?.applicantType === 'owner' ? 'You declined the assignment' : 'Your application was rejected'}
+                      {(myApplications as any)?.applicantType === 'owner'
+                        ? 'You declined the assignment'
+                        : 'Your application was rejected'}
                     </p>
                     <p className="mb-4 text-sm text-gray-600">
-                      Application raised by {(myApplications as any)?.applicantType === 'owner' ? 'the brand' : 'you'}
+                      Application raised by{' '}
+                      {(myApplications as any)?.applicantType === 'owner'
+                        ? 'the brand'
+                        : 'you'}
                     </p>
                     <Link
                       href="/my/applications"
@@ -1872,30 +1910,32 @@ export default function GigDetailsPage() {
                 {/* // If owner change status of gig */}
                 {/* </div>
               <div> */}
-                {isOwner && (gig.status === 'OPEN' || gig.status === 'ASSIGNED') && (
-                  <button
-                    onClick={() =>
-                      confirm(
-                        'This gig wont recive new applications if paused'
-                      ) && changeGigStatus('PAUSED')
-                    }
-                    className="btn-secondary mt-2 w-full"
-                  >
-                    Pause Gig
-                  </button>
-                )}
+                {isOwner &&
+                  (gig.status === 'OPEN' || gig.status === 'ASSIGNED') && (
+                    <button
+                      onClick={() =>
+                        confirm(
+                          'This gig wont recive new applications if paused'
+                        ) && changeGigStatus('PAUSED')
+                      }
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      Pause Gig
+                    </button>
+                  )}
 
-                {isOwner && (gig.status === 'PAUSED' || gig.status === 'IN_REVIEW') && (
-                  <button
-                    onClick={() =>
-                      confirm('Reopen gig will allow new applications') &&
-                      changeGigStatus('OPEN')
-                    }
-                    className="btn-secondary mt-2 w-full"
-                  >
-                    Reopen Gig
-                  </button>
-                )}
+                {isOwner &&
+                  (gig.status === 'PAUSED' || gig.status === 'IN_REVIEW') && (
+                    <button
+                      onClick={() =>
+                        confirm('Reopen gig will allow new applications') &&
+                        changeGigStatus('OPEN')
+                      }
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      Reopen Gig
+                    </button>
+                  )}
               </div>
             </div>
 
@@ -2027,6 +2067,28 @@ export default function GigDetailsPage() {
                         : ''}{' '}
                       ({gig.budgetType})
                     </p>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      UPI ID
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={application.upiId || ''}
+                        onChange={(e) =>
+                          setApplication((prev) => ({
+                            ...prev,
+                            upiId: e.target.value,
+                          }))
+                        }
+                        required
+                        className="w-full rounded-none border border-gray-300 py-2 pr-3 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                        placeholder="Your UPI ID for payment"
+                        style={{ maxWidth: '100%' }}
+                      />
+                    </div>
                   </div>
 
                   {/* Estimated Time */}
@@ -2207,7 +2269,9 @@ export default function GigDetailsPage() {
                       disabled={
                         application.coverLetter.trim().length < 10 ||
                         !application.estimatedTime ||
-                        !application.proposedRate ||
+                        !application.upiId ||
+                        application.upiId!.length < 5 ||
+                        application.upiId!.length > 100 ||
                         application.proposedRate! < gig.budgetMin! ||
                         application.proposedRate! >
                           (gig.budgetMax || Number.MAX_SAFE_INTEGER) ||
@@ -2380,6 +2444,69 @@ export default function GigDetailsPage() {
                   Assign User
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* UPI ID Collection Modal */}
+      {showUpiModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                💳 Payment Details Required
+              </h3>
+              <p className="mt-1 text-sm text-gray-600">
+                Please provide your UPI ID to receive payments for this
+                assignment.
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                UPI ID *
+              </label>
+              <input
+                type="text"
+                value={upiId}
+                onChange={(e) => {
+                  setUpiId(e.target.value);
+                  setUpiValidationError('');
+                }}
+                placeholder="e.g., yourname@paytm, yourname@phonepe"
+                className={`w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  upiValidationError ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {upiValidationError && (
+                <p className="mt-1 text-sm text-red-600">
+                  {upiValidationError}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                💡 This UPI ID will be used for payment after work completion
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowUpiModal(false);
+                  setPendingBidId(null);
+                  setUpiId('');
+                  setUpiValidationError('');
+                }}
+                className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpiSubmit}
+                className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Accept Assignment
+              </button>
             </div>
           </div>
         </div>

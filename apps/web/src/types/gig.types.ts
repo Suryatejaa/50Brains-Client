@@ -147,6 +147,7 @@ export interface Submission {
   submittedById: string;
   submittedByType: 'user' | 'clan';
   title: string;
+  upiId?: string;
   description?: string;
   deliverables: EnhancedDeliverable[]; // Changed from string[] to EnhancedDeliverable[]
   notes?: string;

@@ -281,7 +281,11 @@ export default function GigSubmissionsPage() {
                           })}
                         </div>
                       </div>
-
+                      <div>
+                        <h4 className="mb-1 text-sm font-medium text-gray-900">
+                          UPI ID: {submission.upiId}
+                        </h4>
+                      </div>
                       {submission.notes && (
                         <div className="mb-3">
                           <h4 className="mb-1 text-sm font-medium text-gray-900">

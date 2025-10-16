@@ -1544,7 +1544,7 @@ export default function CreateGigPage() {
                       {formData.budgetType === 'negotiable'
                         ? 'Negotiable'
                         : formData.budgetMin && formData.budgetMax
-                          ? `$${formData.budgetMin} - $${formData.budgetMax}`
+                          ? `₹${formData.budgetMin} - ₹${formData.budgetMax}`
                           : 'Not set'}
                     </p>
                   </div>
