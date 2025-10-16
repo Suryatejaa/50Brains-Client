@@ -198,20 +198,20 @@ export const InfluencerDashboard: React.FC = () => {
                   icon: <MegaphoneIcon className="h-6 w-6" />,
                 },
                 {
-                  label: 'View Portfolio',
-                  href: '/portfolio',
+                  label: 'View Submissions',
+                  href: '/my/submissions',
                   icon: <FileTextIcon className="h-6 w-6" />,
                 },
-                {
-                  label: 'Analytics',
-                  href: '/analytics',
-                  icon: <BarChartIcon className="h-6 w-6" />,
-                },
-                {
-                  label: 'Clans',
-                  href: '/clans',
-                  icon: <UsersIcon className="h-6 w-6" />,
-                },
+                // {
+                //   label: 'Analytics',
+                //   href: '/analytics',
+                //   icon: <BarChartIcon className="h-6 w-6" />,
+                // },
+                // {
+                //   label: 'Clans',
+                //   href: '/clans',
+                //   icon: <UsersIcon className="h-6 w-6" />,
+                // },
               ]}
             />
           </div>

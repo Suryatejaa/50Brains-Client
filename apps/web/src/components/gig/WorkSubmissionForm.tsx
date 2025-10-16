@@ -52,6 +52,7 @@ export default function WorkSubmissionForm({
     notes: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     description?: string;
@@ -445,7 +446,17 @@ export default function WorkSubmissionForm({
       window.location.reload();
     } catch (error) {
       console.error('Failed to submit work:', error);
-      toast.error('Failed to submit work. Please try again.');
+
+      // Extract the actual error message from the backend
+      let errorMessage = 'Failed to submit work. Please try again.';
+
+      if (error instanceof Error) {
+        // If it's an APIError, the message should contain the actual validation error
+        errorMessage = error.message;
+        setFormErrors([errorMessage]);
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -893,56 +904,69 @@ export default function WorkSubmissionForm({
     const isLastStep = currentStep === 'review';
 
     return (
-      <div className="flex gap-1 pt-4 justify-between sm:justify-end">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
-          disabled={isSubmitting}
-        >
-          Cancel
-        </button>
-
-        {/* Manual Save Button */}
-        <button
-          type="button"
-          onClick={saveFormData}
-          className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
-          disabled={isSubmitting}
-        >
-          Save
-        </button>
-
-        {!isFirstStep && (
+      <div>
+        <div className="flex-1">
+          {formErrors.length > 0 && (
+            <div className="mb-2 rounded border border-red-200 bg-red-50 p-3">
+              <ul className="list-inside list-disc text-sm text-red-600">
+                {formErrors.map((error, i) => (
+                  <li key={i}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        <div className="flex justify-between gap-1 pt-4 sm:justify-end">
           <button
             type="button"
-            onClick={prevStep}
-            className="bg-white border border-1 border-gray-600 text-gray-700 p-3"
+            onClick={onCancel}
+            className="border-1 border border-gray-600 bg-white p-3 text-gray-700"
             disabled={isSubmitting}
           >
-            Previous
+            Cancel
           </button>
-        )}
 
-        {!isLastStep ? (
+          {/* Manual Save Button */}
           <button
             type="button"
-            onClick={nextStep}
-            className="bg-[#2563eb] border border-1 border-gray-600 text-white p-3"
+            onClick={saveFormData}
+            className="border-1 border border-gray-600 bg-white p-3 text-gray-700"
             disabled={isSubmitting}
           >
-            Next
+            Save
           </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="bg-[#2563eb] border border-1 border-gray-600 text-white p-2"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
-          </button>
-        )}
+
+          {!isFirstStep && (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="border-1 border border-gray-600 bg-white p-3 text-gray-700"
+              disabled={isSubmitting}
+            >
+              Previous
+            </button>
+          )}
+
+          {!isLastStep ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              className="border-1 border border-gray-600 bg-[#2563eb] p-3 text-white"
+              disabled={isSubmitting}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="border-1 border border-gray-600 bg-[#2563eb] p-2 text-white"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
+          )}
+        </div>
       </div>
     );
   };

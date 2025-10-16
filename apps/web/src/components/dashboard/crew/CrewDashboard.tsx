@@ -178,20 +178,20 @@ export const CrewDashboard: React.FC = () => {
                   icon: <VideoIcon className="h-6 w-6" />,
                 },
                 {
-                  label: 'My Bids',
-                  href: '/my-bids',
+                  label: 'View Submissions',
+                  href: '/my/submissions',
                   icon: <FileTextIcon className="h-6 w-6" />,
                 },
-                {
-                  label: 'Equipment',
-                  href: '/equipment',
-                  icon: <VideoIcon className="h-6 w-6" />,
-                },
-                {
-                  label: 'Profile',
-                  href: '/profile',
-                  icon: <UserIcon className="h-6 w-6" />,
-                },
+                // {
+                //   label: 'Equipment',
+                //   href: '/equipment',
+                //   icon: <VideoIcon className="h-6 w-6" />,
+                // },
+                // {
+                //   label: 'Profile',
+                //   href: '/profile',
+                //   icon: <UserIcon className="h-6 w-6" />,
+                // },
               ]}
             />
           </div>

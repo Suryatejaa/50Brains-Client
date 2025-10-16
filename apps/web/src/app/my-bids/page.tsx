@@ -13,10 +13,17 @@ interface Bid {
   bidAmount: number;
   proposedDuration: string;
   message: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'EXPIRED' | 'APPROVED';
+  status:
+    | 'PENDING'
+    | 'ACCEPTED'
+    | 'REJECTED'
+    | 'WITHDRAWN'
+    | 'EXPIRED'
+    | 'APPROVED';
   submittedAt: string;
   responseAt?: string;
   projectDeadline: string;
+  applicantType: 'owner' | 'user';
   projectBudget: {
     min: number;
     max: number;
@@ -50,7 +57,7 @@ export default function MyBidsPage() {
     sortBy: 'recent',
     page: 1,
     limit: 20,
-    search: ''
+    search: '',
   });
   const router = useRouter();
   useEffect(() => {
@@ -70,6 +77,7 @@ export default function MyBidsPage() {
       if (response.success) {
         // Explicitly type response.data to avoid 'unknown' error
         const data = response.data as { bids: Bid[] };
+        console.log('Fetched bids:', data.bids);
         setBids(data.bids);
       }
     } catch (error) {
@@ -90,9 +98,40 @@ export default function MyBidsPage() {
     }
   };
 
+  //POST /applications/:id/accept-invitation
+  const handleAcceptAssignment = async (bidId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/api/applications/${bidId}/accept-invitation`
+      );
+      if (response.success) {
+        // Refresh bids and stats
+        await loadBids();
+        await loadStats();
+      }
+    } catch (error) {
+      console.error('Failed to accept assignment:', error);
+    }
+  };
+
+  const handleReject = async (bidId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/api/applications/${bidId}/reject-invitation`
+      );
+      if (response.success) {
+        // Refresh bids and stats
+        await loadBids();
+        await loadStats();
+      }
+    } catch (error) {
+      console.error('Failed to reject bid:', error);
+    }
+  };
+
   const handleWithdraw = async (bidId: string) => {
     try {
-      const response = await apiClient.patch(`/api/crew/bids/${bidId}/withdraw`);
+      const response = await apiClient.delete(`/api/applications/${bidId}`);
       if (response.success) {
         // Refresh bids and stats
         await loadBids();
@@ -105,13 +144,20 @@ export default function MyBidsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-      case 'ACCEPTED': return 'bg-green-100 text-green-800';
-      case 'REJECTED': return 'bg-red-100 text-red-800';
-      case 'WITHDRAWN': return 'bg-gray-100 text-gray-800';
-      case 'EXPIRED': return 'bg-orange-100 text-orange-800';
-      case 'APPROVED': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'ACCEPTED':
+        return 'bg-green-100 text-green-800';
+      case 'REJECTED':
+        return 'bg-red-100 text-red-800';
+      case 'WITHDRAWN':
+        return 'bg-gray-100 text-gray-800';
+      case 'EXPIRED':
+        return 'bg-orange-100 text-orange-800';
+      case 'APPROVED':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -121,37 +167,49 @@ export default function MyBidsPage() {
         {/* Header */}
         <div className="mb-2">
           <h1 className="text-3xl font-bold text-gray-900">My Bids</h1>
-          <p className="text-gray-600">Manage your project bids and track performance</p>
+          <p className="text-gray-600">
+            Manage your project bids and track performance
+          </p>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-4 md:grid-cols-4 gap-1 mb-1">
+          <div className="mb-1 grid grid-cols-4 gap-1 md:grid-cols-4">
             <div className="card-glass p-1 text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalBids}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.totalBids}
+              </div>
               <div className="text-sm text-gray-600">Total Bids</div>
             </div>
             <div className="card-glass p-1 text-center">
-              <div className="text-2xl font-bold text-yellow-600">{stats.pendingBids}</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {stats.pendingBids}
+              </div>
               <div className="text-sm text-gray-600">Pending</div>
             </div>
             <div className="card-glass p-1 text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.acceptedBids}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.acceptedBids}
+              </div>
               <div className="text-sm text-gray-600">Approved</div>
             </div>
             <div className="card-glass p-1 text-center">
-              <div className="text-2xl font-bold text-purple-600">{stats.successRate}%</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {stats.successRate}%
+              </div>
               <div className="text-sm text-gray-600">Success Rate</div>
             </div>
           </div>
         )}
 
         {/* Filters */}
-        <div className="card-glass p-1 mb-1">
+        <div className="card-glass mb-1 p-1">
           <div className="flex flex-wrap gap-1">
             <select
               value={filters.status}
-              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, status: e.target.value }))
+              }
               className="input"
             >
               <option value="">All Status</option>
@@ -164,7 +222,9 @@ export default function MyBidsPage() {
 
             <select
               value={filters.sortBy}
-              onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, sortBy: e.target.value }))
+              }
               className="input"
             >
               <option value="recent">Most Recent</option>
@@ -176,7 +236,9 @@ export default function MyBidsPage() {
               type="text"
               placeholder="Search projects..."
               value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
               className="input flex-1"
             />
           </div>
@@ -185,14 +247,18 @@ export default function MyBidsPage() {
         {/* Bids List */}
         {loading ? (
           <div className="card-glass p-8 text-center">
-            <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
             <p>Loading bids...</p>
           </div>
         ) : bids.length === 0 ? (
           <div className="card-glass p-2 text-center">
-            <div className="text-6xl mb-2">📝</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No bids found</h3>
-            <p className="text-gray-600 mb-2">Start bidding on projects to see them here</p>
+            <div className="mb-2 text-6xl">📝</div>
+            <h3 className="mb-2 text-xl font-semibold text-gray-900">
+              No bids found
+            </h3>
+            <p className="mb-2 text-gray-600">
+              Start bidding on projects to see them here
+            </p>
             <Link href="/marketplace" className="btn-primary">
               Browse Projects
             </Link>
@@ -200,27 +266,34 @@ export default function MyBidsPage() {
         ) : (
           <div className="space-y-1">
             {bids.map((bid) => (
-              <div key={bid.id} className="card-glass p-2"
-                onClick={() => router.push(`/gig/${bid.projectId}`)}>
-                <div className="flex items-start justify-between mb-1">
+              <div
+                key={bid.id}
+                className="card-glass p-2"
+                onClick={() => router.push(`/gig/${bid.projectId}`)}
+              >
+                <div className="mb-1 flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center space-x-1 mb-1">
-                      <span className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(bid.status)}`}>
-                        {bid.status}
-                      </span>
+                    <div className="mb-1 flex items-center space-x-1">
                       <h3 className="text-lg font-semibold text-gray-900">
                         {bid.projectTitle}
                       </h3>
                     </div>
+                    <span
+                      className={`rounded px-2 py-1 text-sm font-medium ${getStatusColor(bid.status)}`}
+                    >
+                      {bid.status}
+                    </span>
 
-                    <p className="text-gray-600 text-sm mb-1 line-clamp-2">
+                    <p className="mb-1 line-clamp-2 text-sm text-gray-600">
                       {bid.message}
                     </p>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-1 text-sm text-gray-500 mb-1">
+                    <div className="mb-1 grid grid-cols-2 gap-1 text-sm text-gray-500 md:grid-cols-4">
                       <div>
                         <span className="font-medium">Bid Amount:</span>
-                        <div className="text-green-600 font-semibold">₹{bid.bidAmount.toLocaleString()}</div>
+                        <div className="font-semibold text-green-600">
+                          ₹{bid.bidAmount.toLocaleString()}
+                        </div>
                       </div>
                       <div>
                         <span className="font-medium">Duration:</span>
@@ -228,18 +301,26 @@ export default function MyBidsPage() {
                       </div>
                       <div>
                         <span className="font-medium">Project Budget:</span>
-                        <div>₹{bid.projectBudget.min.toLocaleString()} - ₹{bid.projectBudget.max.toLocaleString()}</div>
+                        <div>
+                          ₹{bid.projectBudget.min.toLocaleString()} - ₹
+                          {bid.projectBudget.max.toLocaleString()}
+                        </div>
                       </div>
                       <div>
                         <span className="font-medium">Deadline:</span>
-                        <div>{new Date(bid.projectDeadline).toLocaleDateString()}</div>
+                        <div>
+                          {new Date(bid.projectDeadline).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
 
                     {bid.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
+                      <div className="mb-3 flex flex-wrap gap-2">
                         {bid.skills.map((skill) => (
-                          <span key={skill} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                          <span
+                            key={skill}
+                            className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700"
+                          >
                             {skill}
                           </span>
                         ))}
@@ -247,28 +328,41 @@ export default function MyBidsPage() {
                     )}
                   </div>
 
-                  <div className="ml-4 flex flex-col space-y-2">
-                    {/* <Link
-                      href={`/gig/${bid.projectId}` as any}
-                      className="btn-ghost-sm"
-                    >
-                      View Project
-                    </Link> */}
+                  <div className="ml-4 flex flex-col space-y-2">                  
+                    {bid.status === 'PENDING' &&
+                      bid.applicantType === 'owner' && (
+                        <div className="flex flex-col space-y-1">
+                          <button
+                            className="btn-primary "
+                            onClick={() => handleAcceptAssignment(bid.id)}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="btn-secondary text-red-600 hover:bg-red-50"
+                            onClick={() => handleReject(bid.id)}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
 
-                    {bid.status === 'PENDING' && (
-                      <button
-                        onClick={() => handleWithdraw(bid.id)}
-                        className="btn-secondary-sm text-red-600 hover:bg-red-50"
-                      >
-                        Withdraw
-                      </button>
-                    )}
+                    {bid.status === 'PENDING' &&
+                      bid.applicantType !== 'owner' && (
+                        <button
+                          onClick={() => handleWithdraw(bid.id)}
+                          className="btn-secondary-sm text-red-600 hover:bg-red-50"
+                        >
+                          Withdraw
+                        </button>
+                      )}
                   </div>
                 </div>
 
                 <div className="text-xs text-gray-500">
                   Submitted: {new Date(bid.submittedAt).toLocaleDateString()}
-                  {bid.responseAt && ` • Responded: ${new Date(bid.responseAt).toLocaleDateString()}`}
+                  {bid.responseAt &&
+                    ` • Responded: ${new Date(bid.responseAt).toLocaleDateString()}`}
                 </div>
               </div>
             ))}

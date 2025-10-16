@@ -39,12 +39,26 @@ export interface Gig {
     daysUntilDeadline: number;
   };
   pendingApplicationsCount?: number;
+  brand?: {
+    id: string;
+    name: string;
+    username: string;
+    logo: string;
+    verified: boolean;
+  };
 }
 
 // Enhanced Deliverable Types
 export interface EnhancedDeliverable {
   type: 'social_post' | 'image' | 'video' | 'article' | 'website' | 'other';
-  platform?: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'tiktok' | 'youtube' | 'other';
+  platform?:
+    | 'instagram'
+    | 'twitter'
+    | 'linkedin'
+    | 'facebook'
+    | 'tiktok'
+    | 'youtube'
+    | 'other';
   content?: string;
   url?: string;
   file?: File;
@@ -95,7 +109,7 @@ export interface Application {
   gigId: string;
   applicantId: string;
   applicantType: 'user' | 'clan';
-  clanId?: string;                    // New: For clan applications
+  clanId?: string; // New: For clan applications
   proposal?: string;
   quotedPrice?: number;
   estimatedTime?: string;
@@ -107,9 +121,9 @@ export interface Application {
   gig?: Gig;
   submissions?: Submission[];
   // New GIG-CLAN workflow fields
-  teamPlan?: TeamPlan;               // New: Clan's team structure
-  milestonePlan?: MilestonePlan[];   // New: Milestone breakdown
-  payoutSplit?: PayoutSplit;         // New: Payment distribution
+  teamPlan?: TeamPlan; // New: Clan's team structure
+  milestonePlan?: MilestonePlan[]; // New: Milestone breakdown
+  payoutSplit?: PayoutSplit; // New: Payment distribution
 }
 
 export interface CreateApplicationData {
@@ -120,10 +134,10 @@ export interface CreateApplicationData {
   portfolio?: string[];
   // New GIG-CLAN workflow fields
   applicantType?: 'user' | 'clan';
-  clanId?: string;                    // Required if applicantType is 'clan'
-  teamPlan?: TeamPlan;               // Required if applicantType is 'clan'
-  milestonePlan?: MilestonePlan[];   // Required if applicantType is 'clan'
-  payoutSplit?: PayoutSplit;         // Required if applicantType is 'clan'
+  clanId?: string; // Required if applicantType is 'clan'
+  teamPlan?: TeamPlan; // Required if applicantType is 'clan'
+  milestonePlan?: MilestonePlan[]; // Required if applicantType is 'clan'
+  payoutSplit?: PayoutSplit; // Required if applicantType is 'clan'
 }
 
 export interface Submission {
@@ -171,7 +185,7 @@ export interface CreateSubmissionData {
 }
 
 export interface GigFilters {
-  category?: string[];
+  category?: string;
   roleRequired?: string[];
   location?: string;
   budgetMin?: number;
@@ -187,7 +201,7 @@ export interface GigFilters {
   experienceLevel?: string;
   skillsRequired?: string[];
   isClanAllowed?: boolean;
-  budgetType?: 'fixed' | 'hourly' | 'negotiable';
+  budgetType?: 'fixed' | 'hourly' | 'negotiable' | '';
 }
 
 export interface GigApiResponse {

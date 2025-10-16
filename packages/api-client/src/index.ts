@@ -23,8 +23,6 @@ import {
   CrewOpportunity,
 } from '@50brains/shared-types';
 
-
-
 export class APIError extends Error {
   constructor(
     public statusCode: number,
@@ -32,7 +30,7 @@ export class APIError extends Error {
     public message: string,
     public success?: boolean,
     public errors?: string[],
-    public details?: any,
+    public details?: any
   ) {
     super(message);
     this.name = 'APIError';
@@ -105,7 +103,7 @@ export class APIClient {
       method: options.method || 'GET',
       headers: { ...this.getHeaders(), ...options.headers },
       body: options.body,
-      credentials: 'include'
+      credentials: 'include',
     });
     console.log('⏱️ Timeout:', this.timeout, 'ms');
     console.log('========================');
@@ -146,8 +144,8 @@ export class APIClient {
             const retryError: APIErrorResponse = await retryResponse.json();
             throw new APIError(
               retryError.statusCode,
-              retryError.message || 'Unknown error',
-              retryError.message || 'Unknown error',
+              retryError.error || retryError.message || 'Unknown error',
+              retryError.error || retryError.message || 'Unknown error',
               retryError.details
             );
           }
@@ -186,8 +184,8 @@ export class APIClient {
           const error: APIErrorResponse = await response.json();
           throw new APIError(
             error.statusCode,
-            error.message || 'Unknown error',
-            error.message || 'Unknown error',
+            error.error || error.message || 'Unknown error',
+            error.error || error.message || 'Unknown error',
             error.details
           );
         }
@@ -198,15 +196,18 @@ export class APIClient {
         console.log('error:', error);
         throw new APIError(
           error.statusCode,
-          error.message || 'Unknown error',
-          error.message || 'Unknown error',
+          error.error || error.message || 'Unknown error',
+          error.error || error.message || 'Unknown error',
           error.details
         );
       }
 
       console.log('📥 === RESPONSE DEBUG ===');
       console.log('✅ Response status:', response.status);
-      console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log(
+        '📋 Response headers:',
+        Object.fromEntries(response.headers.entries())
+      );
       console.log('🔗 Response URL:', response.url);
       console.log('========================');
 
@@ -228,8 +229,14 @@ export class APIClient {
 
       console.log('❌ === ERROR DEBUG ===');
       console.log('🚨 Error occurred:', error);
-      console.log('🔍 Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
-      console.log('📝 Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.log(
+        '🔍 Error type:',
+        error instanceof Error ? error.constructor.name : 'Unknown'
+      );
+      console.log(
+        '📝 Error message:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       console.log('📊 Error details:', error);
       console.log('=====================');
 
@@ -284,7 +291,7 @@ export class APIClient {
         console.error('❌ Refresh token request failed:', {
           status: refreshResponse.status,
           statusText: refreshResponse.statusText,
-          error: refreshError
+          error: refreshError,
         });
 
         // If refresh token is expired (401), this is a critical auth failure
@@ -301,7 +308,8 @@ export class APIClient {
         throw new APIError(
           refreshResponse.status,
           refreshError.error || 'REFRESH_FAILED',
-          refreshError.message || `Token refresh failed: ${refreshResponse.status} ${refreshResponse.statusText}`
+          refreshError.message ||
+            `Token refresh failed: ${refreshResponse.status} ${refreshResponse.statusText}`
         );
       }
 
@@ -345,7 +353,10 @@ export class APIClient {
     console.log('🎯 Endpoint:', endpoint);
     console.log('📤 Data being sent:', data);
     console.log('🔗 Full URL:', `${this.baseURL}${endpoint}`);
-    console.log('📋 Request body:', data ? JSON.stringify(data, null, 2) : 'undefined');
+    console.log(
+      '📋 Request body:',
+      data ? JSON.stringify(data, null, 2) : 'undefined'
+    );
     console.log('================================');
 
     return this.request<T>(endpoint, {
@@ -473,7 +484,7 @@ export class APIClient {
 
 // Service classes for different API endpoints
 export class AuthService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async login(credentials: LoginRequest): Promise<TokenPair> {
     const response = await this.client.post<TokenPair>(
@@ -534,7 +545,7 @@ export class AuthService {
 }
 
 export class UserService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getProfile(): Promise<User> {
     const response = await this.client.get<User>('/api/user/profile');
@@ -588,7 +599,7 @@ export class UserService {
 }
 
 export class GigService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getGigFeed(
     params?: PaginationParams
@@ -735,7 +746,7 @@ export class GigService {
 }
 
 export class ClanService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getClanFeed(
     params?: PaginationParams
@@ -770,7 +781,9 @@ export class ClanService {
   }
 
   async getClanMembers(clanId: string): Promise<any[]> {
-    const response = await this.client.get<any[]>(`/api/clans/${clanId}/members`);
+    const response = await this.client.get<any[]>(
+      `/api/clans/${clanId}/members`
+    );
     return response.data;
   }
 
@@ -802,7 +815,7 @@ export class ClanService {
 }
 
 export class CreditService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getWallet(): Promise<CreditWallet> {
     const response = await this.client.get<CreditWallet>('/api/credit/wallet');
@@ -844,7 +857,7 @@ export class CreditService {
 }
 
 export class NotificationService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getNotifications(
     params?: PaginationParams
@@ -873,7 +886,7 @@ export class NotificationService {
 }
 
 export class SocialMediaService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   // Profile Social Media Management
   async getConnectedAccounts(): Promise<SocialMediaHandle[]> {
@@ -977,7 +990,7 @@ export class SocialMediaService {
 }
 
 export class ReputationService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getUserReputation(userId?: string): Promise<ReputationScore> {
     const endpoint = userId
@@ -1039,7 +1052,7 @@ export class ReputationService {
 }
 
 export class WorkHistoryService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getWorkHistory(
     userId?: string,
@@ -1090,7 +1103,7 @@ export class WorkHistoryService {
 }
 
 export class AnalyticsService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   async getDashboardAnalytics(): Promise<any> {
     const response = await this.client.get<any>('/api/analytics/dashboard');
@@ -1133,7 +1146,7 @@ export class AnalyticsService {
 
 // Influencer-specific service
 export class InfluencerService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   // Dashboard Data
   async getDashboardMetrics(): Promise<InfluencerDashboardMetrics> {
@@ -1392,7 +1405,7 @@ export class InfluencerService {
 
 // Crew-specific service
 export class CrewService {
-  constructor(private client: APIClient) { }
+  constructor(private client: APIClient) {}
 
   // Dashboard Data
   async getDashboardMetrics(): Promise<CrewDashboardMetrics> {

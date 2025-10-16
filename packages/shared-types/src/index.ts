@@ -21,8 +21,9 @@ export interface APISuccessResponse<T> {
 
 export interface APIErrorResponse {
   success?: boolean;
-  errors?: string[];
-  message?: string;
+  error?: string; // Main error message from backend
+  errors?: string[]; // Array of validation errors
+  message?: string; // Alternative message field
   statusCode: number;
   timestamp: string;
   path: string;
@@ -178,12 +179,12 @@ export interface Gig {
 
   // Status & Metrics
   status:
-  | 'DRAFT'
-  | 'ACTIVE'
-  | 'PAUSED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED';
+    | 'DRAFT'
+    | 'ACTIVE'
+    | 'PAUSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED';
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   applicationCount: number;
   viewCount: number;
@@ -276,12 +277,12 @@ export interface CreditTransaction {
   id: string;
   userId: string;
   type:
-  | 'PURCHASE'
-  | 'BOOST_PROFILE'
-  | 'BOOST_GIG'
-  | 'BOOST_CLAN'
-  | 'CONTRIBUTE_CLAN'
-  | 'REFUND';
+    | 'PURCHASE'
+    | 'BOOST_PROFILE'
+    | 'BOOST_GIG'
+    | 'BOOST_CLAN'
+    | 'CONTRIBUTE_CLAN'
+    | 'REFUND';
   amount: number;
   description: string;
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
@@ -332,12 +333,12 @@ export interface Notification {
   id: string;
   userId: string;
   type:
-  | 'GIG_APPLICATION'
-  | 'CLAN_INVITATION'
-  | 'WORK_SUBMISSION'
-  | 'RATING_RECEIVED'
-  | 'BOOST_APPLIED'
-  | 'PAYMENT_RECEIVED';
+    | 'GIG_APPLICATION'
+    | 'CLAN_INVITATION'
+    | 'WORK_SUBMISSION'
+    | 'RATING_RECEIVED'
+    | 'BOOST_APPLIED'
+    | 'PAYMENT_RECEIVED';
   title: string;
   message: string;
 
@@ -479,12 +480,12 @@ export interface CampaignApplication {
   gigId: string;
   applicantId: string;
   status:
-  | 'PENDING'
-  | 'REVIEWING'
-  | 'SHORTLISTED'
-  | 'ACCEPTED'
-  | 'REJECTED'
-  | 'WITHDRAWN';
+    | 'PENDING'
+    | 'REVIEWING'
+    | 'SHORTLISTED'
+    | 'ACCEPTED'
+    | 'REJECTED'
+    | 'WITHDRAWN';
   appliedAt: string;
   proposedRate?: number;
   coverLetter?: string;
@@ -612,12 +613,12 @@ export interface SocialMediaHandle {
   id: string;
   userId: string;
   platform:
-  | 'INSTAGRAM'
-  | 'TIKTOK'
-  | 'YOUTUBE'
-  | 'TWITTER'
-  | 'LINKEDIN'
-  | 'FACEBOOK';
+    | 'INSTAGRAM'
+    | 'TIKTOK'
+    | 'YOUTUBE'
+    | 'TWITTER'
+    | 'LINKEDIN'
+    | 'FACEBOOK';
   handle: string;
   url: string;
   isVerified: boolean;
@@ -647,10 +648,10 @@ export interface SearchFilters {
 export interface FileUpload {
   file: File;
   type:
-  | 'PROFILE_PICTURE'
-  | 'COVER_PHOTO'
-  | 'PORTFOLIO_ITEM'
-  | 'WORK_SUBMISSION';
+    | 'PROFILE_PICTURE'
+    | 'COVER_PHOTO'
+    | 'PORTFOLIO_ITEM'
+    | 'WORK_SUBMISSION';
   metadata?: Record<string, any>;
 }
 
@@ -692,13 +693,13 @@ export interface FormField<T = any> {
   name: string;
   label: string;
   type:
-  | 'text'
-  | 'email'
-  | 'password'
-  | 'textarea'
-  | 'select'
-  | 'checkbox'
-  | 'file';
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'file';
   value: T;
   error?: string;
   required?: boolean;

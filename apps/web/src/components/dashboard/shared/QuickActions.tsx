@@ -88,7 +88,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   return (
     <div className="card-glass dashboard-card-padding">
       <h3 className="flex items-center gap-2 text-heading mb-mobile text-lg font-semibold">{title}</h3>
-      <div className="dashboard-grid-gap grid grid-cols-2 md:grid-cols-4">
+      <div className="dashboard-grid-gap grid grid-cols-2 md:grid-cols-2">
         {actions.map((action, index) => (
           <QuickActionButton key={index} {...action} />
         ))}

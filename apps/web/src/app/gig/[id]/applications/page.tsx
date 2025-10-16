@@ -31,7 +31,7 @@ interface Application {
   proposal: string;
   quotedPrice: number;
   estimatedTime: string;
-  applicantType: 'user' | 'clan';
+  applicantType: 'user' | 'clan' | 'owner';
   portfolio: string[];
   appliedAt: string;
   address?: string;
@@ -681,7 +681,7 @@ export default function GigApplicationsPage() {
                   )}
 
                 {/* Actions */}
-                {application.status === 'PENDING' && (
+                {application.status === 'PENDING' && application.applicantType !== 'owner' && (
                   <div className="flex items-center justify-end space-x-3">
                     <button
                       onClick={() => openRejectModal(application.id)}

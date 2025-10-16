@@ -9,67 +9,52 @@ import { useRouter } from 'next/navigation';
 
 interface Creator {
   id: string;
-  name: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
-  avatar?: string;
-  bio: string;
-  verified: boolean;
-
-  // Social metrics
-  totalFollowers: number;
-  avgEngagementRate: number;
-  categories: string[];
+  email?: string;
+  profilePicture?: string;
+  bio?: string;
+  verified?: boolean;
   location?: string;
+  roles: string[]; // Array of roles like ['INFLUENCER', 'CREW', 'BRAND', 'USER']
 
-  // Platform stats
-  platforms: {
+  // Influencer-specific fields
+  primaryNiche?: string;
+  primaryPlatform?: string;
+  contentCategories?: string[];
+  socialHandles?: {
     platform: string;
-    followers: number;
     handle: string;
-    verified: boolean;
+    followers?: number;
+    verified?: boolean;
   }[];
 
-  // Portfolio
-  portfolioItems: {
-    id: string;
-    title: string;
-    thumbnail: string;
-    platform: string;
-    views?: number;
-    likes?: number;
-  }[];
+  // Crew-specific fields
+  experienceLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT';
+  availability?: string;
+  workStyle?: string;
+  skills?: string[];
+  hourlyRate?: number;
+  equipment?: string[];
 
-  // Rates and availability
-  rates: {
-    post: number;
-    story: number;
-    reel: number;
-    video: number;
-  };
-
-  // Performance
-  rating: number;
-  completedCampaigns: number;
-  responseTime: string; // e.g., "Within 24 hours"
-
-  // Availability
-  isAvailable: boolean;
-  nextAvailableDate?: string;
+  // Common fields
+  totalFollowers?: number;
+  avgEngagementRate?: number;
+  rating?: number;
+  completedProjects?: number;
+  isAvailable?: boolean;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 interface SearchFilters {
-  category: string;
-  location: string;
-  minFollowers: number;
-  maxFollowers: number;
-  platforms: string[];
-  minEngagement: number;
-  maxRate: number;
-  availability: 'all' | 'available' | 'verified';
-  sortBy: 'followers' | 'engagement' | 'rating' | 'rate';
+  query: string;
+  page: number;
+  limit: number;
 }
 
-export default function InfluencersSearchPage() {
+export default function TalentSearchPage() {
   const { user, isAuthenticated } = useAuth();
   const { currentRole } = useRoleSwitch();
   const router = useRouter();
@@ -77,26 +62,65 @@ export default function InfluencersSearchPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'influencers' | 'crew'>(
+    'all'
+  );
   const [filters, setFilters] = useState<SearchFilters>({
-    category: '',
-    location: '',
-    minFollowers: 0,
-    maxFollowers: 0,
-    platforms: [],
-    minEngagement: 0,
-    maxRate: 0,
-    availability: 'all',
-    sortBy: 'followers'
+    query: '',
+    page: 1,
+    limit: 18,
   });
 
-  const categories = [
-    'Fashion & Style', 'Beauty & Makeup', 'Fitness & Health', 'Food & Cooking',
-    'Travel & Lifestyle', 'Technology', 'Gaming', 'Business & Finance',
-    'Education', 'Entertainment', 'Sports', 'Art & Design', 'Music',
-    'Parenting & Family', 'Home & Garden', 'Photography'
+  const niches = [
+    'fitness',
+    'beauty',
+    'tech',
+    'fashion',
+    'food',
+    'travel',
+    'gaming',
+    'business',
+    'education',
+    'entertainment',
+    'sports',
+    'art',
+    'music',
+    'parenting',
+    'home',
+    'photography',
+    'lifestyle',
   ];
 
-  const platforms = ['Instagram', 'YouTube', 'TikTok', 'Twitter', 'LinkedIn'];
+  const platforms = ['INSTAGRAM', 'YOUTUBE', 'TIKTOK', 'TWITTER', 'LINKEDIN'];
+
+  const contentCategories = [
+    'posts',
+    'stories',
+    'reels',
+    'videos',
+    'tutorials',
+    'reviews',
+    'unboxing',
+    'lifestyle',
+    'educational',
+    'promotional',
+  ];
+
+  const crewSkills = [
+    'photography',
+    'videography',
+    'editing',
+    'drone-operation',
+    'sound-engineering',
+    'lighting',
+    'graphic-design',
+    'animation',
+    'social-media-management',
+    'content-writing',
+  ];
+
+  const experienceLevels = ['BEGINNER', 'INTERMEDIATE', 'EXPERT'];
+  const workStyles = ['remote', 'on-site', 'hybrid', 'flexible'];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -104,61 +128,115 @@ export default function InfluencersSearchPage() {
       return;
     }
 
-    loadCreators();
-  }, [isAuthenticated, filters, searchQuery]);
+    // Add a small delay to prevent too many API calls while typing
+    const timeoutId = setTimeout(() => {
+      loadCreators();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, filters, searchQuery, activeTab]);
+
+  // Handle tab changes - just reload creators with client-side filtering
+  useEffect(() => {
+    // Tab changes will be handled by client-side filtering
+    // Reset to page 1 when changing tabs
+    setFilters((prev) => ({ ...prev, page: 1 }));
+  }, [activeTab]);
 
   const loadCreators = async () => {
     try {
       setIsLoading(true);
+
+      console.log('Loading creators with search query:', searchQuery);
+      console.log('Active tab:', activeTab);
+      console.log('Filters:', filters);
+
       const params = new URLSearchParams();
 
-      if (searchQuery) params.append('search', searchQuery);
-      if (filters.category) params.append('category', filters.category);
-      if (filters.location) params.append('location', filters.location);
-      if (filters.minFollowers > 0) params.append('minFollowers', filters.minFollowers.toString());
-      if (filters.maxFollowers > 0) params.append('maxFollowers', filters.maxFollowers.toString());
-      if (filters.platforms.length > 0) params.append('platforms', filters.platforms.join(','));
-      if (filters.minEngagement > 0) params.append('minEngagement', filters.minEngagement.toString());
-      if (filters.maxRate > 0) params.append('maxRate', filters.maxRate.toString());
-      if (filters.availability !== 'all') params.append('availability', filters.availability);
-      params.append('sortBy', filters.sortBy);
+      // Add search query if exists
+      const queryToUse = searchQuery.trim() || filters.query.trim();
+      if (queryToUse) {
+        params.append('query', queryToUse);
+      }
 
-      const response = await apiClient.get(`/api/creators/search?${params.toString()}`);
+      // Add pagination
+      params.append('page', filters.page.toString());
+      params.append('limit', filters.limit.toString());
 
-      if (response.success) {
-        setCreators(((response.data as any)?.creators || []) as Creator[]);
+      const apiUrl = `/api/search/users?${params.toString()}`;
+      console.log('Making API call to:', apiUrl);
+
+      const response = await apiClient.get(apiUrl);
+      console.log('API Response:', response);
+
+      if (response.success && response.data) {
+        const responseData = response.data as {
+          results?: Creator[];
+          pagination?: {
+            total: number;
+            page: number;
+            limit: number;
+            pages: number;
+          };
+        };
+        let allCreators: Creator[] = [];
+
+        if (responseData.results && Array.isArray(responseData.results)) {
+          allCreators = responseData.results;
+          console.log('Raw creators from API:', allCreators.length);
+        } else {
+          console.log('No results array found in response:', responseData);
+        }
+
+        // Client-side filtering based on active tab and roles
+        let filteredCreators = allCreators;
+
+        if (activeTab === 'influencers') {
+          filteredCreators = allCreators.filter(
+            (creator) => creator.roles && creator.roles.includes('INFLUENCER')
+          );
+          console.log('Filtered for influencers:', filteredCreators.length);
+        } else if (activeTab === 'crew') {
+          filteredCreators = allCreators.filter(
+            (creator) => creator.roles && creator.roles.includes('CREW')
+          );
+          console.log('Filtered for crew:', filteredCreators.length);
+        } else {
+          // For 'all' tab, show users who have either INFLUENCER or CREW roles
+          filteredCreators = allCreators.filter(
+            (creator) =>
+              creator.roles &&
+              (creator.roles.includes('INFLUENCER') ||
+                creator.roles.includes('CREW'))
+          );
+          console.log('Filtered for all talent:', filteredCreators.length);
+        }
+
+        console.log('Final filtered creators:', filteredCreators.length);
+        setCreators(filteredCreators);
+      } else {
+        console.log('API response not successful:', response);
+        setCreators([]);
       }
     } catch (error) {
       console.error('Failed to load creators:', error);
+      setCreators([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const updateFilter = (key: keyof SearchFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const togglePlatform = (platform: string) => {
-    setFilters(prev => ({
-      ...prev,
-      platforms: prev.platforms.includes(platform)
-        ? prev.platforms.filter(p => p !== platform)
-        : [...prev.platforms, platform]
-    }));
-  };
+  // Removed toggleArrayFilter since we don't need complex filtering for MVP
 
   const clearFilters = () => {
     setFilters({
-      category: '',
-      location: '',
-      minFollowers: 0,
-      maxFollowers: 0,
-      platforms: [],
-      minEngagement: 0,
-      maxRate: 0,
-      availability: 'all',
-      sortBy: 'followers'
+      query: '',
+      page: 1,
+      limit: 18,
     });
     setSearchQuery('');
   };
@@ -172,13 +250,14 @@ export default function InfluencersSearchPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2 py-2">
-          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+      <div className="border-b bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl px-2 py-2 sm:px-2 lg:px-2">
+          <div className="items-left flex flex-col justify-between gap-1 md:flex-row lg:flex-row">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Find Influencers</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Find Talent</h1>
               <p className="mt-1 text-sm text-gray-600">
-                Discover and connect with creators for your campaigns
+                Discover and connect with influencers and crew members for your
+                projects
               </p>
             </div>
             <div className="flex space-x-2">
@@ -190,310 +269,242 @@ export default function InfluencersSearchPage() {
               </Link>
             </div>
           </div>
+
+          {/* Tabs */}
+          <div className="mt-4 flex space-x-1 rounded-none bg-gray-100 p-1">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`flex-1 rounded-none px-2 py-1 text-sm font-medium transition-colors ${
+                activeTab === 'all'
+                  ? 'bg-white text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              All Talent ({creators.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('influencers')}
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'influencers'
+                  ? 'bg-white text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Influencers (
+              {
+                creators.filter(
+                  (c) => c.roles && c.roles.includes('INFLUENCER')
+                ).length
+              }
+              )
+            </button>
+            <button
+              onClick={() => setActiveTab('crew')}
+              className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'crew'
+                  ? 'bg-white text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Crew (
+              {
+                creators.filter((c) => c.roles && c.roles.includes('CREW'))
+                  .length
+              }
+              )
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2 py-2">
-        <div className="flex flex-col lg:flex-row gap-2">
+      <div className="mx-auto max-w-7xl px-2 py-2 sm:px-2 lg:px-2">
+        <div className="flex flex-col gap-2 lg:flex-row">
           {/* Sidebar Filters */}
           <div className="lg:w-80">
-            <div className="card-glass p-2 sticky top-2">
-              <div className="flex items-center justify-between mb-2">
+            <div className="card-glass sticky top-2 p-2">
+              <div className="mb-2 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Filters</h2>
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Clear All
-                </button>
+                <div className="flex space-x-2">
+                  {/* <button
+                    onClick={async () => {
+                      console.log('Testing API endpoints...');
+                      try {
+                        const testResponse = await apiClient.get(
+                          '/api/search/influencers?limit=5'
+                        );
+                        console.log('Test API response:', testResponse);
+                      } catch (error) {
+                        console.error('Test API error:', error);
+                      }
+                    }}
+                    className="text-xs text-green-600 hover:text-green-800"
+                  >
+                    Test API
+                  </button> */}
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Clear All
+                  </button>
+                </div>
               </div>
 
               {/* Search */}
               <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-bold text-gray-700">
                   Search
                 </label>
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Search by name, username, or keyword..."
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchQuery(value);
+                    updateFilter('query', value);
+                  }}
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                  placeholder="Search by name, username, bio, or skills..."
                 />
-              </div>
-
-              {/* Category */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Category
-                </label>
-                <select
-                  value={filters.category}
-                  onChange={(e) => updateFilter('category', e.target.value)}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                {searchQuery && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Searching for: "{searchQuery}"
+                  </p>
+                )}
+                <button
+                  onClick={() => {
+                    console.log('Manual search triggered');
+                    loadCreators();
+                  }}
+                  className="mt-2 w-full rounded-none bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-700"
                 >
-                  <option value="">All Categories</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
+                  Search Now
+                </button>
               </div>
 
-              {/* Platforms */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Platforms
-                </label>
-                <div className="space-y-2">
-                  {platforms.map(platform => (
-                    <label key={platform} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.platforms.includes(platform)}
-                        onChange={() => togglePlatform(platform)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm">{platform}</span>
-                    </label>
-                  ))}
+              {/* All filters hidden for MVP - only search by name/username/bio */}
+
+              {/* Content Categories for Influencers */}
+              {/* {(activeTab === 'all' || activeTab === 'influencers') && (
+                <div className="mb-2">
+                  <label className="mb-2 block text-sm font-bold text-gray-700">
+                    Content Types
+                  </label>
+                  <div className="max-h-32 space-y-2 overflow-y-auto">
+                    {contentCategories.map((category) => (
+                      <label key={category} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={filters.contentCategories.includes(category)}
+                          onChange={() =>
+                            toggleArrayFilter('contentCategories', category)
+                          }
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="ml-2 text-sm">
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )} */}
 
-              {/* Followers Range */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Followers Range
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="number"
-                    value={filters.minFollowers || ''}
-                    onChange={(e) => updateFilter('minFollowers', Number(e.target.value))}
-                    className="border border-gray-300 rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Min"
-                  />
-                  <input
-                    type="number"
-                    value={filters.maxFollowers || ''}
-                    onChange={(e) => updateFilter('maxFollowers', Number(e.target.value))}
-                    className="border border-gray-300 rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Max"
-                  />
-                </div>
-              </div>
-
-              {/* Engagement Rate */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Min Engagement Rate (%)
-                </label>
-                <input
-                  type="number"
-                  value={filters.minEngagement || ''}
-                  onChange={(e) => updateFilter('minEngagement', Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 3.5"
-                  step="0.1"
-                />
-              </div>
-
-              {/* Max Rate */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Max Rate per Post ($)
-                </label>
-                <input
-                  type="number"
-                  value={filters.maxRate || ''}
-                  onChange={(e) => updateFilter('maxRate', Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Budget limit"
-                />
-              </div>
-
-              {/* Location */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  value={filters.location}
-                  onChange={(e) => updateFilter('location', e.target.value)}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="City, Country"
-                />
-              </div>
-
-              {/* Availability */}
-              <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Availability
-                </label>
-                <select
-                  value={filters.availability}
-                  onChange={(e) => updateFilter('availability', e.target.value)}
-                  className="w-full border border-gray-300 rounded-none px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Creators</option>
-                  <option value="available">Available Now</option>
-                  <option value="verified">Verified Only</option>
-                </select>
-              </div>
+              {/* All advanced filters hidden for MVP - only search by name/bio */}
             </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1">
             {/* Sort and Results Count */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 {isLoading ? 'Loading...' : `${creators.length} creators found`}
               </div>
               <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700">Sort by:</label>
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => updateFilter('sortBy', e.target.value)}
-                  className="border border-gray-300 rounded-none px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="followers">Followers</option>
-                  <option value="engagement">Engagement Rate</option>
-                  <option value="rating">Rating</option>
-                  <option value="rate">Rate (Low to High)</option>
-                </select>
+                <label className="text-sm font-medium text-gray-700">
+                  Sort by:
+                </label>
+                <span className="text-sm text-gray-500">
+                  Sorted by relevance
+                </span>
               </div>
             </div>
 
             {/* Results */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="card-glass p-3 animate-pulse">
-                    <div className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4"></div>
-                    <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-300 rounded mb-4"></div>
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="h-8 bg-gray-300 rounded-full"></div>
-                      <div className="h-8 bg-gray-300 rounded-full"></div>
+                  <div key={i} className="card-glass animate-pulse p-3">
+                    <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gray-300"></div>
+                    <div className="mb-2 h-4 rounded bg-gray-300"></div>
+                    <div className="mb-4 h-3 rounded bg-gray-300"></div>
+                    <div className="mb-4 grid grid-cols-2 gap-2">
+                      <div className="h-8 rounded-full bg-gray-300"></div>
+                      <div className="h-8 rounded-full bg-gray-300"></div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : creators.length === 0 ? (
               <div className="card-glass p-12 text-center">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No creators found</h3>
-                <p className="text-gray-600 mb-6">
-                  Try adjusting your filters or search terms to find more creators
+                <div className="mb-4 text-6xl">🔍</div>
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  No creators found
+                </h3>
+                <p className="mb-6 text-gray-600">
+                  Try adjusting your filters or search terms to find more
+                  creators
                 </p>
                 <button onClick={clearFilters} className="btn-primary">
                   Clear Filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
                 {creators.map((creator) => (
-                  <div key={creator.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
+                  <div
+                    key={creator.id}
+                    className="card-glass flex h-32 cursor-pointer flex-col justify-between p-1 transition-shadow hover:shadow-lg"
+                    onClick={() => router.push(`/profile/${creator.id}`)}
+                  >
                     {/* Creator Header */}
-                    <div className="text-center mb-4">
-                      <div className="relative inline-block">
-                        <img
-                          src={creator.avatar || '/default-avatar.png'}
-                          alt={creator.name}
-                          className="w-16 h-16 rounded-none mx-auto mb-3"
-                        />
-                        {creator.verified && (
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 text-white rounded-none flex items-center justify-center text-xs">
-                            ✓
-                          </div>
-                        )}
-                        {!creator.isAvailable && (
-                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-gray-400 rounded-none border-2 border-white"></div>
-                        )}
-                        {creator.isAvailable && (
-                          <div className="absolute -bottom-1 right-0 w-4 h-4 bg-green-500 rounded-none border-2 border-white"></div>
-                        )}
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">{creator.name}</h3>
-                      <p className="text-sm text-gray-600">@{creator.username}</p>
+                    <div className="flex-1">
+                      <h3 className="mb-1 line-clamp-1 text-lg font-semibold text-gray-900">
+                        {`${creator.firstName || ''} ${creator.lastName || ''}`.trim() ||
+                          creator.username}
+                      </h3>
+                      <p className="mb-2 text-sm text-gray-600">
+                        @{creator.username}
+                      </p>
                       {creator.location && (
-                        <p className="text-xs text-gray-500">📍 {creator.location}</p>
+                        <p className="mb-2 text-xs text-gray-500">
+                          📍 {creator.location}
+                        </p>
                       )}
                     </div>
 
-                    {/* Bio */}
-                    <p className="text-sm text-gray-700 mb-4 line-clamp-2">{creator.bio}</p>
-
-                    {/* Categories */}
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {creator.categories.slice(0, 2).map((category, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                          {category}
-                        </span>
-                      ))}
-                      {creator.categories.length > 2 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                          +{creator.categories.length - 2} more
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-4 text-center">
-                      <div>
-                        <div className="text-lg font-bold text-gray-900">
-                          {formatFollowers(creator.totalFollowers)}
-                        </div>
-                        <div className="text-xs text-gray-600">Total Followers</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-green-600">
-                          {creator.avgEngagementRate.toFixed(1)}%
-                        </div>
-                        <div className="text-xs text-gray-600">Engagement</div>
-                      </div>
-                    </div>
-
-                    {/* Platforms */}
-                    <div className="flex justify-center space-x-2 mb-4">
-                      {creator.platforms.slice(0, 4).map((platform, index) => (
-                        <div key={index} className="text-center">
-                          <div className="text-xs text-gray-600">{platform.platform}</div>
-                          <div className="text-sm font-medium">{formatFollowers(platform.followers)}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Rating and Price */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-yellow-500">⭐</span>
-                        <span className="text-sm font-medium">{creator.rating.toFixed(1)}</span>
-                        <span className="text-xs text-gray-600">({creator.completedCampaigns})</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-green-600">${creator.rates.post}</div>
-                        <div className="text-xs text-gray-600">per post</div>
-                      </div>
-                    </div>
-
-                    {/* Response Time */}
-                    <div className="text-center mb-4">
-                      <span className="text-xs text-gray-600">Response: {creator.responseTime}</span>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="space-y-2">
-                      <Link
-                        href={`/influencer/${creator.id}` as any}
-                        className="btn-primary w-full text-center block"
-                      >
-                        View Profile
-                      </Link>
-                      <button className="btn-secondary w-full">
-                        Send Message
-                      </button>
+                    {/* Roles - positioned at bottom */}
+                    <div className="mt-auto flex flex-wrap gap-1">
+                      {creator.roles &&
+                        creator.roles.map(
+                          (role, index) =>
+                            role !== 'USER' && (
+                              <span
+                                key={index}
+                                className={`rounded-full px-2 py-1 text-xs ${
+                                  role === 'INFLUENCER'
+                                    ? 'bg-purple-100 text-purple-600'
+                                    : role === 'CREW'
+                                      ? 'bg-blue-100 text-blue-600'
+                                      : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {role.charAt(0).toUpperCase() +
+                                  role.slice(1).toLowerCase()}
+                              </span>
+                            )
+                        )}
                     </div>
                   </div>
                 ))}
@@ -502,10 +513,8 @@ export default function InfluencersSearchPage() {
 
             {/* Load More */}
             {creators.length > 0 && creators.length % 18 === 0 && (
-              <div className="text-center mt-12">
-                <button className="btn-secondary">
-                  Load More Creators
-                </button>
+              <div className="mt-12 text-center">
+                <button className="btn-secondary">Load More Creators</button>
               </div>
             )}
           </div>

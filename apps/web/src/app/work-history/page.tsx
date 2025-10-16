@@ -37,7 +37,7 @@ const WorkHistoryPage: React.FC = () => {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="grid grid-cols-2 gap-2 mb-6">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
@@ -47,7 +47,7 @@ const WorkHistoryPage: React.FC = () => {
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
-                        <span className="mr-2">{tab.icon}</span>
+                        {/* <span className="mr-2">{tab.icon}</span> */}
                         {tab.label}
                     </button>
                 ))}

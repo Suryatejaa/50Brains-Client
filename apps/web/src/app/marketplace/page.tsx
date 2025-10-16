@@ -24,9 +24,9 @@ export default function MarketplacePage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<GigFilters>({
-    category: [],
+    category: '',
     experienceLevel: '',
-    budgetType: 'fixed',
+    budgetType: undefined,
     budgetMin: undefined,
     budgetMax: undefined,
     location: '',
@@ -57,6 +57,102 @@ export default function MarketplacePage() {
     }
   };
 
+  // Client-side filtering logic
+  const filteredGigs = gigs.filter((gig) => {
+    // Search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesTitle = gig.title?.toLowerCase().includes(query);
+      const matchesDescription = gig.description?.toLowerCase().includes(query);
+      const matchesSkills = gig.skillsRequired?.some((skill) =>
+        skill.toLowerCase().includes(query)
+      );
+      const matchesCategory = gig.category?.toLowerCase().includes(query);
+      const matchesBrand = gig.brand?.name?.toLowerCase().includes(query);
+
+      if (
+        !matchesTitle &&
+        !matchesDescription &&
+        !matchesSkills &&
+        !matchesCategory &&
+        !matchesBrand
+      ) {
+        return false;
+      }
+    }
+
+    // Category filter
+    if (filters.category && gig.category !== filters.category) {
+      return false;
+    }
+
+    // Budget type filter
+    if (filters.budgetType && gig.budgetType !== filters.budgetType) {
+      return false;
+    }
+
+    // Budget range filter
+    if (
+      filters.budgetMin &&
+      gig.budgetMin &&
+      gig.budgetMin < filters.budgetMin
+    ) {
+      return false;
+    }
+    if (
+      filters.budgetMax &&
+      gig.budgetMax &&
+      gig.budgetMax > filters.budgetMax
+    ) {
+      return false;
+    }
+
+    // Location filter
+    if (filters.location && filters.location.trim()) {
+      const locationQuery = filters.location.toLowerCase();
+      const gigLocation = gig.location?.toLowerCase() || '';
+      if (!gigLocation.includes(locationQuery)) {
+        return false;
+      }
+    }
+
+    // Role/Experience level filter (using roleRequired field)
+    if (
+      filters.experienceLevel &&
+      gig.roleRequired !== filters.experienceLevel
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Apply sorting to filtered gigs
+  const sortedGigs = [...filteredGigs].sort((a, b) => {
+    switch (filters.sortBy) {
+      case 'budget_high':
+        return (
+          (b.budgetMax || b.budgetMin || 0) - (a.budgetMax || a.budgetMin || 0)
+        );
+      case 'budget_low':
+        return (
+          (a.budgetMin || a.budgetMax || 0) - (b.budgetMin || b.budgetMax || 0)
+        );
+      case 'deadline':
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      case 'recent':
+      default:
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+    }
+  });
+
+  // Use sorted and filtered gigs for display
+  const displayGigs = activeTab === 'featured' ? gigs : sortedGigs;
+
   const updateFilter = (key: keyof GigFilters, value: any) => {
     setFilters((prev) => ({
       ...prev,
@@ -67,9 +163,9 @@ export default function MarketplacePage() {
 
   const clearFilters = () => {
     setFilters({
-      category: [],
+      category: '',
       experienceLevel: '',
-      budgetType: 'fixed',
+      budgetType: undefined,
       budgetMin: undefined,
       budgetMax: undefined,
       location: '',
@@ -103,7 +199,7 @@ export default function MarketplacePage() {
     return date.toLocaleDateString();
   };
 
-  console.log(gigs)
+  console.log(gigs);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,15 +209,15 @@ export default function MarketplacePage() {
           <div className="mb-1">
             <div className="flex flex-col gap-1">
               <div className="flex flex-col gap-1">
-                <div className="flex flex-row justify-between lg:gap-4 md:gap-4 sm:gap-4">
-                  <h1 className="flex text-heading text-4xl font-bold">
+                <div className="flex flex-row justify-between sm:gap-4 md:gap-4 lg:gap-4">
+                  <h1 className="text-heading flex text-4xl font-bold">
                     Marketplace
                   </h1>
-                  <Link href="/search" className="flex btn-primary px-3 py-2">
+                  <Link href="/search" className="btn-primary flex px-3 py-2">
                     Search People
                   </Link>
                 </div>
-                <p className="flex text-muted">
+                <p className="text-muted flex">
                   Discover amazing opportunities and collaborate with top
                   creators
                 </p>
@@ -202,10 +298,10 @@ export default function MarketplacePage() {
                 </div>
 
                 <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-4">
-                  {/* Experience Level */}
+                  {/* Role Required */}
                   <div>
                     <label className="text-body mb-2 block text-sm font-medium">
-                      Experience Level
+                      Role Required
                     </label>
                     <select
                       value={filters.experienceLevel}
@@ -214,12 +310,12 @@ export default function MarketplacePage() {
                       }
                       className="input w-full"
                     >
-                      <option value="">Any Level</option>
-                      {Object.entries(EXPERIENCE_LEVELS).map(([key, label]) => (
-                        <option key={key} value={key}>
-                          {label}
-                        </option>
-                      ))}
+                      <option value="">Any Role</option>
+                      <option value="influencer">Influencer</option>
+                      <option value="crew">Crew</option>
+                      <option value="creator">Creator</option>
+                      <option value="editor">Editor</option>
+                      <option value="photographer">Photographer</option>
                     </select>
                   </div>
 
@@ -236,11 +332,9 @@ export default function MarketplacePage() {
                       className="input w-full"
                     >
                       <option value="">All Types</option>
-                      {Object.entries(BUDGET_TYPES).map(([key, label]) => (
-                        <option key={key} value={key}>
-                          {label}
-                        </option>
-                      ))}
+                      <option value="fixed">Fixed Price</option>
+                      <option value="hourly">Hourly Rate</option>
+                      <option value="negotiable">Negotiable</option>
                     </select>
                   </div>
 
@@ -326,19 +420,21 @@ export default function MarketplacePage() {
             <div className="flex space-x-1 rounded-none bg-white p-1">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'all'
-                  ? 'bg-blue-700 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'all'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                All Gigs ({gigs.length})
+                All Gigs ({displayGigs.length})
               </button>
               <button
                 onClick={() => setActiveTab('featured')}
-                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'featured'
-                  ? 'bg-blue-700 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                className={`flex-1 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'featured'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
                 ⭐ Featured
               </button>
@@ -367,16 +463,17 @@ export default function MarketplacePage() {
           )}
 
           {/* Gigs Grid */}
-          {!loading && gigs.length > 0 && (
+          {!loading && displayGigs.length > 0 && (
             <div className="grid gap-1 lg:grid-cols-3">
-              {gigs.map((gig, index) => (
+              {displayGigs.map((gig: Gig, index: number) => (
                 <Link
                   key={gig.id}
                   href={`/gig/${gig.id}` as any}
-                  className={`card-glass group block p-2 transition-all duration-200 hover:shadow-lg ${index === 0 && activeTab === 'featured'
-                    ? 'border-brand-primary/30 bg-brand-light-blue/5 border-2 lg:col-span-2'
-                    : ''
-                    }`}
+                  className={`card-glass group block p-2 transition-all duration-200 hover:shadow-lg ${
+                    index === 0 && activeTab === 'featured'
+                      ? 'border-brand-primary/30 bg-brand-light-blue/5 border-2 lg:col-span-2'
+                      : ''
+                  }`}
                 >
                   {/* Header */}
                   <div className="mb-2 flex items-start justify-between">
@@ -390,20 +487,49 @@ export default function MarketplacePage() {
                         </span>
                       )}
                       <span
-                        className={`rounded px-2 py-1 text-xs font-medium ${gig.urgency === 'urgent'
-                          ? 'bg-red-100 text-red-600'
-                          : gig.urgency === 'normal'
-                            ? 'bg-yellow-100 text-yellow-600'
-                            : 'bg-green-100 text-green-600'
-                          }`}
+                        className={`rounded px-2 py-1 text-xs font-medium ${
+                          gig.urgency === 'urgent'
+                            ? 'bg-red-100 text-red-600'
+                            : gig.urgency === 'normal'
+                              ? 'bg-yellow-100 text-yellow-600'
+                              : 'bg-green-100 text-green-600'
+                        }`}
                       >
                         {gig.urgency}
+                      </span>
+                      <span
+                        className={`rounded px-2 py-1 text-xs font-medium ${
+                          gig.status === 'OPEN'
+                            ? 'bg-green-100 text-green-600'
+                            : gig.status === 'ASSIGNED'
+                              ? 'bg-blue-100 text-blue-600'
+                              : gig.status === 'COMPLETED'
+                                ? 'bg-gray-100 text-gray-600'
+                                : 'bg-yellow-100 text-yellow-600'
+                        }`}
+                      >
+                        {gig.status}
                       </span>
                     </div>
                     <span className="text-muted text-xs">
                       {new Date(gig.createdAt).toLocaleDateString()}
                     </span>
                   </div>
+
+                  {/* Brand Info */}
+                  {gig.brand && (
+                    <div className="mb-2 flex items-center space-x-2">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-600">
+                        {gig.brand.name?.[0]?.toUpperCase() || 'B'}
+                      </div>
+                      <span className="text-sm text-gray-600">
+                        {gig.brand.name}
+                        {gig.brand.verified && (
+                          <span className="ml-1 text-blue-500">✓</span>
+                        )}
+                      </span>
+                    </div>
+                  )}
 
                   <div
                     className={`grid gap-1 ${index === 0 && activeTab === 'featured' ? 'md:grid-cols-3' : ''}`}
@@ -416,10 +542,11 @@ export default function MarketplacePage() {
                       }
                     >
                       <h3
-                        className={`text-heading group-hover:text-brand-primary mb-2 font-semibold transition-colors ${index === 0 && activeTab === 'featured'
-                          ? 'text-xl'
-                          : 'text-lg'
-                          }`}
+                        className={`text-heading group-hover:text-brand-primary mb-2 font-semibold transition-colors ${
+                          index === 0 && activeTab === 'featured'
+                            ? 'text-xl'
+                            : 'text-lg'
+                        }`}
                       >
                         {gig.title}
                       </h3>
@@ -431,14 +558,16 @@ export default function MarketplacePage() {
                       {gig.skillsRequired && gig.skillsRequired.length > 0 && (
                         <div className="mb-4">
                           <div className="flex flex-wrap gap-1">
-                            {gig.skillsRequired.slice(0, 3).map((skill) => (
-                              <span
-                                key={skill}
-                                className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700"
-                              >
-                                {skill}
-                              </span>
-                            ))}
+                            {gig.skillsRequired
+                              .slice(0, 3)
+                              .map((skill: string) => (
+                                <span
+                                  key={skill}
+                                  className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
                             {gig.skillsRequired.length > 3 && (
                               <span className="text-muted text-xs">
                                 +{gig.skillsRequired.length - 3} more
@@ -484,7 +613,7 @@ export default function MarketplacePage() {
                         <div
                           className={`${index === 0 && activeTab === 'featured' ? 'mb-3' : 'mt-2'}`}
                         >
-                          <span className="btn-primary text-white group-hover:text-white inline-block text-sm font-medium">
+                          <span className="btn-primary inline-block text-sm font-medium text-white group-hover:text-white">
                             Apply Now →
                           </span>
                         </div>
@@ -503,7 +632,7 @@ export default function MarketplacePage() {
           )}
 
           {/* Empty State */}
-          {!loading && gigs.length === 0 && (
+          {!loading && displayGigs.length === 0 && (
             <div className="py-12 text-center">
               <div className="text-muted mb-4 text-6xl">🔍</div>
               <h3 className="text-heading mb-2 text-xl font-semibold">
@@ -526,8 +655,8 @@ export default function MarketplacePage() {
 
           {/* Load More */}
           {!loading &&
-            gigs.length > 0 &&
-            gigs.length >= (filters.limit || 12) && (
+            displayGigs.length > 0 &&
+            displayGigs.length >= (filters.limit || 12) && (
               <div className="mt-1 text-center">
                 <button
                   onClick={() => {
@@ -541,7 +670,6 @@ export default function MarketplacePage() {
                 </button>
               </div>
             )}
-
         </div>
       </div>
     </div>

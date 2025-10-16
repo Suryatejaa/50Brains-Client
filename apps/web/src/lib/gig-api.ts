@@ -484,7 +484,7 @@ export class GigAPI {
   }
 
   static async getMySubmissions(queryParams?: string): Promise<{ submissions: Submission[]; pagination: any }> {
-    const url = queryParams ? `${GIG_API_BASE}/my/submissions?${queryParams}` : `${GIG_API_BASE}/my/submissions`;
+    const url = queryParams ? `api/my/submissions?${queryParams}` : `api/my/submissions`;
     const response = await apiClient.get(url);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch my submissions');

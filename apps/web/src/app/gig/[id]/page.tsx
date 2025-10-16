@@ -5,11 +5,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
+import { GigAPI } from '@/lib/gig-api';
 import { useParams, useRouter } from 'next/navigation';
 import { useClanSearch } from '@/hooks/useClanSearch';
 import { useMemberSuggest } from '@/hooks/useMemberSuggest';
+import { Submission, SubmissionStatus } from '@/types/gig.types';
 import { useMyClans, useClanMembers } from '@/hooks/useClans';
 import WorkSubmissionForm from '@/components/gig/WorkSubmissionForm';
+import AssignModal from '@/components/gig/AssignModal';
+import { FaBullseye, FaAccessibleIcon } from 'react-icons/fa';
+import { m } from 'framer-motion';
 
 interface Gig {
   id: string;
@@ -25,6 +30,7 @@ interface Gig {
     | 'SUBMITTED'
     | 'CANCELLED'
     | 'OPEN'
+    | 'IN_REVIEW'
     | 'ASSIGNED';
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin: number;
@@ -119,6 +125,7 @@ export default function GigDetailsPage() {
   const [gig, setGig] = useState<Gig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [alreadyAppliedMessage, setAlreadyAppliedMessage] = useState<
     string | null
@@ -151,6 +158,15 @@ export default function GigDetailsPage() {
     deliverables?: string;
   }>({});
   const [isGigIdLoading, setIsGigIdLoading] = useState(true);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showAssignDetailsModal, setShowAssignDetailsModal] = useState(false);
+  const [selectedUserForAssignment, setSelectedUserForAssignment] =
+    useState<any>(null);
+  const [assignmentDetails, setAssignmentDetails] = useState({
+    quotedPrice: '',
+    estimatedTime: '',
+    proposal: '',
+  });
   const userType = getUserTypeForRole(currentRole);
 
   // Extract gigId from params with debugging and fallback
@@ -261,6 +277,8 @@ export default function GigDetailsPage() {
     }
   };
 
+  
+
   // Handle submission success
   const handleSubmissionSuccess = () => {
     setShowSubmissionForm(false);
@@ -269,6 +287,106 @@ export default function GigDetailsPage() {
       'Work submitted successfully! The brand will review your submission.'
     );
     loadGigDetails(true); // Refresh gig data
+  };
+
+  const handleAcceptAssignment = async (bidId: string) => {
+    console.log('Accepting assignment for bidId:', bidId);
+    try {
+      const response = await apiClient.post(
+        `/api/gig/applications/${bidId}/accept-invitation`
+      );
+      if (response.success) {
+        // Refresh bids and stats
+        await loadGigDetails(true);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Failed to accept assignment:', error);
+    }
+  };
+
+  const handleReject = async (bidId: string) => {
+    try {
+      const response = await apiClient.post(
+        `/api/gig/applications/${bidId}/reject-invitation`
+      );
+      if (response.success) {
+        // Refresh bids and stats
+        await loadGigDetails(true);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Failed to reject bid:', error);
+    }
+  };
+  // Handle user assignment - show mini modal for assignment details
+  const handleAssignUser = (selectedUser: any) => {
+    if (!gigId || !selectedUser?.id) {
+      showToast('error', 'Missing required data for assignment');
+      return;
+    }
+
+    // Check if gig type allows assignment
+    if (gig?.gigType === 'PRODUCT') {
+      showToast(
+        'error',
+        'Assignment is only available for Visit or Remote gigs, not Product gigs'
+      );
+      return;
+    }
+
+    // Store selected user and show assignment details modal
+    setSelectedUserForAssignment(selectedUser);
+    setAssignmentDetails({
+      quotedPrice: gig?.budgetMin?.toString() || '',
+      estimatedTime: '',
+      proposal: `We'd love to have you work on this project. Your portfolio matches perfectly with our requirements.`,
+    });
+    setShowAssignDetailsModal(true);
+  };
+
+  // Handle final assignment with details
+  const handleFinalAssignment = async () => {
+    if (!selectedUserForAssignment || !gigId) {
+      showToast('error', 'Missing required data for assignment');
+      return;
+    }
+
+    if (
+      !assignmentDetails.quotedPrice ||
+      !assignmentDetails.estimatedTime ||
+      !assignmentDetails.proposal.trim()
+    ) {
+      showToast('error', 'Please fill in all assignment details');
+      return;
+    }
+
+    try {
+      const response = await apiClient.post(`/api/gig/${gigId}/assign`, {
+        applicantId: selectedUserForAssignment.id,
+        applicantType: 'owner',
+        proposal: assignmentDetails.proposal.trim(),
+        quotedPrice: Number(assignmentDetails.quotedPrice),
+        estimatedTime: assignmentDetails.estimatedTime,
+      });
+
+      if (response.success) {
+        showToast(
+          'success',
+          `Successfully assigned ${selectedUserForAssignment.firstName || selectedUserForAssignment.username} to this gig`
+        );
+        setShowAssignDetailsModal(false);
+        setShowAssignModal(false);
+        setSelectedUserForAssignment(null);
+        loadGigDetails(true); // Refresh gig data
+      } else if (response && response.success === false) {
+        console.error('Assignment failed:', response);
+        showToast('error', response.message || 'Failed to assign user');
+      }
+    } catch (error: any) {
+      console.error('Error assigning user:', error);
+      showToast('error', error.message || 'Failed to assign user');
+    }
   };
 
   // Helper function to navigate back intelligently
@@ -455,7 +573,17 @@ export default function GigDetailsPage() {
       const response = await apiClient.get(`/api/my/${gigId}/applications`);
       console.log('🎯 Loaded my applications:', response);
       if (response.success && response.data) {
-        setMyApplications((response.data as any).applicationStatus);
+        const formatMyApplications = (response.data as any).applicationStatus;
+        const applicantType = (response.data as any).application?.applicantType;
+        const applicationId = (response.data as any).application?.id;
+        // Add applicantType to the application status object
+        const applicationWithType = {
+          ...formatMyApplications,
+          applicantType: applicantType,
+          applicationId: applicationId,
+        };
+
+        setMyApplications(applicationWithType);
       }
     } catch (error) {
       console.error('❌ Failed to load applications:', error);
@@ -997,7 +1125,7 @@ export default function GigDetailsPage() {
                 ←
               </button>
               <button
-              // reload window not working with router.reload()              
+                // reload window not working with router.reload()
                 onClick={() => window.location.reload()}
                 className="btn-secondary text-sm"
                 disabled={isLoading}
@@ -1069,7 +1197,7 @@ export default function GigDetailsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
           {/* Draft Notice */}
           {gig.status === 'DRAFT' && (
             <div className="mb-2 lg:col-span-3">
@@ -1170,6 +1298,27 @@ export default function GigDetailsPage() {
                       <p className="text-sm text-blue-600">
                         {alreadyAppliedMessage ||
                           'You have already applied to this gig. You have completed the gig successfully.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : myApplicationStatus === 'PENDING' &&
+              (myApplications as any)?.gigId === gigId &&
+              (myApplications as any)?.applicantType === 'owner' &&
+              gigId &&
+              !isOwner ? (
+              <div className="mb-1 lg:col-span-3">
+                <div className="flex items-center justify-between rounded-none border border-green-200 bg-green-50 p-1">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-2xl">✅</div>
+                    <div>
+                      <p className="font-semibold text-green-800">
+                        Application {myApplicationStatus}
+                      </p>
+                      <p className="text-sm text-blue-600">
+                        {alreadyAppliedMessage ||
+                          'You have been assigned to this gig. Accept the assignment to start working on it.'}
                       </p>
                     </div>
                   </div>
@@ -1496,6 +1645,31 @@ export default function GigDetailsPage() {
                         View Submissions
                       </Link>
                     </div>
+                    <div className="mt-3">
+                      <button
+                        onClick={() => {
+                          if (gig?.gigType === 'PRODUCT') {
+                            showToast(
+                              'error',
+                              'Assignment is only available for Visit or Remote gigs, not Product gigs'
+                            );
+                            return;
+                          }
+                          setShowAssignModal(true);
+                        }}
+                        className={`btn-primary w-full ${
+                          gig?.gigType === 'PRODUCT'
+                            ? 'cursor-not-allowed opacity-50'
+                            : ''
+                        }`}
+                        disabled={gig?.gigType === 'PRODUCT'}
+                      >
+                        <FaBullseye />
+                        {gig?.gigType === 'PRODUCT'
+                          ? 'Assignment not allowed for Product Gigs'
+                          : 'Assign User'}
+                      </button>
+                    </div>
                   </div>
                 ) : isOwner && gig.status === 'DRAFT' ? (
                   <div className="text-center">
@@ -1557,6 +1731,38 @@ export default function GigDetailsPage() {
                 ) : !isOwner &&
                   (myApplications as any)?.status === 'PENDING' &&
                   (myApplications as any)?.gigId === gigId &&
+                  (myApplications as any)?.applicantType === 'owner' &&
+                  gigId &&
+                  !isOwner ? (
+                  <div className="text-center">
+                    <div className="mb-2 text-4xl">📄</div>
+                    <p className="mb-2 font-semibold text-gray-600">
+                      You have been assigned to this gig
+                    </p>
+                    <p className="mb-4 text-sm text-gray-600">
+                      Accept or reject the assignment in your applications
+                    </p>
+                    <div className="flex flex-col space-y-1">
+                      <button
+                        className="btn-primary "
+                        onClick={() =>
+                          handleAcceptAssignment((myApplications as any)?.applicationId)
+                        }
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="btn-secondary text-red-600 hover:bg-red-50"
+                        onClick={() =>
+                          handleReject((myApplications as any)?.applicationId)
+                        }
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ) : (myApplications as any)?.status === 'PENDING' &&
+                  (myApplications as any)?.gigId === gigId &&
                   gigId ? (
                   <div className="text-center">
                     <div className="mb-2 text-4xl">↻</div>
@@ -1599,10 +1805,10 @@ export default function GigDetailsPage() {
                   <div className="text-center">
                     <div className="mb-2 text-4xl">❌</div>
                     <p className="mb-2 font-semibold text-red-600">
-                      Application Rejected
+                      {(myApplications as any)?.applicantType === 'owner' ? 'You declined the assignment' : 'Your application was rejected'}
                     </p>
                     <p className="mb-4 text-sm text-gray-600">
-                      Your application was not approved
+                      Application raised by {(myApplications as any)?.applicantType === 'owner' ? 'the brand' : 'you'}
                     </p>
                     <Link
                       href="/my/applications"
@@ -1666,7 +1872,7 @@ export default function GigDetailsPage() {
                 {/* // If owner change status of gig */}
                 {/* </div>
               <div> */}
-                {isOwner && gig.status === 'OPEN' && (
+                {isOwner && (gig.status === 'OPEN' || gig.status === 'ASSIGNED') && (
                   <button
                     onClick={() =>
                       confirm(
@@ -1679,9 +1885,12 @@ export default function GigDetailsPage() {
                   </button>
                 )}
 
-                {isOwner && gig.status === 'PAUSED' && (
+                {isOwner && (gig.status === 'PAUSED' || gig.status === 'IN_REVIEW') && (
                   <button
-                    onClick={() => confirm('Reopen gig will allow new applications') && changeGigStatus('OPEN')}
+                    onClick={() =>
+                      confirm('Reopen gig will allow new applications') &&
+                      changeGigStatus('OPEN')
+                    }
                     className="btn-secondary mt-2 w-full"
                   >
                     Reopen Gig
@@ -2032,6 +2241,149 @@ export default function GigDetailsPage() {
             />
           )}
       </div>
+
+      {/* Assign Modal */}
+      <AssignModal
+        isOpen={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        onAssign={handleAssignUser}
+        gigId={gigId || undefined}
+        title="Assign User to Gig"
+      />
+
+      {/* Assignment Details Mini Modal */}
+      {showAssignDetailsModal && selectedUserForAssignment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="mx-2 w-full max-w-md rounded-lg bg-white shadow-xl">
+            <div className="p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-lg font-semibold">
+                  Assign{' '}
+                  {selectedUserForAssignment.firstName ||
+                    selectedUserForAssignment.username}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowAssignDetailsModal(false);
+                    setSelectedUserForAssignment(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Proposal */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Proposal Message *
+                  </label>
+                  <textarea
+                    value={assignmentDetails.proposal}
+                    onChange={(e) =>
+                      setAssignmentDetails((prev) => ({
+                        ...prev,
+                        proposal: e.target.value,
+                      }))
+                    }
+                    rows={3}
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter a message for the assignment..."
+                  />
+                </div>
+
+                {/* Quoted Price */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Quoted Price *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 text-sm text-gray-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={assignmentDetails.quotedPrice}
+                      onChange={(e) =>
+                        setAssignmentDetails((prev) => ({
+                          ...prev,
+                          quotedPrice: e.target.value,
+                        }))
+                      }
+                      min={gig?.budgetMin || 0}
+                      max={gig?.budgetMax || undefined}
+                      className="w-full rounded border border-gray-300 py-2 pl-8 pr-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter quoted price"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-600">
+                    Budget: ₹{gig?.budgetMin?.toLocaleString()}
+                    {gig?.budgetMax && gig.budgetMax !== gig.budgetMin
+                      ? ` - ₹${gig.budgetMax?.toLocaleString()}`
+                      : ''}{' '}
+                    ({gig?.budgetType})
+                  </p>
+                </div>
+
+                {/* Estimated Time */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Estimated Time *
+                  </label>
+                  <select
+                    value={assignmentDetails.estimatedTime}
+                    onChange={(e) =>
+                      setAssignmentDetails((prev) => ({
+                        ...prev,
+                        estimatedTime: e.target.value,
+                      }))
+                    }
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="">Select estimated time</option>
+                    <option value="1-3 days">1-3 days</option>
+                    <option value="4-7 days">4-7 days</option>
+                    <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="2-4 weeks">2-4 weeks</option>
+                    <option value="1-2 months">1-2 months</option>
+                    <option value="2+ months">2+ months</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowAssignDetailsModal(false);
+                    setSelectedUserForAssignment(null);
+                  }}
+                  className="flex-1 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleFinalAssignment}
+                  disabled={
+                    !assignmentDetails.quotedPrice ||
+                    !assignmentDetails.estimatedTime ||
+                    !assignmentDetails.proposal.trim() ||
+                    Number(assignmentDetails.quotedPrice) <
+                      (gig?.budgetMin ?? 0) ||
+                    Boolean(
+                      gig?.budgetMax &&
+                        Number(assignmentDetails.quotedPrice) > gig.budgetMax
+                    )
+                  }
+                  className="flex-1 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Assign User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notification */}
       {toast && (
