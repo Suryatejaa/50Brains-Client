@@ -8,6 +8,7 @@
     "dev:local": "cross-env NODE_ENV=development next dev --port 5173",
     "build": "next build",
     "build:prod": "cross-env NODE_ENV=production next build",
+    "build:vercel": "cross-env NODE_ENV=production SKIP_ENV_VALIDATION=1 next build",
     "start": "next start --port 5173",
     "start:prod": "node scripts/start-prod.js",
     "start:prod:direct": "node scripts/start-prod-direct.js",
