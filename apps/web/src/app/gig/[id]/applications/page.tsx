@@ -95,21 +95,21 @@ export default function GigApplicationsPage() {
   useEffect(() => {
     if (isAuthenticated && user) {
       if (userType !== 'brand') {
-        console.log('User is not a brand, redirecting to dashboard');
+        //console.log(('User is not a brand, redirecting to dashboard');
         router.push('/dashboard');
         return;
       }
-      console.log('Loading gig and applications for gigId:', gigId);
+      //console.log(('Loading gig and applications for gigId:', gigId);
       loadGigAndApplications();
     } else if (isAuthenticated === false) {
-      console.log('User not authenticated, redirecting to login');
+      //console.log(('User not authenticated, redirecting to login');
       router.push('/login');
     }
   }, [isAuthenticated, user, userType, gigId]);
 
   const loadGigAndApplications = async () => {
     try {
-      console.log('↻ Starting loadGigAndApplications for gigId:', gigId);
+      //console.log(('↻ Starting loadGigAndApplications for gigId:', gigId);
       setIsLoading(true);
 
       // Load gig details and applications in parallel
@@ -118,35 +118,35 @@ export default function GigApplicationsPage() {
         apiClient.get(`/api/gig/${gigId}/applications`),
       ]);
 
-      console.log(
-        '📡 API responses received - Gig:',
-        gigResponse.status,
-        'Applications:',
-        applicationsResponse
-      );
+      //console.log((
+      //   '📡 API responses received - Gig:',
+      //   gigResponse.status,
+      //   'Applications:',
+      //   applicationsResponse
+      // );
 
       // Handle gig response
       if (gigResponse.status === 'fulfilled' && gigResponse.value.success) {
         const gigData = gigResponse.value.data;
-        console.log('✅ Gig data received successfully');
+        //console.log(('✅ Gig data received successfully');
 
         // Check if user owns this gig
         const gigDetails = gigData as any;
         const gigOwnerId = gigDetails.brand?.id || gigDetails.postedById;
 
         if (gigOwnerId !== user?.id) {
-          console.log('❌ Ownership check failed - Redirecting to my-gigs');
+          //console.log(('❌ Ownership check failed - Redirecting to my-gigs');
           router.push('/my-gigs');
           return;
         }
 
-        console.log('✅ Ownership check passed - Setting gig data');
-        console.log('🔍 Gig Data Debug:', {
-          gigId: gigDetails.id,
-          title: gigDetails.title,
-          applicationCount: gigDetails.applicationCount,
-          fullGigData: gigDetails,
-        });
+        //console.log(('✅ Ownership check passed - Setting gig data');
+        //console.log(('🔍 Gig Data Debug:', {
+        //   gigId: gigDetails.id,
+        //   title: gigDetails.title,
+        //   applicationCount: gigDetails.applicationCount,
+        //   fullGigData: gigDetails,
+        // });
         setGig(gigData as Gig);
       } else {
         console.error(
@@ -165,11 +165,11 @@ export default function GigApplicationsPage() {
         applicationsResponse.value.success
       ) {
         const applicationsData = applicationsResponse.value.data as any;
-        console.log(
-          '📊 Applications data structure:',
-          Object.keys(applicationsData || {})
-        );
-        console.log('Applications:', applicationsData);
+        //console.log((
+        //   '📊 Applications data structure:',
+        //   Object.keys(applicationsData || {})
+        // );
+        //console.log(('Applications:', applicationsData);
         // Try different possible structures
         let extractedApplications = [];
         if (applicationsData?.applications) {
@@ -178,15 +178,15 @@ export default function GigApplicationsPage() {
           extractedApplications = applicationsData;
         }
 
-        console.log('✅ Setting', extractedApplications.length, 'applications');
-        console.log('🔍 Data Mismatch Debug:', {
-          gigApplicationCount: gig?.applicationCount,
-          actualApplicationsLength: extractedApplications.length,
-          applicationsDataKeys: Object.keys(applicationsData || {}),
-          applicationsDataType: typeof applicationsData,
-          applicationsDataIsArray: Array.isArray(applicationsData),
-          rawApplicationsResponse: applicationsResponse.value,
-        });
+        //console.log(('✅ Setting', extractedApplications.length, 'applications');
+        //console.log(('🔍 Data Mismatch Debug:', {
+        //   gigApplicationCount: gig?.applicationCount,
+        //   actualApplicationsLength: extractedApplications.length,
+        //   applicationsDataKeys: Object.keys(applicationsData || {}),
+        //   applicationsDataType: typeof applicationsData,
+        //   applicationsDataIsArray: Array.isArray(applicationsData),
+        //   rawApplicationsResponse: applicationsResponse.value,
+        // });
         setApplications(extractedApplications);
       } else {
         console.error(
@@ -199,13 +199,13 @@ export default function GigApplicationsPage() {
         setApplications([]);
       }
 
-      console.log('🎉 loadGigAndApplications completed successfully');
+      //console.log(('🎉 loadGigAndApplications completed successfully');
     } catch (error) {
       console.error('💥 Exception in loadGigAndApplications:', error);
       // Don't redirect on refresh errors, just log them
       setApplications([]);
     } finally {
-      console.log('🏁 Setting isLoading to false');
+      //console.log(('🏁 Setting isLoading to false');
       setIsLoading(false);
     }
   };
@@ -214,7 +214,7 @@ export default function GigApplicationsPage() {
     if (!confirm('Are you sure you want to accept this application?')) return;
 
     try {
-      console.log('Accepting application:', applicationId);
+      //console.log(('Accepting application:', applicationId);
       setProcessingApplicationId(applicationId);
 
       const response = await apiClient.post(
@@ -225,7 +225,7 @@ export default function GigApplicationsPage() {
       );
 
       if (response.success) {
-        console.log('Application accepted successfully, updating UI...');
+        //console.log(('Application accepted successfully, updating UI...');
 
         // Immediately update the application status in the local state
         setApplications((prevApplications) =>
@@ -276,7 +276,7 @@ export default function GigApplicationsPage() {
     if (!rejectApplicationId || !rejectionReason.trim()) return;
 
     try {
-      console.log('Rejecting application:', rejectApplicationId);
+      //console.log(('Rejecting application:', rejectApplicationId);
       setProcessingApplicationId(rejectApplicationId);
 
       const response = await apiClient.post(
@@ -288,7 +288,7 @@ export default function GigApplicationsPage() {
       );
 
       if (response.success) {
-        console.log('Application rejected successfully, updating UI...');
+        //console.log(('Application rejected successfully, updating UI...');
 
         // Immediately update the application status in the local state
         setApplications((prevApplications) =>
@@ -351,9 +351,9 @@ export default function GigApplicationsPage() {
     setApproveApplication(app);
     setShowApproveModal(true);
   };
-  console.log('Applications:', applications);
+  //console.log(('Applications:', applications);
   const filteredApplications = applications.filter((app) => {
-    console.log('App:', app);
+    //console.log(('App:', app);
     if (selectedStatus === 'all') return true;
     return (
       String(app.status || '').toLowerCase() ===

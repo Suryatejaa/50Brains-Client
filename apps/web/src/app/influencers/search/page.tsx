@@ -147,9 +147,9 @@ export default function TalentSearchPage() {
     try {
       setIsLoading(true);
 
-      console.log('Loading creators with search query:', searchQuery);
-      console.log('Active tab:', activeTab);
-      console.log('Filters:', filters);
+      //console.log(('Loading creators with search query:', searchQuery);
+      //console.log(('Active tab:', activeTab);
+      //console.log(('Filters:', filters);
 
       const params = new URLSearchParams();
 
@@ -164,10 +164,10 @@ export default function TalentSearchPage() {
       params.append('limit', filters.limit.toString());
 
       const apiUrl = `/api/search/users?${params.toString()}`;
-      console.log('Making API call to:', apiUrl);
+      //console.log(('Making API call to:', apiUrl);
 
       const response = await apiClient.get(apiUrl);
-      console.log('API Response:', response);
+      //console.log(('API Response:', response);
 
       if (response.success && response.data) {
         const responseData = response.data as {
@@ -183,9 +183,9 @@ export default function TalentSearchPage() {
 
         if (responseData.results && Array.isArray(responseData.results)) {
           allCreators = responseData.results;
-          console.log('Raw creators from API:', allCreators.length);
+          //console.log(('Raw creators from API:', allCreators.length);
         } else {
-          console.log('No results array found in response:', responseData);
+          //console.log(('No results array found in response:', responseData);
         }
 
         // Client-side filtering based on active tab and roles
@@ -195,12 +195,12 @@ export default function TalentSearchPage() {
           filteredCreators = allCreators.filter(
             (creator) => creator.roles && creator.roles.includes('INFLUENCER')
           );
-          console.log('Filtered for influencers:', filteredCreators.length);
+          //console.log(('Filtered for influencers:', filteredCreators.length);
         } else if (activeTab === 'crew') {
           filteredCreators = allCreators.filter(
             (creator) => creator.roles && creator.roles.includes('CREW')
           );
-          console.log('Filtered for crew:', filteredCreators.length);
+          //console.log(('Filtered for crew:', filteredCreators.length);
         } else {
           // For 'all' tab, show users who have either INFLUENCER or CREW roles
           filteredCreators = allCreators.filter(
@@ -209,13 +209,13 @@ export default function TalentSearchPage() {
               (creator.roles.includes('INFLUENCER') ||
                 creator.roles.includes('CREW'))
           );
-          console.log('Filtered for all talent:', filteredCreators.length);
+          //console.log(('Filtered for all talent:', filteredCreators.length);
         }
 
-        console.log('Final filtered creators:', filteredCreators.length);
+        //console.log(('Final filtered creators:', filteredCreators.length);
         setCreators(filteredCreators);
       } else {
-        console.log('API response not successful:', response);
+        //console.log(('API response not successful:', response);
         setCreators([]);
       }
     } catch (error) {
@@ -327,12 +327,12 @@ export default function TalentSearchPage() {
                 <div className="flex space-x-2">
                   {/* <button
                     onClick={async () => {
-                      console.log('Testing API endpoints...');
+                      //console.log(('Testing API endpoints...');
                       try {
                         const testResponse = await apiClient.get(
                           '/api/search/influencers?limit=5'
                         );
-                        console.log('Test API response:', testResponse);
+                        //console.log(('Test API response:', testResponse);
                       } catch (error) {
                         console.error('Test API error:', error);
                       }
@@ -373,7 +373,7 @@ export default function TalentSearchPage() {
                 )}
                 <button
                   onClick={() => {
-                    console.log('Manual search triggered');
+                    //console.log(('Manual search triggered');
                     loadCreators();
                   }}
                   className="mt-2 w-full rounded-none bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-700"

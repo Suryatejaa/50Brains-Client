@@ -49,9 +49,9 @@ export const useClanGigWorkflow = (clanId: string, gigId?: string) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 Fetching gig assignments for clan:', clanId);
+      //console.log('🔍 Fetching gig assignments for clan:', clanId);
       const result = await clanApiClient.getClanGigAssignments(clanId);
-      console.log('📊 Gig assignments result:', result);
+      //console.log('📊 Gig assignments result:', result);
       setAssignments((result.data as GigAssignment[]) || []);
     } catch (err) {
       console.error('❌ Failed to fetch gig assignments:', err);

@@ -38,7 +38,7 @@ export default function GigSubmissionsPage() {
     try {
       setIsLoading(true);
       const data = await GigAPI.getGigSubmissions(gigId);
-      console.log('Loaded submissions:', data);
+      // console.log('Loaded submissions:', data);
       setSubmissions(data);
     } catch (error) {
       console.error('Failed to load submissions:', error);

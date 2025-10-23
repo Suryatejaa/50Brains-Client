@@ -201,7 +201,7 @@ export default function MarketplacePage() {
     return date.toLocaleDateString();
   };
 
-  console.log(gigs);
+  //console.log((gigs);
 
   return (
     <div className="min-h-screen bg-gray-50">

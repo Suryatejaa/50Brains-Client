@@ -87,10 +87,10 @@ export default function NotificationBell() {
         if (open) {
             // Only refresh if WebSocket is not connected or no recent data
             if (!isConnected) {
-                console.log('↻ Bell opened - refreshing (WebSocket disconnected)');
+                //console.log(('↻ Bell opened - refreshing (WebSocket disconnected)');
                 forceRefresh();
             } else {
-                console.log('🚫 Bell opened - skipping refresh (WebSocket connected)');
+                //console.log(('🚫 Bell opened - skipping refresh (WebSocket connected)');
             }
 
             // Mark all notifications as read when opening the bell (just by viewing them)
@@ -105,7 +105,7 @@ export default function NotificationBell() {
 
     // Debug WebSocket connection
     useEffect(() => {
-        console.log('🔌 WebSocket Status:', { isConnected, connectionStatus });
+        //console.log(('🔌 WebSocket Status:', { isConnected, connectionStatus });
     }, [isConnected, connectionStatus]);
 
     // Reset optimistic count when real count changes
@@ -136,7 +136,7 @@ export default function NotificationBell() {
 
     const getActionUrl = (notification: Notification) => {
         // Generate action URLs based on notification type and metadata
-        console.log('Generating action URL for notification:', notification.metadata);
+        //console.log(('Generating action URL for notification:', notification.metadata);
         if (notification.metadata?.gigId) {
             return `/gig/${notification.metadata.gigId}`;
         }

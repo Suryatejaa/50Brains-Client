@@ -99,9 +99,9 @@ export default function EditGigPage() {
   const shouldPublish = searchParams.get('publish') === 'true' || 
     (typeof window !== 'undefined' && sessionStorage.getItem('publishDraftIntent') === 'true');
 
-  console.log('Edit page - shouldPublish:', shouldPublish);
-  console.log('Edit page - search param publish:', searchParams.get('publish'));
-  console.log('Edit page - sessionStorage publishDraftIntent:', typeof window !== 'undefined' ? sessionStorage.getItem('publishDraftIntent') : 'server-side');
+  //console.log(('Edit page - shouldPublish:', shouldPublish);
+  //console.log(('Edit page - search param publish:', searchParams.get('publish'));
+  //console.log(('Edit page - sessionStorage publishDraftIntent:', typeof window !== 'undefined' ? sessionStorage.getItem('publishDraftIntent') : 'server-side');
 
   const gigId = params.id as string;
   const userType = getUserTypeForRole(currentRole);
@@ -159,7 +159,7 @@ export default function EditGigPage() {
         const canEdit = gigData.brand?.id === userId || gigData.postedById === userId;
 
         //checking if the user is the owner or has the right role
-        console.log(gigData)
+        //console.log((gigData)
         if (!canEdit) {
           setError('You do not have permission to edit this gig');
           return;
@@ -474,18 +474,18 @@ export default function EditGigPage() {
         // status: formData.status
       };
 
-      console.log('Sending data to API:', JSON.stringify(cleanedData, null, 2));
-      console.log('Budget type value:', formData.budgetType, 'Type:', typeof formData.budgetType);
+      //console.log(('Sending data to API:', JSON.stringify(cleanedData, null, 2));
+      //console.log(('Budget type value:', formData.budgetType, 'Type:', typeof formData.budgetType);
       
       const response = await apiClient.put(`/api/gig/${gigId}`, cleanedData);
-      console.log('API response:', response);
+      //console.log(('API response:', response);
       
       if (response.success) {
         alert('Gig updated successfully!');
         router.push(`/gig/${gigId}`);
       } else {
         // Handle API error response - response might be of error type
-        console.log('API returned error:', response);
+        //console.log(('API returned error:', response);
         let errorMessage = 'Failed to update gig';
         
         const errorResponse = response as any; // Type assertion for error response
@@ -517,12 +517,12 @@ export default function EditGigPage() {
         errorMessage = error.message;
       }
       
-      console.log('Detailed error:', {
-        error: error.error,
-        details: error.details,
-        message: error.message,
-        full: error
-      });
+      //console.log(('Detailed error:', {
+      //   error: error.error,
+      //   details: error.details,
+      //   message: error.message,
+      //   full: error
+      // });
       
       setError(errorMessage);
     } finally {

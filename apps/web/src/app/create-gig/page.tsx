@@ -207,7 +207,7 @@ export default function CreateGigPage() {
         }),
       };
 
-      console.log('Creating gig with data:', JSON.stringify(gigData, null, 2));
+      // console.log('Creating gig with data:', JSON.stringify(gigData, null, 2));
 
       // Use appropriate API call based on draft status
       let gig;
@@ -241,10 +241,10 @@ export default function CreateGigPage() {
           isClanAllowed: baseGigData.isClanAllowed,
         };
 
-        console.log(
-          'Retrying with legacy format:',
-          JSON.stringify(legacyGigData, null, 2)
-        );
+        // console.log(
+        //   'Retrying with legacy format:',
+        //   JSON.stringify(legacyGigData, null, 2)
+        // );
 
         gig = asDraft
           ? await createDraftGig(legacyGigData)

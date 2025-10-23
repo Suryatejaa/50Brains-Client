@@ -81,7 +81,7 @@ export default function MySubmissionsPage() {
       }
 
       const response = await apiClient.get('/api/my/submissions');
-      console.log('Submissions:', response);
+      //console.log(('Submissions:', response);
 
       if (response.success && response.data && Array.isArray(response.data)) {
         // Parse deliverables JSON strings and process submissions

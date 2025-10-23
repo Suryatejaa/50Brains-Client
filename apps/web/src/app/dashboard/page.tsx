@@ -8,10 +8,10 @@ export default async function DashboardPage() {
   const accessToken = cookieStore.get('accessToken')?.value;
   const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  console.log('🏠 [Dashboard Server] Auth tokens present:', {
-    hasAccessToken: !!accessToken,
-    hasRefreshToken: !!refreshToken,
-  });
+  // console.log('🏠 [Dashboard Server] Auth tokens present:', {
+  //   hasAccessToken: !!accessToken,
+  //   hasRefreshToken: !!refreshToken,
+  // });
 
   // Let the client-side RouteGuard handle authentication redirects
   // This prevents server/client conflicts and allows proper auth state management

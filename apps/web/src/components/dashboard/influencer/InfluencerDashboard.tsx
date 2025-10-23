@@ -75,14 +75,14 @@ export const InfluencerDashboard: React.FC = () => {
     fetchAchievements,
   } = useWorkHistory(user?.id);
 
-  console.log('🎯 Influencer Dashboard Data:', data);
-  console.log('📊 Work History Data:', {
-    workSummary,
-    skills,
-    portfolio,
-    achievements,
-    reputation,
-  });
+  //console.log(('🎯 Influencer Dashboard Data:', data);
+  //console.log(('📊 Work History Data:', {
+  //   workSummary,
+  //   skills,
+  //   portfolio,
+  //   achievements,
+  //   reputation,
+  // });
 
   const [applications, setApplications] = React.useState<Application[]>([]);
   const [stats, setStats] = React.useState({
@@ -104,13 +104,13 @@ export const InfluencerDashboard: React.FC = () => {
       setIsLoading(true);
       const response = await apiClient.get('/api/my/applications');
 
-      console.log(response);
+      //console.log((response);
       if (response.success && response.data) {
         const { applications = [] } = response.data as {
           applications: Application[];
         };
         setApplications(applications);
-        console.log(applications);
+        //console.log((applications);
         // Calculate stats
         setStats({
           total: applications.length,

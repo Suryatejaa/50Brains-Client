@@ -171,18 +171,18 @@ export default function EquipmentPage() {
 
   const loadCategories = async () => {
     try {
-      console.log('Loading user equipment categories...');
+      //console.log(('Loading user equipment categories...');
       const response = await apiClient.get('/api/user/equipment/categories');
-      console.log('Categories API response:', response);
+      //console.log(('Categories API response:', response);
 
       if (response.success && response.data && Array.isArray(response.data)) {
         // Backend returns categories with counts, extract just the category names
         const categories = response.data.map((item: any) => item.category).filter(Boolean);
-        console.log('User has equipment in categories:', categories);
+        //console.log(('User has equipment in categories:', categories);
         setEquipmentCategories(categories);
       } else {
         // If API response is invalid, set empty array (user has no equipment yet)
-        console.log('No user categories found or invalid response');
+        //console.log(('No user categories found or invalid response');
         setEquipmentCategories([]);
       }
     } catch (error) {
@@ -201,18 +201,18 @@ export default function EquipmentPage() {
   }, [isAuthenticated, filter, sortBy]);
 
   // Debug: Log success message changes
-  useEffect(() => {
-    console.log('Success message changed:', successMessage);
-  }, [successMessage]);
+  // useEffect(() => {
+  //   //console.log(('Success message changed:', successMessage);
+  // }, [successMessage]);
 
-  // Debug: Log equipment state changes
-  useEffect(() => {
-    console.log('Equipment state changed:', equipment.length, 'items');
-  }, [equipment]);
+  // // Debug: Log equipment state changes
+  // useEffect(() => {
+  //   //console.log(('Equipment state changed:', equipment.length, 'items');
+  // }, [equipment]);
 
   const loadEquipment = async () => {
     try {
-      console.log('Loading equipment with filter:', filter, 'sortBy:', sortBy);
+      //console.log(('Loading equipment with filter:', filter, 'sortBy:', sortBy);
       setLoading(true);
       setError(null);
 
@@ -221,21 +221,21 @@ export default function EquipmentPage() {
         sortBy
       });
 
-      console.log('API URL:', `/api/user/equipment?${params}`);
+      //console.log(('API URL:', `/api/user/equipment?${params}`);
       const response = await apiClient.get(`/api/user/equipment?${params}`);
-      console.log('Equipment API response:', response);
+      //console.log(('Equipment API response:', response);
 
       if (response.success) {
         // Backend returns { equipment, pagination } structure
         const equipmentData = (response.data as any)?.equipment || [];
-        console.log('Setting equipment state with:', equipmentData.length, 'items');
+        //console.log(('Setting equipment state with:', equipmentData.length, 'items');
         setEquipment(equipmentData);
       } else {
-        console.log('Equipment API failed:', response);
+        //console.log(('Equipment API failed:', response);
         setError('Failed to load equipment');
       }
     } catch (error: any) {
-      console.log('Equipment API error:', error);
+      //console.log(('Equipment API error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Failed to load equipment';
       setError(errorMessage);
     } finally {
@@ -287,16 +287,16 @@ export default function EquipmentPage() {
           return true;
         })
       );
-      console.log('Equipment data:', equipmentData);
+      //console.log(('Equipment data:', equipmentData);
       let response;
       if (editingItem) {
         response = await apiClient.put(`/api/user/equipment/${editingItem.id}`, equipmentData);
       } else {
         response = await apiClient.post('/api/user/equipment', equipmentData);
       }
-      console.log('Response:', response);
+      //console.log(('Response:', response);
       if (response.success) {
-        console.log('Equipment saved successfully:', response);
+        //console.log(('Equipment saved successfully:', response);
 
         // Show success message
         setError(null); // Clear any previous errors
@@ -327,27 +327,27 @@ export default function EquipmentPage() {
 
         // Add the new equipment directly to state if it's a new item
         if (!editingItem && response.data) {
-          console.log('Adding new equipment directly to state:', response.data);
+          //console.log(('Adding new equipment directly to state:', response.data);
           const newEquipmentItem = response.data as Equipment;
           setEquipment(prev => [...prev, newEquipmentItem]);
         }
 
         // Refresh data
-        console.log('Refreshing equipment data...');
+        //console.log(('Refreshing equipment data...');
         await loadEquipment();
-        console.log('Refreshing stats...');
+        //console.log(('Refreshing stats...');
         await loadStats();
-        console.log('Refreshing categories...');
+        //console.log(('Refreshing categories...');
         await loadCategories(); // Refresh categories too
-        console.log('All data refreshed successfully');
+        //console.log(('All data refreshed successfully');
 
         // Show success feedback immediately
-        console.log('Setting success message immediately...');
+        //console.log(('Setting success message immediately...');
         setSuccessMessage('✅ Equipment saved successfully!');
-        console.log('Success message set, will clear in 3 seconds');
+        //console.log(('Success message set, will clear in 3 seconds');
 
         setTimeout(() => {
-          console.log('Clearing success message');
+          //console.log(('Clearing success message');
           setSuccessMessage(null);
         }, 3000); // Clear success message after 3 seconds
       } else {
@@ -355,10 +355,10 @@ export default function EquipmentPage() {
         setError('Failed to save equipment');
       }
     } catch (error: any) {
-      console.log('Error object:', error);
-      console.log('Error message:', error.message);
-      console.log('Error errors:', error.errors);
-      console.log('Error success:', error.success);
+      //console.log(('Error object:', error);
+      //console.log(('Error message:', error.message);
+      //console.log(('Error errors:', error.errors);
+      //console.log(('Error success:', error.success);
 
       // Handle backend validation errors for custom APIError
       if (error.errors && Array.isArray(error.errors)) {
@@ -381,10 +381,10 @@ export default function EquipmentPage() {
           }
         });
 
-        console.log('Parsed backend errors:', backendErrors);
+        //console.log(('Parsed backend errors:', backendErrors);
         setValidationErrors(backendErrors);
       } else {
-        console.log('Not a validation error, showing general error');
+        //console.log(('Not a validation error, showing general error');
         const errorMessage = error.message || 'Failed to save equipment';
         setError(errorMessage);
       }

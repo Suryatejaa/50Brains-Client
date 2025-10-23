@@ -77,7 +77,7 @@ export default function MyBidsPage() {
       if (response.success) {
         // Explicitly type response.data to avoid 'unknown' error
         const data = response.data as { bids: Bid[] };
-        console.log('Fetched bids:', data.bids);
+        //console.log(('Fetched bids:', data.bids);
         setBids(data.bids);
       }
     } catch (error) {

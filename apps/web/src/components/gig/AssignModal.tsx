@@ -48,8 +48,8 @@ export default function AssignModal({
     try {
       setIsLoading(true);
 
-      console.log('Loading creators with search query:', searchQuery);
-      console.log('Active tab:', activeTab);
+      //console.log(('Loading creators with search query:', searchQuery);
+      //console.log(('Active tab:', activeTab);
 
       const params = new URLSearchParams();
 
@@ -64,10 +64,10 @@ export default function AssignModal({
       params.append('limit', '20');
 
       const apiUrl = `/api/search/users?${params.toString()}`;
-      console.log('Making API call to:', apiUrl);
+      //console.log(('Making API call to:', apiUrl);
 
       const response = await apiClient.get(apiUrl);
-      console.log('API Response:', response);
+      //console.log(('API Response:', response);
 
       if (response.success && response.data) {
         const responseData = response.data as {
@@ -83,9 +83,9 @@ export default function AssignModal({
 
         if (responseData.results && Array.isArray(responseData.results)) {
           allCreators = responseData.results;
-          console.log('Raw creators from API:', allCreators.length);
+          //console.log(('Raw creators from API:', allCreators.length);
         } else {
-          console.log('No results array found in response:', responseData);
+          //console.log(('No results array found in response:', responseData);
         }
 
         // Filter out BRAND users and only show INFLUENCER/CREW
@@ -102,18 +102,18 @@ export default function AssignModal({
           filteredCreators = filteredCreators.filter(
             (creator) => creator.roles && creator.roles.includes('INFLUENCER')
           );
-          console.log('Filtered for influencers:', filteredCreators.length);
+          //console.log(('Filtered for influencers:', filteredCreators.length);
         } else if (activeTab === 'crew') {
           filteredCreators = filteredCreators.filter(
             (creator) => creator.roles && creator.roles.includes('CREW')
           );
-          console.log('Filtered for crew:', filteredCreators.length);
+          //console.log(('Filtered for crew:', filteredCreators.length);
         }
 
-        console.log('Final filtered creators:', filteredCreators.length);
+        //console.log(('Final filtered creators:', filteredCreators.length);
         setCreators(filteredCreators);
       } else {
-        console.log('API response not successful:', response);
+        //console.log(('API response not successful:', response);
         setCreators([]);
       }
     } catch (error) {

@@ -22,7 +22,7 @@ export const Achievements: React.FC<AchievementsProps> = ({
         return true;
     });
 
-    console.log('Achievements:', achievements);
+    //console.log(('Achievements:', achievements);
     const types = Array.from(new Set(achievements.map(achievement => achievement.type)));
 
     const getAchievementIcon = (type: string) => {

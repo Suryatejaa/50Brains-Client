@@ -21,7 +21,7 @@ export function AuthDebugger() {
 
     try {
       // Test 1: Auth status
-      console.log('🔍 Testing auth status...');
+      //console.log(('🔍 Testing auth status...');
       try {
         const authTest = await apiClient.get('/api/auth/me');
         results.tests.authTest = authTest;
@@ -30,7 +30,7 @@ export function AuthDebugger() {
       }
 
       // Test 2: Direct API calls
-      console.log('🔍 Testing /api/user/profile...');
+      //console.log(('🔍 Testing /api/user/profile...');
       try {
         const authMeResponse = await apiClient.get('/api/user/profile');
         results.tests.authMe = authMeResponse;
@@ -38,7 +38,7 @@ export function AuthDebugger() {
         results.tests.authMe = { error: error?.message || 'Unknown error' };
       }
 
-      console.log('🔍 Testing /api/user/profile...');
+      //console.log(('🔍 Testing /api/user/profile...');
       try {
         const profileResponse = await apiClient.get('/api/user/profile');
         results.tests.userProfile = profileResponse;

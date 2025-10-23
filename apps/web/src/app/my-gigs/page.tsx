@@ -90,7 +90,7 @@ export default function MyGigsPage() {
         urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
 
       if (shouldRefresh) {
-        console.log('↻ Detected refresh flag, will force refresh gigs data');
+        //console.log(('↻ Detected refresh flag, will force refresh gigs data');
         setRefreshMessage(
           '✅ Gig published successfully! Updating your gigs list...'
         );
@@ -131,11 +131,11 @@ export default function MyGigsPage() {
         : '/api/gig/my-posted';
 
       const response = await apiClient.get<GigsResponse>(url);
-      console.log(
-        'Fetched gigs:',
-        response.data,
-        forceRefresh ? '(force refresh)' : '(cached)'
-      );
+      //console.log((
+      //   'Fetched gigs:',
+      //   response.data,
+      //   forceRefresh ? '(force refresh)' : '(cached)'
+      // );
 
       if (response.success) {
         // The API returns {gigs: Array, pagination: Object}
@@ -144,7 +144,7 @@ export default function MyGigsPage() {
           const statuses = response.data.gigs
             .map((g) => g.status)
             .filter(Boolean);
-          console.log('Gig statuses found:', Array.from(new Set(statuses)));
+          //console.log(('Gig statuses found:', Array.from(new Set(statuses)));
 
           // Update refresh message if this was a force refresh
           if (forceRefresh && refreshMessage) {
@@ -187,7 +187,7 @@ export default function MyGigsPage() {
       const response = await apiClient.put(`/api/gig/${gigId}/status`, {
         status: newStatus,
       });
-      console.log(`Gig ${gigId} status updated to ${newStatus}`, response);
+      //console.log((`Gig ${gigId} status updated to ${newStatus}`, response);
       if (response.success) {
         setGigs((prev) =>
           prev.map((gig) =>

@@ -61,7 +61,7 @@ export const BottomNavigation: React.FC = () => {
   }
 
   const userType = getUserTypeForRole(currentRole);
-  console.log('currentRole', currentRole);
+  // console.log('currentRole', currentRole);
   const getNavigationItems = (): NavigationItem[] => {
     // Core navigation that's always visible (like Instagram/TikTok)
     const baseItems: NavigationItem[] = [

@@ -29,9 +29,9 @@ export const useProfile = (userId?: string) => {
         const cachedProfile = getFromCache(targetUserId);
         if (cachedProfile) {
           const cacheInfo = getCacheInfo(targetUserId);
-          console.log(
-            `🎯 Using cached profile data (age: ${Math.round((cacheInfo?.age || 0) / 1000)}s, expires in: ${Math.round((cacheInfo?.expiresIn || 0) / 1000)}s)`
-          );
+          //console.log((
+          //   `🎯 Using cached profile data (age: ${Math.round((cacheInfo?.age || 0) / 1000)}s, expires in: ${Math.round((cacheInfo?.expiresIn || 0) / 1000)}s)`
+          // );
 
           setState((prev) => ({
             ...prev,
@@ -116,7 +116,7 @@ export const useProfile = (userId?: string) => {
 
       // Cache the profile data for 60 seconds
       if (profile.user) {
-        console.log('💾 Caching profile data for 60 seconds');
+        //console.log(('💾 Caching profile data for 60 seconds');
         setInCache(profile, targetUserId, 60 * 1000); // 60 seconds
       }
 
@@ -169,11 +169,11 @@ export const useProfile = (userId?: string) => {
 
       if (response.success) {
         // Clear cache since profile was updated
-        console.log('🗑️ Clearing profile cache due to update');
+        //console.log(('🗑️ Clearing profile cache due to update');
         clearFromCache(userId);
 
         // Debug the response structure
-        console.log('📊 API Response for section:', section, response.data);
+        //console.log(('📊 API Response for section:', section, response.data);
 
         // Update local state with new data
         let updatedUserData: any = {};
@@ -198,7 +198,7 @@ export const useProfile = (userId?: string) => {
           }
         }
 
-        console.log('↻ Updating user data with:', updatedUserData);
+        //console.log(('↻ Updating user data with:', updatedUserData);
 
         const updatedProfile = state.profile
           ? {
@@ -210,7 +210,7 @@ export const useProfile = (userId?: string) => {
           }
           : null;
 
-        console.log('📱 Updated profile:', updatedProfile);
+        //console.log(('📱 Updated profile:', updatedProfile);
 
         setState((prev) => ({
           ...prev,
@@ -329,7 +329,7 @@ export const useProfile = (userId?: string) => {
 
   // Force refresh profile (bypasses cache)
   const forceRefreshProfile = async () => {
-    console.log('↻ Force refreshing profile (bypassing cache)');
+    //console.log(('↻ Force refreshing profile (bypassing cache)');
     clearFromCache(userId);
     await fetchProfile(userId, true);
   };

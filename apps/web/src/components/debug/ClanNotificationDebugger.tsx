@@ -56,7 +56,7 @@ export default function ClanNotificationDebugger() {
     };
 
     // Simulate receiving a WebSocket message
-    console.log('🏰 Simulating clan notification:', mockNotification);
+    //console.log(('🏰 Simulating clan notification:', mockNotification);
     setTestResult('✅ Simulated clan notification sent to console');
   };
 

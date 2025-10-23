@@ -176,30 +176,30 @@ export default function GigDetailsPage() {
 
   // Extract gigId from params with debugging and fallback
   useEffect(() => {
-    console.log('🔍 === GIG ID DEBUG ===');
-    console.log('📱 Params object:', params);
-    console.log('🆔 Params.id:', params.id);
-    console.log('🔗 Current URL:', window.location.href);
-    console.log('📍 Pathname:', window.location.pathname);
+    //console.log(('🔍 === GIG ID DEBUG ===');
+    //console.log(('📱 Params object:', params);
+    //console.log(('🆔 Params.id:', params.id);
+    //console.log(('🔗 Current URL:', window.location.href);
+    //console.log(('📍 Pathname:', window.location.pathname);
 
     if (params.id && params.id !== 'undefined') {
       const extractedId = params.id as string;
-      console.log('✅ Extracted gigId from params:', extractedId);
+      //console.log(('✅ Extracted gigId from params:', extractedId);
       setGigId(extractedId);
     } else {
-      console.log('❌ No valid gigId found in params');
+      //console.log(('❌ No valid gigId found in params');
       // Try to extract from URL pathname as fallback
       const pathParts = window.location.pathname.split('/');
       const urlId = pathParts[2]; // /gig/[id]/...
       if (urlId && urlId !== 'undefined' && urlId !== 'gig') {
-        console.log('🔄 Fallback: extracted from URL pathname:', urlId);
+        //console.log(('🔄 Fallback: extracted from URL pathname:', urlId);
         setGigId(urlId);
       } else {
-        console.log('❌ Fallback also failed, no valid ID found');
+        //console.log(('❌ Fallback also failed, no valid ID found');
       }
     }
     setIsGigIdLoading(false);
-    console.log('================================');
+    //console.log(('================================');
   }, [params]);
 
   // Show toast notification
@@ -293,7 +293,7 @@ export default function GigDetailsPage() {
   };
 
   const handleAcceptAssignment = async (bidId: string) => {
-    console.log('Accepting assignment for bidId:', bidId);
+    //console.log(('Accepting assignment for bidId:', bidId);
     // Show UPI modal first to collect payment details
     setPendingBidId(bidId);
     setUpiId('');
@@ -429,16 +429,16 @@ export default function GigDetailsPage() {
       ? sessionStorage.getItem(`gig-${gigId}-referrer`)
       : null;
 
-    console.log('🔙 goBack debug:', {
-      lastPageReferrer,
-      sessionReferrer,
-      currentUrl,
-      gigId,
-    });
+    // //console.log(('🔙 goBack debug:', {
+    //   lastPageReferrer,
+    //   sessionReferrer,
+    //   currentUrl,
+    //   gigId,
+    // });
 
     // Always use session referrer if present and not current page
     if (sessionReferrer && sessionReferrer !== currentUrl) {
-      console.log('🔙 [goBack] Using session referrer:', sessionReferrer);
+      //console.log(('🔙 [goBack] Using session referrer:', sessionReferrer);
       if (gigId) {
         sessionStorage.removeItem(`gig-${gigId}-referrer`);
       }
@@ -456,13 +456,13 @@ export default function GigDetailsPage() {
       const originalReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
 
       if (originalReferrer && originalReferrer !== currentUrl) {
-        console.log('🔙 Going back to original referrer:', originalReferrer);
+        //console.log(('🔙 Going back to original referrer:', originalReferrer);
         window.location.href = originalReferrer;
         return;
       } else {
         // No original referrer stored, go to my-gigs if user is brand owner
         if (isOwner) {
-          console.log('🔙 Going to my-gigs (owner, no original referrer)');
+          //console.log(('🔙 Going to my-gigs (owner, no original referrer)');
           router.push('/my-gigs');
           return;
         }
@@ -471,7 +471,7 @@ export default function GigDetailsPage() {
 
     // Check if user came from my-gigs page
     if (lastPageReferrer && lastPageReferrer.includes('/my-gigs')) {
-      console.log('🔙 Going back to my-gigs');
+      //console.log(('🔙 Going back to my-gigs');
       router.push('/my-gigs');
       return;
     }
@@ -485,7 +485,7 @@ export default function GigDetailsPage() {
     ) {
       // User came from another gig, try to go to my-gigs if they're the owner
       if (isOwner) {
-        console.log('🔙 Going to my-gigs (came from other gig, is owner)');
+        //console.log(('🔙 Going to my-gigs (came from other gig, is owner)');
         router.push('/my-gigs');
         return;
       }
@@ -495,11 +495,11 @@ export default function GigDetailsPage() {
     if (lastPageReferrer && lastPageReferrer.includes('/dashboard')) {
       // If they're viewing their own gig, take them to my-gigs instead of dashboard
       if (isOwner) {
-        console.log('🔙 Going to my-gigs (came from dashboard, is owner)');
+        //console.log(('🔙 Going to my-gigs (came from dashboard, is owner)');
         router.push('/my-gigs');
         return;
       } else {
-        console.log('🔙 Going back to dashboard');
+        //console.log(('🔙 Going back to dashboard');
         router.push('/dashboard');
         return;
       }
@@ -508,15 +508,15 @@ export default function GigDetailsPage() {
     // Default cases based on user type and ownership
     if (isOwner) {
       // If user owns this gig, they probably want to go to my-gigs
-      console.log('🔙 Going to my-gigs (default for owner)');
+      //console.log(('🔙 Going to my-gigs (default for owner)');
       router.push('/my-gigs');
     } else if (window.history.length > 1) {
       // For non-owners, try normal back navigation
-      console.log('🔙 Using browser back');
+      //console.log(('🔙 Using browser back');
       router.back();
     } else {
       // Fallback to marketplace for non-owners
-      console.log('🔙 Going to marketplace (fallback)');
+      //console.log(('🔙 Going to marketplace (fallback)');
       router.push('/marketplace');
     }
   };
@@ -527,12 +527,12 @@ export default function GigDetailsPage() {
       const referrer = sessionStorage.getItem('lastPage') || document.referrer;
       const currentReferrer = sessionStorage.getItem(`gig-${gigId}-referrer`);
 
-      console.log('📍 useEffect storing referrer debug:', {
-        referrer,
-        currentReferrer,
-        gigId,
-        isEditPage: gigId ? referrer?.includes(`/gig/${gigId}/edit`) : false,
-      });
+      // //console.log(('📍 useEffect storing referrer debug:', {
+      //   referrer,
+      //   currentReferrer,
+      //   gigId,
+      //   isEditPage: gigId ? referrer?.includes(`/gig/${gigId}/edit`) : false,
+      // });
 
       // Only store referrer if:
       // 1. No referrer is already stored
@@ -550,7 +550,7 @@ export default function GigDetailsPage() {
           referrer.includes('/marketplace') ||
           referrer.includes('/search'))
       ) {
-        console.log('📍 [useEffect] Storing referrer:', referrer);
+        //console.log(('📍 [useEffect] Storing referrer:', referrer);
         sessionStorage.setItem(`gig-${gigId}-referrer`, referrer);
       }
 
@@ -562,14 +562,14 @@ export default function GigDetailsPage() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && gigId) {
-        console.log('↻ Page became visible, refreshing gig data');
+        //console.log(('↻ Page became visible, refreshing gig data');
         loadGigDetails(true); // Force refresh when page becomes visible
       }
     };
 
     const handleFocus = () => {
       if (gigId) {
-        console.log('↻ Window focused, refreshing gig data');
+        //console.log(('↻ Window focused, refreshing gig data');
         loadGigDetails(true); // Force refresh when window is focused
       }
     };
@@ -594,14 +594,14 @@ export default function GigDetailsPage() {
 
   const loadMyApplications = async () => {
     if (!gigId || !user?.id) {
-      console.log('⚠️ Skipping application load - missing gigId or userId');
+      //console.log(('⚠️ Skipping application load - missing gigId or userId');
       return;
     }
 
     try {
       setApplicationsLoading(true);
       const response = await apiClient.get(`/api/my/${gigId}/applications`);
-      console.log('🎯 Loaded my applications:', response);
+      //console.log(('🎯 Loaded my applications:', response);
       if (response.success && response.data) {
         const formatMyApplications = (response.data as any).applicationStatus;
         const applicantType = (response.data as any).application?.applicantType;
@@ -658,7 +658,7 @@ export default function GigDetailsPage() {
 
   const loadGigDetails = async (forceRefresh = false) => {
     if (!gigId) {
-      console.log('⚠️ Skipping gig details load - gigId not available');
+      //console.log(('⚠️ Skipping gig details load - gigId not available');
       return;
     }
 
@@ -674,7 +674,7 @@ export default function GigDetailsPage() {
 
       if (response.success && response.data) {
         const gigData = response.data as Gig;
-        console.log('🎯 Loaded gig data:', gigData);
+        //console.log(('🎯 Loaded gig data:', gigData);
         setGig(gigData);
       } else {
         // Go back to previous page or fallback to marketplace
@@ -703,10 +703,10 @@ export default function GigDetailsPage() {
     // Set a flag in session storage to indicate we want to publish after editing
     sessionStorage.setItem('publishDraftIntent', 'true');
 
-    console.log(
-      '🚀 Redirecting to edit page for draft completion before publishing:',
-      gigId
-    );
+    //console.log((
+    //   '🚀 Redirecting to edit page for draft completion before publishing:',
+    //   gigId
+    // );
 
     // Navigate to edit page with publish intent
     router.push(`/gig/${gigId}/edit?publish=true`);
@@ -898,18 +898,18 @@ export default function GigDetailsPage() {
         };
       }
 
-      console.log('🚀 Sending application data:', applicationData);
-      console.log('🔑 User info:', { id: user.id, email: user.email });
-      console.log('🎯 Gig ID:', gigId);
+      //console.log(('🚀 Sending application data:', applicationData);
+      //console.log(('🔑 User info:', { id: user.id, email: user.email });
+      //console.log(('🎯 Gig ID:', gigId);
 
-      console.log('🚀 Application data:', applicationData);
+      //console.log(('🚀 Application data:', applicationData);
 
       const response = await apiClient.post(
         `/api/gig/${gigId}/apply`,
         applicationData
       );
 
-      console.log('✅ Application response:', response);
+      //console.log(('✅ Application response:', response);
 
       if (response.success) {
         // Refresh gig data to update application status
@@ -1158,12 +1158,12 @@ export default function GigDetailsPage() {
     (gig.status === 'OPEN' || gig.status === 'ASSIGNED') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
-  console.log('🔍 Gig details:', gig);
-  console.log('🔍 Is own gig:', isOwner);
-  console.log('🔍 My applications:', myApplications);
+  //console.log(('🔍 Gig details:', gig);
+  //console.log(('🔍 Is own gig:', isOwner);
+  //console.log(('🔍 My applications:', myApplications);
 
   const myApplicationStatus = (myApplications as any)?.status || null;
-  console.log('🔍 My application status:', myApplicationStatus);
+  //console.log(('🔍 My application status:', myApplicationStatus);
 
   return (
     <div className="min-h-screen bg-gray-50 py-2">

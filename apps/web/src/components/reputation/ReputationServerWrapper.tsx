@@ -21,9 +21,9 @@ const ReputationServerWrapper: React.FC<ReputationServerWrapperProps> = async ({
   compact = false,
   className = '',
 }) => {
-  console.log(
-    `🏆 [ReputationServerWrapper] SSR fetching reputation for user: ${userId}`
-  );
+  //console.log((
+  //   `🏆 [ReputationServerWrapper] SSR fetching reputation for user: ${userId}`
+  // );
 
   try {
     const reputationResponse = await reputationService.getReputation(userId);
@@ -48,9 +48,9 @@ const ReputationServerWrapper: React.FC<ReputationServerWrapperProps> = async ({
     }
 
     const reputation = reputationResponse.data;
-    console.log(
-      `✅ [ReputationServerWrapper] SSR loaded reputation for ${userId}: ${reputation.tier} (${reputation.finalScore} points)`
-    );
+    //console.log((
+    //   `✅ [ReputationServerWrapper] SSR loaded reputation for ${userId}: ${reputation.tier} (${reputation.finalScore} points)`
+    // );
 
     return (
       <div className={`reputation-server-wrapper ${className}`}>

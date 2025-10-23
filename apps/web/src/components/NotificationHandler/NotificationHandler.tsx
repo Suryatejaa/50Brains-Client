@@ -15,7 +15,7 @@ export function NotificationHandler({ userId, onNotification }: NotificationHand
         const connectToNotifications = async () => {
             try {
                 await wsManager.connect('notifications', { userId });
-                console.log('🔔 NotificationHandler: Connected to notifications service');
+                //console.log(('🔔 NotificationHandler: Connected to notifications service');
             } catch (error) {
                 console.error('❌ NotificationHandler: Failed to connect:', error);
             }
@@ -37,7 +37,7 @@ export function NotificationHandler({ userId, onNotification }: NotificationHand
 
         // Listen to notification events
         const unsubscribe = wsManager.on('notifications.notification', (message: any) => {
-            console.log('🔔 Received notification:', message);
+            //console.log(('🔔 Received notification:', message);
             onNotification?.(message);
 
             // You can show toast notifications here

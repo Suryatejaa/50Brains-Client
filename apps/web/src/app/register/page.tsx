@@ -139,8 +139,17 @@ export default function RegisterPage() {
         roles: formData.roles as any[],
       });
 
-      // Registration successful - user will be redirected via useEffect
+      // Registration successful - redirect to dashboard
       console.log('Registration successful:', result.message);
+
+      // Check for saved redirect URL (similar to login)
+      const savedRedirectUrl = localStorage.getItem('authRedirectUrl');
+      if (savedRedirectUrl) {
+        localStorage.removeItem('authRedirectUrl');
+        router.push(savedRedirectUrl as any);
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {

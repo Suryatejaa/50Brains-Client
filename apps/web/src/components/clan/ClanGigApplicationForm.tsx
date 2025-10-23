@@ -30,24 +30,24 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  // Log the props received
-  console.log('🎯 ClanGigApplicationForm: Props received:', {
-    initialGigId,
-    clanId,
-    clanSlug: clanSlug || 'NOT_PROVIDED',
-    clanMembersCount: clanMembers?.length || 0,
-  });
+  // // Log the props received
+  // console.log('🎯 ClanGigApplicationForm: Props received:', {
+  //   initialGigId,
+  //   clanId,
+  //   clanSlug: clanSlug || 'NOT_PROVIDED',
+  //   clanMembersCount: clanMembers?.length || 0,
+  // });
   const { applyToGig, loading, error } = useGigApplication();
   const { gigs, loading: gigsLoading, loadPublicGigs, searchGigs } = useGigs();
 
   // Log the useGigs hook state
-  console.log('🎣 useGigs hook state:', {
-    gigsCount: gigs?.length || 0,
-    gigsLoading,
-    loadPublicGigs: typeof loadPublicGigs,
-    searchGigs: typeof searchGigs,
-    gigs: gigs?.slice(0, 2) || [], // Show first 2 gigs for debugging
-  });
+  // console.log('🎣 useGigs hook state:', {
+  //   gigsCount: gigs?.length || 0,
+  //   gigsLoading,
+  //   loadPublicGigs: typeof loadPublicGigs,
+  //   searchGigs: typeof searchGigs,
+  //   gigs: gigs?.slice(0, 2) || [], // Show first 2 gigs for debugging
+  // });
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedGigId, setSelectedGigId] = useState<string>(
@@ -100,12 +100,12 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
 
   // Load available gigs on component mount
   useEffect(() => {
-    console.log('↻ ClanGigApplicationForm: Loading gigs on mount...');
-    console.log('📋 Current filters:', gigFilters);
-    console.log('🔗 loadPublicGigs function:', typeof loadPublicGigs);
+    // console.log('↻ ClanGigApplicationForm: Loading gigs on mount...');
+    // console.log('📋 Current filters:', gigFilters);
+    // console.log('🔗 loadPublicGigs function:', typeof loadPublicGigs);
     loadPublicGigs(gigFilters)
       .then(() => {
-        console.log('✅ Gigs loaded successfully');
+        // console.log('✅ Gigs loaded successfully');
       })
       .catch((error) => {
         console.error('❌ Error loading gigs:', error);
@@ -124,7 +124,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
           '/api/public/profiles/internal/by-ids',
           { userIds: ids }
         );
-        console.log('res', res);
+        // console.log('res', res);
         if ((res as any)?.success && (res as any)?.data) {
           const profiles = (res as any).data as Array<{
             id: string;
@@ -184,7 +184,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
 
   const handleSubmit = async (finalData: any) => {
     if (!selectedGigId) {
-      console.error('No gig selected');
+      // console.error('No gig selected');
       return;
     }
 
@@ -193,7 +193,7 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
     // Final validation: check if quoted price exceeds gig budget
     const selectedGig = gigs.find((gig) => gig.id === selectedGigId);
     if (selectedGig && quotedPrice > (selectedGig.budgetMax || 0)) {
-      console.error('Quoted price exceeds gig budget');
+      // console.error('Quoted price exceeds gig budget');
       setIsSubmitting(false);
       return;
     }
@@ -201,13 +201,13 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
     try {
       // Validate required fields for clan application
       if (!teamPlan.members || teamPlan.members.length === 0) {
-        console.error('❌ Clan application requires at least one team member');
+        // console.error('❌ Clan application requires at least one team member');
         setIsSubmitting(false);
         return;
       }
 
       if (!milestonePlan || milestonePlan.length === 0) {
-        console.error('❌ Clan application requires at least one milestone');
+        // console.error('❌ Clan application requires at least one milestone');
         setIsSubmitting(false);
         return;
       }
@@ -222,10 +222,10 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
       });
 
       if (invalidMilestones.length > 0) {
-        console.error(
-          '❌ Some milestones have invalid dates:',
-          invalidMilestones
-        );
+        // console.error(
+        //   '❌ Some milestones have invalid dates:',
+        //   invalidMilestones
+        // );
         setIsSubmitting(false);
         return;
       }
@@ -236,9 +236,9 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
         0
       );
       if (totalMilestoneAmount > quotedPrice) {
-        console.error(
-          `❌ Total milestone amount (₹${totalMilestoneAmount}) exceeds quoted price (₹${quotedPrice})`
-        );
+        // console.error(
+        //   `❌ Total milestone amount (₹${totalMilestoneAmount}) exceeds quoted price (₹${quotedPrice})`
+        // );
         setIsSubmitting(false);
         return;
       }
@@ -248,9 +248,9 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
         !payoutSplit.distribution ||
         Object.keys(payoutSplit.distribution).length === 0
       ) {
-        console.error(
-          '❌ Payout split must have at least one member with a distribution'
-        );
+        // console.error(
+        //   '❌ Payout split must have at least one member with a distribution'
+        // );
         setIsSubmitting(false);
         return;
       }
@@ -268,10 +268,10 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
         ) || [];
 
       if (invalidTeamMembers.length > 0) {
-        console.error(
-          '❌ Some team members have incomplete information:',
-          invalidTeamMembers
-        );
+        // console.error(
+        //   '❌ Some team members have incomplete information:',
+        //   invalidTeamMembers
+        // );
         setIsSubmitting(false);
         return;
       }
@@ -355,19 +355,19 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
       }
 
       // Log the application data being sent
-      console.log('📤 ClanGigApplicationForm: Sending application data:', {
-        selectedGigId,
-        clanId,
-        clanSlug: clanSlug || 'NOT_PROVIDED',
-        hasClanSlug: !!(clanSlug && clanSlug.trim()),
-        transformedTeamPlan,
-        transformedMilestonePlan,
-        transformedPayoutSplit,
-        applicationData,
-      });
+      // console.log('📤 ClanGigApplicationForm: Sending application data:', {
+      //   selectedGigId,
+      //   clanId,
+      //   clanSlug: clanSlug || 'NOT_PROVIDED',
+      //   hasClanSlug: !!(clanSlug && clanSlug.trim()),
+      //   transformedTeamPlan,
+      //   transformedMilestonePlan,
+      //   transformedPayoutSplit,
+      //   applicationData,
+      // });
 
       const application = await applyToGig(selectedGigId, applicationData);
-      console.log('🎯 ClanGigApplicationForm: Application:', application);
+      // console.log('🎯 ClanGigApplicationForm: Application:', application);
 
       if (application) {
         setIsSubmitted(true);
@@ -407,13 +407,13 @@ export const ClanGigApplicationForm: React.FC<ClanGigApplicationFormProps> = ({
   const StepComponent = steps[currentStep - 1].component;
 
   // Add logging for debugging
-  console.log('🎯 ClanGigApplicationForm: Main component state:', {
-    currentStep,
-    gigsCount: gigs.length,
-    gigsLoading,
-    selectedGigId,
-    gigs: gigs.slice(0, 3).map((g) => ({ id: g.id, title: g.title })), // Show first 3 gigs
-  });
+  // console.log('🎯 ClanGigApplicationForm: Main component state:', {
+  //   currentStep,
+  //   gigsCount: gigs.length,
+  //   gigsLoading,
+  //   selectedGigId,
+  //   gigs: gigs.slice(0, 3).map((g) => ({ id: g.id, title: g.title })), // Show first 3 gigs
+  // });
 
   // Show success message if submitted
   if (isSubmitted) {
@@ -570,7 +570,7 @@ const GigSelectionStep: React.FC<{
 
   const handleNext = () => {
     if (!selectedGigId) return;
-    console.log('🚀 GigSelectionStep: Proceeding with gig ID:', selectedGigId);
+    // console.log('🚀 GigSelectionStep: Proceeding with gig ID:', selectedGigId);
     onComplete({ selectedGigId });
   };
 
@@ -578,18 +578,18 @@ const GigSelectionStep: React.FC<{
 
   // Add logging for debugging
   const clanAllowedGigs = gigs.filter((gig) => gig.isClanAllowed !== false);
-  console.log('🔍 GigSelectionStep: Current state:', {
-    totalGigsCount: gigs.length,
-    clanAllowedGigsCount: clanAllowedGigs.length,
-    filteredOutCount: gigs.length - clanAllowedGigs.length,
-    gigsLoading,
-    selectedGigId,
-    selectedGig: selectedGig
-      ? { id: selectedGig.id, title: selectedGig.title }
-      : null,
-    searchQuery,
-    gigFilters,
-  });
+  // console.log('🔍 GigSelectionStep: Current state:', {
+  //   totalGigsCount: gigs.length,
+  //   clanAllowedGigsCount: clanAllowedGigs.length,
+  //   filteredOutCount: gigs.length - clanAllowedGigs.length,
+  //   gigsLoading,
+  //   selectedGigId,
+  //   selectedGig: selectedGig
+  //     ? { id: selectedGig.id, title: selectedGig.title }
+  //     : null,
+  //   searchQuery,
+  //   gigFilters,
+  // });
 
   return (
     <div className="space-y-3 md:space-y-6">
@@ -702,13 +702,13 @@ const GigSelectionStep: React.FC<{
 
         <button
           onClick={() => {
-            console.log(
-              '↻ GigSelectionStep: Refreshing gigs with filters:',
-              gigFilters
-            );
+            // console.log(
+            //   '↻ GigSelectionStep: Refreshing gigs with filters:',
+            //   gigFilters
+            // );
             loadPublicGigs(gigFilters)
               .then(() => {
-                console.log('✅ Refresh completed successfully');
+                // console.log('✅ Refresh completed successfully');
               })
               .catch((error) => {
                 console.error('❌ Refresh error:', error);
@@ -1017,11 +1017,11 @@ const TeamPlanStep: React.FC<{
   const [roles, setRoles] = useState<string[]>(data.teamPlan?.roles || []);
 
   // Debug initial state
-  console.log('🔍 TeamPlanStep initial state:', {
-    dataTeamPlan: data.teamPlan,
-    initialMembers: data.teamPlan?.members || [],
-    initialRoles: data.teamPlan?.roles || [],
-  });
+  // console.log('🔍 TeamPlanStep initial state:', {
+  //   dataTeamPlan: data.teamPlan,
+  //   initialMembers: data.teamPlan?.members || [],
+  //   initialRoles: data.teamPlan?.roles || [],
+  // });
 
   // Helper function to check if a member is complete
   const isMemberComplete = (member: TeamMember) => {
@@ -1034,21 +1034,21 @@ const TeamPlanStep: React.FC<{
       member.deliverables.some((d) => d.trim());
 
     // Debug logging for incomplete members
-    if (!result) {
-      console.log('🔍 Member incomplete:', {
-        member,
-        checks: {
-          hasUserId: !!member.userId,
-          hasRole: !!member.role,
-          hasHours: member.expectedHours > 0,
-          hasDeliverables: !!(
-            member.deliverables && member.deliverables.length > 0
-          ),
-          hasNonEmptyDeliverable:
-            member.deliverables && member.deliverables.some((d) => d.trim()),
-        },
-      });
-    }
+    // if (!result) {
+    //   console.log('🔍 Member incomplete:', {
+    //     member,
+    //     checks: {
+    //       hasUserId: !!member.userId,
+    //       hasRole: !!member.role,
+    //       hasHours: member.expectedHours > 0,
+    //       hasDeliverables: !!(
+    //         member.deliverables && member.deliverables.length > 0
+    //       ),
+    //       hasNonEmptyDeliverable:
+    //         member.deliverables && member.deliverables.some((d) => d.trim()),
+    //     },
+    //   });
+    // }
 
     return result;
   };
@@ -1061,7 +1061,7 @@ const TeamPlanStep: React.FC<{
       expectedHours: 0,
       deliverables: ['First deliverable'], // Start with a non-empty deliverable
     };
-    console.log('➕ Adding new member:', newMember);
+    // console.log('➕ Adding new member:', newMember);
     setMembers([...members, newMember]);
   };
 
@@ -1075,11 +1075,11 @@ const TeamPlanStep: React.FC<{
     newMembers[index] = { ...newMembers[index], [field]: value };
     setMembers(newMembers);
 
-    console.log(`↻ Updated member ${index}.${field}:`, {
-      from: oldValue,
-      to: value,
-      member: newMembers[index],
-    });
+    // console.log(`↻ Updated member ${index}.${field}:`, {
+    //   from: oldValue,
+    //   to: value,
+    //   member: newMembers[index],
+    // });
   };
 
   const handleNext = () => {
@@ -1135,17 +1135,17 @@ const TeamPlanStep: React.FC<{
         {process.env.NODE_ENV === 'development' && (
           <button
             onClick={() => {
-              console.log('🔍 Current team members state:', members);
+              // console.log('🔍 Current team members state:', members);
               members.forEach((member, index) => {
-                console.log(`Member ${index}:`, member);
-                console.log(
-                  `Member ${index} complete:`,
-                  isMemberComplete(member)
-                );
+                // console.log(`Member ${index}:`, member);
+                // console.log(
+                //   `Member ${index} complete:`,
+                //   isMemberComplete(member)
+                // );
               });
 
-              console.log('🔍 Clan members data:', clanMembers);
-              console.log('🔍 User map data:', data.userMap);
+              // console.log('🔍 Clan members data:', clanMembers);
+              // console.log('🔍 User map data:', data.userMap);
             }}
             className="mt-2 rounded bg-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-700"
           >
@@ -1265,18 +1265,18 @@ const TeamPlanStep: React.FC<{
                     value={member.userName || ''}
                     onChange={(e) => {
                       const selectedKey = e.target.value;
-                      console.log('🔍 Member selection changed:', {
-                        selectedKey,
-                        memberIndex: index,
-                        currentMember: member,
-                        clanMembers: clanMembers.map((cm) => ({
-                          userId: cm.userId,
-                          username:
-                            data.userMap?.[cm.userId]?.username ||
-                            cm.user?.username ||
-                            cm.userId,
-                        })),
-                      });
+                      // console.log('🔍 Member selection changed:', {
+                      //   selectedKey,
+                      //   memberIndex: index,
+                      //   currentMember: member,
+                      //   clanMembers: clanMembers.map((cm) => ({
+                      //     userId: cm.userId,
+                      //     username:
+                      //       data.userMap?.[cm.userId]?.username ||
+                      //       cm.user?.username ||
+                      //       cm.userId,
+                      //   })),
+                      // });
 
                       // Find selected by matching username in userMap or fallback username in clanMembers
                       const found = clanMembers.find((cm) => {
@@ -1287,7 +1287,7 @@ const TeamPlanStep: React.FC<{
                       });
 
                       if (found) {
-                        console.log('✅ Found clan member:', found);
+                        // console.log('✅ Found clan member:', found);
                         // Update both userId and userName in a single operation to avoid race conditions
                         const updatedMember = {
                           ...member,
@@ -1300,12 +1300,12 @@ const TeamPlanStep: React.FC<{
                         newMembers[index] = updatedMember;
                         setMembers(newMembers);
 
-                        console.log('✅ Updated member:', {
-                          index,
-                          userId: found.userId,
-                          userName: selectedKey,
-                          updatedMember,
-                        });
+                        // console.log('✅ Updated member:', {
+                        //   index,
+                        //   userId: found.userId,
+                        //   userName: selectedKey,
+                        //   updatedMember,
+                        // });
                       } else {
                         console.error(
                           '❌ Could not find clan member for selection:',

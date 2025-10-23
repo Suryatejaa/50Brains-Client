@@ -50,10 +50,10 @@ export const DashboardRouter: React.FC = () => {
   // Add debugging for role switching - only log when role changes
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `🎭 Dashboard Routing - Current Role: ${currentRole}, User Type: ${userType}, Available Roles:`,
-        availableRoles
-      );
+      // console.log(
+      //   `🎭 Dashboard Routing - Current Role: ${currentRole}, User Type: ${userType}, Available Roles:`,
+      //   availableRoles
+      // );
     }
   }, [currentRole, userType, availableRoles]);
 

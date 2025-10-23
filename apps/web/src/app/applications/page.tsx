@@ -112,7 +112,7 @@ export default function ApplicationsPage() {
 
   const loadApplications = async () => {
     try {
-      console.log('Loading applications...');
+      // console.log('Loading applications...');
       setLoading(true);
       setError(null);
       const response = await apiClient.get('/api/applications/received');
@@ -120,11 +120,11 @@ export default function ApplicationsPage() {
       if (response.success) {
         // Handle the nested structure: response.data.applications
         const applicationsData = response.data as any;
-        console.log(
-          'Applications loaded successfully:',
-          applicationsData?.applications || 0,
-          'applications'
-        );
+        // console.log(
+        //   'Applications loaded successfully:',
+        //   applicationsData?.applications || 0,
+        //   'applications'
+        // );
         setApplications(applicationsData?.applications || []);
       } else {
         console.error('Failed to load applications:', response);
@@ -142,7 +142,7 @@ export default function ApplicationsPage() {
     if (!confirm('Are you sure you want to accept this application?')) return;
 
     try {
-      console.log('Accepting application:', applicationId);
+      // console.log('Accepting application:', applicationId);
       setProcessingApplicationId(applicationId);
 
       const response = await apiClient.post(
@@ -153,7 +153,7 @@ export default function ApplicationsPage() {
       );
 
       if (response.success) {
-        console.log('Application accepted successfully, updating UI...');
+        // console.log('Application accepted successfully, updating UI...');
 
         // Immediately update the application status in the local state
         setApplications((prevApplications) =>
@@ -198,7 +198,7 @@ export default function ApplicationsPage() {
     if (!rejectApplicationId || !rejectionReason.trim()) return;
 
     try {
-      console.log('Rejecting application:', rejectApplicationId);
+      // console.log('Rejecting application:', rejectApplicationId);
       setProcessingApplicationId(rejectApplicationId);
 
       const response = await apiClient.post(
@@ -210,7 +210,7 @@ export default function ApplicationsPage() {
       );
 
       if (response.success) {
-        console.log('Application rejected successfully, updating UI...');
+        // console.log('Application rejected successfully, updating UI...');
 
         // Immediately update the application status in the local state
         setApplications((prevApplications) =>
@@ -266,7 +266,7 @@ export default function ApplicationsPage() {
   };
 
   const openApproveModal = (app: Application) => {
-    console.log('Opening approve modal for application:', app);
+    // console.log('Opening approve modal for application:', app);
     setApproveApplication(app);
     setShowApproveModal(true);
   };

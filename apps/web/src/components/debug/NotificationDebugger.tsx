@@ -63,7 +63,7 @@ export default function NotificationDebugger() {
             });
 
             if (response.ok) {
-                console.log('✅ Test notification sent successfully');
+                //console.log(('✅ Test notification sent successfully');
                 alert('Test notification sent! Check if it appears in real-time.');
             } else {
                 console.error('❌ Failed to send test notification');
@@ -76,7 +76,7 @@ export default function NotificationDebugger() {
     };
 
     const testToastDirectly = () => {
-        console.log('🧪 Testing toast directly...');
+        //console.log(('🧪 Testing toast directly...');
         toast(
             <div className="flex items-start space-x-3">
                 <span className="text-lg">🧪</span>
@@ -89,20 +89,20 @@ export default function NotificationDebugger() {
                     </div>
                 </div>
             </div>,
-            {
-                duration: 5000,
-                action: {
-                    label: 'OK',
-                    onClick: () => console.log('Toast action clicked'),
-                },
-                dismissible: true,
-            }
+            // {
+            //     duration: 5000,
+            //     action: {
+            //         label: 'OK',
+            //         onClick: () => //console.log(('Toast action clicked'),
+            //     },
+            //     dismissible: true,
+            // }
         );
-        console.log('✅ Direct toast test completed');
+        //console.log(('✅ Direct toast test completed');
     };
 
     const testNotificationCounts = () => {
-        console.log('🧪 Testing notification count display...');
+        //console.log(('🧪 Testing notification count display...');
 
         // Simulate different notification counts to test the "9+" to dot transition
         const testCounts = [5, 12, 25, 3, 15];
@@ -111,14 +111,14 @@ export default function NotificationDebugger() {
         const simulateCount = () => {
             if (currentIndex < testCounts.length) {
                 const count = testCounts[currentIndex];
-                console.log(`🧪 Simulating notification count: ${count}`);
+                //console.log((`🧪 Simulating notification count: ${count}`);
 
                 // This would need to be integrated with the actual notification state
                 // For now, just log the expected behavior
                 if (count > 9) {
-                    console.log(`🧪 Should show "9+" for ${count} notifications, then change to dot after 1 second`);
+                    //console.log((`🧪 Should show "9+" for ${count} notifications, then change to dot after 1 second`);
                 } else {
-                    console.log(`🧪 Should show "${count}" for ${count} notifications`);
+                    //console.log((`🧪 Should show "${count}" for ${count} notifications`);
                 }
 
                 currentIndex++;

@@ -48,14 +48,14 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   // Update editData when user data changes or when entering edit mode
   React.useEffect(() => {
     // Update the state whenever user data changes, regardless of edit mode
-    console.log('↻ Updating social links edit data (user data changed):', {
-      instagramHandle: user.instagramHandle,
-      twitterHandle: user.twitterHandle,
-      linkedinHandle: user.linkedinHandle,
-      youtubeHandle: user.youtubeHandle,
-      website: user.website,
-      showContact: user.showContact,
-    });
+    // console.log('↻ Updating social links edit data (user data changed):', {
+    //   instagramHandle: user.instagramHandle,
+    //   twitterHandle: user.twitterHandle,
+    //   linkedinHandle: user.linkedinHandle,
+    //   youtubeHandle: user.youtubeHandle,
+    //   website: user.website,
+    //   showContact: user.showContact,
+    // });
     setEditData({
       instagramHandle: user.instagramHandle || '',
       twitterHandle: user.twitterHandle || '',
@@ -75,14 +75,14 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
 
   // Debug user data changes
   React.useEffect(() => {
-    console.log('👤 User social data changed:', {
-      instagramHandle: user.instagramHandle,
-      twitterHandle: user.twitterHandle,
-      linkedinHandle: user.linkedinHandle,
-      youtubeHandle: user.youtubeHandle,
-      website: user.website,
-      showContact: user.showContact,
-    });
+    // console.log('👤 User social data changed:', {
+    //   instagramHandle: user.instagramHandle,
+    //   twitterHandle: user.twitterHandle,
+    //   linkedinHandle: user.linkedinHandle,
+    //   youtubeHandle: user.youtubeHandle,
+    //   website: user.website,
+    //   showContact: user.showContact,
+    // });
   }, [
     user.instagramHandle,
     user.twitterHandle,
@@ -93,44 +93,44 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   ]);
 
   // Debug toggle state
-  React.useEffect(() => {
-    console.log(
-      '🎨 Toggle state changed - showContact:',
-      showContact,
-      'translate-x-5:',
-      showContact ? 'translate-x-5' : 'translate-x-0'
-    );
-  }, [showContact]);
+  // React.useEffect(() => {
+  //   // console.log(
+  //   //   '🎨 Toggle state changed - showContact:',
+  //   //   showContact,
+  //   //   'translate-x-5:',
+  //   //   showContact ? 'translate-x-5' : 'translate-x-0'
+  //   // );
+  // }, [showContact]);
 
   const handleToggleContact = async () => {
     if (!isOwner) return;
 
-    console.log(
-      '↻ Toggling contact privacy from:',
-      showContact,
-      'to:',
-      !showContact
-    );
-    console.log('🎯 Current showContact value:', showContact);
+    // console.log(
+    //   '↻ Toggling contact privacy from:',
+    //   showContact,
+    //   'to:',
+    //   !showContact
+    // );
+    // console.log('🎯 Current showContact value:', showContact);
 
     // Optimistically update the UI immediately
     const newShowContact = !showContact;
     setShowContact(newShowContact);
 
-    console.log('✅ Updated showContact to:', newShowContact);
+    // console.log('✅ Updated showContact to:', newShowContact);
 
     try {
       setTogglingContact(true);
       const response = await apiClient.patch('/api/user/toggle-contact');
 
-      console.log('📡 API Response:', response);
+      // console.log('📡 API Response:', response);
 
       if (response.success) {
         const responseData = response.data as { showContact: boolean };
-        console.log(
-          '✅ Contact visibility toggled to:',
-          responseData.showContact
-        );
+        // console.log(
+        //   '✅ Contact visibility toggled to:',
+        //   responseData.showContact
+        // );
 
         // Update local state with server response
         setShowContact(responseData.showContact);
@@ -140,12 +140,12 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
           onUserUpdate({ showContact: responseData.showContact });
         }
       } else {
-        console.error('❌ Failed to toggle contact visibility:', response);
+        // console.error('❌ Failed to toggle contact visibility:', response);
         // Revert the visual state if API failed
         setShowContact(user.showContact ?? true);
       }
     } catch (error) {
-      console.error('❌ Error toggling contact visibility:', error);
+      // console.error('❌ Error toggling contact visibility:', error);
       // Revert the visual state if API failed
       setShowContact(user.showContact ?? true);
     } finally {
@@ -154,10 +154,10 @@ const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
   };
 
   const handleSave = async () => {
-    console.log('💾 Saving social links data:', editData);
+    // console.log('💾 Saving social links data:', editData);
     try {
       await onSave(editData);
-      console.log('✅ Social links saved successfully');
+      // console.log('✅ Social links saved successfully');
     } catch (error) {
       console.error('❌ Failed to save social links:', error);
     }

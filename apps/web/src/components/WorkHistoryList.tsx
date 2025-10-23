@@ -21,7 +21,7 @@ export const WorkHistoryList: React.FC<WorkHistoryListProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
-  console.log('Work History:', workHistory);
+  //console.log(('Work History:', workHistory);
   const filteredWorkHistory = workHistory.filter((item) => {
     // Only filter by status if the item has a status field
     if (

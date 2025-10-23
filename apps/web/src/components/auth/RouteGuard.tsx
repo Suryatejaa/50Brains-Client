@@ -20,7 +20,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   useEffect(() => {
     // Don't redirect during initial loading to prevent flashing
     if (isLoading) {
-      console.log('↻ RouteGuard: Still loading, skipping route check');
+      //console.log(('↻ RouteGuard: Still loading, skipping route check');
       return;
     }
 
@@ -33,9 +33,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         isLoading,
         'RouteGuard'
       );
-      console.log(
-        '🚨 RouteGuard: Emergency mode active, blocking all redirects'
-      );
+      //console.log((
+      //   '🚨 RouteGuard: Emergency mode active, blocking all redirects'
+      // );
       return;
     }
 
@@ -43,24 +43,24 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     if (lastAuthState.current !== isAuthenticated) {
       lastAuthState.current = isAuthenticated;
       authStateStableTimestamp.current = Date.now();
-      console.log(
-        `🔄 Auth state changed to: ${isAuthenticated}, waiting for stability...`
-      );
+      //console.log((
+      //   `🔄 Auth state changed to: ${isAuthenticated}, waiting for stability...`
+      // );
       return;
     }
 
     // Wait for auth state to be stable for at least 500ms before making decisions
     const timeSinceChange = Date.now() - authStateStableTimestamp.current;
     if (timeSinceChange < 500) {
-      console.log(
-        `⏳ Auth state not stable yet (${timeSinceChange}ms), waiting...`
-      );
+      //console.log((
+      //   `⏳ Auth state not stable yet (${timeSinceChange}ms), waiting...`
+      // );
       return;
     }
 
     // Prevent multiple simultaneous redirects
     if (redirectInProgress.current) {
-      console.log('↻ RouteGuard: Redirect already in progress, skipping');
+      //console.log(('↻ RouteGuard: Redirect already in progress, skipping');
       return;
     }
 
@@ -79,9 +79,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         'RouteGuard'
       );
 
-      console.log(
-        `🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`
-      );
+      //console.log((
+      //   `🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`
+      // );
 
       // Define auth pages that authenticated users shouldn't access
       const authPages = ['/login', '/register', '/forgot-password'];
@@ -127,17 +127,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         protectedPages.some((page) => pathname.startsWith(page)) ||
         protectedPatterns.some((pattern) => pattern.test(pathname));
 
-      console.log(
-        `🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`
-      );
+      //console.log((
+      //   `🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`
+      // );
 
       // If user is authenticated and trying to access auth pages, redirect to dashboard
       if (isAuthenticated && isAuthPage) {
         // Special case: if user is already on dashboard, don't redirect
         if (pathname === '/dashboard') {
-          console.log(
-            '✅ [RouteGuard] User authenticated and on dashboard, allowing access'
-          );
+          //console.log((
+          //   '✅ [RouteGuard] User authenticated and on dashboard, allowing access'
+          // );
           return;
         }
 
@@ -148,9 +148,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
           isLoading,
           'RouteGuard'
         );
-        console.log(
-          `🔒 [RouteGuard] Authenticated user (${isAuthenticated}) accessing auth page (${pathname}), redirecting to dashboard`
-        );
+        //console.log((
+        //   `🔒 [RouteGuard] Authenticated user (${isAuthenticated}) accessing auth page (${pathname}), redirecting to dashboard`
+        // );
 
         // Check for loops before redirecting (only if we should check)
         if (shouldCheckLoop && RouteDebugger.detectLoop()) {
@@ -161,7 +161,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         }
 
         redirectInProgress.current = true;
-        console.log('🚀 [RouteGuard] Starting redirect to /dashboard');
+        //console.log(('🚀 [RouteGuard] Starting redirect to /dashboard');
 
         // Use router.replace instead of window.location for smoother experience
         router.replace('/dashboard');
@@ -180,9 +180,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
         // Special case: if accessing dashboard without auth, redirect to home page for better UX
         if (pathname === '/dashboard') {
-          console.log(
-            `🏠 [RouteGuard] Unauthenticated user accessing dashboard (${pathname}), redirecting to home page`
-          );
+          //console.log((
+          //   `🏠 [RouteGuard] Unauthenticated user accessing dashboard (${pathname}), redirecting to home page`
+          // );
 
           // Check for loops before redirecting (only if we should check)
           if (shouldCheckLoop && RouteDebugger.detectLoop()) {
@@ -193,7 +193,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
           }
 
           redirectInProgress.current = true;
-          console.log('🚀 [RouteGuard] Starting redirect to /');
+          //console.log(('🚀 [RouteGuard] Starting redirect to /');
 
           // Redirect to home page instead of login for better new user experience
           router.replace('/');
@@ -201,9 +201,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         }
 
         // For other protected pages, redirect to login
-        console.log(
-          `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
-        );
+        //console.log((
+        //   `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
+        // );
 
         // Check for loops before redirecting (only if we should check)
         if (shouldCheckLoop && RouteDebugger.detectLoop()) {
@@ -218,13 +218,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
           localStorage.setItem('authRedirectUrl', pathname);
         }
         redirectInProgress.current = true;
-        console.log('🚀 [RouteGuard] Starting redirect to /login');
+        //console.log(('🚀 [RouteGuard] Starting redirect to /login');
 
         // Use router.replace instead of window.location for smoother experience
         router.replace('/login');
         return;
       }
-      console.log(`✅ [RouteGuard] Route access allowed for ${pathname}`);
+      //console.log((`✅ [RouteGuard] Route access allowed for ${pathname}`);
     }, 200); // Increased delay for more stability
 
     return () => clearTimeout(timeoutId);

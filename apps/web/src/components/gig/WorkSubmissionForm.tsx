@@ -29,11 +29,11 @@ export default function WorkSubmissionForm({
 }: WorkSubmissionFormProps) {
   // Debug logging for gigId prop
   useEffect(() => {
-    console.log('🔍 === WORK SUBMISSION FORM DEBUG ===');
-    console.log('🆔 Received gigId prop:', gigId);
-    console.log('📝 Received gigTitle prop:', gigTitle);
-    console.log('🔗 Current URL:', window.location.href);
-    console.log('================================');
+    //console.log(('🔍 === WORK SUBMISSION FORM DEBUG ===');
+    //console.log(('🆔 Received gigId prop:', gigId);
+    //console.log(('📝 Received gigTitle prop:', gigTitle);
+    //console.log(('🔗 Current URL:', window.location.href);
+    //console.log(('================================');
   }, [gigId, gigTitle]);
 
   const [currentStep, setCurrentStep] = useState<FormStep>('basic-info');
@@ -91,9 +91,9 @@ export default function WorkSubmissionForm({
             parsed.formData.qualityChecks ||
             parsed.formData.estimatedHours)
         ) {
-          console.log(
-            '🔄 Detected old form data, clearing for new simplified structure'
-          );
+          //console.log((
+          //   '🔄 Detected old form data, clearing for new simplified structure'
+          // );
           localStorage.removeItem(`${FORM_STORAGE_KEY}_${gigId}`);
           return; // Don't restore old data
         }
@@ -114,9 +114,9 @@ export default function WorkSubmissionForm({
           setFormData(cleanFormData);
           setEnhancedDeliverables(parsed.enhancedDeliverables);
           setCurrentStep(parsed.currentStep);
-          console.log(
-            '📝 WorkSubmissionForm: Restored saved form data (cleaned)'
-          );
+          //console.log((
+          //   '📝 WorkSubmissionForm: Restored saved form data (cleaned)'
+          // );
         }
       }
     } catch (error) {
@@ -203,7 +203,7 @@ export default function WorkSubmissionForm({
       setCurrentStep('basic-info');
 
       toast.success('All old form data cleared!');
-      console.log('🧹 Cleared all old form data');
+      //console.log(('🧹 Cleared all old form data');
     } catch (error) {
       console.warn('Failed to clear old form data:', error);
       toast.error('Failed to clear old data');
@@ -212,7 +212,7 @@ export default function WorkSubmissionForm({
 
   // Test submission function for debugging
   const testSubmission = async () => {
-    console.log('🧪 === TESTING SUBMISSION ===');
+    //console.log(('🧪 === TESTING SUBMISSION ===');
 
     const testData = {
       gigId,
@@ -222,7 +222,7 @@ export default function WorkSubmissionForm({
       notes: 'Test notes',
     };
 
-    console.log('📤 Test data being sent:', testData);
+    //console.log(('📤 Test data being sent:', testData);
 
     try {
       // Convert testData.deliverables to match EnhancedDeliverable[]
@@ -242,7 +242,7 @@ export default function WorkSubmissionForm({
         gigId,
         enhancedTestData as CreateSubmissionData
       );
-      console.log('✅ Test submission successful:', result);
+      //console.log(('✅ Test submission successful:', result);
       toast.success('Test submission successful!');
     } catch (error) {
       console.error('❌ Test submission failed:', error);
@@ -415,20 +415,20 @@ export default function WorkSubmissionForm({
       });
 
       // Comprehensive logging for debugging
-      console.log('🚀 === WORK SUBMISSION DEBUG ===');
-      console.log('📝 Original Form Data:', formData);
-      console.log('📦 Enhanced Deliverables (ORIGINAL):', enhancedDeliverables);
-      console.log('🧹 Cleaned Deliverables:', cleanEnhancedDeliverables);
-      console.log('✨ Final Deliverables (CLEANED):', finalDeliverables);
-      console.log('📤 Final Submission Data:', submissionData);
-      console.log(
-        '🔍 Deliverables being sent to API:',
-        submissionData.deliverables
-      );
-      console.log('🌐 API Endpoint:', `/api/gig/${gigId}/submit`);
-      console.log('🆔 Gig ID:', gigId);
-      console.log('📅 Timestamp:', new Date().toISOString());
-      console.log('================================');
+      //console.log(('🚀 === WORK SUBMISSION DEBUG ===');
+      //console.log(('📝 Original Form Data:', formData);
+      //console.log(('📦 Enhanced Deliverables (ORIGINAL):', enhancedDeliverables);
+      //console.log(('🧹 Cleaned Deliverables:', cleanEnhancedDeliverables);
+      //console.log(('✨ Final Deliverables (CLEANED):', finalDeliverables);
+      //console.log(('📤 Final Submission Data:', submissionData);
+      //console.log((
+      //   '🔍 Deliverables being sent to API:',
+      //   submissionData.deliverables
+      // );
+      //console.log(('🌐 API Endpoint:', `/api/gig/${gigId}/submit`);
+      //console.log(('🆔 Gig ID:', gigId);
+      //console.log(('📅 Timestamp:', new Date().toISOString());
+      //console.log(('================================');
 
       // Double-check: ensure we're not sending empty fields
       const apiPayload = {
@@ -436,7 +436,7 @@ export default function WorkSubmissionForm({
         deliverables: finalDeliverables, // Explicitly use cleaned deliverables
       };
 
-      console.log('🎯 FINAL API PAYLOAD:', apiPayload);
+      //console.log(('🎯 FINAL API PAYLOAD:', apiPayload);
 
       await GigAPI.createSubmission(gigId, apiPayload);
 
@@ -1006,12 +1006,12 @@ export default function WorkSubmissionForm({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        console.log('🔍 === DEBUG: CURRENT FORM STATE ===');
-                                        console.log('📝 Form Data:', formData);
-                                        console.log('📦 Enhanced Deliverables:', enhancedDeliverables);
-                                        console.log('📍 Current Step:', currentStep);
-                                        console.log('🆔 Gig ID:', gigId);
-                                        console.log('================================');
+                                        //console.log(('🔍 === DEBUG: CURRENT FORM STATE ===');
+                                        //console.log(('📝 Form Data:', formData);
+                                        //console.log(('📦 Enhanced Deliverables:', enhancedDeliverables);
+                                        //console.log(('📍 Current Step:', currentStep);
+                                        //console.log(('🆔 Gig ID:', gigId);
+                                        //console.log(('================================');
                                     }}
                                     className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 transition-colors"
                                 >

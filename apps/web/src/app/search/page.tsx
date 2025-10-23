@@ -133,7 +133,7 @@ export default function SearchPage() {
 
       const endpoint = endpointMap[filters.type] || endpointMap['users'];
       const response = await apiClient.get(`${endpoint}?${params}`);
-      console.log(response);
+      //console.log((response);
       if (response.success) {
         setResults(((response.data as any)?.results as SearchResult[]) || []);
       } else {

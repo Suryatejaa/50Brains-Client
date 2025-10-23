@@ -20,7 +20,7 @@ export default function ProfilePage() {
       try {
         setLoading(true);
         const response = await getPublicProfiles([userId]);
-        console.log(response);
+        //console.log((response);
         if (response.success && 'data' in response && Array.isArray(response.data) && response.data.length > 0) {
           setProfile(response.data[0]);
         } else {

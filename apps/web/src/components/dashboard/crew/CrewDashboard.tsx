@@ -61,8 +61,8 @@ export const CrewDashboard: React.FC = () => {
 
   const { workSummary, skills, reputation } = useWorkHistory(user?.id);
 
-  console.log('Work Summary:', workSummary);
-  console.log('Business Metrics:', data?.businessMetrics);
+  //console.log(('Work Summary:', workSummary);
+  //console.log(('Business Metrics:', data?.businessMetrics);
 
   const [applications, setApplications] = React.useState<Application[]>([]);
   const [stats, setStats] = React.useState({
@@ -84,13 +84,13 @@ export const CrewDashboard: React.FC = () => {
       setIsLoading(true);
       const response = await apiClient.get('/api/my/applications');
 
-      console.log(response);
+      //console.log((response);
       if (response.success && response.data) {
         const { applications = [] } = response.data as {
           applications: Application[];
         };
         setApplications(applications);
-        console.log(applications);
+        //console.log((applications);
         // Calculate stats
         setStats({
           total: applications.length,

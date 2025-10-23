@@ -82,13 +82,13 @@ export default function MyApplicationsPage() {
       setIsLoading(true);
       const response = await apiClient.get('/api/my/applications');
 
-      console.log(response);
+      //console.log((response);
       if (response.success && response.data) {
         const { applications = [] } = response.data as {
           applications: Application[];
         };
         setApplications(applications);
-        console.log(applications);
+        //console.log((applications);
         // Calculate stats
         setStats({
           total: applications.length,
