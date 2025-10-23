@@ -176,7 +176,7 @@ export const BrandDashboard: React.FC = () => {
                 .slice(0, 2) // Only show latest 3 gigs
             : [],
       };
-      console.log('Dashboard Data:', data.applications);
+      console.log('Dashboard Data:', data);
       setDashboardData(data);
     } catch (error) {
       console.error('Failed to load brand dashboard data:', error);
@@ -309,125 +309,146 @@ export const BrandDashboard: React.FC = () => {
           {/* Profile Completion Widget */}
           <div className="mb-1 sm:mb-1 md:mb-1 lg:col-span-1">
             <div className="card-glass p-3 ">
-              <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
-                <Building2Icon className="h-6 w-6" /> Company Overview
-              </h3>
-
               {loading ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 w-3/4 rounded bg-gray-300"></div>
-                  <div className="h-3 w-1/2 rounded bg-gray-300"></div>
-                  <div className="h-3 w-2/3 rounded bg-gray-300"></div>
-                </div>
-              ) : dashboardData.profile ? (
-                <div className="space-y-3">
-                  <div>
-                    <div className="text-heading font-semibold">
-                      {dashboardData.profile.companyName ||
-                        `${dashboardData.profile.firstName} ${dashboardData.profile.lastName}`}
-                    </div>
-                    <div className="text-muted text-sm">
-                      {dashboardData.profile.industry ||
-                        'Industry not specified'}
-                    </div>
+                <>
+                  <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+                    <Building2Icon className="h-6 w-6" /> Company Overview
+                  </h3>
+                  <div className="animate-pulse space-y-3">
+                    <div className="h-4 w-3/4 rounded bg-gray-300"></div>
+                    <div className="h-3 w-1/2 rounded bg-gray-300"></div>
+                    <div className="h-3 w-2/3 rounded bg-gray-300"></div>
                   </div>
+                </>
+              ) : dashboardData.profile &&
+                (dashboardData.profile.companyName ||
+                  (dashboardData.profile.firstName &&
+                    dashboardData.profile.lastName) ||
+                  dashboardData.profile.industry ||
+                  dashboardData.profile.bio ||
+                  dashboardData.profile.location) ? (
+                <>
+                  <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+                    <Building2Icon className="h-6 w-6" /> Company Overview
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-heading font-semibold">
+                        {dashboardData.profile.companyName ||
+                          `${dashboardData.profile.firstName || ''} ${dashboardData.profile.lastName || ''}`.trim() ||
+                          'Company Name'}
+                      </div>
+                      <div className="text-muted text-sm">
+                        {dashboardData.profile.industry ||
+                          'Industry not specified'}
+                      </div>
+                    </div>
 
-                  {dashboardData.profile.bio && (
-                    <p className="text-body text-sm">
-                      {dashboardData.profile.bio}
-                    </p>
-                  )}
+                    {dashboardData.profile.bio && (
+                      <p className="text-body text-sm">
+                        {dashboardData.profile.bio}
+                      </p>
+                    )}
 
-                  <div className="flex items-center space-x-4 text-sm">
-                    <span className="flex items-center space-x-1">
-                      <span>
-                        <MapPinIcon className="h-6 w-6" />
-                      </span>
-                      <span>
-                        {dashboardData.profile.location ||
-                          'Location not specified'}
-                      </span>
-                    </span>
-                    {dashboardData.profile.website && (
+                    <div className="flex items-center space-x-4 text-sm">
                       <span className="flex items-center space-x-1">
                         <span>
-                          <GlobeIcon className="h-6 w-6" />
+                          <MapPinIcon className="h-6 w-6" />
                         </span>
-                        <a
-                          href={dashboardData.profile.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          Website
-                        </a>
+                        <span>
+                          {dashboardData.profile.location ||
+                            'Location not specified'}
+                        </span>
                       </span>
-                    )}
-                  </div>
+                      {dashboardData.profile.companyWebsite && (
+                        <span className="flex items-center space-x-1">
+                          <span>
+                            <GlobeIcon className="h-6 w-6" />
+                          </span>
+                          <a
+                            href={dashboardData.profile.companyWebsite}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Website
+                          </a>
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="flex items-center space-x-4 text-sm">
-                    <span
-                      className={`flex items-center space-x-1 ${
-                        dashboardData.profile.status === 'ACTIVE'
-                          ? 'text-green-600'
-                          : 'text-gray-500'
-                      }`}
-                    >
-                      <span>
-                        {dashboardData.profile.status === 'ACTIVE' ? (
-                          <CheckCircleIcon className="h-6 w-6" />
-                        ) : (
-                          <AlertCircleIcon className="h-6 w-6" />
-                        )}
-                      </span>
-                      <span>
-                        {dashboardData.profile.status === 'ACTIVE'
-                          ? 'Active'
-                          : 'Inactive'}
-                      </span>
-                    </span>
-                    {dashboardData.profile.emailVerified && (
-                      <span className="flex items-center space-x-1 text-blue-600">
+                    <div className="flex items-center space-x-4 text-sm">
+                      <span className="flex items-center space-x-1 text-green-600">
                         <span>
                           <CheckCircleIcon className="h-6 w-6" />
                         </span>
-                        <span>Email Verified</span>
+                        <span>Active</span>
                       </span>
+                      {dashboardData.profile.emailVerified && (
+                        <span className="flex items-center space-x-1 text-blue-600">
+                          <span>
+                            <CheckCircleIcon className="h-6 w-6" />
+                          </span>
+                          <span>Email Verified</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {dashboardData.profile.analytics && (
+                      <div className="mt-4 rounded-none bg-gray-50 p-3">
+                        <div className="text-sm font-medium text-gray-700">
+                          Profile Completion
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <div className="h-2 flex-1 rounded-none bg-gray-200">
+                            <div
+                              className="h-2 rounded-none bg-blue-500"
+                              style={{
+                                width: `${dashboardData.profile.analytics.completionPercentage}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="ml-2 text-sm text-gray-600">
+                            {
+                              dashboardData.profile.analytics
+                                .completionPercentage
+                            }
+                            %
+                          </span>
+                        </div>
+                      </div>
                     )}
                   </div>
-
-                  {dashboardData.profile.analytics && (
-                    <div className="mt-4 rounded-none bg-gray-50 p-3">
-                      <div className="text-sm font-medium text-gray-700">
-                        Profile Completion
-                      </div>
-                      <div className="mt-1 flex items-center">
-                        <div className="h-2 flex-1 rounded-none bg-gray-200">
-                          <div
-                            className="h-2 rounded-none bg-blue-500"
-                            style={{
-                              width: `${dashboardData.profile.analytics.completionPercentage}%`,
-                            }}
-                          />
-                        </div>
-                        <span className="ml-2 text-sm text-gray-600">
-                          {dashboardData.profile.analytics.completionPercentage}
-                          %
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                </>
               ) : (
-                <div className="text-muted text-center">
-                  <p>Profile information not available</p>
-                  <button
-                    onClick={() => (window.location.href = '/profile/edit')}
-                    className="btn-primary mt-2"
-                  >
-                    Complete Profile
-                  </button>
-                </div>
+                <>
+                  <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+                    <Building2Icon className="h-6 w-6" /> Complete Your Profile
+                  </h3>
+                  <div className="py-6 text-center">
+                    <div className="mb-4">
+                      <Building2Icon className="mx-auto h-12 w-12 text-gray-400" />
+                    </div>
+                    <h4 className="text-heading mb-2 font-medium">
+                      Profile Setup Required
+                    </h4>
+                    <p className="text-muted mb-4 text-sm">
+                      Complete your brand profile to attract top creators and
+                      showcase your company effectively.
+                    </p>
+                    <button
+                      onClick={() => (window.location.href = '/profile')}
+                      className="btn-primary w-full"
+                    >
+                      Complete Profile
+                    </button>
+                    <div className="mt-3">
+                      <p className="text-xs text-gray-500">
+                        Add company name, industry, location & more
+                      </p>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -729,54 +750,81 @@ export const BrandDashboard: React.FC = () => {
             )}
           </div>
 
-          <div className="card-glass p-2">
-            <h3 className="text-heading mb-3 flex items-center gap-2 text-lg font-semibold">
-              <DollarSignIcon className="h-6 w-6" /> Wallet Management
-            </h3>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-body">Available Credits</span>
-                <span className="text-heading font-semibold text-green-600">
-                  ₹{dashboardData.wallet?.balance || 0}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-body">Total Purchased</span>
-                <span className="text-heading font-semibold text-blue-600">
-                  ₹{dashboardData.wallet?.totalPurchased || 0}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-body">Total Spent</span>
-                <span className="text-heading font-semibold">
-                  ₹{dashboardData.wallet?.totalSpent || 0}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-body">Currency</span>
-                <span className="text-heading text-sm font-medium">
-                  {dashboardData.wallet?.currency || 'INR'}
-                </span>
-              </div>
-
-              <div className="pt-4">
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => (window.location.href = '/credits/purchase')}
-                    className="btn-primary flex-1"
+          <div className="card-glass relative p-3 md:p-4">
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+              <div className="text-center">
+                <div className="mb-2 flex justify-center">
+                  <svg
+                    className="h-8 w-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    Add Credits
-                  </button>
-                  <button
-                    onClick={() => (window.location.href = '/credits/history')}
-                    className="btn-secondary flex-1"
-                  >
-                    View History
-                  </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-sm font-medium text-gray-600">Coming Soon</p>
+                <p className="mt-1 text-xs text-gray-500">Wallet Management</p>
+              </div>
+            </div>
+            <div className="card-glass p-2">
+              <h3 className="text-heading mb-3 flex items-center gap-2 text-lg font-semibold">
+                <DollarSignIcon className="h-6 w-6" /> Wallet Management
+              </h3>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-body">Available Credits</span>
+                  <span className="text-heading font-semibold text-green-600">
+                    ₹{dashboardData.wallet?.balance || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-body">Total Purchased</span>
+                  <span className="text-heading font-semibold text-blue-600">
+                    ₹{dashboardData.wallet?.totalPurchased || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-body">Total Spent</span>
+                  <span className="text-heading font-semibold">
+                    ₹{dashboardData.wallet?.totalSpent || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-body">Currency</span>
+                  <span className="text-heading text-sm font-medium">
+                    {dashboardData.wallet?.currency || 'INR'}
+                  </span>
+                </div>
+
+                <div className="pt-4">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() =>
+                        (window.location.href = '/credits/purchase')
+                      }
+                      className="btn-primary flex-1"
+                    >
+                      Add Credits
+                    </button>
+                    <button
+                      onClick={() =>
+                        (window.location.href = '/credits/history')
+                      }
+                      className="btn-secondary flex-1"
+                    >
+                      View History
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -65,7 +65,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="profile-header">
       {/* Cover Image */}
-      <div className="profile-header__cover">
+      <div className="profile-header__cover hidden">
         {isEditing ? (
           <div className="h-full">
             <ImageUpload
@@ -95,7 +95,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <div className="profile-header__content">
         <div className="profile-header__main flex flex-col gap-2 lg:flex-row">
           {/* Profile Picture */}
-          <div className="profile-header__avatar flex-shrink-0 lg:order-1">
+          {/* <div className="profile-header__avatar hidden flex-shrink-0 lg:order-1">
             {isEditing ? (
               <ImageUpload
                 currentImage={editData.profilePicture}
@@ -109,10 +109,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 }}
                 label="Profile Picture"
                 aspectRatio="square"
-                className="w-full max-w-xs"
+                className="w-full max-w-xs hidden"
               />
             ) : (
-              <div className="profile-header__avatar">
+              <div className="profile-header__avatar hidden">
                 <img
                   src={user.profilePicture || '/default-avatar.jpg'}
                   alt={`${user.firstName}`}
@@ -120,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 />
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Basic Info */}
           <div className="profile-header__info flex-1 lg:order-2">
