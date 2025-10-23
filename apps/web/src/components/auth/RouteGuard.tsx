@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { RouteDebugger } from '@/utils/route-debug';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -27,80 +28,118 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
-    console.log(`🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`);
-
-    // Define auth pages that authenticated users shouldn't access
-    const authPages = ['/login', '/register', '/forgot-password'];
-
-    // Define protected pages that require authentication
-    const protectedPages = [
-      '/dashboard',
-      '/profile',
-      '/credits',
-      '/create-gig',
-      '/my-applications',
-      '/my-bids',
-      '/equipment',
-      '/campaigns',
-      '/social-media',
-      '/notifications',
-      '/settings',
-      '/my-gigs',
-      '/applications',
-      '/brand',
-      '/crew',
-      '/influencer',
-      '/clan',
-      // Note: '/marketplace', '/clans', '/gigs' are public for browsing
-    ];
-
-    // Define protected route patterns (for dynamic routes)
-    const protectedPatterns = [
-      /^\/gig\/[^\/]+\/applications$/, // /gig/[id]/applications
-      /^\/gig\/[^\/]+\/submissions$/, // /gig/[id]/submissions
-      /^\/user\/[^\/]+\/edit$/, // /user/[id]/edit
-      /^\/brand\/[^\/]+\/edit$/, // /brand/[id]/edit
-      /^\/clan\/[^\/]+\/manage$/, // /clan/[id]/manage
-    ];
-
-    // Check if current path is an auth page (exact matches)
-    const isAuthPage = authPages.includes(pathname) ||
-      authPages.some(page => pathname.startsWith(page + '/'));
-
-    // Check if current path is a protected page
-    const isProtectedPage = protectedPages.some((page) =>
-      pathname.startsWith(page)
-    ) || protectedPatterns.some((pattern) => pattern.test(pathname));
-
-    console.log(`🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`);
-
-    // If user is authenticated and trying to access auth pages, redirect to dashboard
-    if (isAuthenticated && isAuthPage) {
-      console.log(
-        `🔒 [RouteGuard] Authenticated user (${isAuthenticated}) accessing auth page (${pathname}), redirecting to dashboard`
+    // Add a small delay to prevent race conditions during auth state changes
+    const timeoutId = setTimeout(() => {
+      RouteDebugger.log(
+        'RouteCheck',
+        pathname,
+        isAuthenticated,
+        isLoading,
+        'RouteGuard'
       );
-      redirectInProgress.current = true;
-      console.log('🚀 [RouteGuard] Starting redirect to /dashboard');
-      router.push('/dashboard');
-      return;
-    }
 
-    // If user is not authenticated and trying to access protected pages, redirect to login
-    if (!isAuthenticated && isProtectedPage) {
-      console.log(
-        `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
-      );
-      // Save the current path to redirect back after login
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authRedirectUrl', pathname);
+      // Check for potential redirect loops
+      if (RouteDebugger.detectLoop()) {
+        console.error('🚨 Redirect loop detected, aborting further redirects');
+        return;
       }
-      redirectInProgress.current = true;
-      console.log('🚀 [RouteGuard] Starting redirect to /login');
-      router.push('/login');
-      return;
-    }
 
-    console.log(`✅ [RouteGuard] Route access allowed for ${pathname}`);
+      console.log(
+        `🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`
+      );
+
+      // Define auth pages that authenticated users shouldn't access
+      const authPages = ['/login', '/register', '/forgot-password'];
+
+      // Define protected pages that require authentication
+      const protectedPages = [
+        '/dashboard',
+        '/profile',
+        '/credits',
+        '/create-gig',
+        '/my-applications',
+        '/my-bids',
+        '/equipment',
+        '/campaigns',
+        '/social-media',
+        '/notifications',
+        '/settings',
+        '/my-gigs',
+        '/applications',
+        '/brand',
+        '/crew',
+        '/influencer',
+        '/clan',
+        // Note: '/marketplace', '/clans', '/gigs' are public for browsing
+      ];
+
+      // Define protected route patterns (for dynamic routes)
+      const protectedPatterns = [
+        /^\/gig\/[^\/]+\/applications$/, // /gig/[id]/applications
+        /^\/gig\/[^\/]+\/submissions$/, // /gig/[id]/submissions
+        /^\/user\/[^\/]+\/edit$/, // /user/[id]/edit
+        /^\/brand\/[^\/]+\/edit$/, // /brand/[id]/edit
+        /^\/clan\/[^\/]+\/manage$/, // /clan/[id]/manage
+      ];
+
+      // Check if current path is an auth page (exact matches)
+      const isAuthPage =
+        authPages.includes(pathname) ||
+        authPages.some((page) => pathname.startsWith(page + '/'));
+
+      // Check if current path is a protected page
+      const isProtectedPage =
+        protectedPages.some((page) => pathname.startsWith(page)) ||
+        protectedPatterns.some((pattern) => pattern.test(pathname));
+
+      console.log(
+        `🔍 [RouteGuard] isAuthPage: ${isAuthPage}, isProtectedPage: ${isProtectedPage}`
+      );
+
+      // If user is authenticated and trying to access auth pages, redirect to dashboard
+      if (isAuthenticated && isAuthPage) {
+        RouteDebugger.log(
+          'RedirectToDashboard',
+          pathname,
+          isAuthenticated,
+          isLoading,
+          'RouteGuard'
+        );
+        console.log(
+          `🔒 [RouteGuard] Authenticated user (${isAuthenticated}) accessing auth page (${pathname}), redirecting to dashboard`
+        );
+        redirectInProgress.current = true;
+        console.log('🚀 [RouteGuard] Starting redirect to /dashboard');
+        router.push('/dashboard');
+        return;
+      }
+
+      // If user is not authenticated and trying to access protected pages, redirect to login
+      if (!isAuthenticated && isProtectedPage) {
+        RouteDebugger.log(
+          'RedirectToLogin',
+          pathname,
+          isAuthenticated,
+          isLoading,
+          'RouteGuard'
+        );
+        console.log(
+          `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
+        );
+        // Save the current path to redirect back after login
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authRedirectUrl', pathname);
+        }
+        redirectInProgress.current = true;
+        console.log('🚀 [RouteGuard] Starting redirect to /login');
+        router.push('/login');
+        return;
+      }
+
+      console.log(`✅ [RouteGuard] Route access allowed for ${pathname}`);
+    }, 50); // Small delay to prevent race conditions
+
+    return () => clearTimeout(timeoutId);
   }, [isAuthenticated, isLoading, pathname]); // Removed router from dependencies to prevent unnecessary re-runs
 
   // Reset redirect flag when pathname changes (redirect completes)
@@ -108,7 +147,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     redirectInProgress.current = false;
   }, [pathname]);
 
-  // Show loading screen during authentication check
+  // Conditional rendering without early return to maintain hook order
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">

@@ -71,7 +71,7 @@ class ReputationService {
         `🏆 [ReputationService] Fetching reputation for user: ${userId}`
       );
 
-      const headersList = headers();
+      const headersList = await headers();
       const cookie = headersList.get('cookie');
 
       const response = await fetch(`${this.baseUrl}/api/reputation/${userId}`, {
@@ -155,7 +155,7 @@ class ReputationService {
         `🏆 [ReputationService] Fetching global leaderboard (limit: ${limit})`
       );
 
-      const headersList = headers();
+      const headersList = await headers();
       const cookie = headersList.get('cookie');
 
       const response = await fetch(
@@ -219,7 +219,7 @@ class ReputationService {
         `🏆 [ReputationService] Fetching ${tier} tier leaderboard (limit: ${limit})`
       );
 
-      const headersList = headers();
+      const headersList = await headers();
       const cookie = headersList.get('cookie');
 
       const response = await fetch(

@@ -1,6 +1,8 @@
 // components/dashboard/brand/CreditsManagement.tsx
 'use client';
 
+import { isFeatureEnabled } from '@/utils/feature-flags';
+import CreditFeatureDisabled from '@/components/common/CreditFeatureDisabled';
 import React, { useState, useEffect } from 'react';
 import { brandApiClient, BrandWallet } from '@/lib/brand-api-client';
 import LoadingSpinner from '@/frontend-profile/components/common/LoadingSpinner';
@@ -72,6 +74,11 @@ const BOOST_OPTIONS: BoostOption[] = [
 ];
 
 export const CreditsManagement: React.FC = () => {
+  // Return disabled component if credits are not enabled
+  if (!isFeatureEnabled('CREDITS_ENABLED')) {
+    return <CreditFeatureDisabled feature="Credits Management" />;
+  }
+
   const [wallet, setWallet] = useState<BrandWallet | null>(null);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [loading, setLoading] = useState(true);

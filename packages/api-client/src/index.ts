@@ -121,8 +121,12 @@ export class APIClient {
 
       clearTimeout(timeoutId);
 
-      // Handle 401 Unauthorized - attempt token refresh
-      if (response.status === 401 && endpoint !== '/api/auth/refresh') {
+      // Handle 401 Unauthorized - don't retry for login endpoints, just fail
+      if (
+        response.status === 401 &&
+        endpoint !== '/api/auth/refresh' &&
+        endpoint !== '/api/auth/login'
+      ) {
         console.log('↻ 401 detected, attempting token refresh...');
 
         try {
@@ -142,10 +146,25 @@ export class APIClient {
 
           if (!retryResponse.ok) {
             const retryError: APIErrorResponse = await retryResponse.json();
+            // Extract error message correctly - prioritize message field over error field
+            const retryErrorMessage =
+              retryError.message ||
+              (typeof retryError.error === 'string'
+                ? retryError.error
+                : 'Unknown error');
+            const retryErrorCode =
+              typeof retryError.error === 'object' && retryError.error?.code
+                ? retryError.error.code
+                : typeof retryError.error === 'string'
+                  ? retryError.error
+                  : retryErrorMessage;
+
             throw new APIError(
               retryError.statusCode,
-              retryError.error || retryError.message || 'Unknown error',
-              retryError.error || retryError.message || 'Unknown error',
+              retryErrorCode,
+              retryErrorMessage,
+              false,
+              undefined,
               retryError.details
             );
           }
@@ -182,10 +201,24 @@ export class APIClient {
 
           // For other refresh errors, throw the original 401 error
           const error: APIErrorResponse = await response.json();
+
+          // Extract error message correctly - prioritize message field over error field
+          const errorMessage =
+            error.message ||
+            (typeof error.error === 'string' ? error.error : 'Unknown error');
+          const errorCode =
+            typeof error.error === 'object' && error.error?.code
+              ? error.error.code
+              : typeof error.error === 'string'
+                ? error.error
+                : errorMessage;
+
           throw new APIError(
             error.statusCode,
-            error.error || error.message || 'Unknown error',
-            error.error || error.message || 'Unknown error',
+            errorCode,
+            errorMessage,
+            false,
+            undefined,
             error.details
           );
         }
@@ -194,10 +227,24 @@ export class APIClient {
       if (!response.ok) {
         const error: APIErrorResponse = await response.json();
         console.log('error:', error);
+
+        // Extract error message correctly - prioritize message field over error field
+        const errorMessage =
+          error.message ||
+          (typeof error.error === 'string' ? error.error : 'Unknown error');
+        const errorCode =
+          typeof error.error === 'object' && error.error?.code
+            ? error.error.code
+            : typeof error.error === 'string'
+              ? error.error
+              : errorMessage;
+
         throw new APIError(
           error.statusCode,
-          error.error || error.message || 'Unknown error',
-          error.error || error.message || 'Unknown error',
+          errorCode,
+          errorMessage,
+          false,
+          undefined,
           error.details
         );
       }
@@ -260,6 +307,17 @@ export class APIClient {
       return this.refreshPromise;
     }
 
+    // For production cross-domain scenarios, log cookie debug info
+    if (this.baseURL.includes('railway.app')) {
+      console.log('🍪 Cross-domain refresh attempt to Railway:', {
+        baseURL: this.baseURL,
+        origin:
+          typeof window !== 'undefined' ? window.location.origin : 'server',
+        cookies:
+          typeof document !== 'undefined' ? document.cookie : 'server-side',
+      });
+    }
+
     // Start a new refresh process
     this.refreshPromise = this.performTokenRefresh();
 
@@ -292,7 +350,28 @@ export class APIClient {
           status: refreshResponse.status,
           statusText: refreshResponse.statusText,
           error: refreshError,
+          baseURL: this.baseURL,
+          isRailway: this.baseURL.includes('railway.app'),
         });
+
+        // Special handling for cross-domain cookie issues
+        if (
+          refreshResponse.status === 400 &&
+          this.baseURL.includes('railway.app')
+        ) {
+          console.error(
+            '🚨 Cross-domain cookie issue detected. Railway backend not receiving refresh tokens from localhost frontend.'
+          );
+          console.error(
+            '💡 This happens because cookies cannot be shared between localhost and railway.app domains'
+          );
+          throw new APIError(
+            400,
+            'CROSS_DOMAIN_COOKIE_ERROR',
+            'Cannot refresh tokens due to cross-domain cookie restrictions. Please login again.',
+            false
+          );
+        }
 
         // If refresh token is expired (401), this is a critical auth failure
         if (refreshResponse.status === 401) {

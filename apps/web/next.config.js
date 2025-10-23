@@ -4,11 +4,17 @@ const path = require('path');
 const nextConfig = {
     typedRoutes: true,
     images: {
-        domains: ['api.50brains.com', 'localhost'],
+        domains: [
+            'api.50brains.com',
+            'localhost',
+            'api-gateway-production-c8bc.up.railway.app',
+            'websocket-gateway-production-dbb2.up.railway.app'
+        ],
         formats: ['image/webp', 'image/avif'],
     },
     env: {
         NEXT_PUBLIC_CLIENT_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173',
+        NEXT_PUBLIC_WEBSOCKET_URL: process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:4000',
     },
     webpack: (config) => {
         config.resolve.alias = {

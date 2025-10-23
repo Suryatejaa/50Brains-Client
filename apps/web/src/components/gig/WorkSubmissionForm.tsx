@@ -916,7 +916,7 @@ export default function WorkSubmissionForm({
             </div>
           )}
         </div>
-        <div className="flex justify-between gap-1 pt-4 sm:justify-end">
+        <div className="grid grid-cols-4 itens-end gap-1 pt-4 sm:justify-end">
           <button
             type="button"
             onClick={onCancel}

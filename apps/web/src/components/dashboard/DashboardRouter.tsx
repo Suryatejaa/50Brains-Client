@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
+import { isFeatureEnabled } from '@/utils/feature-flags';
 import { CreatorDashboardClient } from './creator/CreatorDashboardClient';
 import { InfluencerDashboard } from './influencer/InfluencerDashboard';
 import { CrewDashboard } from './crew/CrewDashboard';
@@ -31,10 +32,17 @@ export const DashboardRouter: React.FC = () => {
     );
   }
 
-  // Redirect to login if not authenticated
+  // Let RouteGuard handle authentication redirects
+  // Don't add client-side redirects here to avoid conflicts
   if (!isAuthenticated || !user) {
-    window.location.href = '/login';
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="card-glass p-3 text-center md:p-3">
+          <div className="border-brand-primary mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent md:mb-4 md:h-8 md:w-8"></div>
+          <p className="text-muted text-sm md:text-base">Authenticating...</p>
+        </div>
+      </div>
+    );
   }
 
   const userType = getUserTypeForRole(currentRole);
@@ -126,7 +134,10 @@ export const DashboardRouter: React.FC = () => {
 
     default:
       // Check if user has admin or moderator roles that might want clan management
-      if (hasRole('ADMIN') || hasRole('SUPER_ADMIN') || hasRole('MODERATOR')) {
+      if (
+        isFeatureEnabled('CLANS_ENABLED') &&
+        (hasRole('ADMIN') || hasRole('SUPER_ADMIN') || hasRole('MODERATOR'))
+      ) {
         return (
           <div>
             {showRoleDebugInfo && (
@@ -204,23 +215,26 @@ export const DashboardRouter: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="card-glass p-2 text-center md:p-4">
-                  <span className="mb-1 block text-xl md:mb-2 md:text-2xl">
-                    👥
-                  </span>
-                  <h3 className="mb-1 text-sm font-semibold md:mb-2 md:text-base">
-                    Join Clan
-                  </h3>
-                  <p className="text-muted mb-2 text-xs md:mb-3 md:text-sm">
-                    Connect with like-minded creators
-                  </p>
-                  <button
-                    onClick={() => (window.location.href = '/clans/browse')}
-                    className="btn-primary w-full py-1.5 text-sm md:py-2 md:text-base"
-                  >
-                    Explore Clans
-                  </button>
-                </div>
+                {/* Clan card - disabled for MVP */}
+                {isFeatureEnabled('CLANS_ENABLED') && (
+                  <div className="card-glass p-2 text-center md:p-4">
+                    <span className="mb-1 block text-xl md:mb-2 md:text-2xl">
+                      👥
+                    </span>
+                    <h3 className="mb-1 text-sm font-semibold md:mb-2 md:text-base">
+                      Join Clan
+                    </h3>
+                    <p className="text-muted mb-2 text-xs md:mb-3 md:text-sm">
+                      Connect with like-minded creators
+                    </p>
+                    <button
+                      onClick={() => (window.location.href = '/clans/browse')}
+                      className="btn-primary w-full py-1.5 text-sm md:py-2 md:text-base"
+                    >
+                      Explore Clans
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="space-x-2 md:space-x-4">

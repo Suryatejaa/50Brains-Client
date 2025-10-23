@@ -21,13 +21,15 @@ export interface APISuccessResponse<T> {
 
 export interface APIErrorResponse {
   success?: boolean;
-  error?: string; // Main error message from backend
+  error?:
+    | string
+    | { code?: string; statusCode?: number; isOperational?: boolean }; // Error can be string or object
   errors?: string[]; // Array of validation errors
   message?: string; // Alternative message field
   statusCode: number;
-  timestamp: string;
-  path: string;
-  requestId: string;
+  timestamp?: string;
+  path?: string;
+  requestId?: string;
   details?: any;
 }
 

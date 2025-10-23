@@ -136,6 +136,7 @@ export default function NotificationBell() {
 
     const getActionUrl = (notification: Notification) => {
         // Generate action URLs based on notification type and metadata
+        console.log('Generating action URL for notification:', notification.metadata);
         if (notification.metadata?.gigId) {
             return `/gig/${notification.metadata.gigId}`;
         }

@@ -1,5 +1,6 @@
 // lib/brand-api-client.ts - Brand-specific API client
 import { apiClient } from './api-client';
+import { isFeatureEnabled } from '@/utils/feature-flags';
 
 export interface BrandProfile {
   id: string;
@@ -78,7 +79,7 @@ export interface BrandGig {
   budget: number;
   budgetMin: number;
   budgetMax: number;
-  applications:any[];
+  applications: any[];
   budgetType: 'FIXED' | 'HOURLY';
   category: string;
   subcategory?: string;
@@ -407,6 +408,24 @@ class BrandApiClient {
     data?: BrandWallet;
     error?: string;
   }> {
+    // Early return if credits are disabled
+    if (
+      !isFeatureEnabled('CREDITS_ENABLED') ||
+      !isFeatureEnabled('CREDIT_WALLET')
+    ) {
+      return {
+        success: true,
+        data: {
+          walletId: 'disabled',
+          balance: 0,
+          totalPurchased: 0,
+          totalSpent: 0,
+          currency: 'USD',
+          lastUpdated: new Date().toISOString(),
+        },
+      };
+    }
+
     try {
       const response = await apiClient.get('/api/credit/wallet');
       return response as {
@@ -424,6 +443,17 @@ class BrandApiClient {
     amount: number;
     paymentMethod: string;
   }): Promise<{ success: boolean; data?: any; error?: string }> {
+    // Early return if credits are disabled
+    if (
+      !isFeatureEnabled('CREDITS_ENABLED') ||
+      !isFeatureEnabled('CREDIT_PURCHASE')
+    ) {
+      return {
+        success: false,
+        error: 'Credit purchase is currently disabled for MVP',
+      };
+    }
+
     try {
       const response = await apiClient.post('/api/credit/purchase', data);
       return response;
@@ -435,6 +465,17 @@ class BrandApiClient {
   async boostProfile(
     duration: number
   ): Promise<{ success: boolean; data?: any; error?: string }> {
+    // Early return if profile boost is disabled
+    if (
+      !isFeatureEnabled('CREDITS_ENABLED') ||
+      !isFeatureEnabled('PROFILE_BOOST')
+    ) {
+      return {
+        success: false,
+        error: 'Profile boost is currently disabled for MVP',
+      };
+    }
+
     try {
       const response = await apiClient.post('/api/credit/boost/profile', {
         duration,
@@ -449,6 +490,17 @@ class BrandApiClient {
     gigId: string,
     duration: number
   ): Promise<{ success: boolean; data?: any; error?: string }> {
+    // Early return if gig boost is disabled
+    if (
+      !isFeatureEnabled('CREDITS_ENABLED') ||
+      !isFeatureEnabled('GIG_BOOST')
+    ) {
+      return {
+        success: false,
+        error: 'Gig boost is currently disabled for MVP',
+      };
+    }
+
     try {
       const response = await apiClient.post('/api/credit/boost/gig', {
         gigId,
@@ -474,6 +526,16 @@ class BrandApiClient {
     };
     error?: string;
   }> {
+    // Early return if credits are disabled
+    if (!isFeatureEnabled('CREDITS_ENABLED')) {
+      return {
+        success: true,
+        data: {
+          transactions: [],
+        },
+      };
+    }
+
     try {
       const response = await apiClient.get('/api/credit/history');
       return response as {
@@ -499,6 +561,14 @@ class BrandApiClient {
     boostType: string;
     cost: number;
   }): Promise<{ success: boolean; data?: any; error?: string }> {
+    // Early return if credits are disabled
+    if (!isFeatureEnabled('CREDITS_ENABLED')) {
+      return {
+        success: false,
+        error: 'Boost features are currently disabled for MVP',
+      };
+    }
+
     try {
       const response = await apiClient.post('/api/credit/boost', data);
       return response;

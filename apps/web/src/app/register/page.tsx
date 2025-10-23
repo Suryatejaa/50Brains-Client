@@ -586,7 +586,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="btn-ghost px-1 py-1"
+                  className="btn-ghost border border-gray-300 px-1 py-1"
                   disabled={isLoading}
                 >
                   Previous

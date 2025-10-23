@@ -1,6 +1,14 @@
 'use client';
 
+import { isFeatureEnabled } from '@/utils/feature-flags';
+import CreditFeatureDisabled from '@/components/common/CreditFeatureDisabled';
+
 export default function CreditsPage() {
+  // Return disabled component if credits are not enabled
+  if (!isFeatureEnabled('CREDITS_ENABLED')) {
+    return <CreditFeatureDisabled feature="Credits & Boosts" />;
+  }
+
   return (
     <div className="page-container pb-bottom-nav-safe min-h-screen pt-16">
       <div className="content-container py-8">

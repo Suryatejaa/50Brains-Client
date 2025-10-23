@@ -9,7 +9,13 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:prod": "turbo run build:prod",
     "dev": "turbo run dev",
+    "dev:local": "turbo run dev:local",
+    "start": "turbo run start",
+    "start:prod": "turbo run start:prod",
+    "preview": "turbo run preview",
+    "preview:prod": "turbo run preview:prod",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "test": "turbo run test",

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
+import { isFeatureEnabled } from '@/utils/feature-flags';
 
 type UserRole =
   | 'USER'
@@ -92,8 +93,10 @@ export const DynamicNavigation: React.FC = () => {
       );
     }
 
-    // Clan-related navigation (available to all users)
-    baseItems.push({ path: '/clans', label: 'Clans', icon: '👥' });
+    // Clan-related navigation (available to all users) - disabled for MVP
+    if (isFeatureEnabled('CLANS_ENABLED')) {
+      baseItems.push({ path: '/clans', label: 'Clans', icon: '👥' });
+    }
 
     // Admin navigation
     if (userType === 'admin') {
@@ -119,8 +122,10 @@ export const DynamicNavigation: React.FC = () => {
       );
     }
 
-    // Credits (available to all)
-    baseItems.push({ path: '/credits', label: 'Credits', icon: '💰' });
+    // Credits (available to all) - disabled for MVP
+    if (isFeatureEnabled('CREDITS_ENABLED')) {
+      baseItems.push({ path: '/credits', label: 'Credits', icon: '💰' });
+    }
 
     return baseItems;
   };
