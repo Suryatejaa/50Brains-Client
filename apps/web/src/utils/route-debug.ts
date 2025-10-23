@@ -9,6 +9,9 @@ export class RouteDebugger {
     source: string;
   }> = [];
 
+  private static emergencyMode = false;
+  private static emergencyActivatedAt = 0;
+
   static log(
     event: string,
     pathname: string,
@@ -16,6 +19,17 @@ export class RouteDebugger {
     isLoading: boolean,
     source: string
   ) {
+    // If emergency mode is active, don't log redirects
+    if (
+      this.emergencyMode &&
+      (event.includes('redirect') || event.includes('Redirect'))
+    ) {
+      console.warn(
+        '🚫 [RouteDebugger] Emergency mode active - blocking redirect logging'
+      );
+      return;
+    }
+
     const logEntry = {
       timestamp: Date.now(),
       event,
@@ -46,6 +60,19 @@ export class RouteDebugger {
   }
 
   static detectLoop() {
+    // If emergency mode is active for less than 30 seconds, keep it active
+    if (this.emergencyMode && Date.now() - this.emergencyActivatedAt < 30000) {
+      console.warn(
+        '🚫 [RouteDebugger] Emergency mode still active, blocking all redirects'
+      );
+      return true;
+    } else if (this.emergencyMode) {
+      // Reset emergency mode after 30 seconds
+      console.log('🔄 [RouteDebugger] Emergency mode expired, resetting...');
+      this.emergencyMode = false;
+      this.emergencyActivatedAt = 0;
+    }
+
     // Check for rapid alternating redirects in the last 10 seconds
     const now = Date.now();
     const recentLogs = this.logs.filter((log) => now - log.timestamp < 10000);
@@ -54,18 +81,25 @@ export class RouteDebugger {
       (log) => log.event.includes('redirect') || log.event.includes('Redirect')
     );
 
-    // More aggressive loop detection - if we have 3 or more redirects
-    if (redirectLogs.length >= 3) {
+    // More aggressive loop detection - if we have 2 or more redirects to same path
+    if (redirectLogs.length >= 2) {
       const paths = redirectLogs.map((log) => log.pathname);
       const uniquePaths = Array.from(new Set(paths));
 
       // If we have the same path appearing multiple times in redirects
-      if (uniquePaths.length <= 2 && redirectLogs.length >= 3) {
-        console.error('🚨 [RouteDebugger] Potential redirect loop detected!', {
-          paths: uniquePaths,
-          redirectCount: redirectLogs.length,
-          logs: redirectLogs,
-        });
+      if (uniquePaths.length <= 2 && redirectLogs.length >= 2) {
+        console.error(
+          '🚨 [RouteDebugger] Redirect loop detected! Activating emergency mode.',
+          {
+            paths: uniquePaths,
+            redirectCount: redirectLogs.length,
+            logs: redirectLogs,
+          }
+        );
+
+        // Activate emergency mode
+        this.emergencyMode = true;
+        this.emergencyActivatedAt = Date.now();
 
         // Clear logs to reset the detection
         this.clear();
@@ -74,6 +108,16 @@ export class RouteDebugger {
     }
 
     return false;
+  }
+
+  static isEmergencyMode() {
+    return this.emergencyMode;
+  }
+
+  static resetEmergencyMode() {
+    this.emergencyMode = false;
+    this.emergencyActivatedAt = 0;
+    console.log('🔄 [RouteDebugger] Emergency mode manually reset');
   }
 }
 
