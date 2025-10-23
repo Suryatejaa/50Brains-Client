@@ -1,12 +1,12 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "apps/web/.next",
+  "outputDirectory": ".next",
   "installCommand": "npm ci && npm run build --workspace=@50brains/shared-types --workspace=@50brains/api-client",
   "framework": "nextjs",
   "regions": ["iad1"],
   "functions": {
-    "apps/web/pages/api/**/*.ts": {
+    "pages/api/**/*.ts": {
       "runtime": "nodejs20.x"
     }
   },
