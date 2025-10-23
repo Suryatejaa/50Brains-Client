@@ -253,7 +253,12 @@ export class APIClient {
       console.log('✅ Response status:', response.status);
       console.log(
         '📋 Response headers:',
-        Object.fromEntries(response.headers.entries())
+        response.headers instanceof Headers
+          ? Array.from(response.headers.entries()).reduce(
+              (acc, [key, value]) => ({ ...acc, [key]: value }),
+              {}
+            )
+          : response.headers
       );
       console.log('🔗 Response URL:', response.url);
       console.log('========================');
