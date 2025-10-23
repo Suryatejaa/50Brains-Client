@@ -254,9 +254,8 @@ export class APIClient {
       console.log(
         '📋 Response headers:',
         response.headers instanceof Headers
-          ? Array.from(response.headers.entries()).reduce(
-              (acc, [key, value]) => ({ ...acc, [key]: value }),
-              {}
+          ? Object.fromEntries(
+              Object.entries(response.headers).map(([key, value]) => [key, value])
             )
           : response.headers
       );
