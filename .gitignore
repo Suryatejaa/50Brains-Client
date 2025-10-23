@@ -16,6 +16,7 @@ out/
 .env.local
 .env.development
 .env.production
+.env.local.temp
 
 # IDE files
 .vscode/
