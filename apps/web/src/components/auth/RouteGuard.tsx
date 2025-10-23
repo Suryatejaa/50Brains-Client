@@ -28,6 +28,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
+    // Check for potential redirect loops first
+    if (RouteDebugger.detectLoop()) {
+      console.error('🚨 Redirect loop detected, aborting further redirects');
+      redirectInProgress.current = true; // Prevent further redirects
+      return;
+    }
+
     // Add a small delay to prevent race conditions during auth state changes
     const timeoutId = setTimeout(() => {
       RouteDebugger.log(
@@ -37,12 +44,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         isLoading,
         'RouteGuard'
       );
-
-      // Check for potential redirect loops
-      if (RouteDebugger.detectLoop()) {
-        console.error('🚨 Redirect loop detected, aborting further redirects');
-        return;
-      }
 
       console.log(
         `🔍 [RouteGuard] Checking route: ${pathname}, isAuthenticated: ${isAuthenticated}`
@@ -110,7 +111,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         );
         redirectInProgress.current = true;
         console.log('🚀 [RouteGuard] Starting redirect to /dashboard');
-        router.push('/dashboard');
+
+        // Use window.location for more reliable redirect
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        } else {
+          router.push('/dashboard');
+        }
         return;
       }
 
@@ -132,12 +139,18 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         }
         redirectInProgress.current = true;
         console.log('🚀 [RouteGuard] Starting redirect to /login');
-        router.push('/login');
+
+        // Use window.location for more reliable redirect
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        } else {
+          router.push('/login');
+        }
         return;
       }
 
       console.log(`✅ [RouteGuard] Route access allowed for ${pathname}`);
-    }, 50); // Small delay to prevent race conditions
+    }, 100); // Increased delay to give more time for route changes
 
     return () => clearTimeout(timeoutId);
   }, [isAuthenticated, isLoading, pathname]); // Removed router from dependencies to prevent unnecessary re-runs

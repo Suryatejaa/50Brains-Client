@@ -46,24 +46,29 @@ export class RouteDebugger {
   }
 
   static detectLoop() {
-    // Check for rapid alternating redirects in the last 5 seconds
+    // Check for rapid alternating redirects in the last 10 seconds
     const now = Date.now();
-    const recentLogs = this.logs.filter((log) => now - log.timestamp < 5000);
+    const recentLogs = this.logs.filter((log) => now - log.timestamp < 10000);
 
     const redirectLogs = recentLogs.filter(
       (log) => log.event.includes('redirect') || log.event.includes('Redirect')
     );
 
-    if (redirectLogs.length >= 4) {
+    // More aggressive loop detection - if we have 3 or more redirects
+    if (redirectLogs.length >= 3) {
       const paths = redirectLogs.map((log) => log.pathname);
       const uniquePaths = Array.from(new Set(paths));
 
-      if (uniquePaths.length <= 2 && redirectLogs.length >= 4) {
+      // If we have the same path appearing multiple times in redirects
+      if (uniquePaths.length <= 2 && redirectLogs.length >= 3) {
         console.error('🚨 [RouteDebugger] Potential redirect loop detected!', {
           paths: uniquePaths,
           redirectCount: redirectLogs.length,
           logs: redirectLogs,
         });
+
+        // Clear logs to reset the detection
+        this.clear();
         return true;
       }
     }
