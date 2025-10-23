@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "apps/web/.next",
-  "installCommand": "npm ci",
+  "installCommand": "npm ci && npm run build --workspace=@50brains/shared-types --workspace=@50brains/api-client",
   "framework": "nextjs",
   "regions": ["iad1"],
   "functions": {
