@@ -135,7 +135,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       if (isAuthenticated && isAuthPage) {
         // Special case: if user is already on dashboard, don't redirect
         if (pathname === '/dashboard') {
-          console.log('✅ [RouteGuard] User authenticated and on dashboard, allowing access');
+          console.log(
+            '✅ [RouteGuard] User authenticated and on dashboard, allowing access'
+          );
           return;
         }
 
@@ -166,15 +168,39 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         return;
       }
 
-      // If user is not authenticated and trying to access protected pages, redirect to login
+      // If user is not authenticated and trying to access protected pages, redirect appropriately
       if (!isAuthenticated && isProtectedPage) {
         RouteDebugger.log(
-          'RedirectToLogin',
+          'RedirectUnauthenticated',
           pathname,
           isAuthenticated,
           isLoading,
           'RouteGuard'
         );
+
+        // Special case: if accessing dashboard without auth, redirect to home page for better UX
+        if (pathname === '/dashboard') {
+          console.log(
+            `🏠 [RouteGuard] Unauthenticated user accessing dashboard (${pathname}), redirecting to home page`
+          );
+
+          // Check for loops before redirecting (only if we should check)
+          if (shouldCheckLoop && RouteDebugger.detectLoop()) {
+            console.error(
+              '🚨 Emergency mode activated - stopping redirect to home'
+            );
+            return;
+          }
+
+          redirectInProgress.current = true;
+          console.log('🚀 [RouteGuard] Starting redirect to /');
+
+          // Redirect to home page instead of login for better new user experience
+          router.replace('/');
+          return;
+        }
+
+        // For other protected pages, redirect to login
         console.log(
           `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
         );
