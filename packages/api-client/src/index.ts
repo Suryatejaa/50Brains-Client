@@ -255,7 +255,10 @@ export class APIClient {
         '📋 Response headers:',
         response.headers instanceof Headers
           ? Object.fromEntries(
-              Object.entries(response.headers).map(([key, value]) => [key, value])
+              Object.entries(response.headers).map(([key, value]) => [
+                key,
+                value,
+              ])
             )
           : response.headers
       );
