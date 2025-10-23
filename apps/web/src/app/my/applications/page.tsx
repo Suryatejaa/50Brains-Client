@@ -420,7 +420,7 @@ export default function MyApplicationsPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="mt-2 rounded-none border border-blue-200 bg-blue-50 p-3">
+        <div className="mt-2 hidden rounded-none border border-blue-200 bg-blue-50 p-3">
           <h3 className="mb-2 text-lg font-semibold text-blue-900">
             💡 Quick Actions
           </h3>

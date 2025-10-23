@@ -9,6 +9,7 @@ import RoleBadges from './common/RoleBadges';
 import EditableField from './common/EditableField';
 import ImageUpload from './common/ImageUpload';
 import './ProfileHeader.css';
+import { Pen, PenIcon } from 'lucide-react';
 
 interface ProfileHeaderProps {
   user: UserProfileData;
@@ -274,21 +275,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 {isOwner ? (
                   <button
                     onClick={onEditClick}
-                    className="profile-header__edit-btn w-full rounded-none bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                    className="profile-header__edit-btn w-full rounded-none bg-blue-600 px-2 py-2 font-medium text-white hover:bg-blue-700"
                   >
-                    ✏️ Edit Profile
+                    <span className="mr-2 relative top-0.5 inline-block">
+                      Edit Profile
+                    </span>
                   </button>
                 ) : (
                   <div className="profile-header__public-actions flex flex-col gap-2 sm:flex-row">
-                    <button className="profile-header__contact-btn flex-1 rounded-none bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700">
+                    <button className="profile-header__contact-btn flex-1 rounded-none bg-green-600 px-2 py-2 font-medium text-white hover:bg-green-700">
                       💬 Contact
                     </button>
-                    <button className="profile-header__follow-btn flex-1 rounded-none bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700">
+                    <button className="profile-header__follow-btn flex-1 rounded-none bg-purple-600 px-2 py-2 font-medium text-white hover:bg-purple-700">
                       ⭐ Follow
                     </button>
                   </div>
                 )}
-                <button className="profile-header__share-btn w-full rounded-none bg-gray-100 px-4 py-2 font-medium text-gray-700 hover:bg-gray-200">
+                <button className="profile-header__share-btn w-full rounded-none bg-gray-100 px-2 py-2 font-medium text-gray-700 hover:bg-gray-200">
                   🔗 Share Profile
                 </button>
               </div>
