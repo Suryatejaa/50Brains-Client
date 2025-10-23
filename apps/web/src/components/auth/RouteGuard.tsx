@@ -24,17 +24,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
-     if (pathname === '/dashboard' && isAuthenticated) {
-      console.log('✅ [RouteGuard] Already on dashboard with auth, no action needed');
-      return;
-    }
-
-    if (pathname === '/login' && !isAuthenticated) {
-      console.log('✅ [RouteGuard] Already on login without auth, no action needed');
-      return;
-    }
-
-
     // Don't process redirects if in emergency mode
     if (RouteDebugger.isEmergencyMode()) {
       RouteDebugger.log(
@@ -144,6 +133,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
       // If user is authenticated and trying to access auth pages, redirect to dashboard
       if (isAuthenticated && isAuthPage) {
+        // Special case: if user is already on dashboard, don't redirect
+        if (pathname === '/dashboard') {
+          console.log('✅ [RouteGuard] User authenticated and on dashboard, allowing access');
+          return;
+        }
+
         RouteDebugger.log(
           'RedirectToDashboard',
           pathname,
