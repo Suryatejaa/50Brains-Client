@@ -24,6 +24,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
+     if (pathname === '/dashboard' && isAuthenticated) {
+      console.log('✅ [RouteGuard] Already on dashboard with auth, no action needed');
+      return;
+    }
+
+    if (pathname === '/login' && !isAuthenticated) {
+      console.log('✅ [RouteGuard] Already on login without auth, no action needed');
+      return;
+    }
+
+
     // Don't process redirects if in emergency mode
     if (RouteDebugger.isEmergencyMode()) {
       RouteDebugger.log(
@@ -66,7 +77,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     // Check for potential redirect loops - but only during the timeout phase
     // Don't check for loops on every render to avoid false positives
-    const shouldCheckLoop = !redirectInProgress.current && timeSinceChange >= 500;
+    const shouldCheckLoop =
+      !redirectInProgress.current && timeSinceChange >= 500;
 
     // Add a small delay to prevent race conditions during auth state changes
     const timeoutId = setTimeout(() => {

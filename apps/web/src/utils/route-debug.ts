@@ -102,7 +102,7 @@ export class RouteDebugger {
               paths: uniquePaths,
               redirectCount: redirectLogs.length,
               logs: redirectLogs,
-              pattern: 'alternating'
+              pattern: 'alternating',
             }
           );
 
