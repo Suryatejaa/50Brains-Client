@@ -4,12 +4,20 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "cache": true
     },
     "build:prod": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"],
+      "cache": true
+    },
+    "build:vercel": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*", "SKIP_ENV_VALIDATION"],
+      "cache": false
     },
     "dev": {
       "cache": false,

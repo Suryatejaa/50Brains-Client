@@ -1,0 +1,47 @@
+# Ignore unnecessary files for faster builds
+node_modules
+.turbo
+.next
+dist
+build
+.git
+.vscode
+.idea
+
+# Documentation
+*.md
+!README.md
+
+# Temp files
+.env.local.temp
+temp-*.js
+debug-*.js
+test-*.js
+
+# Development scripts
+start-dev.*
+*.sh
+
+# Trash and backups
+trash/
+*_backup.*
+old-*/
+
+# Logs
+logs
+*.log
+
+# Cache
+.cache
+.parcel-cache
+
+# Testing
+coverage
+.nyc_output
+__tests__
+*.test.*
+*.spec.*
+
+# OS
+.DS_Store
+Thumbs.db
