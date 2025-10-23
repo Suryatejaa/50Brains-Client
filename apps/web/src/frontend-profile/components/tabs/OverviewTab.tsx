@@ -146,7 +146,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <div className="overview-tab__field">
                     <label>Estimated Followers:</label>
                     <span>
-                      {user.estimatedFollowers?.toLocaleString() ||
+                      {(user.estimatedFollowers || 0).toLocaleString() ||
                         'Not specified'}
                     </span>
                   </div>
@@ -300,9 +300,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <div className="overview-tab__field">
                     <label>Equipment:</label>
                     <div className="overview-tab__tags flex flex-col gap-1">
-                      <span className="overview-tab__tag cursor-pointer" onClick={() => {
-                        window.location.href = `/equipment`;
-                      }}>
+                      <span
+                        className="overview-tab__tag cursor-pointer"
+                        onClick={() => {
+                          window.location.href = `/equipment`;
+                        }}
+                      >
                         Manage Equipment ({user.equipmentOwned.length})
                       </span>
                     </div>

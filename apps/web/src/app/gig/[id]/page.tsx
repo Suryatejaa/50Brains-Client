@@ -1403,7 +1403,7 @@ export default function GigDetailsPage() {
                   </div>
                   <div className="text-left">
                     <div className="text-3xl font-bold text-green-600">
-                      ₹{gig.budgetMin?.toLocaleString()}
+                      ₹{(gig.budgetMin || 0).toLocaleString()}
                       {gig.budgetMax && gig.budgetMax !== gig.budgetMin
                         ? ` - ₹${gig.budgetMax?.toLocaleString()}`
                         : ''}
@@ -1564,7 +1564,7 @@ export default function GigDetailsPage() {
                             </span>
                             <span className="text-sm text-gray-600">
                               {req.minFollowers
-                                ? `${req.minFollowers.toLocaleString()}+ followers`
+                                ? `${(req.minFollowers || 0).toLocaleString()}+ followers`
                                 : 'Requirements specified'}
                             </span>
                           </div>

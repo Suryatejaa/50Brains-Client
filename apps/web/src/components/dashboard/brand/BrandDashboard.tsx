@@ -12,8 +12,23 @@ import { DashboardHeader } from '../shared/DashboardHeader';
 import { MetricCard } from '../shared/MetricCard';
 import { QuickActionsGrid } from '../shared/QuickActions';
 import { ProfileCompletionWidget } from '@/components/ProfileCompletionWidget';
-import { BarChartIcon, Building2Icon, FileTextIcon, GlobeIcon, HeadphonesIcon, MapPinIcon, MegaphoneIcon, PlusIcon, RocketIcon } from 'lucide-react';
-import { AlertCircleIcon, CheckCircleIcon, MailIcon, SearchIcon } from 'lucide-react';
+import {
+  BarChartIcon,
+  Building2Icon,
+  FileTextIcon,
+  GlobeIcon,
+  HeadphonesIcon,
+  MapPinIcon,
+  MegaphoneIcon,
+  PlusIcon,
+  RocketIcon,
+} from 'lucide-react';
+import {
+  AlertCircleIcon,
+  CheckCircleIcon,
+  MailIcon,
+  SearchIcon,
+} from 'lucide-react';
 import { CreditCardIcon, EyeIcon } from 'lucide-react';
 import { DollarSignIcon } from 'lucide-react';
 import { Gig } from '@/types/gig.types';
@@ -91,7 +106,6 @@ export const BrandDashboard: React.FC = () => {
         console.log('First gig structure:', gigs);
 
         applicationsStats.total = gigs.reduce((sum, gig) => {
-
           const appCount =
             gig._count?.applications ||
             gig.stats?.applicationsCount ||
@@ -103,38 +117,43 @@ export const BrandDashboard: React.FC = () => {
 
         //gig.applications will have applications array, if application.status is Approved or CLosed them increase the accepted count
         applicationsStats.approved = gigs.reduce((sum, gig) => {
-          const acceptedCount = gig.applications.filter((app) =>
-            app.status === 'APPROVED' || app.status === 'CLOSED'
+          const acceptedCount = gig.applications.filter(
+            (app) => app.status === 'APPROVED' || app.status === 'CLOSED'
           ).length;
           console.log(`Gig ${gig.id} approved applications:`, gig.applications);
           return sum + acceptedCount;
         }, 0);
-        applicationsStats.pending = (gigsResponse.value.data as any).summary.totalPendingApplicationsAcrossAllGigs || 0;
+        applicationsStats.pending =
+          (gigsResponse.value.data as any).summary
+            .totalPendingApplicationsAcrossAllGigs || 0;
       }
 
       const data: BrandDashboardData = {
         profile:
           profileResponse.status === 'fulfilled' &&
-            profileResponse.value.success
+          profileResponse.value.success
             ? (profileResponse.value.data as any)?.user || null
             : null,
 
         gigsStats:
           gigsResponse.status === 'fulfilled' &&
-            gigsResponse.value.success &&
-            (gigsResponse.value.data as any).summary ?
-            {
-              totalGigs: (gigsResponse.value.data as any).summary.totalGigs,
-              activeGigs: (gigsResponse.value.data as any).summary.totalActiveGigs,
-              completedGigs: (gigsResponse.value.data as any).summary.totalCompletedGigs,
-              totalBudget: (gigsResponse.value.data as any).summary.totalBudget,
-            }
+          gigsResponse.value.success &&
+          (gigsResponse.value.data as any).summary
+            ? {
+                totalGigs: (gigsResponse.value.data as any).summary.totalGigs,
+                activeGigs: (gigsResponse.value.data as any).summary
+                  .totalActiveGigs,
+                completedGigs: (gigsResponse.value.data as any).summary
+                  .totalCompletedGigs,
+                totalBudget: (gigsResponse.value.data as any).summary
+                  .totalBudget,
+              }
             : {
-              totalGigs: 0,
-              activeGigs: 0,
-              completedGigs: 0,
-              totalBudget: 0,
-            },
+                totalGigs: 0,
+                activeGigs: 0,
+                completedGigs: 0,
+                totalBudget: 0,
+              },
 
         wallet:
           walletResponse.status === 'fulfilled' && walletResponse.value.success
@@ -145,16 +164,16 @@ export const BrandDashboard: React.FC = () => {
 
         recentGigs:
           gigsResponse.status === 'fulfilled' &&
-            gigsResponse.value.success &&
-            gigsResponse.value.data?.gigs
+          gigsResponse.value.success &&
+          gigsResponse.value.data?.gigs
             ? gigsResponse.value.data.gigs
-              .sort((a, b) => {
-                // Use updatedAt if available, fallback to createdAt
-                const dateA = new Date(a.updatedAt || a.createdAt).getTime();
-                const dateB = new Date(b.updatedAt || b.createdAt).getTime();
-                return dateB - dateA; // Most recent first
-              })
-              .slice(0, 2) // Only show latest 3 gigs
+                .sort((a, b) => {
+                  // Use updatedAt if available, fallback to createdAt
+                  const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+                  const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+                  return dateB - dateA; // Most recent first
+                })
+                .slice(0, 2) // Only show latest 3 gigs
             : [],
       };
       console.log('Dashboard Data:', data.applications);
@@ -170,27 +189,27 @@ export const BrandDashboard: React.FC = () => {
   const quickActions = [
     {
       href: '/create-gig',
-      icon: <PlusIcon className="w-6 h-6" />,
+      icon: <PlusIcon className="h-6 w-6" />,
       label: 'Create Campaign',
       description: 'Launch new campaign',
       permission: 'gig.create',
     },
     {
       href: '/my-gigs',
-      icon: <MegaphoneIcon className="w-6 h-6" />,
+      icon: <MegaphoneIcon className="h-6 w-6" />,
       label: 'My Gigs',
       description: 'Manage gigs',
     },
     {
       href: '/influencers/search',
-      icon: <SearchIcon className="w-6 h-6" />,
+      icon: <SearchIcon className="h-6 w-6" />,
       label: 'Find Influencers',
       description: 'Discover creators',
       permission: 'influencer.search',
     },
     {
       href: '/applications',
-      icon: <MailIcon className="w-6 h-6" />,
+      icon: <MailIcon className="h-6 w-6" />,
       label: 'Applications',
       description: 'Review applications',
       permission: 'applications.manage',
@@ -244,7 +263,7 @@ export const BrandDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 px-0 py-0 md:p-1">
-      <div className="mx-auto border-1px border-gray-800 max-w-7xl">
+      <div className="border-1px mx-auto max-w-7xl border-gray-800">
         <DashboardHeader
           title={`Welcome back, ${dashboardData.profile?.companyName || 'Brand'}`}
           subtitle="Manage your campaigns and connect with top creators"
@@ -255,14 +274,14 @@ export const BrandDashboard: React.FC = () => {
           <MetricCard
             title="Active Gigs"
             value={dashboardData.gigsStats.activeGigs}
-            icon={<RocketIcon className="w-6 h-6" />}
+            icon={<RocketIcon className="h-6 w-6" />}
             loading={loading}
             onClick={() => (window.location.href = '/my-gigs?status=ACTIVE')}
           />
           <MetricCard
             title="Pending Applications"
             value={dashboardData.applications.pending}
-            icon={<MailIcon className="w-6 h-6" />}
+            icon={<MailIcon className="h-6 w-6" />}
             loading={loading}
             urgent={dashboardData.applications.pending > 10}
             onClick={() =>
@@ -286,12 +305,12 @@ export const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 gap-0 md:mb-0 mb-0 md:gap-1 lg:grid-cols-3">
+        <div className="mb-0 grid grid-cols-1 gap-0 md:mb-0 md:gap-1 lg:grid-cols-3">
           {/* Profile Completion Widget */}
-          <div className="lg:col-span-1 sm:mb-1 md:mb-1 mb-1">
+          <div className="mb-1 sm:mb-1 md:mb-1 lg:col-span-1">
             <div className="card-glass p-3 ">
-              <h3 className="flex items-center gap-2 text-heading text-lg font-semibold">
-                <Building2Icon className="w-6 h-6" />  Company Overview
+              <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+                <Building2Icon className="h-6 w-6" /> Company Overview
               </h3>
 
               {loading ? (
@@ -304,10 +323,12 @@ export const BrandDashboard: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <div className="text-heading font-semibold">
-                      {dashboardData.profile.companyName || `${dashboardData.profile.firstName} ${dashboardData.profile.lastName}`}
+                      {dashboardData.profile.companyName ||
+                        `${dashboardData.profile.firstName} ${dashboardData.profile.lastName}`}
                     </div>
                     <div className="text-muted text-sm">
-                      {dashboardData.profile.industry || 'Industry not specified'}
+                      {dashboardData.profile.industry ||
+                        'Industry not specified'}
                     </div>
                   </div>
 
@@ -319,12 +340,19 @@ export const BrandDashboard: React.FC = () => {
 
                   <div className="flex items-center space-x-4 text-sm">
                     <span className="flex items-center space-x-1">
-                      <span><MapPinIcon className="w-6 h-6" /></span>
-                      <span>{dashboardData.profile.location || 'Location not specified'}</span>
+                      <span>
+                        <MapPinIcon className="h-6 w-6" />
+                      </span>
+                      <span>
+                        {dashboardData.profile.location ||
+                          'Location not specified'}
+                      </span>
                     </span>
                     {dashboardData.profile.website && (
                       <span className="flex items-center space-x-1">
-                        <span><GlobeIcon className="w-6 h-6" /></span>
+                        <span>
+                          <GlobeIcon className="h-6 w-6" />
+                        </span>
                         <a
                           href={dashboardData.profile.website}
                           target="_blank"
@@ -338,14 +366,31 @@ export const BrandDashboard: React.FC = () => {
                   </div>
 
                   <div className="flex items-center space-x-4 text-sm">
-                    <span className={`flex items-center space-x-1 ${dashboardData.profile.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'
-                      }`}>
-                      <span>{dashboardData.profile.status === 'ACTIVE' ? <CheckCircleIcon className="w-6 h-6" /> : <AlertCircleIcon className="w-6 h-6" />}</span>
-                      <span>{dashboardData.profile.status === 'ACTIVE' ? 'Active' : 'Inactive'}</span>
+                    <span
+                      className={`flex items-center space-x-1 ${
+                        dashboardData.profile.status === 'ACTIVE'
+                          ? 'text-green-600'
+                          : 'text-gray-500'
+                      }`}
+                    >
+                      <span>
+                        {dashboardData.profile.status === 'ACTIVE' ? (
+                          <CheckCircleIcon className="h-6 w-6" />
+                        ) : (
+                          <AlertCircleIcon className="h-6 w-6" />
+                        )}
+                      </span>
+                      <span>
+                        {dashboardData.profile.status === 'ACTIVE'
+                          ? 'Active'
+                          : 'Inactive'}
+                      </span>
                     </span>
                     {dashboardData.profile.emailVerified && (
                       <span className="flex items-center space-x-1 text-blue-600">
-                        <span><CheckCircleIcon className="w-6 h-6" /></span>
+                        <span>
+                          <CheckCircleIcon className="h-6 w-6" />
+                        </span>
                         <span>Email Verified</span>
                       </span>
                     )}
@@ -389,10 +434,10 @@ export const BrandDashboard: React.FC = () => {
 
           {/* Recent Gigs */}
           <div className="lg:col-span-2">
-            <div className="sm:mb-1 md:mb-1 mb-1 card-glass p-2">
+            <div className="card-glass mb-1 p-2 sm:mb-1 md:mb-1">
               <div className="flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-heading text-lg font-semibold">
-                  <FileTextIcon className="w-6 h-6" /> Recent Gigs
+                <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+                  <FileTextIcon className="h-6 w-6" /> Recent Gigs
                 </h3>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-gray-500">Latest 2</span>
@@ -433,24 +478,30 @@ export const BrandDashboard: React.FC = () => {
                           </p>
                           <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
                             <span>
-                              Min-Budget: ₹{gig.budgetMin.toLocaleString()}
+                              Min-Budget: ₹
+                              {(gig.budgetMin || 0).toLocaleString()}
                             </span>
                             <span>
-                              Max-Budget: ₹{gig.budgetMax.toLocaleString()}
+                              Max-Budget: ₹
+                              {(gig.budgetMax || 0).toLocaleString()}
                             </span>
                             <span>Applications: {gig.applicationsCount}</span>
                             <span>Views: {gig.viewsCount}</span>
                             <span>
-                              Updated: {new Date(gig.updatedAt || gig.createdAt).toLocaleDateString()}
+                              Updated:{' '}
+                              {new Date(
+                                gig.updatedAt || gig.createdAt
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                           <span
-                            className={`rounded-none px-1 py-1 text-xs font-medium ${gig.status === 'ACTIVE'
-                              ? 'bg-green-100 text-green-800'
-                              : gig.status === 'COMPLETED'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                              }`}
+                            className={`rounded-none px-1 py-1 text-xs font-medium ${
+                              gig.status === 'ACTIVE'
+                                ? 'bg-green-100 text-green-800'
+                                : gig.status === 'COMPLETED'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-gray-100 text-gray-800'
+                            }`}
                           >
                             {gig.status}
                           </span>
@@ -462,7 +513,7 @@ export const BrandDashboard: React.FC = () => {
                   <div className="text-right">
                     <p
                       onClick={() => (window.location.href = '/my-gigs')}
-                      className="text-sm cursor-pointer text-blue-600 hover:underline"
+                      className="cursor-pointer text-sm text-blue-600 hover:underline"
                     >
                       View All Gigs
                     </p>
@@ -470,7 +521,9 @@ export const BrandDashboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="py-8 text-center">
-                  <span className="mb-2 block text-4xl"><FileTextIcon className="w-6 h-6" /></span>
+                  <span className="mb-2 block text-4xl">
+                    <FileTextIcon className="h-6 w-6" />
+                  </span>
                   <p className="text-muted mb-4">No gigs posted yet</p>
                   <button
                     onClick={() => (window.location.href = '/create-gig')}
@@ -490,8 +543,8 @@ export const BrandDashboard: React.FC = () => {
         <div className="mb-1 mt-1 grid grid-cols-1 gap-1 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="card-glass p-3">
-              <h3 className="flex items-center gap-2 text-heading mb-6 text-lg font-semibold">
-                <BarChartIcon className="w-6 h-6" /> Gig Performance
+              <h3 className="text-heading mb-6 flex items-center gap-2 text-lg font-semibold">
+                <BarChartIcon className="h-6 w-6" /> Gig Performance
               </h3>
 
               {loading ? (
@@ -509,7 +562,10 @@ export const BrandDashboard: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      ₹{dashboardData.gigsStats.totalBudget.toLocaleString()}
+                      ₹
+                      {(
+                        dashboardData.gigsStats.totalBudget || 0
+                      ).toLocaleString()}
                     </div>
                     <div className="text-muted text-sm">Total Budget</div>
                   </div>
@@ -532,8 +588,8 @@ export const BrandDashboard: React.FC = () => {
 
           {/* Recent Applications */}
           <div className="card-glass p-3">
-            <h3 className="flex items-center gap-2 text-heading mb-2 text-lg font-semibold">
-              <MailIcon className="w-6 h-6" /> Recent Applications
+            <h3 className="text-heading mb-2 flex items-center gap-2 text-lg font-semibold">
+              <MailIcon className="h-6 w-6" /> Recent Applications
             </h3>
 
             {loading ? (
@@ -594,7 +650,9 @@ export const BrandDashboard: React.FC = () => {
                   </>
                 ) : (
                   <div className="py-2 text-center">
-                    <span className="mb-2 block text-4xl"><MailIcon className="w-6 h-6" /></span>
+                    <span className="mb-2 block text-4xl">
+                      <MailIcon className="h-6 w-6" />
+                    </span>
                     <p className="text-muted mb-4">
                       No applications received yet
                     </p>
@@ -614,8 +672,8 @@ export const BrandDashboard: React.FC = () => {
         {/* Analytics & Budget */}
         <div className="mb-1 grid grid-cols-1 gap-1 lg:grid-cols-2">
           <div className="card-glass p-2">
-            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
-              <BarChartIcon className="w-6 h-6" /> Gig Analytics
+            <h3 className="text-heading mb-3 flex items-center gap-2 text-lg font-semibold">
+              <BarChartIcon className="h-6 w-6" /> Gig Analytics
             </h3>
 
             {loading ? (
@@ -672,8 +730,8 @@ export const BrandDashboard: React.FC = () => {
           </div>
 
           <div className="card-glass p-2">
-            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
-              <DollarSignIcon className="w-6 h-6" /> Wallet Management
+            <h3 className="text-heading mb-3 flex items-center gap-2 text-lg font-semibold">
+              <DollarSignIcon className="h-6 w-6" /> Wallet Management
             </h3>
 
             <div className="space-y-2">
@@ -728,8 +786,8 @@ export const BrandDashboard: React.FC = () => {
         {/* Performance Overview */}
         <div className="mb-0">
           <div className="card-glass p-3">
-            <h3 className="flex items-center gap-2 text-heading mb-3 text-lg font-semibold">
-              <BarChartIcon className="w-6 h-6" /> Performance Overview
+            <h3 className="text-heading mb-3 flex items-center gap-2 text-lg font-semibold">
+              <BarChartIcon className="h-6 w-6" /> Performance Overview
             </h3>
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -741,13 +799,18 @@ export const BrandDashboard: React.FC = () => {
               </div>
               <div className="text-center">
                 <div className="text-heading text-2xl font-bold">
-                  ₹{dashboardData.gigsStats.totalBudget.toLocaleString()}
+                  ₹
+                  {(
+                    dashboardData.gigsStats.totalBudget ||
+                    0 ||
+                    0
+                  ).toLocaleString()}
                 </div>
                 <div className="text-muted text-sm">Total Investment</div>
               </div>
               <div className="text-center">
                 <div className="text-heading text-2xl font-bold">
-                  {dashboardData.wallet?.totalSpent.toLocaleString() || 0}
+                  {(dashboardData.wallet?.totalSpent || 0).toLocaleString()}
                 </div>
                 <div className="text-muted text-sm">Credits Spent</div>
               </div>

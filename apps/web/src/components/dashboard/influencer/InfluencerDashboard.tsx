@@ -224,8 +224,7 @@ export const InfluencerDashboard: React.FC = () => {
               <div>
                 <p className="text-muted text-xs md:text-sm">Total Followers</p>
                 <p className="text-heading text-lg font-semibold md:text-xl">
-                  {data?.contentMetrics?.totalFollowers?.toLocaleString() ||
-                    '0'}
+                  {(data?.contentMetrics?.totalFollowers || 0).toLocaleString()}
                 </p>
                 <p className="text-xs text-green-600">
                   {data?.contentMetrics?.growthRate
@@ -247,13 +246,13 @@ export const InfluencerDashboard: React.FC = () => {
                 </p>
                 <p className="text-heading text-lg font-semibold md:text-xl">
                   ₹
-                  {data?.earningsMetrics?.monthlyEarnings?.toLocaleString() ||
-                    '0'}
+                  {(
+                    data?.earningsMetrics?.monthlyEarnings || 0
+                  ).toLocaleString()}
                 </p>
                 <p className="text-muted text-xs">
                   Avg: ₹
-                  {data?.earningsMetrics?.avgGigPayment?.toLocaleString() ||
-                    '0'}
+                  {(data?.earningsMetrics?.avgGigPayment || 0).toLocaleString()}
                 </p>
               </div>
               <div className="text-2xl md:text-3xl">
@@ -359,8 +358,9 @@ export const InfluencerDashboard: React.FC = () => {
                       Monthly Reach
                     </p>
                     <p className="text-heading text-lg font-semibold">
-                      {data?.contentMetrics?.monthlyReach?.toLocaleString() ||
-                        '0'}
+                      {(
+                        data?.contentMetrics?.monthlyReach || 0
+                      ).toLocaleString()}
                     </p>
                   </div>
                   <div className="text-center">
@@ -588,25 +588,29 @@ export const InfluencerDashboard: React.FC = () => {
                   <span className="text-muted text-sm">Total Earnings</span>
                   <span className="text-heading font-semibold">
                     ₹
-                    {workSummary?.totalEarnings?.toLocaleString() ||
-                      data?.earningsMetrics?.totalEarnings?.toLocaleString() ||
-                      '0'}
+                    {(
+                      workSummary?.totalEarnings ||
+                      data?.earningsMetrics?.totalEarnings ||
+                      0
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted text-sm">This Month</span>
                   <span className="text-heading font-semibold">
                     ₹
-                    {data?.earningsMetrics?.monthlyEarnings?.toLocaleString() ||
-                      '0'}
+                    {(
+                      data?.earningsMetrics?.monthlyEarnings || 0
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted text-sm">Pending</span>
                   <span className="font-semibold text-yellow-600">
                     ₹
-                    {data?.earningsMetrics?.pendingPayments?.toLocaleString() ||
-                      '0'}
+                    {(
+                      data?.earningsMetrics?.pendingPayments || 0
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">

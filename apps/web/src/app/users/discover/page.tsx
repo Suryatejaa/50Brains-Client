@@ -43,13 +43,21 @@ const experienceLevels = [
   'Entry Level (0-1 years)',
   'Intermediate (2-4 years)',
   'Experienced (5-7 years)',
-  'Expert (8+ years)'
+  'Expert (8+ years)',
 ];
 
 const availabilityOptions = [
-  { value: 'available', label: 'Available', color: 'bg-green-100 text-green-700' },
+  {
+    value: 'available',
+    label: 'Available',
+    color: 'bg-green-100 text-green-700',
+  },
   { value: 'busy', label: 'Busy', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'unavailable', label: 'Unavailable', color: 'bg-red-100 text-red-700' }
+  {
+    value: 'unavailable',
+    label: 'Unavailable',
+    color: 'bg-red-100 text-red-700',
+  },
 ];
 
 const skillCategories = [
@@ -67,19 +75,19 @@ const skillCategories = [
   'Data Analysis',
   'Consulting',
   'Project Management',
-  'Other'
+  'Other',
 ];
 
 export default function UsersDiscoveryPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  
+
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  
+
   const [filters, setFilters] = useState({
     category: '',
     experience: '',
@@ -91,7 +99,7 @@ export default function UsersDiscoveryPage() {
     search: '',
     onlineOnly: false,
     verifiedOnly: false,
-    sortBy: 'reputation'
+    sortBy: 'reputation',
   });
 
   const [showSkillsFilter, setShowSkillsFilter] = useState(false);
@@ -104,7 +112,7 @@ export default function UsersDiscoveryPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '12',
@@ -117,15 +125,15 @@ export default function UsersDiscoveryPage() {
         ...(filters.search && { search: filters.search }),
         ...(filters.onlineOnly && { onlineOnly: 'true' }),
         ...(filters.verifiedOnly && { verifiedOnly: 'true' }),
-        sortBy: filters.sortBy
+        sortBy: filters.sortBy,
       });
-      
+
       if (filters.skills.length > 0) {
         params.append('skills', filters.skills.join(','));
       }
-      
+
       const response = await apiClient.get(`/api/users/discover?${params}`);
-      
+
       if (response.success) {
         setUsers((response.data as any)?.users || []);
         setTotalCount((response.data as any)?.total || 0);
@@ -139,17 +147,20 @@ export default function UsersDiscoveryPage() {
     }
   };
 
-  const handleFilterChange = (key: string, value: string | boolean | string[]) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const handleFilterChange = (
+    key: string,
+    value: string | boolean | string[]
+  ) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
   const handleSkillToggle = (skill: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       skills: prev.skills.includes(skill)
-        ? prev.skills.filter(s => s !== skill)
-        : [...prev.skills, skill]
+        ? prev.skills.filter((s) => s !== skill)
+        : [...prev.skills, skill],
     }));
     setCurrentPage(1);
   };
@@ -162,7 +173,7 @@ export default function UsersDiscoveryPage() {
 
     try {
       const response = await apiClient.post(`/api/users/${userId}/connect`);
-      
+
       if (response.success) {
         alert('Connection request sent successfully!');
       } else {
@@ -178,20 +189,25 @@ export default function UsersDiscoveryPage() {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(rate);
   };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}>
+      <span
+        key={i}
+        className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}
+      >
         ★
       </span>
     ));
   };
 
   const getAvailabilityStyle = (availability: string) => {
-    const option = availabilityOptions.find(opt => opt.value === availability);
+    const option = availabilityOptions.find(
+      (opt) => opt.value === availability
+    );
     return option ? option.color : 'bg-gray-100 text-gray-700';
   };
 
@@ -200,7 +216,7 @@ export default function UsersDiscoveryPage() {
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     const diffInMinutes = Math.floor(diffInMs / 60000);
-    
+
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
@@ -224,23 +240,25 @@ export default function UsersDiscoveryPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
               {/* Filters Sidebar */}
               <div className="lg:col-span-1">
-                <div className="card-glass p-3 sticky top-24">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <div className="card-glass sticky top-24 p-3">
+                  <h3 className="mb-4 text-lg font-semibold text-gray-900">
                     Filter Talent
                   </h3>
-                  
+
                   {/* Search */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Search
                     </label>
                     <input
                       type="text"
                       value={filters.search}
-                      onChange={(e) => handleFilterChange('search', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('search', e.target.value)
+                      }
                       placeholder="Search by name, skills, title..."
                       className="input w-full"
                     />
@@ -248,12 +266,14 @@ export default function UsersDiscoveryPage() {
 
                   {/* Category */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Category
                     </label>
                     <select
                       value={filters.category}
-                      onChange={(e) => handleFilterChange('category', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('category', e.target.value)
+                      }
                       className="input w-full"
                     >
                       <option value="">All Categories</option>
@@ -267,12 +287,14 @@ export default function UsersDiscoveryPage() {
 
                   {/* Experience Level */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Experience Level
                     </label>
                     <select
                       value={filters.experience}
-                      onChange={(e) => handleFilterChange('experience', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('experience', e.target.value)
+                      }
                       className="input w-full"
                     >
                       <option value="">Any Experience</option>
@@ -286,12 +308,14 @@ export default function UsersDiscoveryPage() {
 
                   {/* Availability */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Availability
                     </label>
                     <select
                       value={filters.availability}
-                      onChange={(e) => handleFilterChange('availability', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('availability', e.target.value)
+                      }
                       className="input w-full"
                     >
                       <option value="">Any Availability</option>
@@ -305,27 +329,29 @@ export default function UsersDiscoveryPage() {
 
                   {/* Skills */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Skills
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowSkillsFilter(!showSkillsFilter)}
-                      className="w-full text-left input flex items-center justify-between"
+                      className="input flex w-full items-center justify-between text-left"
                     >
                       <span>
-                        {filters.skills.length === 0 
-                          ? 'Select skills...' 
-                          : `${filters.skills.length} skills selected`
-                        }
+                        {filters.skills.length === 0
+                          ? 'Select skills...'
+                          : `${filters.skills.length} skills selected`}
                       </span>
                       <span>{showSkillsFilter ? '▲' : '▼'}</span>
                     </button>
-                    
+
                     {showSkillsFilter && (
-                      <div className="mt-2 max-h-48 overflow-y-auto border border-gray-200 rounded-none p-2">
+                      <div className="mt-2 max-h-48 overflow-y-auto rounded-none border border-gray-200 p-2">
                         {skillCategories.map((skill) => (
-                          <label key={skill} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                          <label
+                            key={skill}
+                            className="flex items-center space-x-2 rounded p-2 hover:bg-gray-50"
+                          >
                             <input
                               type="checkbox"
                               checked={filters.skills.includes(skill)}
@@ -341,12 +367,14 @@ export default function UsersDiscoveryPage() {
 
                   {/* Rating */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Minimum Rating
                     </label>
                     <select
                       value={filters.minRating}
-                      onChange={(e) => handleFilterChange('minRating', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('minRating', e.target.value)
+                      }
                       className="input w-full"
                     >
                       <option value="">Any Rating</option>
@@ -358,13 +386,15 @@ export default function UsersDiscoveryPage() {
 
                   {/* Max Hourly Rate */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Max Hourly Rate
                     </label>
                     <input
                       type="number"
                       value={filters.maxRate}
-                      onChange={(e) => handleFilterChange('maxRate', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('maxRate', e.target.value)
+                      }
                       placeholder="$150"
                       className="input w-full"
                     />
@@ -372,13 +402,15 @@ export default function UsersDiscoveryPage() {
 
                   {/* Location */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Location
                     </label>
                     <input
                       type="text"
                       value={filters.location}
-                      onChange={(e) => handleFilterChange('location', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('location', e.target.value)
+                      }
                       placeholder="City, Country"
                       className="input w-full"
                     />
@@ -390,19 +422,23 @@ export default function UsersDiscoveryPage() {
                       <input
                         type="checkbox"
                         checked={filters.onlineOnly}
-                        onChange={(e) => handleFilterChange('onlineOnly', e.target.checked)}
+                        onChange={(e) =>
+                          handleFilterChange('onlineOnly', e.target.checked)
+                        }
                         className="rounded"
                       />
                       <span className="text-sm font-medium text-gray-700">
                         Online now
                       </span>
                     </label>
-                    
+
                     <label className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={filters.verifiedOnly}
-                        onChange={(e) => handleFilterChange('verifiedOnly', e.target.checked)}
+                        onChange={(e) =>
+                          handleFilterChange('verifiedOnly', e.target.checked)
+                        }
                         className="rounded"
                       />
                       <span className="text-sm font-medium text-gray-700">
@@ -425,7 +461,7 @@ export default function UsersDiscoveryPage() {
                         search: '',
                         onlineOnly: false,
                         verifiedOnly: false,
-                        sortBy: 'reputation'
+                        sortBy: 'reputation',
                       });
                       setCurrentPage(1);
                     }}
@@ -439,15 +475,19 @@ export default function UsersDiscoveryPage() {
               {/* Users List */}
               <div className="lg:col-span-3">
                 {/* Sort and Results Count */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-gray-600">
-                    {loading ? 'Loading...' : `${totalCount.toLocaleString()} creators found`}
+                    {loading
+                      ? 'Loading...'
+                      : `${(totalCount || 0).toLocaleString()} creators found`}
                   </div>
-                  
+
                   <div className="mt-4 sm:mt-0">
                     <select
                       value={filters.sortBy}
-                      onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('sortBy', e.target.value)
+                      }
                       className="input w-auto"
                     >
                       <option value="reputation">Highest Reputation</option>
@@ -469,35 +509,35 @@ export default function UsersDiscoveryPage() {
 
                 {/* Users Grid */}
                 {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="card-glass p-3 animate-pulse">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div key={i} className="card-glass animate-pulse p-3">
+                        <div className="mb-4 flex items-center space-x-3">
+                          <div className="h-12 w-12 rounded-full bg-gray-200"></div>
                           <div className="flex-1">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
+                            <div className="h-3 w-1/2 rounded bg-gray-200"></div>
                           </div>
                         </div>
-                        <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                        <div className="mb-2 h-3 w-full rounded bg-gray-200"></div>
+                        <div className="h-3 w-2/3 rounded bg-gray-200"></div>
                       </div>
                     ))}
                   </div>
                 ) : users.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
-                      <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
                         <span className="text-2xl">👤</span>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900">
                         No creators found
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="mb-6 text-gray-600">
                         Try adjusting your filters to find more creators
                       </p>
                     </div>
-                    
+
                     <button
                       onClick={() => {
                         setFilters({
@@ -511,7 +551,7 @@ export default function UsersDiscoveryPage() {
                           search: '',
                           onlineOnly: false,
                           verifiedOnly: false,
-                          sortBy: 'reputation'
+                          sortBy: 'reputation',
                         });
                         setCurrentPage(1);
                       }}
@@ -521,89 +561,107 @@ export default function UsersDiscoveryPage() {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {users.map((user) => (
-                      <div key={user.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
+                      <div
+                        key={user.id}
+                        className="card-glass p-3 transition-shadow hover:shadow-lg"
+                      >
                         {/* Header */}
-                        <div className="flex items-start space-x-3 mb-4">
+                        <div className="mb-4 flex items-start space-x-3">
                           <div className="relative">
-                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 font-semibold text-white">
                               {user.profilePicture ? (
-                                <img 
-                                  src={user.profilePicture} 
-                                  alt="User" 
-                                  className="w-12 h-12 rounded-full object-cover"
+                                <img
+                                  src={user.profilePicture}
+                                  alt="User"
+                                  className="h-12 w-12 rounded-full object-cover"
                                 />
                               ) : (
-                                (user.firstName || user.displayName || 'U')[0]?.toUpperCase()
+                                (user.firstName ||
+                                  user.displayName ||
+                                  'U')[0]?.toUpperCase()
                               )}
                             </div>
                             {user.isOnline && (
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white bg-green-500"></div>
                             )}
                           </div>
-                          
-                          <div className="flex-1 min-w-0">
+
+                          <div className="min-w-0 flex-1">
                             <div className="flex items-center space-x-2">
                               <Link
                                 href={`/profile/${user.id}` as any}
-                                className="font-semibold text-gray-900 hover:text-brand-primary truncate"
+                                className="hover:text-brand-primary truncate font-semibold text-gray-900"
                               >
-                                {user.displayName || 
-                                 `${user.firstName || ''} ${user.lastName || ''}`.trim() || 
-                                 'Anonymous User'}
+                                {user.displayName ||
+                                  `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                                  'Anonymous User'}
                               </Link>
                               {user.verified && (
-                                <span className="text-blue-500 text-sm">✓</span>
+                                <span className="text-sm text-blue-500">✓</span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 truncate">
+                            <p className="truncate text-sm text-gray-600">
                               {user.title || 'Creative Professional'}
                             </p>
                             {user.location && (
-                              <p className="text-xs text-gray-500">📍 {user.location}</p>
+                              <p className="text-xs text-gray-500">
+                                📍 {user.location}
+                              </p>
                             )}
                           </div>
                         </div>
-                        
+
                         {/* Availability */}
-                        <div className="flex items-center justify-between mb-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${getAvailabilityStyle(user.availability)}`}>
-                            {user.availability.charAt(0).toUpperCase() + user.availability.slice(1)}
+                        <div className="mb-3 flex items-center justify-between">
+                          <span
+                            className={`rounded px-2 py-1 text-xs font-medium ${getAvailabilityStyle(user.availability)}`}
+                          >
+                            {user.availability.charAt(0).toUpperCase() +
+                              user.availability.slice(1)}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {user.isOnline ? 'Online now' : `Last seen ${timeAgo(user.lastSeen)}`}
+                            {user.isOnline
+                              ? 'Online now'
+                              : `Last seen ${timeAgo(user.lastSeen)}`}
                           </span>
                         </div>
-                        
+
                         {/* Bio */}
                         {user.bio && (
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                          <p className="mb-4 line-clamp-2 text-sm text-gray-600">
                             {user.bio}
                           </p>
                         )}
-                        
+
                         {/* Stats */}
-                        <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-none text-sm">
+                        <div className="mb-4 grid grid-cols-2 gap-4 rounded-none bg-gray-50 p-3 text-sm">
                           <div className="text-center">
-                            <p className="font-bold text-gray-900">{user.completedProjects}</p>
+                            <p className="font-bold text-gray-900">
+                              {user.completedProjects}
+                            </p>
                             <p className="text-xs text-gray-600">Projects</p>
                           </div>
                           <div className="text-center">
-                            <p className="font-bold text-gray-900">{user.successRate}%</p>
-                            <p className="text-xs text-gray-600">Success Rate</p>
+                            <p className="font-bold text-gray-900">
+                              {user.successRate}%
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Success Rate
+                            </p>
                           </div>
                         </div>
-                        
+
                         {/* Rating and Rate */}
-                        <div className="flex items-center justify-between mb-4 text-sm">
+                        <div className="mb-4 flex items-center justify-between text-sm">
                           <div className="flex items-center space-x-1">
                             {renderStars(user.averageRating)}
-                            <span className="text-gray-600 text-xs">
+                            <span className="text-xs text-gray-600">
                               ({user.reviewCount})
                             </span>
                           </div>
-                          
+
                           {user.hourlyRate && (
                             <div className="text-right">
                               <p className="font-semibold text-green-600">
@@ -615,63 +673,74 @@ export default function UsersDiscoveryPage() {
                             </div>
                           )}
                         </div>
-                        
+
                         {/* Skills */}
                         {user.skills.length > 0 && (
                           <div className="mb-4">
                             <div className="flex flex-wrap gap-1">
                               {user.skills.slice(0, 3).map((skill) => (
-                                <span key={skill} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                                <span
+                                  key={skill}
+                                  className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700"
+                                >
                                   {skill}
                                 </span>
                               ))}
                               {user.skills.length > 3 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                                <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
                                   +{user.skills.length - 3} more
                                 </span>
                               )}
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Badges */}
                         {user.badges.length > 0 && (
                           <div className="mb-4">
                             <div className="flex flex-wrap gap-1">
                               {user.badges.slice(0, 2).map((badge) => (
-                                <span key={badge} className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
+                                <span
+                                  key={badge}
+                                  className="rounded bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700"
+                                >
                                   🏆 {badge}
                                 </span>
                               ))}
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Reputation */}
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="mb-4 flex items-center justify-between">
                           <div className="text-sm">
                             <span className="text-gray-600">Reputation:</span>
-                            <span className="font-semibold text-brand-primary ml-1">
-                              ⭐ {user.reputation.toLocaleString()}
+                            <span className="text-brand-primary ml-1 font-semibold">
+                              ⭐ {(user.reputation || 0).toLocaleString()}
                             </span>
                           </div>
                         </div>
-                        
+
                         {/* Portfolio Preview */}
                         {user.portfolio.length > 0 && (
                           <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 mb-2">Recent Work</p>
+                            <p className="mb-2 text-sm font-medium text-gray-700">
+                              Recent Work
+                            </p>
                             <div className="flex space-x-2">
                               {user.portfolio.slice(0, 3).map((item) => (
-                                <div key={item.id} className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  key={item.id}
+                                  className="h-16 w-16 overflow-hidden rounded-full bg-gray-200"
+                                >
                                   {item.image ? (
-                                    <img 
-                                      src={item.image} 
+                                    <img
+                                      src={item.image}
                                       alt={item.title}
-                                      className="w-full h-full object-cover"
+                                      className="h-full w-full object-cover"
                                     />
                                   ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                                    <div className="flex h-full w-full items-center justify-center text-xs text-gray-500">
                                       {item.category[0]?.toUpperCase()}
                                     </div>
                                   )}
@@ -680,7 +749,7 @@ export default function UsersDiscoveryPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Action Buttons */}
                         <div className="flex space-x-2">
                           <Link
@@ -689,7 +758,7 @@ export default function UsersDiscoveryPage() {
                           >
                             View Profile
                           </Link>
-                          
+
                           {isAuthenticated && user.id !== user?.id && (
                             <button
                               onClick={() => handleConnectUser(user.id)}
@@ -706,38 +775,46 @@ export default function UsersDiscoveryPage() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center space-x-2 mt-8">
+                  <div className="mt-8 flex items-center justify-center space-x-2">
                     <button
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
                       disabled={currentPage === 1}
                       className="btn-ghost-sm"
                     >
                       ← Previous
                     </button>
-                    
+
                     <div className="flex space-x-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                        if (page > totalPages) return null;
-                        
-                        return (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`px-3 py-1 rounded text-sm ${
-                              currentPage === page
-                                ? 'bg-brand-primary text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        );
-                      })}
+                      {Array.from(
+                        { length: Math.min(5, totalPages) },
+                        (_, i) => {
+                          const page =
+                            currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+                          if (page > totalPages) return null;
+
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`rounded px-3 py-1 text-sm ${
+                                currentPage === page
+                                  ? 'bg-brand-primary text-white'
+                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        }
+                      )}
                     </div>
-                    
+
                     <button
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
                       disabled={currentPage === totalPages}
                       className="btn-ghost-sm"
                     >

@@ -78,7 +78,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
             {user.estimatedFollowers && (
               <div className="overview-tab__field">
                 <label>Estimated Followers:</label>
-                <span>{user.estimatedFollowers.toLocaleString()}</span>
+                <span>{(user.estimatedFollowers || 0).toLocaleString()}</span>
               </div>
             )}
           </div>
@@ -116,9 +116,15 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
         {/* Contact Actions - Only for public profiles */}
         {isPublicView && (
           <div className="contact-actions">
-            <div className="btn btn-primary cursor-not-allowed opacity-60">💬 Send Message</div>
-            <div className="btn btn-secondary cursor-not-allowed opacity-60">🤝 Connect</div>
-            <p className="text-xs text-gray-500 mt-2">Interactive features coming soon</p>
+            <div className="btn btn-primary cursor-not-allowed opacity-60">
+              💬 Send Message
+            </div>
+            <div className="btn btn-secondary cursor-not-allowed opacity-60">
+              🤝 Connect
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              Interactive features coming soon
+            </p>
           </div>
         )}
       </div>
