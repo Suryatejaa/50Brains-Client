@@ -64,12 +64,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
-    // Check for potential redirect loops first
-    if (RouteDebugger.detectLoop()) {
-      console.error('🚨 Redirect loop detected, emergency mode activated');
-      redirectInProgress.current = true; // Prevent further redirects
-      return;
-    }
+    // Check for potential redirect loops - but only during the timeout phase
+    // Don't check for loops on every render to avoid false positives
+    const shouldCheckLoop = !redirectInProgress.current && timeSinceChange >= 500;
 
     // Add a small delay to prevent race conditions during auth state changes
     const timeoutId = setTimeout(() => {
@@ -146,8 +143,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
           `🔒 [RouteGuard] Authenticated user (${isAuthenticated}) accessing auth page (${pathname}), redirecting to dashboard`
         );
 
-        // Check for loops before redirecting
-        if (RouteDebugger.detectLoop()) {
+        // Check for loops before redirecting (only if we should check)
+        if (shouldCheckLoop && RouteDebugger.detectLoop()) {
           console.error(
             '🚨 Emergency mode activated - stopping redirect to dashboard'
           );
@@ -175,8 +172,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
           `🔒 [RouteGuard] Unauthenticated user (${isAuthenticated}) accessing protected page (${pathname}), redirecting to login`
         );
 
-        // Check for loops before redirecting
-        if (RouteDebugger.detectLoop()) {
+        // Check for loops before redirecting (only if we should check)
+        if (shouldCheckLoop && RouteDebugger.detectLoop()) {
           console.error(
             '🚨 Emergency mode activated - stopping redirect to login'
           );

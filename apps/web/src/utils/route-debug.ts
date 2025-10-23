@@ -81,29 +81,39 @@ export class RouteDebugger {
       (log) => log.event.includes('redirect') || log.event.includes('Redirect')
     );
 
-    // More aggressive loop detection - if we have 2 or more redirects to same path
-    if (redirectLogs.length >= 2) {
+    // More sophisticated loop detection - require 4+ redirects and check for ping-pong pattern
+    if (redirectLogs.length >= 4) {
       const paths = redirectLogs.map((log) => log.pathname);
       const uniquePaths = Array.from(new Set(paths));
 
-      // If we have the same path appearing multiple times in redirects
-      if (uniquePaths.length <= 2 && redirectLogs.length >= 2) {
-        console.error(
-          '🚨 [RouteDebugger] Redirect loop detected! Activating emergency mode.',
-          {
-            paths: uniquePaths,
-            redirectCount: redirectLogs.length,
-            logs: redirectLogs,
-          }
-        );
+      // Check for ping-pong pattern between 2 routes (login <-> dashboard)
+      if (uniquePaths.length === 2 && redirectLogs.length >= 4) {
+        // Check if it's actually alternating between the two paths
+        const isAlternating = redirectLogs.every((log, index) => {
+          if (index === 0) return true;
+          const prevPath = redirectLogs[index - 1].pathname;
+          return log.pathname !== prevPath;
+        });
 
-        // Activate emergency mode
-        this.emergencyMode = true;
-        this.emergencyActivatedAt = Date.now();
+        if (isAlternating) {
+          console.error(
+            '🚨 [RouteDebugger] Redirect loop detected! Activating emergency mode.',
+            {
+              paths: uniquePaths,
+              redirectCount: redirectLogs.length,
+              logs: redirectLogs,
+              pattern: 'alternating'
+            }
+          );
 
-        // Clear logs to reset the detection
-        this.clear();
-        return true;
+          // Activate emergency mode
+          this.emergencyMode = true;
+          this.emergencyActivatedAt = Date.now();
+
+          // Clear logs to reset the detection
+          this.clear();
+          return true;
+        }
       }
     }
 
@@ -124,4 +134,8 @@ export class RouteDebugger {
 // Make it available globally for debugging
 if (typeof window !== 'undefined') {
   (window as any).RouteDebugger = RouteDebugger;
+  (window as any).resetRouteEmergency = () => {
+    RouteDebugger.resetEmergencyMode();
+    console.log('🔄 Emergency mode reset from console');
+  };
 }
