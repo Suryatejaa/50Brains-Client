@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:prod",
+  "buildCommand": "npm run build",
   "outputDirectory": "apps/web/.next",
   "installCommand": "npm ci",
   "framework": "nextjs",
