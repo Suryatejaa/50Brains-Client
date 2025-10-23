@@ -199,8 +199,9 @@ export const CrewDashboard: React.FC = () => {
 
         {/* Key Metrics Row */}
         <div className="mb-1 grid grid-cols-1 gap-1 md:mb-1 md:grid-cols-3 md:gap-1 lg:grid-cols-3">
-          <div className="card-glass p-3 md:p-4"
-          onClick={()=>router.push('/my-bids')}
+          <div
+            className="card-glass p-3 md:p-4"
+            onClick={() => router.push('/my-bids')}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -390,7 +391,7 @@ export const CrewDashboard: React.FC = () => {
                       </div>
                       <div className="ml-3 text-right">
                         <p className="text-heading text-sm font-medium md:text-base">
-                          ${project.budget.toLocaleString()}
+                          ${(project.budget || 0).toLocaleString()}
                         </p>
                         <span
                           className={`inline-block rounded-none px-2 py-1 text-xs ${
@@ -498,7 +499,7 @@ export const CrewDashboard: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-heading text-sm font-medium md:text-base">
-                          ${client.totalValue.toLocaleString()}
+                          ${(client.totalValue || 0).toLocaleString()}
                         </p>
                         <div className="flex items-center gap-1">
                           <span className="text-xs">⭐</span>
@@ -730,7 +731,7 @@ export const CrewDashboard: React.FC = () => {
                           {category.category}
                         </h4>
                         <span className="text-muted text-xs">
-                          ${category.value.toLocaleString()}
+                          ${(category.value || 0).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-1">

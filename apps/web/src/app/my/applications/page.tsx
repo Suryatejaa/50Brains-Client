@@ -218,7 +218,9 @@ export default function MyApplicationsPage() {
               >
                 {status === 'ALL'
                   ? 'All Applications'
-                  : status.toLowerCase().replace('_', ' ')}
+                  : String(status || '')
+                      .toLowerCase()
+                      .replace('_', ' ')}
               </button>
             ))}
           </div>
@@ -236,12 +238,12 @@ export default function MyApplicationsPage() {
             <h3 className="mb-2 text-xl font-semibold">
               {filter === 'ALL'
                 ? 'No Applications Yet'
-                : `No ${filter.toLowerCase()} applications`}
+                : `No ${String(filter || '').toLowerCase()} applications`}
             </h3>
             <p className="mb-2 text-gray-600">
               {filter === 'ALL'
                 ? 'Start applying to gigs to see them here!'
-                : `You don't have any ${filter.toLowerCase()} applications at the moment.`}
+                : `You don't have any ${String(filter || '').toLowerCase()} applications at the moment.`}
             </p>
             <Link href="/marketplace" className="btn-primary">
               Browse Available Gigs

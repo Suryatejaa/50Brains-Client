@@ -360,7 +360,7 @@ export const CreditsManagement: React.FC = () => {
                       onClick={() => setPurchaseAmount(amount)}
                       className="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
                     >
-                      ₹{amount.toLocaleString()}
+                      ₹{(amount || 0).toLocaleString()}
                     </button>
                   ))}
                 </div>
@@ -384,7 +384,7 @@ export const CreditsManagement: React.FC = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Credits:</span>
-                    <span>₹{purchaseAmount.toLocaleString()}</span>
+                    <span>₹{(purchaseAmount || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Processing Fee:</span>

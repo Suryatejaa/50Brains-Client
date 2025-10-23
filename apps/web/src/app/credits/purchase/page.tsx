@@ -264,7 +264,7 @@ export default function CreditsPurchasePage() {
                   <div>
                     <div className="text-sm text-gray-600">Current Balance</div>
                     <div className="text-brand-primary text-xl font-bold">
-                      {currentBalance.toLocaleString()} Credits
+                      {(currentBalance || 0).toLocaleString()} Credits
                     </div>
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export default function CreditsPurchasePage() {
 
                         <div className="mb-2">
                           <span className="text-brand-primary text-3xl font-bold">
-                            {pkg.credits.toLocaleString()}
+                            {(pkg.credits || 0).toLocaleString()}
                           </span>
                           <span className="ml-1 text-gray-600">Credits</span>
                         </div>
@@ -408,7 +408,7 @@ export default function CreditsPurchasePage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Credits:</span>
                           <span className="font-medium">
-                            {selectedPackage.credits.toLocaleString()}
+                            {(selectedPackage.credits || 0).toLocaleString()}
                           </span>
                         </div>
                         {selectedPackage.discount && (

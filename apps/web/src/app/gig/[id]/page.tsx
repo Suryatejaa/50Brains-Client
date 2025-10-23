@@ -962,25 +962,45 @@ export default function GigDetailsPage() {
       }
 
       // Special handling for common errors
-      if (userMessage.toLowerCase().includes('already applied')) {
+      if (
+        String(userMessage || '')
+          .toLowerCase()
+          .includes('already applied')
+      ) {
         userMessage =
           'You have already applied to this gig. Check your applications in the "My Applications" section.';
         setAlreadyAppliedMessage('You have already applied to this gig');
         showToast('warning', userMessage);
         // Also refresh the gig data to update the UI state
         await loadGigDetails();
-      } else if (userMessage.toLowerCase().includes('not authenticated')) {
+      } else if (
+        String(userMessage || '')
+          .toLowerCase()
+          .includes('not authenticated')
+      ) {
         userMessage = 'Please log in again to apply for this gig.';
         showToast('error', userMessage);
         router.push('/login');
-      } else if (userMessage.toLowerCase().includes('maximum applications')) {
+      } else if (
+        String(userMessage || '')
+          .toLowerCase()
+          .includes('maximum applications')
+      ) {
         userMessage =
           'This gig has reached its maximum number of applications.';
         showToast('warning', userMessage);
-      } else if (userMessage.toLowerCase().includes('gig not found')) {
+      } else if (
+        String(userMessage || '')
+          .toLowerCase()
+          .includes('gig not found')
+      ) {
         userMessage = 'This gig is no longer available.';
         showToast('error', userMessage);
-      } else if (userMessage.toLowerCase().includes('validation')) {
+      } else if (
+        String(userMessage || '')
+          .toLowerCase()
+          .includes('validation')
+      ) {
         userMessage = 'Please check all required fields and try again.';
         showToast('warning', userMessage);
       } else {

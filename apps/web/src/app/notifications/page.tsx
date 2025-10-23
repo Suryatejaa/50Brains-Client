@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationContext } from '@/components/NotificationProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Notification, NotificationPreferences } from '@/types/notification.types';
+import {
+  Notification,
+  NotificationPreferences,
+} from '@/types/notification.types';
 import { toast } from 'sonner';
 import NotificationDebugger from '@/components/debug/NotificationDebugger';
 import { RefreshCcwIcon } from 'lucide-react';
@@ -34,13 +37,13 @@ export default function NotificationsPage() {
   const [filters, setFilters] = useState({
     type: '',
     category: '',
-    read: undefined as boolean | undefined
+    read: undefined as boolean | undefined,
   });
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   const getNotificationActionUrl = (notification: Notification) => {
@@ -165,7 +168,11 @@ export default function NotificationsPage() {
   const handleClearAll = async () => {
     if (!user) return;
 
-    if (confirm('Are you sure you want to clear all notifications? This action cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to clear all notifications? This action cannot be undone.'
+      )
+    ) {
       try {
         await clearAllNotificationsForUser();
       } catch (error) {
@@ -174,8 +181,11 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleFilterChange = (key: string, value: string | boolean | undefined) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const handleFilterChange = (
+    key: string,
+    value: string | boolean | undefined
+  ) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     // setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page - handled by context
   };
 
@@ -204,13 +214,21 @@ export default function NotificationsPage() {
       fetchCounts();
 
       // Mark all notifications as read when viewing the notifications page
-      if (notifications.length > 0 && notifications.some(n => !n.read)) {
+      if (notifications.length > 0 && notifications.some((n) => !n.read)) {
         markAllNotificationsAsRead();
       }
     }
-  }, [user, fetchNotifications, fetchCounts, notifications, markAllNotificationsAsRead]);
+  }, [
+    user,
+    fetchNotifications,
+    fetchCounts,
+    notifications,
+    markAllNotificationsAsRead,
+  ]);
 
-  const handlePreferenceUpdate = async (updates: Partial<NotificationPreferences>) => {
+  const handlePreferenceUpdate = async (
+    updates: Partial<NotificationPreferences>
+  ) => {
     if (!user) return;
 
     try {
@@ -224,7 +242,7 @@ export default function NotificationsPage() {
     const colors: { [key: string]: string } = {
       HIGH: 'border-l-red-500 bg-red-50',
       MEDIUM: 'border-l-yellow-500 bg-yellow-50',
-      LOW: 'border-l-green-500 bg-green-50'
+      LOW: 'border-l-green-500 bg-green-50',
     };
     return colors[priority || ''] || 'border-l-gray-300';
   };
@@ -243,9 +261,11 @@ export default function NotificationsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="text-xl font-semibold text-gray-900 mb-2">Please log in to view notifications</div>
+          <div className="mb-2 text-xl font-semibold text-gray-900">
+            Please log in to view notifications
+          </div>
         </div>
       </div>
     );
@@ -253,30 +273,32 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-1 py-1">
+      <div className="mx-auto max-w-4xl px-1 py-1">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-1 mb-1">
-          <div className="flex items-center justify-between mb-1">
+        <div className="mb-1 rounded-lg bg-white p-1 shadow-sm">
+          <div className="mb-1 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-            <div className="flex space-x-2">              
+            <div className="flex space-x-2">
               <button
                 onClick={() => {
                   fetchNotifications();
                   fetchCounts();
                 }}
-                className="px-1 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
+                className="rounded-md px-1 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800"
               >
-                <RefreshCcwIcon className="w-4 h-4" />
-              </button>            
+                <RefreshCcwIcon className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+          <div className="grid grid-cols-1 gap-1 md:grid-cols-3">
             <select
               value={filters.type}
-              onChange={(e) => handleFilterChange('type', e.target.value || undefined)}
-              className="px-1 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                handleFilterChange('type', e.target.value || undefined)
+              }
+              className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Types</option>
               <option value="SYSTEM">System</option>
@@ -291,8 +313,10 @@ export default function NotificationsPage() {
 
             <select
               value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
-              className="px-1 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                handleFilterChange('category', e.target.value || undefined)
+              }
+              className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Categories</option>
               <option value="USER">User</option>
@@ -306,8 +330,13 @@ export default function NotificationsPage() {
 
             <select
               value={filters.read === undefined ? '' : filters.read.toString()}
-              onChange={(e) => handleFilterChange('read', e.target.value === '' ? undefined : e.target.value === 'true')}
-              className="px-1 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                handleFilterChange(
+                  'read',
+                  e.target.value === '' ? undefined : e.target.value === 'true'
+                )
+              }
+              className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Status</option>
               <option value="false">Unread</option>
@@ -318,23 +347,31 @@ export default function NotificationsPage() {
 
         {/* Preferences Panel */}
         {showPreferences && preferences && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mb-6 rounded-lg bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">
+              Notification Preferences
+            </h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <h3 className="font-medium text-gray-900 mb-3">Channels</h3>
+                <h3 className="mb-3 font-medium text-gray-900">Channels</h3>
                 <div className="space-y-2">
                   {Object.entries({
                     email: 'Email',
                     push: 'Push Notifications',
                     sms: 'SMS',
-                    inApp: 'In-App'
+                    inApp: 'In-App',
                   }).map(([key, label]) => (
                     <label key={key} className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={preferences?.[key as keyof NotificationPreferences] as boolean || false}
-                        onChange={(e) => handlePreferenceUpdate({ [key]: e.target.checked })}
+                        checked={
+                          (preferences?.[
+                            key as keyof NotificationPreferences
+                          ] as boolean) || false
+                        }
+                        onChange={(e) =>
+                          handlePreferenceUpdate({ [key]: e.target.checked })
+                        }
                         className="mr-2"
                       />
                       {label}
@@ -343,24 +380,29 @@ export default function NotificationsPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 mb-3">Categories</h3>
+                <h3 className="mb-3 font-medium text-gray-900">Categories</h3>
                 <div className="space-y-2">
-                  {preferences?.categories && Object.entries(preferences.categories).map(([key, value]) => (
-                    <label key={key} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={value}
-                        onChange={(e) => handlePreferenceUpdate({
-                          categories: {
-                            ...preferences.categories,
-                            [key]: e.target.checked
-                          }
-                        })}
-                        className="mr-2"
-                      />
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </label>
-                  ))}
+                  {preferences?.categories &&
+                    Object.entries(preferences.categories).map(
+                      ([key, value]) => (
+                        <label key={key} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={value}
+                            onChange={(e) =>
+                              handlePreferenceUpdate({
+                                categories: {
+                                  ...preferences.categories,
+                                  [key]: e.target.checked,
+                                },
+                              })
+                            }
+                            className="mr-2"
+                          />
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
+                      )
+                    )}
                 </div>
               </div>
             </div>
@@ -368,76 +410,91 @@ export default function NotificationsPage() {
         )}
 
         {/* Notifications List */}
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="rounded-lg bg-white shadow-sm">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
               <div className="text-gray-500">Loading notifications...</div>
             </div>
           ) : error ? (
             <div className="p-8 text-center">
-              <div className="text-red-500 mb-4">{error}</div>
+              <div className="mb-4 text-red-500">{error}</div>
               <button
                 onClick={() => fetchNotifications()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
               >
                 Try again
               </button>
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-8 text-center">
-              <div className="text-gray-500 mb-4">No notifications found</div>
+              <div className="mb-4 text-gray-500">No notifications found</div>
               <div className="text-sm text-gray-400">You're all caught up!</div>
             </div>
           ) : (
             <>
-              <div className="divide-y space-y-2 divide-gray-200">
+              <div className="space-y-2 divide-y divide-gray-200">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-1 border-l-4 ${getPriorityColor(notification.priority)} hover:bg-gray-50 transition-colors cursor-pointer`}
+                    className={`border-l-4 p-1 ${getPriorityColor(notification.priority)} cursor-pointer transition-colors hover:bg-gray-50`}
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4 flex-1">
+                      <div className="flex flex-1 items-start space-x-4">
                         {/* <span className="text-2xl flex-shrink-0">
                           {notification.icon || '🔔'}
                         </span> */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-1 mb-1">
-                            <h3 className={`font-medium text-gray-900 ${!notification.read ? 'font-semibold' : ''}`}>
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center space-x-1">
+                            <h3
+                              className={`font-medium text-gray-900 ${!notification.read ? 'font-semibold' : ''}`}
+                            >
                               {notification.title}
                             </h3>
                             {!notification.read && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
                                 New
                               </span>
                             )}
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${notification.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
-                              notification.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-green-100 text-green-800'
-                              }`}>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                notification.priority === 'HIGH'
+                                  ? 'bg-red-100 text-red-800'
+                                  : notification.priority === 'MEDIUM'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-green-100 text-green-800'
+                              }`}
+                            >
                               {notification.priority}
                             </span>
                           </div>
-                          <p className="text-gray-600 mb-1">{notification.message}</p>
+                          <p className="mb-1 text-gray-600">
+                            {notification.message}
+                          </p>
                           <div className="flex items-center space-x-1 text-sm text-gray-500">
                             <span>{formatTimeAgo(notification.createdAt)}</span>
                             <span>•</span>
-                            <span className="capitalize">{notification.type.toLowerCase()}</span>
+                            <span className="capitalize">
+                              {String(notification.type || '').toLowerCase()}
+                            </span>
                             <span>•</span>
-                            <span className="capitalize">{notification.category.toLowerCase()}</span>
+                            <span className="capitalize">
+                              {String(
+                                notification.category || ''
+                              ).toLowerCase()}
+                            </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1 ml-1">
+                      <div className="ml-1 flex items-center space-x-1">
                         {!notification.read && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMarkAsRead(notification.id);
                             }}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800"
                           >
                             Mark as read
                           </button>
@@ -447,7 +504,7 @@ export default function NotificationsPage() {
                             e.stopPropagation();
                             handleDeleteNotification(notification.id);
                           }}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          className="text-sm font-medium text-red-600 hover:text-red-800"
                         >
                           Delete
                         </button>
@@ -490,9 +547,7 @@ export default function NotificationsPage() {
         </div>
         {/* Debug Section - Only show in development */}
         {process.env.NODE_ENV === 'development' && (
-          <div className="mt-8">
-            {/* <NotificationDebugger /> */}
-          </div>
+          <div className="mt-8">{/* <NotificationDebugger /> */}</div>
         )}
       </div>
     </div>

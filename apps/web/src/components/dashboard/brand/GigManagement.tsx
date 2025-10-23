@@ -105,8 +105,12 @@ export const GigManagement: React.FC<GigManagementProps> = ({
   const filteredGigs = gigs.filter((gig) => {
     if (filters.search) {
       return (
-        gig.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        gig.description.toLowerCase().includes(filters.search.toLowerCase())
+        String(gig.title || '')
+          .toLowerCase()
+          .includes(String(filters.search || '').toLowerCase()) ||
+        String(gig.description || '')
+          .toLowerCase()
+          .includes(String(filters.search || '').toLowerCase())
       );
     }
     if (filters.category) {

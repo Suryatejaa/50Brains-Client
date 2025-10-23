@@ -61,11 +61,13 @@ export default function MarketplacePage() {
   const filteredGigs = gigs.filter((gig) => {
     // Search query filter
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const query = String(searchQuery || '').toLowerCase();
       const matchesTitle = gig.title?.toLowerCase().includes(query);
       const matchesDescription = gig.description?.toLowerCase().includes(query);
       const matchesSkills = gig.skillsRequired?.some((skill) =>
-        skill.toLowerCase().includes(query)
+        String(skill || '')
+          .toLowerCase()
+          .includes(query)
       );
       const matchesCategory = gig.category?.toLowerCase().includes(query);
       const matchesBrand = gig.brand?.name?.toLowerCase().includes(query);
@@ -109,7 +111,7 @@ export default function MarketplacePage() {
 
     // Location filter
     if (filters.location && filters.location.trim()) {
-      const locationQuery = filters.location.toLowerCase();
+      const locationQuery = String(filters.location || '').toLowerCase();
       const gigLocation = gig.location?.toLowerCase() || '';
       if (!gigLocation.includes(locationQuery)) {
         return false;

@@ -1405,7 +1405,6 @@ export default function CreateGigPage() {
                       className="input w-full"
                       value={formData.deadline}
                       onChange={handleChange}
-
                     />
                   </div>
                   {/* Duration */}
@@ -1523,7 +1522,7 @@ export default function CreateGigPage() {
                   <div>
                     <h4 className="text-body text-sm font-medium">Gig Type</h4>
                     <p className="text-muted capitalize">
-                      {formData.gigType.toLowerCase()}
+                      {String(formData.gigType || '').toLowerCase()}
                     </p>
                   </div>
                   {formData.latitude !== undefined &&

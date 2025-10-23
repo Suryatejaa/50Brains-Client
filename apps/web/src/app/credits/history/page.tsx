@@ -521,7 +521,10 @@ export default function CreditsHistoryPage() {
                               className="text-sm text-blue-600 hover:underline"
                             >
                               View Related{' '}
-                              {transaction.relatedEntity.type.toLowerCase()} →
+                              {String(
+                                transaction.relatedEntity?.type || ''
+                              ).toLowerCase()}{' '}
+                              →
                             </a>
                           </div>
                         )}
@@ -566,7 +569,7 @@ export default function CreditsHistoryPage() {
                   <p className="mb-6 text-gray-600">
                     {typeFilter === 'all'
                       ? "You haven't made any credit transactions yet. Start by applying for gigs or creating campaigns!"
-                      : `No transactions of type "${typeFilter.toLowerCase()}" found.`}
+                      : `No transactions of type "${String(typeFilter || '').toLowerCase()}" found.`}
                   </p>
                   {typeFilter === 'all' ? (
                     <div className="space-x-3">

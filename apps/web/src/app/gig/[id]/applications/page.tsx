@@ -355,7 +355,10 @@ export default function GigApplicationsPage() {
   const filteredApplications = applications.filter((app) => {
     console.log('App:', app);
     if (selectedStatus === 'all') return true;
-    return app.status.toLowerCase() === selectedStatus.toLowerCase();
+    return (
+      String(app.status || '').toLowerCase() ===
+      String(selectedStatus || '').toLowerCase()
+    );
   });
 
   const getStatusColor = (status: string) => {
@@ -605,7 +608,9 @@ export default function GigApplicationsPage() {
                 {/* Application Details */}
                 <div className="mb-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                   <div>
-                    <h6><b>UPI Id:</b> {application.upiId}</h6>
+                    <h6>
+                      <b>UPI Id:</b> {application.upiId}
+                    </h6>
                     <h4 className="mb-2 font-semibold">Proposal</h4>
                     <p className="whitespace-pre-wrap rounded-none bg-gray-50 p-2 text-gray-700">
                       {application.proposal}

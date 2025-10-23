@@ -311,7 +311,7 @@ export default function MySubmissionsPage() {
         </div>
 
         {/* Submissions List */}
-        <div className="overflow-hidden rounded-sm space-y-2 gap-2 bg-white shadow-lg">
+        <div className="gap-2 space-y-2 overflow-hidden rounded-sm bg-white shadow-lg">
           {isLoading ? (
             <div className="p-8 text-center">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
@@ -326,7 +326,7 @@ export default function MySubmissionsPage() {
               <p className="mb-4 text-gray-600">
                 {filterStatus === 'ALL'
                   ? "You haven't submitted any work yet. Start by applying to gigs and submitting completed work."
-                  : `No ${filterStatus.toLowerCase()} submissions found.`}
+                  : `No ${String(filterStatus || '').toLowerCase()} submissions found.`}
               </p>
               {filterStatus === 'ALL' && (
                 <Link href="/marketplace" className="btn-primary">
@@ -335,145 +335,148 @@ export default function MySubmissionsPage() {
               )}
             </div>
           ) : (
-            <div className='space-y-2 gap-2 mb-2'>
-            <div className="divide-y mb-2 divide-gray-200">
-              {submissions.map((submission) => (
-                <div
-                  key={submission.id}
-                  className="p-2 transition-colors hover:bg-gray-50"
-                >
+            <div className="mb-2 gap-2 space-y-2">
+              <div className="mb-2 divide-y divide-gray-200">
+                {submissions.map((submission) => (
                   <div
-                    className="flex items-start justify-between"
-                    onClick={() => router.push(`/gig/${submission.gigId}`)}
+                    key={submission.id}
+                    className="p-2 transition-colors hover:bg-gray-50"
                   >
-                    <div className="flex-1">
-                      <div className="mb-3 flex items-center gap-3">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {submission.title}
-                        </h3>
-                        <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(submission.status)}`}
-                        >
-                          {getStatusIcon(submission.status)} {submission.status}
-                        </span>
-                      </div>
-
-                      {submission.gig && (
-                        <div className="mb-3">
-                          <h4 className="mb-1 text-sm font-medium text-gray-900">
-                            Gig:
-                          </h4>
-                          <Link
-                            href={`/gig/${submission.gig.id}`}
-                            className="font-medium text-blue-600 hover:text-blue-800"
+                    <div
+                      className="flex items-start justify-between"
+                      onClick={() => router.push(`/gig/${submission.gigId}`)}
+                    >
+                      <div className="flex-1">
+                        <div className="mb-3 flex items-center gap-3">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {submission.title}
+                          </h3>
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(submission.status)}`}
                           >
-                            {submission.gig.title}
-                          </Link>
+                            {getStatusIcon(submission.status)}{' '}
+                            {submission.status}
+                          </span>
                         </div>
-                      )}
 
-                      {submission.description && (
-                        <p className="mb-3 text-gray-600">
-                          {submission.description}
-                        </p>
-                      )}
-
-                      <div className="mb-3">
-                        <h4 className="mb-2 text-sm font-medium text-gray-900">
-                          Deliverables:
-                        </h4>
-                        <div className="flex flex-col gap-2">
-                          {submission.deliverables.map((deliverable, index) => (
-                            <div
-                              key={index}
-                              className="rounded border bg-gray-50 p-2"
+                        {submission.gig && (
+                          <div className="mb-3">
+                            <h4 className="mb-1 text-sm font-medium text-gray-900">
+                              Gig:
+                            </h4>
+                            <Link
+                              href={`/gig/${submission.gig.id}`}
+                              className="font-medium text-blue-600 hover:text-blue-800"
                             >
-                              <div className="mb-1 flex items-center gap-2">
-                                <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
-                                  {deliverable.type
-                                    ?.replace('_', ' ')
-                                    .toUpperCase() || 'OTHER'}
-                                </span>
-                                {deliverable.platform && (
-                                  <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
-                                    {deliverable.platform.toUpperCase()}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="mb-1 text-sm text-gray-700">
-                                {deliverable.description}
-                              </p>
-                              {deliverable.url && (
-                                <a
-                                  href={deliverable.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-blue-600 underline hover:text-blue-800"
-                                >
-                                  View Deliverable →
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                              {submission.gig.title}
+                            </Link>
+                          </div>
+                        )}
 
-                      {submission.notes && (
-                        <div className="mb-3">
-                          <h4 className="mb-1 text-sm font-medium text-gray-900">
-                            Notes:
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {submission.notes}
+                        {submission.description && (
+                          <p className="mb-3 text-gray-600">
+                            {submission.description}
                           </p>
-                        </div>
-                      )}
+                        )}
 
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <span>
-                          Submitted:{' '}
-                          {new Date(
-                            submission.submittedAt
-                          ).toLocaleDateString()}
-                        </span>
-                        {submission.reviewedAt && (
+                        <div className="mb-3">
+                          <h4 className="mb-2 text-sm font-medium text-gray-900">
+                            Deliverables:
+                          </h4>
+                          <div className="flex flex-col gap-2">
+                            {submission.deliverables.map(
+                              (deliverable, index) => (
+                                <div
+                                  key={index}
+                                  className="rounded border bg-gray-50 p-2"
+                                >
+                                  <div className="mb-1 flex items-center gap-2">
+                                    <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                                      {deliverable.type
+                                        ?.replace('_', ' ')
+                                        .toUpperCase() || 'OTHER'}
+                                    </span>
+                                    {deliverable.platform && (
+                                      <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
+                                        {deliverable.platform.toUpperCase()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="mb-1 text-sm text-gray-700">
+                                    {deliverable.description}
+                                  </p>
+                                  {deliverable.url && (
+                                    <a
+                                      href={deliverable.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-blue-600 underline hover:text-blue-800"
+                                    >
+                                      View Deliverable →
+                                    </a>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {submission.notes && (
+                          <div className="mb-3">
+                            <h4 className="mb-1 text-sm font-medium text-gray-900">
+                              Notes:
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {submission.notes}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
                           <span>
-                            Reviewed:{' '}
+                            Submitted:{' '}
                             {new Date(
-                              submission.reviewedAt
+                              submission.submittedAt
                             ).toLocaleDateString()}
                           </span>
-                        )}
-                        {submission.rating && (
-                          <span className="flex items-center gap-1">
-                            Rating: {submission.rating}/5 ⭐
-                          </span>
+                          {submission.reviewedAt && (
+                            <span>
+                              Reviewed:{' '}
+                              {new Date(
+                                submission.reviewedAt
+                              ).toLocaleDateString()}
+                            </span>
+                          )}
+                          {submission.rating && (
+                            <span className="flex items-center gap-1">
+                              Rating: {submission.rating}/5 ⭐
+                            </span>
+                          )}
+                        </div>
+
+                        {submission.feedback && (
+                          <div className="mt-3 rounded bg-gray-50 p-3">
+                            <h4 className="mb-1 text-sm font-medium text-gray-900">
+                              Feedback:
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {submission.feedback}
+                            </p>
+                          </div>
                         )}
                       </div>
 
-                      {submission.feedback && (
-                        <div className="mt-3 rounded bg-gray-50 p-3">
-                          <h4 className="mb-1 text-sm font-medium text-gray-900">
-                            Feedback:
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {submission.feedback}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="ml-4 flex flex-col gap-2">
-                      {submission.status === 'REVISION' && (
-                        <button className="btn-primary px-4 py-2 text-sm">
-                          Submit Revision
-                        </button>
-                      )}
+                      <div className="ml-4 flex flex-col gap-2">
+                        {submission.status === 'REVISION' && (
+                          <button className="btn-primary px-4 py-2 text-sm">
+                            Submit Revision
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

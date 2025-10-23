@@ -292,7 +292,9 @@ export default function AssignModal({
                                   }`}
                                 >
                                   {role.charAt(0).toUpperCase() +
-                                    role.slice(1).toLowerCase()}
+                                    String(role || '')
+                                      .slice(1)
+                                      .toLowerCase()}
                                 </span>
                               )
                           )}

@@ -294,11 +294,11 @@ export function useWorkHistory(userId?: string) {
             (badge: string, index: number) => ({
               id: `badge-${index}`,
               type: 'badge',
-              title: badge
+              title: String(badge || '')
                 .replace('_', ' ')
                 .toLowerCase()
                 .replace(/\b\w/g, (l) => l.toUpperCase()),
-              description: `Earned ${badge} badge`,
+              description: `Earned ${String(badge || '')} badge`,
               achievedAt: data.updatedAt,
               verified: true,
             })

@@ -86,11 +86,14 @@ export default function MyGigsPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
-      const shouldRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
+      const shouldRefresh =
+        urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
 
       if (shouldRefresh) {
         console.log('↻ Detected refresh flag, will force refresh gigs data');
-        setRefreshMessage('✅ Gig published successfully! Updating your gigs list...');
+        setRefreshMessage(
+          '✅ Gig published successfully! Updating your gigs list...'
+        );
 
         // Clear the refresh flag
         sessionStorage.removeItem('refresh-my-gigs');
@@ -111,7 +114,8 @@ export default function MyGigsPage() {
     if (user?.roles?.includes('BRAND')) {
       // Check if we need to force refresh
       const urlParams = new URLSearchParams(window.location.search);
-      const shouldForceRefresh = urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
+      const shouldForceRefresh =
+        urlParams.get('refresh') || sessionStorage.getItem('refresh-my-gigs');
 
       loadGigs(!!shouldForceRefresh);
     }
@@ -127,13 +131,19 @@ export default function MyGigsPage() {
         : '/api/gig/my-posted';
 
       const response = await apiClient.get<GigsResponse>(url);
-      console.log('Fetched gigs:', response.data, forceRefresh ? '(force refresh)' : '(cached)');
+      console.log(
+        'Fetched gigs:',
+        response.data,
+        forceRefresh ? '(force refresh)' : '(cached)'
+      );
 
       if (response.success) {
         // The API returns {gigs: Array, pagination: Object}
         if (response.data && Array.isArray(response.data.gigs)) {
           setGigs(response.data.gigs);
-          const statuses = response.data.gigs.map(g => g.status).filter(Boolean);
+          const statuses = response.data.gigs
+            .map((g) => g.status)
+            .filter(Boolean);
           console.log('Gig statuses found:', Array.from(new Set(statuses)));
 
           // Update refresh message if this was a force refresh
@@ -168,7 +178,9 @@ export default function MyGigsPage() {
       // Validate status transition
       const validStatuses = Object.values(GigStatus);
       if (!validStatuses.includes(newStatus)) {
-        alert(`Invalid status: ${newStatus}. Valid statuses are: ${validStatuses.join(', ')}`);
+        alert(
+          `Invalid status: ${newStatus}. Valid statuses are: ${validStatuses.join(', ')}`
+        );
         return;
       }
 
@@ -177,9 +189,11 @@ export default function MyGigsPage() {
       });
       console.log(`Gig ${gigId} status updated to ${newStatus}`, response);
       if (response.success) {
-        setGigs(prev => prev.map(gig =>
-          gig.id === gigId ? { ...gig, status: newStatus } : gig
-        ));
+        setGigs((prev) =>
+          prev.map((gig) =>
+            gig.id === gigId ? { ...gig, status: newStatus } : gig
+          )
+        );
       } else {
         // Handle error response
         const errorMessage = (response as any).error || 'Unknown error';
@@ -187,7 +201,9 @@ export default function MyGigsPage() {
       }
     } catch (error: any) {
       console.error('Status update error:', error);
-      alert(`Failed to update gig status: ${error.message || error || 'Unknown error'}`);
+      alert(
+        `Failed to update gig status: ${error.message || error || 'Unknown error'}`
+      );
     }
   };
 
@@ -198,7 +214,7 @@ export default function MyGigsPage() {
       const response = await apiClient.delete(`/api/gig/${gigId}`);
 
       if (response.success) {
-        setGigs(prev => prev.filter(gig => gig.id !== gigId));
+        setGigs((prev) => prev.filter((gig) => gig.id !== gigId));
       } else {
         alert('Failed to delete gig');
       }
@@ -207,7 +223,7 @@ export default function MyGigsPage() {
     }
   };
 
-  const filteredGigs = gigs.filter(gig => {
+  const filteredGigs = gigs.filter((gig) => {
     if (filter === 'ALL') return true;
     return gig.status === filter;
   });
@@ -215,7 +231,7 @@ export default function MyGigsPage() {
   // Get status counts for filter buttons
   const getStatusCount = (status: string) => {
     if (status === 'ALL') return gigs.length;
-    return gigs.filter(g => g.status === status).length;
+    return gigs.filter((g) => g.status === status).length;
   };
 
   const formatBudget = (gig: Gig) => {
@@ -235,7 +251,7 @@ export default function MyGigsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
           <div className="border-brand-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
           <p className="text-muted">Loading...</p>
@@ -260,7 +276,7 @@ export default function MyGigsPage() {
                 </p>
               </div>
 
-              <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+              <div className="mt-4 flex items-center space-x-3 sm:mt-0">
                 <button
                   onClick={() => loadGigs(true)}
                   disabled={loading}
@@ -269,10 +285,7 @@ export default function MyGigsPage() {
                 >
                   {loading ? '↻' : '↻'} Refresh
                 </button>
-                <Link
-                  href="/create-gig"
-                  className="btn-primary"
-                >
+                <Link href="/create-gig" className="btn-primary">
                   + Create New Gig
                 </Link>
               </div>
@@ -294,16 +307,32 @@ export default function MyGigsPage() {
 
             {/* Filters */}
             <div className="mb-6 flex gap-1 overflow-x-auto">
-              {(['ALL', GigStatus.OPEN, GigStatus.ASSIGNED, GigStatus.IN_PROGRESS, GigStatus.DRAFT, GigStatus.COMPLETED] as const).map((status) => (
+              {(
+                [
+                  'ALL',
+                  GigStatus.OPEN,
+                  GigStatus.ASSIGNED,
+                  GigStatus.IN_PROGRESS,
+                  GigStatus.DRAFT,
+                  GigStatus.COMPLETED,
+                ] as const
+              ).map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilter(status)}
-                  className={`px-1 py-1 rounded-none text-sm font-medium transition-colors ${filter === status
-                    ? 'bg-brand-primary text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
-                    }`}
+                  className={`rounded-none px-1 py-1 text-sm font-medium transition-colors ${
+                    filter === status
+                      ? 'bg-brand-primary text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
                 >
-                  {status === 'ALL' ? 'All Gigs' : status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ')}
+                  {status === 'ALL'
+                    ? 'All Gigs'
+                    : String(status || '').charAt(0) +
+                      String(status || '')
+                        .slice(1)
+                        .toLowerCase()
+                        .replace('_', ' ')}
                   {` (${getStatusCount(status)})`}
                 </button>
               ))}
@@ -318,25 +347,23 @@ export default function MyGigsPage() {
             ) : filteredGigs.length === 0 ? (
               <div className="card-glass p-2 text-center">
                 <div className="mb-2">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-600">
                     <span className="text-2xl">📋</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {filter === 'ALL' ? 'No gigs yet' : `No ${filter.toLowerCase()} gigs`}
+                  <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                    {filter === 'ALL'
+                      ? 'No gigs yet'
+                      : `No ${String(filter || '').toLowerCase()} gigs`}
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="mb-6 text-gray-600">
                     {filter === 'ALL'
                       ? 'Start by creating your first gig to find talented creators.'
-                      : `You don't have any ${filter.toLowerCase()} gigs at the moment.`
-                    }
+                      : `You don't have any ${String(filter || '').toLowerCase()} gigs at the moment.`}
                   </p>
                 </div>
 
                 {filter === 'ALL' && (
-                  <Link
-                    href="/create-gig"
-                    className="btn-primary"
-                  >
+                  <Link href="/create-gig" className="btn-primary">
                     Create Your First Gig
                   </Link>
                 )}
@@ -344,17 +371,22 @@ export default function MyGigsPage() {
             ) : (
               <div className="space-y-1">
                 {filteredGigs.map((gig) => (
-                  <div key={gig.id} className="card-glass p-2 cursor-pointer"
-                    onClick={() => router.push(`/gig/${gig.id}`)}>
+                  <div
+                    key={gig.id}
+                    className="card-glass cursor-pointer p-2"
+                    onClick={() => router.push(`/gig/${gig.id}`)}
+                  >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                        <div className="mb-3 flex flex-wrap items-center gap-3">
                           <h3 className="text-lg font-semibold text-gray-900">
                             {gig.title}
                           </h3>
                           {gig.status && (
                             <>
-                              <span className={`px-2 py-1 rounded-none text-xs font-medium ${statusColors[gig.status] || 'bg-gray-100 text-gray-700'}`}>
+                              <span
+                                className={`rounded-none px-2 py-1 text-xs font-medium ${statusColors[gig.status] || 'bg-gray-100 text-gray-700'}`}
+                              >
                                 {gig.status.replace('_', ' ')}
                               </span>
                             </>
@@ -366,7 +398,7 @@ export default function MyGigsPage() {
                           )}
                         </div>
 
-                        <p className="text-gray-600 text-sm mb-1 line-clamp-2">
+                        <p className="mb-1 line-clamp-2 text-sm text-gray-600">
                           {gig.description}
                         </p>
 
@@ -383,7 +415,7 @@ export default function MyGigsPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-wrap gap-1">
+                      <div className="mt-4 flex flex-wrap gap-1 lg:ml-6 lg:mt-0">
                         <Link
                           href={`/gig/${gig.id}`}
                           className="btn-ghost-sm text-gray-700 hover:text-blue-800"
@@ -409,7 +441,9 @@ export default function MyGigsPage() {
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_REVIEW)}
+                              onClick={() =>
+                                handleStatusChange(gig.id, GigStatus.IN_REVIEW)
+                              }
                               className="btn-ghost-sm text-yellow-600"
                             >
                               Review
@@ -418,7 +452,12 @@ export default function MyGigsPage() {
                               <>
                                 <span> | </span>
                                 <button
-                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      gig.id,
+                                      GigStatus.CANCELLED
+                                    )
+                                  }
                                   className="btn-ghost-sm text-red-600"
                                 >
                                   Cancel
@@ -432,7 +471,9 @@ export default function MyGigsPage() {
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.OPEN)}
+                              onClick={() =>
+                                handleStatusChange(gig.id, GigStatus.OPEN)
+                              }
                               className="btn-ghost-sm text-green-600"
                             >
                               Reopen
@@ -441,7 +482,12 @@ export default function MyGigsPage() {
                               <>
                                 <span> | </span>
                                 <button
-                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      gig.id,
+                                      GigStatus.CANCELLED
+                                    )
+                                  }
                                   className="btn-ghost-sm text-red-600"
                                 >
                                   Cancel
@@ -455,7 +501,12 @@ export default function MyGigsPage() {
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_PROGRESS)}
+                              onClick={() =>
+                                handleStatusChange(
+                                  gig.id,
+                                  GigStatus.IN_PROGRESS
+                                )
+                              }
                               className="btn-ghost-sm text-blue-600"
                             >
                               Start Work
@@ -464,7 +515,12 @@ export default function MyGigsPage() {
                               <>
                                 <span> | </span>
                                 <button
-                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      gig.id,
+                                      GigStatus.CANCELLED
+                                    )
+                                  }
                                   className="btn-ghost-sm text-red-600"
                                 >
                                   Cancel
@@ -478,7 +534,9 @@ export default function MyGigsPage() {
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.SUBMITTED)}
+                              onClick={() =>
+                                handleStatusChange(gig.id, GigStatus.SUBMITTED)
+                              }
                               className="btn-ghost-sm text-purple-600"
                             >
                               Submit
@@ -487,7 +545,12 @@ export default function MyGigsPage() {
                               <>
                                 <span> | </span>
                                 <button
-                                  onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      gig.id,
+                                      GigStatus.CANCELLED
+                                    )
+                                  }
                                   className="btn-ghost-sm text-red-600"
                                 >
                                   Cancel
@@ -501,14 +564,21 @@ export default function MyGigsPage() {
                           <>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.COMPLETED)}
+                              onClick={() =>
+                                handleStatusChange(gig.id, GigStatus.COMPLETED)
+                              }
                               className="btn-ghost-sm text-emerald-600"
                             >
                               Approve
                             </button>
                             <span> | </span>
                             <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.IN_PROGRESS)}
+                              onClick={() =>
+                                handleStatusChange(
+                                  gig.id,
+                                  GigStatus.IN_PROGRESS
+                                )
+                              }
                               className="btn-ghost-sm text-blue-600"
                             >
                               Request Revision
@@ -516,26 +586,30 @@ export default function MyGigsPage() {
                           </>
                         )}
 
-
-
-                        {gig.status === GigStatus.DRAFT && gig._count.applications === 0 && (
-                          <>
-                            <span> | </span>
-                            <button
-                              onClick={() => handleDeleteGig(gig.id)}
-                              className="btn-ghost-sm text-red-600"
-                            >
-                              Delete
-                            </button>
-                            <span> | </span>
-                            <button
-                              onClick={() => handleStatusChange(gig.id, GigStatus.CANCELLED)}
-                              className="btn-ghost-sm text-red-600"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        )}
+                        {gig.status === GigStatus.DRAFT &&
+                          gig._count.applications === 0 && (
+                            <>
+                              <span> | </span>
+                              <button
+                                onClick={() => handleDeleteGig(gig.id)}
+                                className="btn-ghost-sm text-red-600"
+                              >
+                                Delete
+                              </button>
+                              <span> | </span>
+                              <button
+                                onClick={() =>
+                                  handleStatusChange(
+                                    gig.id,
+                                    GigStatus.CANCELLED
+                                  )
+                                }
+                                className="btn-ghost-sm text-red-600"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -545,9 +619,9 @@ export default function MyGigsPage() {
 
             {/* Stats Summary */}
             {gigs.length > 0 && (
-              <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-1">
+              <div className="mt-8 grid grid-cols-2 gap-1 md:grid-cols-5">
                 <div className="card-glass p-4 text-center">
-                  <div className="text-2xl font-bold text-brand-primary">
+                  <div className="text-brand-primary text-2xl font-bold">
                     {gigs.length}
                   </div>
                   <div className="text-sm text-gray-600">Total Gigs</div>
@@ -555,21 +629,30 @@ export default function MyGigsPage() {
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {gigs.filter(g => g.status === GigStatus.OPEN).length}
+                    {gigs.filter((g) => g.status === GigStatus.OPEN).length}
                   </div>
                   <div className="text-sm text-gray-600">Open</div>
                 </div>
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {gigs.filter(g => [GigStatus.ASSIGNED, GigStatus.IN_PROGRESS].includes(g.status)).length}
+                    {
+                      gigs.filter((g) =>
+                        [GigStatus.ASSIGNED, GigStatus.IN_PROGRESS].includes(
+                          g.status
+                        )
+                      ).length
+                    }
                   </div>
                   <div className="text-sm text-gray-600">In Progress</div>
                 </div>
 
                 <div className="card-glass p-4 text-center">
                   <div className="text-2xl font-bold text-emerald-600">
-                    {gigs.filter(g => g.status === GigStatus.COMPLETED).length}
+                    {
+                      gigs.filter((g) => g.status === GigStatus.COMPLETED)
+                        .length
+                    }
                   </div>
                   <div className="text-sm text-gray-600">Completed</div>
                 </div>

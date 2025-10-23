@@ -447,8 +447,8 @@ export const InfluencerDashboard: React.FC = () => {
                             {platform.platform}
                           </p>
                           <p className="text-muted text-xs">
-                            {platform.followers.toLocaleString()} followers •{' '}
-                            {platform.engagement}% engagement
+                            {(platform.followers || 0).toLocaleString()}{' '}
+                            followers • {platform.engagement}% engagement
                           </p>
                         </div>
                       </div>
@@ -495,7 +495,7 @@ export const InfluencerDashboard: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-heading text-sm font-medium md:text-base">
-                          ${campaign.payment.toLocaleString()}
+                          ${(campaign.payment || 0).toLocaleString()}
                         </p>
                         <span
                           className={`inline-block rounded-none px-2 py-1 text-xs ${

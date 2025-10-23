@@ -126,11 +126,17 @@ export const ApplicationManagement: React.FC<ApplicationManagementProps> = ({
   const filteredApplications = applications.filter((app) => {
     if (filters.status && app.status !== filters.status) return false;
     if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
+      const searchLower = String(filters.search || '').toLowerCase();
       return (
-        app.applicant.firstName.toLowerCase().includes(searchLower) ||
-        app.applicant.lastName.toLowerCase().includes(searchLower) ||
-        app.coverLetter.toLowerCase().includes(searchLower)
+        String(app.applicant?.firstName || '')
+          .toLowerCase()
+          .includes(searchLower) ||
+        String(app.applicant?.lastName || '')
+          .toLowerCase()
+          .includes(searchLower) ||
+        String(app.coverLetter || '')
+          .toLowerCase()
+          .includes(searchLower)
       );
     }
     return true;

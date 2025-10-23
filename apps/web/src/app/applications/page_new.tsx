@@ -51,7 +51,9 @@ export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN'>('ALL');
+  const [filter, setFilter] = useState<
+    'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN'
+  >('ALL');
 
   const userType = getUserTypeForRole(currentRole);
 
@@ -73,7 +75,7 @@ export default function ApplicationsPage() {
     try {
       setLoading(true);
       const response = await apiClient.get('/api/applications/received');
-      
+
       if (response.success) {
         // Handle the nested structure: response.data.applications
         const applicationsData = response.data as any;
@@ -88,16 +90,26 @@ export default function ApplicationsPage() {
     }
   };
 
-  const handleStatusChange = async (applicationId: string, newStatus: string) => {
+  const handleStatusChange = async (
+    applicationId: string,
+    newStatus: string
+  ) => {
     try {
-      const response = await apiClient.put(`/api/applications/${applicationId}/status`, {
-        status: newStatus,
-      });
-      
+      const response = await apiClient.put(
+        `/api/applications/${applicationId}/status`,
+        {
+          status: newStatus,
+        }
+      );
+
       if (response.success) {
-        setApplications(applications.map(app =>
-          app.id === applicationId ? { ...app, status: newStatus as any } : app
-        ));
+        setApplications(
+          applications.map((app) =>
+            app.id === applicationId
+              ? { ...app, status: newStatus as any }
+              : app
+          )
+        );
       } else {
         alert('Failed to update application status');
       }
@@ -106,7 +118,7 @@ export default function ApplicationsPage() {
     }
   };
 
-  const filteredApplications = applications.filter(app => {
+  const filteredApplications = applications.filter((app) => {
     if (filter === 'ALL') return true;
     return app.status === filter;
   });
@@ -125,18 +137,20 @@ export default function ApplicationsPage() {
 
   if (!isAuthenticated || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
       </div>
     );
   }
 
   if (userType !== 'brand') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">This page is only available for brand accounts.</p>
+          <h1 className="mb-4 text-2xl font-bold">Access Denied</h1>
+          <p className="mb-6 text-gray-600">
+            This page is only available for brand accounts.
+          </p>
           <Link href="/dashboard" className="btn-primary">
             Go to Dashboard
           </Link>
@@ -147,10 +161,10 @@ export default function ApplicationsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Error</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="mb-4 text-2xl font-bold">Error</h1>
+          <p className="mb-6 text-gray-600">{error}</p>
           <button onClick={loadApplications} className="btn-primary">
             Try Again
           </button>
@@ -166,7 +180,9 @@ export default function ApplicationsPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Applications Received</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Applications Received
+              </h1>
               <p className="text-gray-600">Manage applications for your gigs</p>
             </div>
             <Link href="/my-gigs" className="btn-primary">
@@ -176,14 +192,14 @@ export default function ApplicationsPage() {
         </div>
 
         {/* Filters */}
-        <div className="card-glass p-6 mb-8">
+        <div className="card-glass mb-8 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <h3 className="text-lg font-semibold">Filter Applications</h3>
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               >
                 <option value="ALL">All Applications</option>
                 <option value="PENDING">Pending</option>
@@ -192,19 +208,28 @@ export default function ApplicationsPage() {
                 <option value="WITHDRAWN">Withdrawn</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-4 text-sm">
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-yellow-100 rounded-none"></div>
-                <span>Pending: {applications.filter(a => a.status === 'PENDING').length}</span>
+                <div className="h-3 w-3 rounded-none bg-yellow-100"></div>
+                <span>
+                  Pending:{' '}
+                  {applications.filter((a) => a.status === 'PENDING').length}
+                </span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-100 rounded-none"></div>
-                <span>Accepted: {applications.filter(a => a.status === 'ACCEPTED').length}</span>
+                <div className="h-3 w-3 rounded-none bg-green-100"></div>
+                <span>
+                  Accepted:{' '}
+                  {applications.filter((a) => a.status === 'ACCEPTED').length}
+                </span>
               </span>
               <span className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-100 rounded-none"></div>
-                <span>Rejected: {applications.filter(a => a.status === 'REJECTED').length}</span>
+                <div className="h-3 w-3 rounded-none bg-red-100"></div>
+                <span>
+                  Rejected:{' '}
+                  {applications.filter((a) => a.status === 'REJECTED').length}
+                </span>
               </span>
             </div>
           </div>
@@ -215,15 +240,17 @@ export default function ApplicationsPage() {
           <div className="space-y-6">
             {filteredApplications.map((application) => (
               <div key={application.id} className="card-glass p-6">
-                <div className="flex items-start justify-between mb-4">
+                <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-none flex items-center justify-center">
-                      <span className="text-gray-500 font-medium">
-                        {getApplicantName(application.applicantId)[0]?.toUpperCase() || 'A'}
+                    <div className="flex h-12 w-12 items-center justify-center rounded-none bg-gray-200">
+                      <span className="font-medium text-gray-500">
+                        {getApplicantName(
+                          application.applicantId
+                        )[0]?.toUpperCase() || 'A'}
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">
+                      <h3 className="text-lg font-semibold">
                         {getApplicantName(application.applicantId)}
                       </h3>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -233,49 +260,66 @@ export default function ApplicationsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-3 py-1 rounded-none text-sm font-medium ${statusColors[application.status]}`}>
+                    <span
+                      className={`rounded-none px-3 py-1 text-sm font-medium ${statusColors[application.status]}`}
+                    >
                       {application.status}
                     </span>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="mt-1 text-sm text-gray-500">
                       Applied {formatDate(application.appliedAt)}
                     </p>
                   </div>
                 </div>
 
                 {/* Gig Details */}
-                <div className="bg-gray-50 p-4 rounded-none mb-4">
-                  <h4 className="font-semibold mb-2">Gig: {application.gig.title}</h4>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                <div className="mb-4 rounded-none bg-gray-50 p-4">
+                  <h4 className="mb-2 font-semibold">
+                    Gig: {application.gig.title}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 lg:grid-cols-4">
                     <span>Category: {application.gig.category}</span>
-                    <span>Budget: ₹{application.gig.budgetMin} - ₹{application.gig.budgetMax}</span>
+                    <span>
+                      Budget: ₹{application.gig.budgetMin} - ₹
+                      {application.gig.budgetMax}
+                    </span>
                     <span>Type: {application.gig.budgetType}</span>
-                    <span>Deadline: {formatDate(application.gig.deadline)}</span>
+                    <span>
+                      Deadline: {formatDate(application.gig.deadline)}
+                    </span>
                   </div>
                 </div>
 
                 {/* Application Details */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                   <div>
-                    <h4 className="font-semibold mb-2">Proposal</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-none whitespace-pre-wrap">
+                    <h4 className="mb-2 font-semibold">Proposal</h4>
+                    <p className="whitespace-pre-wrap rounded-none bg-gray-50 p-3 text-gray-700">
                       {application.proposal}
                     </p>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-semibold mb-2">Application Details</h4>
+                      <h4 className="mb-2 font-semibold">
+                        Application Details
+                      </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
-                          <span className="font-medium">₹{application.quotedPrice.toLocaleString()}</span>
+                          <span className="font-medium">
+                            ₹{application.quotedPrice.toLocaleString()}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Estimated Time:</span>
-                          <span className="font-medium">{application.estimatedTime}</span>
+                          <span className="font-medium">
+                            {application.estimatedTime}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Submissions:</span>
-                          <span className="font-medium">{application.submissionsCount}</span>
+                          <span className="font-medium">
+                            {application.submissionsCount}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -285,7 +329,7 @@ export default function ApplicationsPage() {
                 {/* Portfolio */}
                 {application.portfolio && application.portfolio.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="font-semibold mb-2">Portfolio</h4>
+                    <h4 className="mb-2 font-semibold">Portfolio</h4>
                     <div className="space-y-2">
                       {application.portfolio.map((url, index) => (
                         <a
@@ -293,7 +337,7 @@ export default function ApplicationsPage() {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block text-blue-600 hover:underline text-sm"
+                          className="block text-sm text-blue-600 hover:underline"
                         >
                           Portfolio Item {index + 1}: {url}
                         </a>
@@ -303,26 +347,33 @@ export default function ApplicationsPage() {
                 )}
 
                 {/* Rejection Reason */}
-                {application.status === 'REJECTED' && application.rejectionReason && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-2 text-red-600">Rejection Reason</h4>
-                    <p className="text-gray-700 bg-red-50 p-3 rounded-none">
-                      {application.rejectionReason}
-                    </p>
-                  </div>
-                )}
+                {application.status === 'REJECTED' &&
+                  application.rejectionReason && (
+                    <div className="mb-6">
+                      <h4 className="mb-2 font-semibold text-red-600">
+                        Rejection Reason
+                      </h4>
+                      <p className="rounded-none bg-red-50 p-3 text-gray-700">
+                        {application.rejectionReason}
+                      </p>
+                    </div>
+                  )}
 
                 {/* Actions */}
                 {application.status === 'PENDING' && (
                   <div className="flex items-center justify-end space-x-3">
                     <button
-                      onClick={() => handleStatusChange(application.id, 'REJECTED')}
+                      onClick={() =>
+                        handleStatusChange(application.id, 'REJECTED')
+                      }
                       className="btn-secondary text-red-600 hover:bg-red-50"
                     >
                       Reject
                     </button>
                     <button
-                      onClick={() => handleStatusChange(application.id, 'ACCEPTED')}
+                      onClick={() =>
+                        handleStatusChange(application.id, 'ACCEPTED')
+                      }
                       className="btn-primary"
                     >
                       Accept
@@ -330,16 +381,16 @@ export default function ApplicationsPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                  <Link 
+                <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
+                  <Link
                     href={`/gig/${application.gigId}`}
-                    className="text-blue-600 hover:underline text-sm"
+                    className="text-sm text-blue-600 hover:underline"
                   >
                     View Gig Details →
                   </Link>
-                  <Link 
+                  <Link
                     href={`/gig/${application.gigId}/applications`}
-                    className="text-blue-600 hover:underline text-sm"
+                    className="text-sm text-blue-600 hover:underline"
                   >
                     Manage All Applications →
                   </Link>
@@ -349,12 +400,12 @@ export default function ApplicationsPage() {
           </div>
         ) : (
           <div className="card-glass p-12 text-center">
-            <div className="text-6xl mb-4">📨</div>
-            <h3 className="text-xl font-semibold mb-2">No Applications</h3>
-            <p className="text-gray-600 mb-6">
-              {filter === 'ALL' 
-                ? 'No applications received yet.' 
-                : `No ${filter.toLowerCase()} applications found.`}
+            <div className="mb-4 text-6xl">📨</div>
+            <h3 className="mb-2 text-xl font-semibold">No Applications</h3>
+            <p className="mb-6 text-gray-600">
+              {filter === 'ALL'
+                ? 'No applications received yet.'
+                : `No ${String(filter || '').toLowerCase()} applications found.`}
             </p>
             <Link href="/my-gigs" className="btn-primary">
               View My Gigs

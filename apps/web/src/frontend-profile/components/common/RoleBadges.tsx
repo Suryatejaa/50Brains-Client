@@ -24,7 +24,14 @@ const RoleBadges: React.FC<RoleBadgesProps> = ({ roles, className = '' }) => {
   };
 
   const formatRole = (role: string) => {
-    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    return (
+      String(role || '')
+        .charAt(0)
+        .toUpperCase() +
+      String(role || '')
+        .slice(1)
+        .toLowerCase()
+    );
   };
 
   if (!roles || roles.length === 0) {
