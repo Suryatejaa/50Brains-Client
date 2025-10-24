@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   // Remove the useEffect that was causing the redirect loop
   // RouteGuard will handle redirecting authenticated users away from login page
@@ -59,9 +60,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col space-y-2 min-h-screen items-center justify-center bg-white p-4">
+    <div className="flex flex-col space-y-2 min-h-screen items-center justify-center bg-white p-1">
       <div className="w-full max-w-md space-y-1">
-        <div className="rounded-3xl border border-black/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg">
+        <div className="rounded-none border-none border-black/20 bg-white/10 p-1 shadow-none backdrop-blur-lg">
           <div className="text-center">
             <h2 className="mb-2 text-3xl font-bold text-black">Welcome Back</h2>
             <p className="text-black/80">Sign in to your account</p>
@@ -192,7 +193,7 @@ export default function LoginPage() {
               >
                 {isSubmitting ? (
                   <div className="flex items-center">
-                    <div className="mr-3 h-5 w-5 animate-spin rounded-none border-2 border-white border-t-transparent"></div>
+                    <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                     Signing in...
                   </div>
                 ) : (
@@ -215,9 +216,19 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="w-full rounded-3xl border border-black/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg space-y-1">
-        <BusinessRoadmap />
-      </div>
+      <div className="flex justify-center">
+          <button
+            className="btn-ghost px-1 py-1"
+            onClick={() => setShowRoadmap(!showRoadmap)}
+          >
+            {showRoadmap ? 'Hide Roadmap' : 'Show Roadmap'}
+          </button>
+        </div>
+        {showRoadmap && (
+          <div className="w-full space-y-1 rounded-none border-none border-black/20 bg-white p-1 shadow-none backdrop-blur-lg">
+            <BusinessRoadmap />
+          </div>
+        )}
     </div>
   );
 }

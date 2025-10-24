@@ -146,6 +146,8 @@ interface AuthContextType {
     email: string;
     expiresIn: number;
   }>;
+  deactivateAccount: (password: string) => Promise<boolean>;
+  deleteAccount: (password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -638,7 +640,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     } catch (error: any) {
-      //console.log('🔍 Login error details:', error);
+      console.log('🔍 Login error details:', error);
 
       // Handle specific authentication errors first (401 = invalid credentials)
       if (
@@ -655,7 +657,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               ? 'No account found with this email address.'
               : error.error || error.message || 'Invalid email or password.';
 
-        //console.log('❌ Authentication failed:', errorMessage);
+        console.log('❌ Authentication failed:', errorMessage);
         setError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -1012,6 +1014,88 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const deactivateAccount = async (password: string) => {
+    try {
+      console.log(
+        '🔒 Attempting to deactivate account with password length:',
+        password.length
+      );
+      setError(null);
+
+      const response = await apiClient.post<{
+        message: string;
+        error?: string;
+        success?: boolean;
+      }>('/api/auth/deactivate-account', {
+        password,
+      });
+
+      console.log('📋 Deactivate account response:', response);
+
+      if (response.success) {
+        console.log('✅ Account deactivated successfully');
+        setUser(null);
+        return true;
+      } else {
+        // Handle API error response structure - check both response.data.error and response.message
+        const errorMessage =
+          response.data?.error ||
+          response.message ||
+          'Failed to deactivate account. Please try again.';
+        console.log('❌ Deactivate account failed:', errorMessage);
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.log('🔍 Deactivate account error details:', error);
+      const errorMessage =
+        error.message || 'Failed to deactivate account. Please try again.';
+      console.log('❌ Final deactivate error message:', errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const deleteAccount = async (password: string) => {
+    try {
+      console.log(
+        '🗑️ Attempting to delete account with password length:',
+        password.length
+      );
+      setError(null);
+
+      const response = await apiClient.post<{
+        message: string;
+        error?: string;
+        success?: boolean;
+      }>('/api/auth/delete-account', {
+        password,
+      });
+      console.log('🗑️ Delete account response:', response);
+      if (response.success) {
+        console.log('✅ Account deleted successfully');
+        setUser(null);
+        return true;
+      } else {
+        // Handle API error response structure - check both response.data.error and response.message
+        const errorMessage =
+          response.data?.error ||
+          response.message ||
+          'Failed to delete account. Please try again.';
+        console.log('❌ Delete account error message:', errorMessage);
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.log('🔍 Delete account error details:', error);
+      const errorMessage =
+        error.message || 'Failed to delete account. Please try again.';
+      console.log('❌ Final delete error message:', errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -1022,6 +1106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
     forgotPassword,
     resetPassword,
+    deactivateAccount,
+    deleteAccount,
     changePassword,
     refreshToken,
     clearError,

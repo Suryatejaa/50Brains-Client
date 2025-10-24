@@ -4,10 +4,9 @@
 import React, { useState } from 'react';
 import { UserProfileData } from '../../types/profile.types';
 import EditableField from '../common/EditableField';
-import ConfirmDialog from '../common/ConfirmDialog';
+import MiniConfirmDialog from '../common/MiniConfirmDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useAccountActions } from '@/hooks/useAccountActions';
-import '../common/ConfirmDialog.css';
 
 interface SettingsTabProps {
   user: UserProfileData;
@@ -30,23 +29,21 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
   const isEditingPrivacy = editing.section === 'privacy';
   const isEditingNotifications = editing.section === 'notifications';
   const isEditingAccount = editing.section === 'account';
-  const { logout, isLoading } = useAuth();
-  const {
-    deactivateAccount,
-    deleteAccount,
-    isLoading: accountActionsLoading,
-    error: accountError,
-  } = useAccountActions();
+  const { logout, deactivateAccount, deleteAccount, isLoading } = useAuth();
+  const { isLoading: accountActionsLoading, error: accountError } =
+    useAccountActions();
 
   // Dialog state management
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     type: 'logout' | 'deactivate' | 'delete' | null;
     loading: boolean;
+    error: string | null;
   }>({
     isOpen: false,
     type: null,
     loading: false,
+    error: null,
   });
 
   const openDialog = (type: 'logout' | 'deactivate' | 'delete') => {
@@ -54,6 +51,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
       isOpen: true,
       type,
       loading: false,
+      error: null,
     });
   };
 
@@ -63,11 +61,12 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
         isOpen: false,
         type: null,
         loading: false,
+        error: null,
       });
     }
   };
 
-  const handleConfirmAction = async () => {
+  const handleConfirmAction = async (password?: string) => {
     setConfirmDialog((prev) => ({ ...prev, loading: true }));
 
     try {
@@ -79,21 +78,56 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
           success = true;
           break;
         case 'deactivate':
-          success = await deactivateAccount();
+          if (!password) {
+            setConfirmDialog((prev) => ({ ...prev, loading: false }));
+            return;
+          }
+          success = await deactivateAccount(password);
           break;
         case 'delete':
-          success = await deleteAccount();
+          if (!password) {
+            setConfirmDialog((prev) => ({ ...prev, loading: false }));
+            return;
+          }
+          success = await deleteAccount(password);
           break;
       }
 
+      console.log(`result of ${confirmDialog.type}:`, success);
       if (success) {
         closeDialog();
       } else {
-        setConfirmDialog((prev) => ({ ...prev, loading: false }));
+        setConfirmDialog((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Operation failed. Please try again.',
+        }));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to ${confirmDialog.type} account:`, error);
-      setConfirmDialog((prev) => ({ ...prev, loading: false }));
+      console.log('🔍 Error object structure:', {
+        message: error?.message,
+        error: error?.error,
+        statusCode: error?.statusCode,
+        status: error?.status,
+        details: error?.details,
+        fullError: error,
+      });
+
+      // Extract error message from various possible structures
+      const errorMessage =
+        error?.error || // API error field
+        error?.message || // Standard error message
+        error?.data?.message || // Nested API response
+        error?.response?.data?.message || // Axios-style response
+        `Failed to ${confirmDialog.type} account. Please try again.`;
+
+      console.log('📝 Final error message to display:', errorMessage);
+      setConfirmDialog((prev) => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
     }
   };
 
@@ -124,43 +158,6 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     const result = await onUpdateSection('settings', { [section]: data });
     if (!result.success) {
       console.error(`Failed to update ${section}:`, result.error);
-    }
-  };
-
-  // Dialog configuration based on type
-  const getDialogConfig = () => {
-    switch (confirmDialog.type) {
-      case 'logout':
-        return {
-          title: 'Confirm Logout',
-          message:
-            'Are you sure you want to logout? You will need to login again to access your account.',
-          confirmText: 'Logout',
-          danger: false,
-        };
-      case 'deactivate':
-        return {
-          title: 'Deactivate Account',
-          message:
-            'Are you sure you want to deactivate your account? Your profile will be hidden from other users, but you can reactivate it later by logging in.',
-          confirmText: 'Deactivate',
-          danger: true,
-        };
-      case 'delete':
-        return {
-          title: 'Delete Account',
-          message:
-            'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost forever.',
-          confirmText: 'Delete Forever',
-          danger: true,
-        };
-      default:
-        return {
-          title: '',
-          message: '',
-          confirmText: 'Confirm',
-          danger: false,
-        };
     }
   };
 
@@ -462,13 +459,14 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
         </div>
       </div>
 
-      {/* Confirm Dialog */}
-      <ConfirmDialog
+      {/* Mini Confirm Dialog */}
+      <MiniConfirmDialog
         isOpen={confirmDialog.isOpen}
-        {...getDialogConfig()}
+        type={confirmDialog.type || 'logout'}
         onConfirm={handleConfirmAction}
         onCancel={closeDialog}
         loading={confirmDialog.loading}
+        error={confirmDialog.error}
       />
     </div>
   );

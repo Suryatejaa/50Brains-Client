@@ -11,6 +11,8 @@ export function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
+  const hasMultiRoles = user?.roles && user.roles.length > 2;
+
   if (isAuthenticated) {
     // Minimal header for authenticated users - most navigation happens in bottom nav
     return (
@@ -55,7 +57,7 @@ export function Header() {
             {/* 🚀 Desktop User Menu */}
             <div className="hidden items-center space-x-4 md:flex">
               {/* Role Switcher - Only show if user has multiple roles */}
-              <RoleSwitcher />
+              {hasMultiRoles && <RoleSwitcher />}
 
               {/* Notifications */}
               <NotificationBell />
@@ -65,13 +67,13 @@ export function Header() {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="text-body hover:text-accent bg-gray-200 rounded-full flex items-center space-x-2 transition-colors"
+                  className="text-body hover:text-accent flex items-center space-x-2 rounded-full bg-gray-200 transition-colors"
                 >
                   <div className="bg-brand-light-blue flex h-8 w-8 items-center justify-center rounded-full">
                     <span className="text-sm">
-                      {(user?.firstName?.charAt(0) ||
-                        user?.email?.charAt(0))?.toUpperCase() ||
-                        '👤'}
+                      {(
+                        user?.firstName?.charAt(0) || user?.email?.charAt(0)
+                      )?.toUpperCase() || '👤'}
                     </span>
                   </div>
                 </button>
@@ -124,18 +126,6 @@ export function Header() {
                         </Link>
 
                         {/* Divider */}
-                        <div className="my-2 border-t border-gray-200"></div>
-
-                        <button
-                          onClick={() => {
-                            logout();
-                            setIsUserMenuOpen(false);
-                          }}
-                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-red-600 transition-colors duration-200 hover:bg-red-50"
-                        >
-                          <span>🚪</span>
-                          <span>Sign Out</span>
-                        </button>
                       </div>
                     </div>
                   </>
@@ -147,46 +137,53 @@ export function Header() {
           {/* 📱 Mobile User Menu */}
           {isMenuOpen && (
             <div className="md:hidden">
-              <div className="border-brand-border bg-brand-glass space-y-1 border-t px-2 pb-3 pt-2 backdrop-blur-md">
-                <div className="border-brand-border mb-2 flex items-center border-b px-3 py-3">
-                  <div className="bg-brand-light-blue/20 mr-3 flex h-10 w-10 items-center justify-center rounded-none">
-                    <span className="text-lg font-medium">
-                      {user?.firstName?.charAt(0) ||
-                        user?.email?.charAt(0) ||
-                        '👤'}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-brand-text-main font-medium">
-                      {user?.firstName} {user?.lastName}
+              <div className="border-brand-border space-y-1 border-none bg-brand-glass">
+                {/* User Info Header */}
+                <div className="border-brand-border border-b px-2 py-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-brand-light-blue flex h-10 w-10 items-center justify-center rounded-full">
+                      <span className="text-lg font-medium text-white">
+                        {(
+                          user?.firstName?.charAt(0) || user?.email?.charAt(0)
+                        )?.toUpperCase() || '👤'}
+                      </span>
                     </div>
-                    <div className="text-brand-text-muted text-sm">
-                      {user?.email}
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">
+                        {user?.firstName} {user?.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500">{user?.email}</div>
                     </div>
                   </div>
+                </div>
+
+                {/* Menu Items */}
+                <div className="px-2 py-2">
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                  >
+                    <span>�</span>
+                    <span>Profile</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                  >
+                    <span>🏠</span>
+                    <span>Dashboard</span>
+                  </Link>
                 </div>
 
                 {/* Mobile Role Switcher */}
-                <div className="px-3 py-2">
-                  <RoleSwitcher variant="tabs" showDescription={false} />
-                </div>
-
-                <Link
-                  href="/credits"
-                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Credits
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="text-body hover:text-accent hover:bg-brand-light-blue/30 w-full rounded-none px-3 py-2 text-left transition-all duration-200"
-                >
-                  Sign Out
-                </button>
+                {hasMultiRoles && (
+                  <div className="border-brand-border border-t px-3 py-3">
+                    <RoleSwitcher variant="tabs" showDescription={false} />
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -217,7 +214,7 @@ export function Header() {
 
           {/* 📱 Mobile menu button */}
           <button
-            className="text-body hover:text-accent p-2 transition-colors md:hidden"
+            className="text-body hover:text-accent hidden p-2 transition-colors md:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <svg
@@ -244,7 +241,7 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="border-brand-border bg-brand-glass space-y-1 border-t px-2 pb-3 pt-2 backdrop-blur-md">
-              <Link
+              {/* <Link
                 href="/marketplace"
                 className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
@@ -257,14 +254,14 @@ export function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Clans
-              </Link>
-              <Link
+              </Link> */}
+              {/* <Link
                 href="/create-gig"
                 className="text-body hover:text-accent hover:bg-brand-light-blue/30 block rounded-none px-3 py-2 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Create Gig
-              </Link>
+              </Link> */}
               <div className="border-brand-border mt-4 space-y-2 border-t px-3 py-2">
                 <Link
                   href="/login"
