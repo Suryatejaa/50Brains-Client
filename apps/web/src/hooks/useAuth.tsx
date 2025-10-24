@@ -65,6 +65,7 @@ interface RegisterRequest {
   email: string;
   password: string;
   firstName: string;
+  instagramHandle?: string;
   lastName?: string;
   roles?: UserRole[]; // Optional for registration
 }
@@ -506,8 +507,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
             if (!isOnAuthPage) {
               //console.log(
-                    //   '🔄 Global redirect to login due to expired refresh token'
-                    // );
+              //   '🔄 Global redirect to login due to expired refresh token'
+              // );
               router.push('/login');
             }
           }
@@ -534,8 +535,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // If it's a refresh token expired error, clear auth state gracefully
         if (event.reason?.error === 'REFRESH_EXPIRED') {
           //console.log(
-            //   '🔒 Handling expired refresh token globally (promise rejection)'
-            // );
+          //   '🔒 Handling expired refresh token globally (promise rejection)'
+          // );
           setUser(null);
           clearUserCache();
 

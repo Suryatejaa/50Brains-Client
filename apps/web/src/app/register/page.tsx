@@ -13,6 +13,7 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
     roles: [] as string[],
+    instagramHandle: '',
     agreedToTerms: false,
     subscribeToNewsletter: false,
   });
@@ -118,6 +119,18 @@ export default function RegisterPage() {
       return;
     }
 
+    // Validate Instagram handle for CREW and INFLUENCER roles
+    const requiresInstagram = formData.roles.some(
+      (role) => role === 'CREW' || role === 'INFLUENCER'
+    );
+
+    if (requiresInstagram && !formData.instagramHandle.trim()) {
+      setError(
+        'Instagram handle is required for Content Creators and Freelancers.'
+      );
+      return;
+    }
+
     if (!formData.agreedToTerms) {
       setError(
         'Please agree to the Terms of Service and Privacy Policy to continue.'
@@ -137,6 +150,7 @@ export default function RegisterPage() {
         password: formData.password,
         firstName: formData.email.split('@')[0], // Use email username as firstName for now
         roles: formData.roles as any[],
+        instagramHandle: formData.instagramHandle.trim(),
       });
 
       // Registration successful - redirect to dashboard
@@ -164,9 +178,15 @@ export default function RegisterPage() {
     const checked =
       type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
 
+    // Remove spaces from password and confirmPassword fields
+    let processedValue = value;
+    if (name === 'password' || name === 'confirmPassword') {
+      processedValue = value.replace(/\s/g, '');
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : processedValue,
     }));
 
     // Clear errors when user types
@@ -528,6 +548,39 @@ export default function RegisterPage() {
         })}
       </div>
 
+      {/* Instagram Handle Field for CREW and INFLUENCER */}
+      {formData.roles.some(
+        (role) => role === 'CREW' || role === 'INFLUENCER'
+      ) && (
+        <div className="mt-4 space-y-2 rounded-lg border border-blue-200 bg-blue-50/50 p-4">
+          <label
+            htmlFor="instagramHandle"
+            className="text-body block text-sm font-medium"
+          >
+            Instagram Handle *
+          </label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              @
+            </span>
+            <input
+              id="instagramHandle"
+              name="instagramHandle"
+              type="text"
+              required
+              className="input w-full pl-8"
+              placeholder="your_instagram_handle"
+              value={formData.instagramHandle}
+              onChange={handleChange}
+              autoComplete="off"
+            />
+          </div>
+          <p className="text-xs text-gray-600">
+            Required for Content Creators and Freelancers to showcase your work
+          </p>
+        </div>
+      )}
+
       <div className="mt-1 space-y-1 border-t border-gray-200 pt-1">
         <label className="flex items-start space-x-3">
           <input
@@ -624,7 +677,12 @@ export default function RegisterPage() {
                   disabled={
                     isLoading ||
                     (step === 3 &&
-                      (formData.roles.length === 0 || !formData.agreedToTerms))
+                      (formData.roles.length === 0 ||
+                        !formData.agreedToTerms ||
+                        (formData.roles.some(
+                          (role) => role === 'CREW' || role === 'INFLUENCER'
+                        ) &&
+                          !formData.instagramHandle.trim())))
                   }
                   className="btn-primary flex items-center justify-center px-1 py-1 disabled:cursor-not-allowed disabled:opacity-50"
                 >
