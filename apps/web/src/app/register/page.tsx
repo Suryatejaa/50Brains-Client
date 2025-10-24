@@ -143,12 +143,24 @@ export default function RegisterPage() {
     clearError();
 
     try {
+      // Format username according to server Joi validation
+      const formatUsername = (email: string): string => {
+        const baseUsername = email.split('@')[0];
+        // Only allow letters, numbers, periods, underscores, and hyphens
+        const cleanUsername = baseUsername.replace(/[^a-zA-Z0-9._-]/g, '');
+        // Ensure minimum 3 characters, maximum 30 characters
+        if (cleanUsername.length < 3) {
+          return cleanUsername.padEnd(3, '0'); // Pad with zeros if too short
+        }
+        return cleanUsername.substring(0, 30); // Truncate if too long
+      };
+
       const result = await register({
         email: String(formData.email || '')
           .toLowerCase()
           .trim(),
         password: formData.password,
-        username: formData.email.split('@')[0], // Use email username as username for now
+        username: formatUsername(formData.email),
         roles: formData.roles as any[],
         instagramHandle: formData.instagramHandle.trim(),
       });
