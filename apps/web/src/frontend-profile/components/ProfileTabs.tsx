@@ -112,7 +112,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-96 bg-white p-6">{renderTabContent()}</div>
+      <div className="min-h-96 bg-white p-1">{renderTabContent()}</div>
     </div>
   );
 };

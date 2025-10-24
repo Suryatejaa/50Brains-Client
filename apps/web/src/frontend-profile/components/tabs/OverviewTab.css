@@ -12,21 +12,22 @@
 .overview-tab__role-section {
   grid-column: 1 / -1;
   background: white;
-  border: 1px solid #e5e7eb;
-  padding: 2px;
-  border-radius: 8px;
+  /* border: 1px solid #e5e7eb; */
+  padding: 1px;
+  /* border-radius: 8px; */
   margin-top: 2px;
 }
 
 .overview-tab__role-content {
-  margin-top: 12px;
+  margin-top: 2px;
+  padding: 2px 4px;
 }
 
 .overview-tab__field {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 2px 0;
   border-bottom: 1px solid #f3f4f6;
 }
 
@@ -92,8 +93,9 @@
 .section-header {
   display: flex;
   justify-content: space-between;
+  padding: 2px 4px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 2px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f3f4f6;
 }

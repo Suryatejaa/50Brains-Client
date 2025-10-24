@@ -420,6 +420,14 @@ export class UserAPI {
     });
   }
 
+  static async getPublicProfilesByUsernames(
+    usernames: string[]
+  ): Promise<APIResponse<UserProfile[]>> {
+    return apiClient.post<UserProfile[]>(`/api/public/profiles/internal/by-usernames`, {
+      usernames: usernames,
+    });
+  }
+
   static async searchUsers(params: {
     q?: string;
     roles?: UserRole[];
@@ -505,6 +513,7 @@ export const {
   updateUserSettings,
   getUserAnalytics,
   getPublicProfiles,
+  getPublicProfilesByUsernames,
   searchUsers,
   requestVerification,
   getAchievements,

@@ -57,6 +57,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     onCancelEdit();
   };
 
+  const handleShareProfile = () => {
+    const profileUrl = `${window.location.origin}/profile/${user.username}`;
+    navigator.clipboard.writeText(profileUrl).then(() => {
+      alert('Profile URL copied to clipboard!');
+    });
+  };
+
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
@@ -277,7 +284,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     onClick={onEditClick}
                     className="profile-header__edit-btn w-full rounded-none bg-blue-600 px-2 py-2 font-medium text-white hover:bg-blue-700"
                   >
-                    <span className="mr-2 relative top-0.5 inline-block">
+                    <span className="relative top-0.5 mr-2 inline-block">
                       Edit Profile
                     </span>
                   </button>
@@ -291,7 +298,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     </button>
                   </div>
                 )}
-                <button className="profile-header__share-btn w-full rounded-none bg-gray-100 px-2 py-2 font-medium text-gray-700 hover:bg-gray-200">
+                <button
+                  className="profile-header__share-btn w-full rounded-none bg-gray-100 px-2 py-2 font-medium text-gray-700 hover:bg-gray-200"
+                  onClick={() => handleShareProfile()}
+                >
                   🔗 Share Profile
                 </button>
               </div>

@@ -234,7 +234,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
 
         {user.roles.includes('CREW') && (
           <div className="overview-tab__role-section">
-            <div className="section-header">
+            <div className="section-header p-2">
               <h3>Crew Information</h3>
               {isOwner && editing.section !== 'crewRoleInfo' && (
                 <button
