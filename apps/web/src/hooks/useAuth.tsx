@@ -64,7 +64,8 @@ interface LoginRequest {
 interface RegisterRequest {
   email: string;
   password: string;
-  firstName: string;
+  username: string;
+  firstName?: string;
   instagramHandle?: string;
   lastName?: string;
   roles?: UserRole[]; // Optional for registration

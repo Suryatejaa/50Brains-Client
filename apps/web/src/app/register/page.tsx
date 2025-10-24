@@ -148,7 +148,7 @@ export default function RegisterPage() {
           .toLowerCase()
           .trim(),
         password: formData.password,
-        firstName: formData.email.split('@')[0], // Use email username as firstName for now
+        username: formData.email.split('@')[0], // Use email username as username for now
         roles: formData.roles as any[],
         instagramHandle: formData.instagramHandle.trim(),
       });
