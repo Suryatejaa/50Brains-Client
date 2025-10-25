@@ -306,7 +306,7 @@ export default function ApplicationsPage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">
-                            ₹{application.quotedPrice.toLocaleString()}
+                            ₹{application.quotedPrice.toLocaleString() ?? 0}
                           </span>
                         </div>
                         <div className="flex justify-between">

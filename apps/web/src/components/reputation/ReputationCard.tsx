@@ -90,7 +90,7 @@ const ReputationCard: React.FC<ReputationCardProps> = ({
         </div>
         <div className="text-right">
           <div className={`text-2xl font-bold ${tierStyle.text}`}>
-            {reputation.finalScore.toLocaleString()}
+            {reputation.finalScore.toLocaleString() ?? 0}
           </div>
           <div className="text-sm text-gray-600">Points</div>
         </div>

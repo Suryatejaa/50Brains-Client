@@ -482,7 +482,7 @@ export default function ApplicationsPage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">
-                            ₹{application.quotedPrice.toLocaleString()}
+                            ₹{application.quotedPrice.toLocaleString() ?? 0}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -541,7 +541,7 @@ export default function ApplicationsPage() {
                               {new Date(m.dueAt).toLocaleDateString()}
                             </span>
                             <span className="font-medium">
-                              ₹{(m.amount || 0).toLocaleString()}
+                              ₹{(m.amount || 0).toLocaleString() ?? 0}
                             </span>
                           </div>
                         ))}
@@ -567,7 +567,7 @@ export default function ApplicationsPage() {
                             <span className="font-medium">
                               {p.percentage
                                 ? `${p.percentage}%`
-                                : `₹${(p.fixedAmount || 0).toLocaleString()}`}
+                                : `₹${(p.fixedAmount || 0).toLocaleString() ?? 0}`}
                             </span>
                           </div>
                         ))}
@@ -737,7 +737,7 @@ export default function ApplicationsPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Quoted Price</span>
                       <span className="font-medium">
-                        ₹{approveApplication.quotedPrice.toLocaleString()}
+                        ₹{approveApplication.quotedPrice.toLocaleString() ?? 0}
                       </span>
                     </div>
                     {approveApplication.estimatedTime && (
@@ -774,7 +774,7 @@ export default function ApplicationsPage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Milestone Total</span>
                           <span className="font-medium">
-                            ₹{msTotal.toLocaleString()}
+                            ₹{msTotal.toLocaleString() ?? 0}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -856,7 +856,7 @@ export default function ApplicationsPage() {
                             {m.title} — {new Date(m.dueAt).toLocaleDateString()}
                           </span>
                           <span className="font-medium">
-                            ₹{(m.amount || 0).toLocaleString()}
+                            ₹{(m.amount || 0).toLocaleString() ?? 0}
                           </span>
                         </div>
                       ))}
@@ -883,7 +883,7 @@ export default function ApplicationsPage() {
                           <span className="font-medium">
                             {p.percentage
                               ? `${p.percentage}%`
-                              : `₹${(p.fixedAmount || 0).toLocaleString()}`}
+                              : `₹${(p.fixedAmount || 0).toLocaleString() ?? 0}`}
                           </span>
                         </div>
                       ))}

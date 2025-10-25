@@ -369,7 +369,7 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
                         </div>
                         <div className="text-right">
                           <div className="text-heading font-semibold">
-                            {platform.followers.toLocaleString()}
+                            {platform.followers.toLocaleString() ?? 0}
                           </div>
                           <div className="text-muted text-xs">
                             {platform.engagement}% engagement

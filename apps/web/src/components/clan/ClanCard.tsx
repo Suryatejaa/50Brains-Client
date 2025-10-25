@@ -64,7 +64,7 @@ export const ClanCard: React.FC<ClanCardProps> = ({
     const formatCurrency = (amount: number) => {
         if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
         if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
-        return `$${amount?.toLocaleString()}`;
+        return `$${amount?.toLocaleString() ?? 0}`;
     };
 
     const canJoin = useMemo(() => {

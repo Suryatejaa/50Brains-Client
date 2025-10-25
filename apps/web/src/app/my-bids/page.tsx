@@ -292,7 +292,7 @@ export default function MyBidsPage() {
                       <div>
                         <span className="font-medium">Bid Amount:</span>
                         <div className="font-semibold text-green-600">
-                          ₹{bid.bidAmount.toLocaleString()}
+                          ₹{bid.bidAmount.toLocaleString() ?? 0}
                         </div>
                       </div>
                       <div>
@@ -302,8 +302,8 @@ export default function MyBidsPage() {
                       <div>
                         <span className="font-medium">Project Budget:</span>
                         <div>
-                          ₹{bid.projectBudget.min.toLocaleString()} - ₹
-                          {bid.projectBudget.max.toLocaleString()}
+                          ₹{bid.projectBudget.min.toLocaleString() ?? 0} - ₹
+                          {bid.projectBudget.max.toLocaleString() ?? 0}
                         </div>
                       </div>
                       <div>

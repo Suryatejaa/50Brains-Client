@@ -434,7 +434,7 @@ export default function CreditsHistoryPage() {
                               <span>
                                 {new Date(
                                   transaction.createdAt
-                                ).toLocaleString()}
+                                ).toLocaleString() ?? 0}
                               </span>
                               <span>Type: {transaction.type}</span>
                               {transaction.relatedEntity && (

@@ -263,7 +263,7 @@ export const ApplicationManagement: React.FC<ApplicationManagementProps> = ({
                         <p className="text-sm text-gray-500">
                           Primary Platform:{' '}
                           {application.applicant.primaryPlatform} |{' '}
-                          {application.applicant.followers.toLocaleString()}{' '}
+                          {application.applicant.followers.toLocaleString() ?? 0}{' '}
                           followers
                         </p>
                         <p className="text-xs text-gray-400">
@@ -283,7 +283,7 @@ export const ApplicationManagement: React.FC<ApplicationManagementProps> = ({
                         Proposed Budget
                       </h4>
                       <p className="text-lg font-bold text-green-600">
-                        ₹{application.proposedBudget.toLocaleString()}
+                        ₹{application.proposedBudget.toLocaleString() ?? 0}
                       </p>
                     </div>
 

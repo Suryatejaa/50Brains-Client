@@ -753,9 +753,9 @@ const GigSelectionStep: React.FC<{
               .filter((gig) => gig.isClanAllowed !== false)
               .map((gig: Gig) => (
                 <option key={gig.id} value={gig.id}>
-                  {gig.title} - Budget: ₹{gig.budgetMin?.toLocaleString()}
+                  {gig.title} - Budget: ₹{gig.budgetMin?.toLocaleString() ?? 0}
                   {gig.budgetMax && gig.budgetMax !== gig.budgetMin
-                    ? ` - ₹${gig.budgetMax?.toLocaleString()}`
+                    ? ` - ₹${gig.budgetMax?.toLocaleString() ?? 0}`
                     : ''}{' '}
                   ({gig.budgetType})
                 </option>
@@ -779,10 +779,10 @@ const GigSelectionStep: React.FC<{
             </p>
             <p>
               <span className="font-medium">Budget:</span> ₹
-              {selectedGig.budgetMin?.toLocaleString()}
+              {selectedGig.budgetMin?.toLocaleString() ?? 0}
               {selectedGig.budgetMax &&
               selectedGig.budgetMax !== selectedGig.budgetMin
-                ? ` - ₹${selectedGig.budgetMax?.toLocaleString()}`
+                ? ` - ₹${selectedGig.budgetMax?.toLocaleString() ?? 0}`
                 : ''}{' '}
               ({selectedGig.budgetType})
             </p>
@@ -897,7 +897,7 @@ const ApplicationDetailsStep: React.FC<{
           Quoted Price (₹) *
           {selectedGig && (
             <span className="ml-2 text-sm text-gray-500">
-              (Max: ₹{selectedGig.budgetMax?.toLocaleString() || 'Unlimited'})
+              (Max: ₹{selectedGig.budgetMax?.toLocaleString()|| 'Unlimited'})
             </span>
           )}
         </label>
@@ -917,12 +917,12 @@ const ApplicationDetailsStep: React.FC<{
         {!isPriceValid && (
           <p className="mt-1 text-sm text-red-600">
             ❌ Quoted price cannot exceed the gig's maximum budget of ₹
-            {maxAllowedPrice.toLocaleString()}
+            {maxAllowedPrice.toLocaleString() ?? 0}
           </p>
         )}
         {selectedGig && (
           <p className="mt-1 text-sm text-gray-500">
-            💡 Gig budget: ₹{selectedGig.budgetMin?.toLocaleString() || 0} - ₹
+            💡 Gig budget: ₹{selectedGig.budgetMin?.toLocaleString()  || 0} - ₹
             {selectedGig.budgetMax?.toLocaleString() || 'Unlimited'}
           </p>
         )}
@@ -1589,10 +1589,10 @@ const MilestoneStep: React.FC<{
               Total Milestone Amount: ₹
               {milestones
                 .reduce((sum, m) => sum + m.amount, 0)
-                .toLocaleString()}
+                .toLocaleString() ?? 0}
             </span>
             <span className="text-sm text-gray-500">
-              / ₹{(data.quotedPrice || 0).toLocaleString()} (Quoted Price)
+              / ₹{(data.quotedPrice || 0).toLocaleString() ?? 0} (Quoted Price)
             </span>
             {milestones.length > 0 && (
               <span

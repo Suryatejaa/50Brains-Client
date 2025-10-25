@@ -67,7 +67,7 @@ export const WorkHistorySummary: React.FC<WorkHistorySummaryProps> = ({
 
         <div className="card-glass p-1 text-center">
           <div className="text-2xl font-bold text-purple-600">
-            ₹{(workSummary.totalEarnings || 0).toLocaleString()}
+            ₹{(workSummary.totalEarnings || 0).toLocaleString() ?? 0}
           </div>
           <div className="text-sm text-gray-600">Total Earnings</div>
         </div>

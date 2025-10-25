@@ -28,7 +28,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       } else if (val >= 1000) {
         return `${(val / 1000).toFixed(1)}K`;
       }
-      return val.toLocaleString();
+      return val.toLocaleString() ?? 0;
     }
     return val;
   };

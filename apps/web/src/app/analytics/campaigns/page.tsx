@@ -267,7 +267,7 @@ export default function CampaignAnalyticsPage() {
                         Total Spent
                       </p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${summary.totalSpent.toLocaleString()}
+                        ${summary.totalSpent?.toLocaleString() ?? '0'}
                       </p>
                     </div>
                     <div className="flex h-10 w-10 items-center justify-center rounded-none bg-red-100">
@@ -277,8 +277,8 @@ export default function CampaignAnalyticsPage() {
                   <p className="mt-2 text-sm text-gray-600">
                     Avg: $
                     {Math.round(
-                      summary.totalSpent / (summary.totalCampaigns || 1)
-                    ).toLocaleString()}{' '}
+                      (summary.totalSpent || 0) / (summary.totalCampaigns || 1)
+                    )?.toLocaleString() ?? '0'}{' '}
                     per campaign
                   </p>
                 </div>
@@ -408,13 +408,15 @@ export default function CampaignAnalyticsPage() {
                               </p>
                               <p className="text-lg font-semibold text-gray-900">
                                 $
-                                {campaign.analytics.totalSpent.toLocaleString()}
+                                {campaign.analytics.totalSpent?.toLocaleString() ??
+                                  '0'}
                               </p>
                             </div>
                             <div>
                               <p className="text-sm text-gray-600">Reach</p>
                               <p className="text-lg font-semibold text-purple-600">
-                                {campaign.analytics.reach.toLocaleString()}
+                                {campaign.analytics.reach?.toLocaleString() ??
+                                  '0'}
                               </p>
                             </div>
                           </div>
@@ -453,7 +455,8 @@ export default function CampaignAnalyticsPage() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-gray-600">Views</span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.views.toLocaleString()}
+                                    {campaign.analytics.views?.toLocaleString() ??
+                                      '0'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -461,13 +464,15 @@ export default function CampaignAnalyticsPage() {
                                     Impressions
                                   </span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.impressions.toLocaleString()}
+                                    {campaign.analytics.impressions?.toLocaleString() ??
+                                      '0'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
                                   <span className="text-gray-600">Clicks</span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.clicks.toLocaleString()}
+                                    {campaign.analytics.clicks?.toLocaleString() ??
+                                      '0'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -508,8 +513,12 @@ export default function CampaignAnalyticsPage() {
                                     Budget Range
                                   </span>
                                   <span className="font-semibold">
-                                    ${campaign.budgetMin.toLocaleString()} - $
-                                    {campaign.budgetMax.toLocaleString()}
+                                    $
+                                    {campaign.budgetMin?.toLocaleString() ??
+                                      '0'}{' '}
+                                    - $
+                                    {campaign.budgetMax?.toLocaleString() ??
+                                      '0'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -518,9 +527,9 @@ export default function CampaignAnalyticsPage() {
                                   </span>
                                   <span className="font-semibold">
                                     $
-                                    {campaign.analytics.costPerAcquisition.toFixed(
+                                    {campaign.analytics.costPerAcquisition?.toFixed(
                                       2
-                                    )}
+                                    ) ?? '0.00'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -529,9 +538,9 @@ export default function CampaignAnalyticsPage() {
                                   </span>
                                   <span className="font-semibold">
                                     $
-                                    {campaign.analytics.costPerEngagement.toFixed(
+                                    {campaign.analytics.costPerEngagement?.toFixed(
                                       2
-                                    )}
+                                    ) ?? '0.00'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">

@@ -102,9 +102,9 @@ export default function PortfolioPage() {
     
     return (
       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
-        {metrics.views && <span>👁️ {metrics.views.toLocaleString()} views</span>}
+        {metrics.views && <span>👁️ {metrics.views.toLocaleString() ?? 0} views</span>}
         {metrics.engagement && <span>❤️ {metrics.engagement}% engagement</span>}
-        {metrics.reach && <span>📊 {metrics.reach.toLocaleString()} reach</span>}
+        {metrics.reach && <span>📊 {metrics.reach.toLocaleString() ?? 0} reach</span>}
         {metrics.conversions && <span>🎯 {metrics.conversions} conversions</span>}
       </div>
     );
@@ -342,14 +342,14 @@ export default function PortfolioPage() {
                 
                 <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {portfolioItems.reduce((sum, item) => sum + (item.metrics?.views || 0), 0).toLocaleString()}
+                    {portfolioItems.reduce((sum, item) => sum + (item.metrics?.views || 0), 0).toLocaleString() ?? 0}
                   </div>
                   <div className="text-sm text-gray-600">Total Views</div>
                 </div>
                 
                 <div className="card-glass p-2 text-center">
                   <div className="text-2xl font-bold text-purple-600">
-                    {portfolioItems.reduce((sum, item) => sum + (item.metrics?.reach || 0), 0).toLocaleString()}
+                    {portfolioItems.reduce((sum, item) => sum + (item.metrics?.reach || 0), 0).toLocaleString() ?? 0}
                   </div>
                   <div className="text-sm text-gray-600">Total Reach</div>
                 </div>

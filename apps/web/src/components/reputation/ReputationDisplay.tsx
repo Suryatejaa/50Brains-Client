@@ -67,7 +67,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
           {reputation.tier}
         </div>
         <span className="text-sm font-medium text-gray-600">
-          {reputation.finalScore.toLocaleString()} pts
+          {reputation.finalScore.toLocaleString() ?? 0} pts
         </span>
         {showRanking && (
           <span className="text-xs text-gray-500">
@@ -94,7 +94,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-gray-900">
-            {reputation.finalScore.toLocaleString()}
+            {reputation.finalScore.toLocaleString() ?? 0}
           </div>
           <div className="text-sm text-gray-500">Total Points</div>
         </div>
@@ -104,13 +104,13 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
       <div className="mb-6 grid grid-cols-2 gap-4">
         <div className="rounded-none bg-blue-50 p-3">
           <div className="text-lg font-semibold text-blue-600">
-            {reputation.baseScore.toLocaleString()}
+            {reputation.baseScore.toLocaleString() ?? 0}
           </div>
           <div className="text-sm text-blue-500">Base Score</div>
         </div>
         <div className="rounded-none bg-green-50 p-3">
           <div className="text-lg font-semibold text-green-600">
-            +{reputation.bonusScore.toLocaleString()}
+            +{reputation.bonusScore.toLocaleString() ?? 0}
           </div>
           <div className="text-sm text-green-500">Bonus Points</div>
         </div>
@@ -181,7 +181,7 @@ const ReputationDisplay: React.FC<ReputationDisplayProps> = ({
             <div className="flex justify-between">
               <span className="text-gray-600">Profile Views:</span>
               <span className="font-medium">
-                {reputation.metrics.profileViews.toLocaleString()}
+                {reputation.metrics.profileViews.toLocaleString() ?? 0}
               </span>
             </div>
           </div>

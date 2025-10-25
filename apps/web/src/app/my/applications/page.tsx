@@ -327,8 +327,8 @@ export default function MyApplicationsPage() {
                         Budget
                       </label>
                       <div className="text-lg font-semibold text-green-600">
-                        ₹{application.gig.budgetMin.toLocaleString()} - ₹
-                        {application.gig.budgetMax.toLocaleString()}
+                        ₹{application.gig.budgetMin.toLocaleString() ?? 0} - ₹
+                        {application.gig.budgetMax.toLocaleString() ?? 0}
                       </div>
                     </div>
                     <div>

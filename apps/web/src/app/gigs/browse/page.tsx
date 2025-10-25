@@ -136,10 +136,10 @@ export default function GigsBrowsePage() {
   const formatBudget = (gig: Gig) => {
     if (gig.budgetType === 'NEGOTIABLE') return 'Negotiable';
     if (gig.budgetMin && gig.budgetMax) {
-      return `${gig.currency} ${gig.budgetMin.toLocaleString()} - ${gig.budgetMax.toLocaleString()}`;
+      return `${gig.currency} ${gig.budgetMin.toLocaleString() ?? 0} - ${gig.budgetMax.toLocaleString() ?? 0}`;
     }
     if (gig.budgetMin) {
-      return `${gig.currency} ${gig.budgetMin.toLocaleString()}+`;
+      return `${gig.currency} ${gig.budgetMin.toLocaleString() ?? 0}+`;
     }
     return 'Budget not specified';
   };
@@ -322,7 +322,7 @@ export default function GigsBrowsePage() {
                 {/* Sort and Results Count */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                   <div className="text-gray-600">
-                    {loading ? 'Loading...' : `${totalCount.toLocaleString()} gigs found`}
+                    {loading ? 'Loading...' : `${totalCount.toLocaleString() ?? 0} gigs found`}
                   </div>
                   
                   <div className="mt-4 sm:mt-0">

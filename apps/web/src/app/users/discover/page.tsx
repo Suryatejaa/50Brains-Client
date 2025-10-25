@@ -479,7 +479,7 @@ export default function UsersDiscoveryPage() {
                   <div className="text-gray-600">
                     {loading
                       ? 'Loading...'
-                      : `${(totalCount || 0).toLocaleString()} creators found`}
+                      : `${(totalCount || 0).toLocaleString() ?? 0} creators found`}
                   </div>
 
                   <div className="mt-4 sm:mt-0">
@@ -716,7 +716,7 @@ export default function UsersDiscoveryPage() {
                           <div className="text-sm">
                             <span className="text-gray-600">Reputation:</span>
                             <span className="text-brand-primary ml-1 font-semibold">
-                              ⭐ {(user.reputation || 0).toLocaleString()}
+                              ⭐ {(user.reputation || 0).toLocaleString() ?? 0}
                             </span>
                           </div>
                         </div>

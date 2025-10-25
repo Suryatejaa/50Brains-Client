@@ -328,7 +328,7 @@ export default function ClansBrowsePage() {
                 {/* Sort and Results Count */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                   <div className="text-gray-600">
-                    {loading ? 'Loading...' : `${totalCount.toLocaleString()} clans found`}
+                    {loading ? 'Loading...' : `${totalCount.toLocaleString() ?? 0} clans found`}
                   </div>
 
                   <div className="mt-4 sm:mt-0">

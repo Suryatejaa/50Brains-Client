@@ -346,7 +346,7 @@ export const CreatorDashboard: React.FC = () => {
                         </div>
                         <div className="text-right">
                           <div className="text-heading font-semibold">
-                            {account.followers.toLocaleString()}
+                            {account.followers.toLocaleString() ?? 0}
                           </div>
                           <div className="text-muted text-xs">
                             {account.engagement}% engagement
