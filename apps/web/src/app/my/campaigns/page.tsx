@@ -421,13 +421,13 @@ export default function MyCampaignsPage() {
                     <div className="text-center">
                       <div className="text-sm text-gray-600">Total Reach</div>
                       <div className="text-lg font-semibold">
-                        {campaign.totalReach?.toLocaleString() ?? 0 || '--'}
+                        {campaign.totalReach?.toLocaleString() || '--'}
                       </div>
                     </div>
                     <div className="text-center">
                       <div className="text-sm text-gray-600">Engagement</div>
                       <div className="text-lg font-semibold">
-                        {campaign.totalEngagement?.toLocaleString() ?? 0 || '--'}
+                        {campaign.totalEngagement?.toLocaleString() || '--'}
                       </div>
                     </div>
                     <div className="text-center">
