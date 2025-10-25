@@ -77,15 +77,31 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return (
-      <div className="page-container flex min-h-screen items-center justify-center">
-        <div className="card-glass p-8 text-center">
-          <div className="border-brand-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
-          <p className="text-muted">Loading...</p>
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        {/* Brain Icon Container */}
+        <div className="relative mb-6">                         
+          {/* Spinning Circle */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+          
+          {/* Brain Icon (or '50' Number) */}
+          <div className="relative flex items-center justify-center w-20 h-20 mx-auto">
+            <span className="text-3xl font-bold text-blue-600">50</span>
+          </div>
         </div>
+        
+        {/* Brand Name */}
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          50BraIns
+        </h2>
+        <p className="text-sm text-gray-500">Connecting brands & influencers...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // Show content if all checks pass
   if (requireAuth && !isAuthenticated) {

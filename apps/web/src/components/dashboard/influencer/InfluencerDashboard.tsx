@@ -140,8 +140,18 @@ export const InfluencerDashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 px-3 py-2 md:p-3">
         <div className="flex min-h-screen items-center justify-center">
-          <div className="card-glass p-3 text-center md:p-3">
-            <div className="border-brand-primary mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent md:mb-4 md:h-8 md:w-8"></div>
+          <div className="p-3 text-center md:p-3">
+            <div className="relative mb-2">
+              {/* Spinning Circle */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+              </div>
+
+              {/* Brain Icon (or '50' Number) */}
+              <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+                <span className="text-md font-bold text-blue-600">50</span>
+              </div>
+            </div>
             <p className="text-muted text-sm md:text-base">
               Loading your influencer dashboard...
             </p>

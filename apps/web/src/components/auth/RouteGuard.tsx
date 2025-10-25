@@ -4,6 +4,9 @@ import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { RouteDebugger } from '@/utils/route-debug';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+
+
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -237,15 +240,152 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   // Conditional rendering without early return to maintain hook order
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="card-glass p-8 text-center">
-          <div className="border-brand-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
-          <p className="text-muted">Loading...</p>
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        {/* Brain Icon Container */}
+        <div className="relative mb-6">                         
+          {/* Spinning Circle */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+          
+          {/* Brain Icon (or '50' Number) */}
+          <div className="relative flex items-center justify-center w-20 h-20 mx-auto">
+            <span className="text-3xl font-bold text-blue-600">50</span>
+          </div>
         </div>
+        
+        {/* Brand Name */}
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          50BraIns
+        </h2>
+        <p className="text-sm text-gray-500">Connecting brands & influencers...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+// if (isLoading) {
+//   return (
+//     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+//       <div className="text-center">
+//         {/* Logo/Brand */}
+//         <div className="mb-8">
+//           <h1 className="text-5xl font-bold text-gray-800 dark:text-white mb-2">
+//             50BraIns
+//           </h1>
+//           <p className="text-sm text-gray-500">Influencer Marketing Platform</p>
+//         </div>
+        
+//         {/* Dots Animation */}
+//         <div className="flex gap-2 justify-center">
+//           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce-dot" style={{ animationDelay: '0ms' }}></div>
+//           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce-dot" style={{ animationDelay: '150ms' }}></div>
+//           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce-dot" style={{ animationDelay: '300ms' }}></div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// if (isLoading) {
+//   return (
+//     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+//       <div className="text-center">
+//         {/* Logo Container with Circular Progress */}
+//         <div className="relative inline-block mb-6">
+//           {/* Circular Progress */}
+//           <svg className="w-24 h-24 animate-spin-slow" viewBox="0 0 100 100">
+//             <circle
+//               cx="50"
+//               cy="50"
+//               r="45"
+//               fill="none"
+//               stroke="#e5e7eb"
+//               strokeWidth="6"
+//             />
+//             <circle
+//               cx="50"
+//               cy="50"
+//               r="45"
+//               fill="none"
+//               stroke="#14b8a6"
+//               strokeWidth="6"
+//               strokeDasharray="283"
+//               strokeDashoffset="75"
+//               strokeLinecap="round"
+//               className="animate-dash"
+//             />
+//           </svg>
+          
+//           {/* Logo/Brand in Center */}
+//           <div className="absolute inset-0 flex items-center justify-center">
+//             <div className="bg-white dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+//               <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+//                 50
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+        
+//         {/* Brand Text */}
+//         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+//           50BraIns
+//         </h2>
+//         <p className="text-sm text-gray-500">Loading your dashboard...</p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// if (isLoading) {
+//   return (
+//     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+//       <div className="text-center px-4">
+//         {/* Logo Badge with Spinner */}
+//         <div className="relative inline-block mb-6">
+//           {/* Outer spinning ring */}
+//           <div className="absolute inset-0 rounded-full border-4 border-blue-200 dark:border-blue-900 border-t-blue-500 animate-spin"></div>
+          
+//           {/* Logo Container */}
+//           <div className="relative bg-white dark:bg-gray-800 rounded-full w-20 h-20 flex items-center justify-center shadow-xl">
+//             <div className="text-center">
+//               <span className="block text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+//                 50
+//               </span>
+//               <span className="block text-[10px] font-semibold text-gray-500 -mt-1">
+//                 BraIns
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+        
+//         {/* Brand Title */}
+//         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+//           50BraIns
+//         </h1>
+        
+//         {/* Subtitle */}
+//         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+//           Connecting Brands & Influencers
+//         </p>
+        
+//         {/* Loading Progress */}
+//         <div className="w-48 mx-auto">
+//           <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+//             <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 animate-loading-bar"></div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// if (isLoading) {
+//   return <LoadingScreen message="Verifying authentication..." />;
+// }
 
   return <>{children}</>;
 };

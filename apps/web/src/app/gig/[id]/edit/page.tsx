@@ -12,41 +12,48 @@ interface BackendGig {
   title: string;
   description: string;
   category: string;
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN';
-  
+  status:
+    | 'DRAFT'
+    | 'ACTIVE'
+    | 'PAUSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'OPEN';
+
   // Budget & Pricing
   budgetType: 'fixed' | 'hourly' | 'negotiable';
   budgetMin: number;
   budgetMax: number;
-  
+
   // Timeline
   deadline: string;
   duration: string;
   campaignDuration: string;
-  
+
   // Location
   location: string;
-  
+
   // Requirements
   roleRequired: string;
   skillsRequired: string[];
   experienceLevel: string;
   urgency: string;
   requirements: string;
-  
+
   // Targeting Requirements
   platformRequirements: string[];
-  followerRequirements: Array<{platform: string; minFollowers: number}>;
+  followerRequirements: Array<{ platform: string; minFollowers: number }>;
   locationRequirements: string[];
-  
+
   // Deliverables & Applications
   deliverables: string[];
   maxApplications: number;
   isClanAllowed: boolean;
-  
+
   // Additional
   tags: string[];
-  
+
   // Meta fields
   posterId: string;
   postedById: string;
@@ -68,20 +75,12 @@ const categories = [
   'web-development',
   'mobile-development',
   'marketing',
-  'consulting'
+  'consulting',
 ];
 
-const experienceLevels = [
-  'beginner',
-  'intermediate',
-  'expert'
-];
+const experienceLevels = ['beginner', 'intermediate', 'expert'];
 
-const urgencyLevels = [
-  'urgent',
-  'normal', 
-  'flexible'
-];
+const urgencyLevels = ['urgent', 'normal', 'flexible'];
 
 export default function EditGigPage() {
   const params = useParams();
@@ -94,10 +93,12 @@ export default function EditGigPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Check if we should publish after editing
-  const shouldPublish = searchParams.get('publish') === 'true' || 
-    (typeof window !== 'undefined' && sessionStorage.getItem('publishDraftIntent') === 'true');
+  const shouldPublish =
+    searchParams.get('publish') === 'true' ||
+    (typeof window !== 'undefined' &&
+      sessionStorage.getItem('publishDraftIntent') === 'true');
 
   //console.log(('Edit page - shouldPublish:', shouldPublish);
   //console.log(('Edit page - search param publish:', searchParams.get('publish'));
@@ -129,7 +130,7 @@ export default function EditGigPage() {
     tags: [''],
     platformRequirements: [''],
     followerRequirements: [{ platform: '', minFollowers: 0 }],
-    locationRequirements: ['']
+    locationRequirements: [''],
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -138,7 +139,7 @@ export default function EditGigPage() {
     category: '',
     roleRequired: '',
     budgetMin: '',
-    budgetMax: ''
+    budgetMax: '',
   });
 
   useEffect(() => {
@@ -150,13 +151,14 @@ export default function EditGigPage() {
   const loadGig = async () => {
     try {
       const response = await apiClient.get(`/api/gig/${gigId}`);
-      
+
       if (response.success && response.data) {
         const gigData = response.data as BackendGig;
-        
+
         // Check ownership - check if user ID matches the poster
         const userId = user?.id;
-        const canEdit = gigData.brand?.id === userId || gigData.postedById === userId;
+        const canEdit =
+          gigData.brand?.id === userId || gigData.postedById === userId;
 
         //checking if the user is the owner or has the right role
         //console.log((gigData)
@@ -164,35 +166,61 @@ export default function EditGigPage() {
           setError('You do not have permission to edit this gig');
           return;
         }
-        
+
         setGig(gigData);
-        
+
         // Populate form with backend field names
         setFormData({
           title: gigData.title || '',
           description: gigData.description || '',
           category: gigData.category || '',
           roleRequired: gigData.roleRequired || '',
-          skillsRequired: gigData.skillsRequired && gigData.skillsRequired.length > 0 ? gigData.skillsRequired : [''],
+          skillsRequired:
+            gigData.skillsRequired && gigData.skillsRequired.length > 0
+              ? gigData.skillsRequired
+              : [''],
           experienceLevel: gigData.experienceLevel || '',
-          location: gigData.location === 'remote' ? '' : (gigData.location || ''),
+          location: gigData.location === 'remote' ? '' : gigData.location || '',
           isRemote: gigData.location === 'remote' || !gigData.location,
-          deadline: gigData.deadline ? new Date(gigData.deadline).toISOString().split('T')[0] : '',
-          budgetType: (gigData.budgetType as 'fixed' | 'hourly' | 'negotiable') || 'fixed',
+          deadline: gigData.deadline
+            ? new Date(gigData.deadline).toISOString().split('T')[0]
+            : '',
+          budgetType:
+            (gigData.budgetType as 'fixed' | 'hourly' | 'negotiable') ||
+            'fixed',
           budgetMin: gigData.budgetMin || 0,
           budgetMax: gigData.budgetMax || 0,
-          requirements: gigData.requirements && gigData.requirements !== 'N/A' ? gigData.requirements : '',
+          requirements:
+            gigData.requirements && gigData.requirements !== 'N/A'
+              ? gigData.requirements
+              : '',
           duration: gigData.duration || '',
           campaignDuration: gigData.campaignDuration || '',
-          urgency: (gigData.urgency as 'urgent' | 'normal' | 'flexible') || 'normal',
-          deliverables: gigData.deliverables && gigData.deliverables.length > 0 ? gigData.deliverables : [''],
+          urgency:
+            (gigData.urgency as 'urgent' | 'normal' | 'flexible') || 'normal',
+          deliverables:
+            gigData.deliverables && gigData.deliverables.length > 0
+              ? gigData.deliverables
+              : [''],
           maxApplications: gigData.maxApplications ?? null,
           isClanAllowed: gigData.isClanAllowed ?? false,
           tags: gigData.tags && gigData.tags.length > 0 ? gigData.tags : [''],
-          platformRequirements: gigData.platformRequirements && gigData.platformRequirements.length > 0 ? gigData.platformRequirements : [''],
-          followerRequirements: gigData.followerRequirements && gigData.followerRequirements.length > 0 ? gigData.followerRequirements : [{ platform: '', minFollowers: 0 }],
-          locationRequirements: gigData.locationRequirements && gigData.locationRequirements.length > 0 ? gigData.locationRequirements : ['']
-        //   status: (gigData.status === 'OPEN' ? 'ACTIVE' : gigData.status) as 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN'
+          platformRequirements:
+            gigData.platformRequirements &&
+            gigData.platformRequirements.length > 0
+              ? gigData.platformRequirements
+              : [''],
+          followerRequirements:
+            gigData.followerRequirements &&
+            gigData.followerRequirements.length > 0
+              ? gigData.followerRequirements
+              : [{ platform: '', minFollowers: 0 }],
+          locationRequirements:
+            gigData.locationRequirements &&
+            gigData.locationRequirements.length > 0
+              ? gigData.locationRequirements
+              : [''],
+          //   status: (gigData.status === 'OPEN' ? 'ACTIVE' : gigData.status) as 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'OPEN'
         });
       } else {
         setError('Failed to load gig');
@@ -206,75 +234,84 @@ export default function EditGigPage() {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleArrayChange = (field: string, index: number, value: string) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const arrayField = prev[field as keyof typeof prev] as string[];
       if (!Array.isArray(arrayField)) return prev;
-      
+
       return {
         ...prev,
-        [field]: arrayField.map((item: string, i: number) => 
+        [field]: arrayField.map((item: string, i: number) =>
           i === index ? value : item
-        )
+        ),
       };
     });
   };
 
   const addArrayItem = (field: string) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const arrayField = prev[field as keyof typeof prev] as string[];
       if (!Array.isArray(arrayField)) return prev;
-      
+
       return {
         ...prev,
-        [field]: [...arrayField, '']
+        [field]: [...arrayField, ''],
       };
     });
   };
 
   const removeArrayItem = (field: string, index: number) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const arrayField = prev[field as keyof typeof prev] as string[];
       if (!Array.isArray(arrayField)) return prev;
-      
+
       return {
         ...prev,
-        [field]: arrayField.filter((_: any, i: number) => i !== index)
+        [field]: arrayField.filter((_: any, i: number) => i !== index),
       };
     });
   };
 
-  const handleFollowerRequirementChange = (index: number, field: 'platform' | 'minFollowers', value: string | number) => {
-    setFormData(prev => {
+  const handleFollowerRequirementChange = (
+    index: number,
+    field: 'platform' | 'minFollowers',
+    value: string | number
+  ) => {
+    setFormData((prev) => {
       const newFollowerReqs = [...prev.followerRequirements];
       newFollowerReqs[index] = {
         ...newFollowerReqs[index],
-        [field]: field === 'minFollowers' ? Number(value) : value
+        [field]: field === 'minFollowers' ? Number(value) : value,
       };
       return {
         ...prev,
-        followerRequirements: newFollowerReqs
+        followerRequirements: newFollowerReqs,
       };
     });
   };
 
   const addFollowerRequirement = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      followerRequirements: [...prev.followerRequirements, { platform: '', minFollowers: 0 }]
+      followerRequirements: [
+        ...prev.followerRequirements,
+        { platform: '', minFollowers: 0 },
+      ],
     }));
   };
 
   const removeFollowerRequirement = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      followerRequirements: prev.followerRequirements.filter((_, i) => i !== index)
+      followerRequirements: prev.followerRequirements.filter(
+        (_, i) => i !== index
+      ),
     }));
   };
 
@@ -285,39 +322,55 @@ export default function EditGigPage() {
       category: '',
       roleRequired: '',
       budgetMin: '',
-      budgetMax: ''
+      budgetMax: '',
     };
 
     const validationMessages: string[] = [];
     let isValid = true;
 
     // Title validation (5-200 characters) - matching create-gig
-    if (!formData.title || typeof formData.title !== 'string' || !formData.title.trim()) {
+    if (
+      !formData.title ||
+      typeof formData.title !== 'string' ||
+      !formData.title.trim()
+    ) {
       errors.title = 'Title is required';
       validationMessages.push('• Title is required');
       isValid = false;
     } else if (formData.title.trim().length < 5) {
       errors.title = 'Title must be at least 5 characters long';
-      validationMessages.push(`• Title is too short (${formData.title.trim().length}/5 characters minimum)`);
+      validationMessages.push(
+        `• Title is too short (${formData.title.trim().length}/5 characters minimum)`
+      );
       isValid = false;
     } else if (formData.title.trim().length > 200) {
       errors.title = 'Title must not exceed 200 characters';
-      validationMessages.push(`• Title is too long (${formData.title.trim().length}/200 characters maximum)`);
+      validationMessages.push(
+        `• Title is too long (${formData.title.trim().length}/200 characters maximum)`
+      );
       isValid = false;
     }
 
     // Description validation (10-2000 characters) - matching create-gig
-    if (!formData.description || typeof formData.description !== 'string' || !formData.description.trim()) {
+    if (
+      !formData.description ||
+      typeof formData.description !== 'string' ||
+      !formData.description.trim()
+    ) {
       errors.description = 'Description is required';
       validationMessages.push('• Description is required');
       isValid = false;
     } else if (formData.description.trim().length < 10) {
       errors.description = 'Description must be at least 10 characters long';
-      validationMessages.push(`• Description is too short (${formData.description.trim().length}/10 characters minimum)`);
+      validationMessages.push(
+        `• Description is too short (${formData.description.trim().length}/10 characters minimum)`
+      );
       isValid = false;
     } else if (formData.description.trim().length > 2000) {
       errors.description = 'Description must not exceed 2000 characters';
-      validationMessages.push(`• Description is too long (${formData.description.trim().length}/2000 characters maximum)`);
+      validationMessages.push(
+        `• Description is too long (${formData.description.trim().length}/2000 characters maximum)`
+      );
       isValid = false;
     }
 
@@ -329,39 +382,57 @@ export default function EditGigPage() {
     }
 
     // Role required validation
-    if (!formData.roleRequired || typeof formData.roleRequired !== 'string' || !formData.roleRequired.trim()) {
+    if (
+      !formData.roleRequired ||
+      typeof formData.roleRequired !== 'string' ||
+      !formData.roleRequired.trim()
+    ) {
       errors.roleRequired = 'Please select a role required';
-      validationMessages.push('• Please select a role required from the dropdown');
+      validationMessages.push(
+        '• Please select a role required from the dropdown'
+      );
       isValid = false;
     }
 
     // Skills validation - matching create-gig
     if (shouldPublish) {
-      const validSkills = formData.skillsRequired.filter(skill => skill && skill.trim());
+      const validSkills = formData.skillsRequired.filter(
+        (skill) => skill && skill.trim()
+      );
       if (validSkills.length === 0) {
-        validationMessages.push('• Please add at least one required skill before publishing');
+        validationMessages.push(
+          '• Please add at least one required skill before publishing'
+        );
         isValid = false;
       }
     }
 
-    // Deliverables validation - matching create-gig  
+    // Deliverables validation - matching create-gig
     if (shouldPublish) {
-      const validDeliverables = formData.deliverables.filter(d => d && d.trim());
+      const validDeliverables = formData.deliverables.filter(
+        (d) => d && d.trim()
+      );
       if (validDeliverables.length === 0) {
-        validationMessages.push('• Please add at least one deliverable before publishing');
+        validationMessages.push(
+          '• Please add at least one deliverable before publishing'
+        );
         isValid = false;
       }
     }
 
     // Experience level validation for publishing
     if (shouldPublish && !formData.experienceLevel) {
-      validationMessages.push('• Please select an experience level before publishing');
+      validationMessages.push(
+        '• Please select an experience level before publishing'
+      );
       isValid = false;
     }
 
     // Duration validation for publishing
     if (shouldPublish && (!formData.duration || !formData.duration.trim())) {
-      validationMessages.push('• Please select a project duration before publishing');
+      validationMessages.push(
+        '• Please select a project duration before publishing'
+      );
       isValid = false;
     }
 
@@ -369,28 +440,38 @@ export default function EditGigPage() {
     if (formData.budgetType !== 'negotiable') {
       if (!formData.budgetMin || formData.budgetMin <= 0) {
         errors.budgetMin = 'Please enter a valid minimum budget';
-        validationMessages.push('• Please enter a valid minimum budget (must be greater than 0)');
+        validationMessages.push(
+          '• Please enter a valid minimum budget (must be greater than 0)'
+        );
         isValid = false;
       }
 
       if (!formData.budgetMax || formData.budgetMax <= 0) {
         errors.budgetMax = 'Please enter a valid maximum budget';
-        validationMessages.push('• Please enter a valid maximum budget (must be greater than 0)');
+        validationMessages.push(
+          '• Please enter a valid maximum budget (must be greater than 0)'
+        );
         isValid = false;
       }
 
-      if (formData.budgetMin && formData.budgetMax && formData.budgetMin > formData.budgetMax) {
+      if (
+        formData.budgetMin &&
+        formData.budgetMax &&
+        formData.budgetMin > formData.budgetMax
+      ) {
         errors.budgetMax = 'Maximum budget must be greater than minimum budget';
-        validationMessages.push(`• Maximum budget (₹${formData.budgetMax}) must be greater than minimum budget (₹${formData.budgetMin})`);
+        validationMessages.push(
+          `• Maximum budget (₹${formData.budgetMax}) must be greater than minimum budget (₹${formData.budgetMin})`
+        );
         isValid = false;
       }
     }
 
     // Set a comprehensive error message with specific issues
     if (validationMessages.length > 0) {
-      const errorHeader = shouldPublish ? 
-        'Please fix the following issues before publishing:' : 
-        'Please fix the following issues:';
+      const errorHeader = shouldPublish
+        ? 'Please fix the following issues before publishing:'
+        : 'Please fix the following issues:';
       setError(`${errorHeader}\n\n${validationMessages.join('\n')}`);
     }
 
@@ -408,7 +489,7 @@ export default function EditGigPage() {
       category: '',
       roleRequired: '',
       budgetMin: '',
-      budgetMax: ''
+      budgetMax: '',
     });
 
     // Validate form
@@ -425,50 +506,73 @@ export default function EditGigPage() {
         description: (formData.description || '').trim(),
         category: formData.category,
         roleRequired: (formData.roleRequired || '').trim(),
-        
+
         // Location
         location: formData.isRemote ? 'remote' : formData.location || undefined,
-        
+
         // Budget (only if not negotiable)
         ...(formData.budgetType !== 'negotiable' && {
           budgetMin: Number(formData.budgetMin),
           budgetMax: Number(formData.budgetMax),
         }),
         budgetType: formData.budgetType,
-        
+
         // Optional fields
         ...(formData.deadline && {
-          deadline: new Date(formData.deadline).toISOString()
+          deadline: new Date(formData.deadline).toISOString(),
         }),
-        ...(formData.duration && typeof formData.duration === 'string' && formData.duration.trim() && {
-          duration: formData.duration.trim()
-        }),
-        ...(formData.campaignDuration && formData.campaignDuration.trim() && {
-          campaignDuration: formData.campaignDuration.trim()
-        }),
+        ...(formData.duration &&
+          typeof formData.duration === 'string' &&
+          formData.duration.trim() && {
+            duration: formData.duration.trim(),
+          }),
+        ...(formData.campaignDuration &&
+          formData.campaignDuration.trim() && {
+            campaignDuration: formData.campaignDuration.trim(),
+          }),
         urgency: formData.urgency,
         ...(formData.maxApplications && {
-          maxApplications: Number(formData.maxApplications)
+          maxApplications: Number(formData.maxApplications),
         }),
-        
+
         // Requirements and details
-        ...(formData.requirements && typeof formData.requirements === 'string' && formData.requirements.trim() && {
-          requirements: formData.requirements.trim()
-        }),
-        deliverables: (formData.deliverables || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        ...(formData.requirements &&
+          typeof formData.requirements === 'string' &&
+          formData.requirements.trim() && {
+            requirements: formData.requirements.trim(),
+          }),
+        deliverables: (formData.deliverables || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // Skills and experience
         ...(formData.experienceLevel && {
-          experienceLevel: formData.experienceLevel
+          experienceLevel: formData.experienceLevel,
         }),
-        skillsRequired: (formData.skillsRequired || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        tags: (formData.tags || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        skillsRequired: (formData.skillsRequired || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+        tags: (formData.tags || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // New targeting fields
-        platformRequirements: (formData.platformRequirements || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        followerRequirements: (formData.followerRequirements || []).filter((req: any) => req.platform && req.platform.trim() && req.minFollowers > 0),
-        locationRequirements: (formData.locationRequirements || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        platformRequirements: (formData.platformRequirements || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+        followerRequirements: (formData.followerRequirements || []).filter(
+          (req: any) =>
+            req.platform && req.platform.trim() && req.minFollowers > 0
+        ),
+        locationRequirements: (formData.locationRequirements || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // Settings
         isClanAllowed: formData.isClanAllowed,
         // status: formData.status
@@ -476,10 +580,10 @@ export default function EditGigPage() {
 
       //console.log(('Sending data to API:', JSON.stringify(cleanedData, null, 2));
       //console.log(('Budget type value:', formData.budgetType, 'Type:', typeof formData.budgetType);
-      
+
       const response = await apiClient.put(`/api/gig/${gigId}`, cleanedData);
       //console.log(('API response:', response);
-      
+
       if (response.success) {
         alert('Gig updated successfully!');
         router.push(`/gig/${gigId}`);
@@ -487,9 +591,9 @@ export default function EditGigPage() {
         // Handle API error response - response might be of error type
         //console.log(('API returned error:', response);
         let errorMessage = 'Failed to update gig';
-        
+
         const errorResponse = response as any; // Type assertion for error response
-        
+
         if (errorResponse.details && Array.isArray(errorResponse.details)) {
           errorMessage = `Validation failed: ${errorResponse.details.join(', ')}`;
         } else if (errorResponse.error) {
@@ -497,15 +601,15 @@ export default function EditGigPage() {
         } else if (errorResponse.message) {
           errorMessage = errorResponse.message;
         }
-        
+
         setError(errorMessage);
       }
     } catch (error: any) {
       console.error('Failed to update the gig:', error);
-      
+
       // Extract detailed error information
       let errorMessage = 'Failed to update gig';
-      
+
       if (error.details && Array.isArray(error.details)) {
         // Backend validation errors
         errorMessage = `Validation failed: ${error.details.join(', ')}`;
@@ -516,14 +620,14 @@ export default function EditGigPage() {
         // JavaScript error message
         errorMessage = error.message;
       }
-      
+
       //console.log(('Detailed error:', {
       //   error: error.error,
       //   details: error.details,
       //   message: error.message,
       //   full: error
       // });
-      
+
       setError(errorMessage);
     } finally {
       setIsSaving(false);
@@ -539,7 +643,7 @@ export default function EditGigPage() {
       category: '',
       roleRequired: '',
       budgetMin: '',
-      budgetMax: ''
+      budgetMax: '',
     });
 
     // Validate form first
@@ -556,64 +660,92 @@ export default function EditGigPage() {
         description: (formData.description || '').trim(),
         category: formData.category,
         roleRequired: (formData.roleRequired || '').trim(),
-        
+
         // Location
         location: formData.isRemote ? 'remote' : formData.location || undefined,
-        
+
         // Budget (only if not negotiable)
         ...(formData.budgetType !== 'negotiable' && {
           budgetMin: Number(formData.budgetMin),
           budgetMax: Number(formData.budgetMax),
         }),
         budgetType: formData.budgetType,
-        
+
         // Optional fields
         ...(formData.deadline && {
-          deadline: new Date(formData.deadline).toISOString()
+          deadline: new Date(formData.deadline).toISOString(),
         }),
-        ...(formData.duration && typeof formData.duration === 'string' && formData.duration.trim() && {
-          duration: formData.duration.trim()
-        }),
-        ...(formData.campaignDuration && formData.campaignDuration.trim() && {
-          campaignDuration: formData.campaignDuration.trim()
-        }),
+        ...(formData.duration &&
+          typeof formData.duration === 'string' &&
+          formData.duration.trim() && {
+            duration: formData.duration.trim(),
+          }),
+        ...(formData.campaignDuration &&
+          formData.campaignDuration.trim() && {
+            campaignDuration: formData.campaignDuration.trim(),
+          }),
         urgency: formData.urgency,
         ...(formData.maxApplications && {
-          maxApplications: Number(formData.maxApplications)
+          maxApplications: Number(formData.maxApplications),
         }),
-        
+
         // Requirements and details
-        ...(formData.requirements && typeof formData.requirements === 'string' && formData.requirements.trim() && {
-          requirements: formData.requirements.trim()
-        }),
-        deliverables: (formData.deliverables || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        ...(formData.requirements &&
+          typeof formData.requirements === 'string' &&
+          formData.requirements.trim() && {
+            requirements: formData.requirements.trim(),
+          }),
+        deliverables: (formData.deliverables || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // Skills and experience
         ...(formData.experienceLevel && {
-          experienceLevel: formData.experienceLevel
+          experienceLevel: formData.experienceLevel,
         }),
-        skillsRequired: (formData.skillsRequired || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        tags: (formData.tags || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        skillsRequired: (formData.skillsRequired || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+        tags: (formData.tags || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // New targeting fields
-        platformRequirements: (formData.platformRequirements || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        followerRequirements: (formData.followerRequirements || []).filter((req: any) => req.platform && req.platform.trim() && req.minFollowers > 0),
-        locationRequirements: (formData.locationRequirements || []).filter((item: string) => item && typeof item === 'string' && item.trim() !== ''),
-        
+        platformRequirements: (formData.platformRequirements || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+        followerRequirements: (formData.followerRequirements || []).filter(
+          (req: any) =>
+            req.platform && req.platform.trim() && req.minFollowers > 0
+        ),
+        locationRequirements: (formData.locationRequirements || []).filter(
+          (item: string) =>
+            item && typeof item === 'string' && item.trim() !== ''
+        ),
+
         // Settings
         isClanAllowed: formData.isClanAllowed,
       };
 
       // Update the gig first
-      const updateResponse = await apiClient.put(`/api/gig/${gigId}`, cleanedData);
-      
+      const updateResponse = await apiClient.put(
+        `/api/gig/${gigId}`,
+        cleanedData
+      );
+
       if (!updateResponse.success) {
         throw new Error('Failed to update gig before publishing');
       }
 
       // Then publish the draft
-      const publishResponse = await apiClient.post(`/api/gig/draft/${gigId}/publish`);
-      
+      const publishResponse = await apiClient.post(
+        `/api/gig/draft/${gigId}/publish`
+      );
+
       if (publishResponse.success) {
         // Clear publish intent
         if (typeof window !== 'undefined') {
@@ -621,7 +753,7 @@ export default function EditGigPage() {
           // Set a flag to force refresh the my-gigs page
           sessionStorage.setItem('refresh-my-gigs', 'true');
         }
-        
+
         alert('Gig published successfully!');
         // Use replace instead of push to avoid back navigation issues
         // Add timestamp to force refresh of my-gigs page data
@@ -631,9 +763,9 @@ export default function EditGigPage() {
       }
     } catch (error: any) {
       console.error('Failed to publish the gig:', error);
-      
+
       let errorMessage = 'Failed to publish gig';
-      
+
       if (error.details && Array.isArray(error.details)) {
         errorMessage = `Validation failed: ${error.details.join(', ')}`;
       } else if (error.error) {
@@ -641,7 +773,7 @@ export default function EditGigPage() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsPublishing(false);
@@ -659,10 +791,12 @@ export default function EditGigPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
-          <p className="text-gray-600 mb-6">You need to be signed in to edit gigs.</p>
+          <h1 className="mb-4 text-2xl font-bold">Please Sign In</h1>
+          <p className="mb-6 text-gray-600">
+            You need to be signed in to edit gigs.
+          </p>
           <Link href="/login" className="btn-primary">
             Sign In
           </Link>
@@ -673,10 +807,12 @@ export default function EditGigPage() {
 
   if (userType !== 'brand') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">This page is only available for brand accounts.</p>
+          <h1 className="mb-4 text-2xl font-bold">Access Denied</h1>
+          <p className="mb-6 text-gray-600">
+            This page is only available for brand accounts.
+          </p>
           <Link href="/dashboard" className="btn-primary">
             Go to Dashboard
           </Link>
@@ -687,9 +823,19 @@ export default function EditGigPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="relative mb-2">
+            {/* Spinning Circle */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+            </div>
+
+            {/* Brain Icon (or '50' Number) */}
+            <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+              <span className="text-md font-bold text-blue-600">50</span>
+            </div>
+          </div>
           <p>Loading gig...</p>
         </div>
       </div>
@@ -698,11 +844,14 @@ export default function EditGigPage() {
 
   if (!gig) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <div className="text-6xl mb-4">❌</div>
-          <h1 className="text-2xl font-bold mb-4">Gig Not Found</h1>
-          <p className="text-gray-600 mb-6">The gig you're trying to edit doesn't exist or you don't have permission to edit it.</p>
+          <div className="mb-4 text-6xl">❌</div>
+          <h1 className="mb-4 text-2xl font-bold">Gig Not Found</h1>
+          <p className="mb-6 text-gray-600">
+            The gig you're trying to edit doesn't exist or you don't have
+            permission to edit it.
+          </p>
           <Link href="/my-gigs" className="btn-primary">
             Back to My Gigs
           </Link>
@@ -733,74 +882,170 @@ export default function EditGigPage() {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-none">
+          <div className="mb-6 rounded-none border border-red-200 bg-red-50 px-4 py-3 text-red-600">
             <div className="whitespace-pre-line">{error}</div>
           </div>
         )}
 
         {shouldPublish && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-none p-4">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">Publishing Checklist</h3>
+          <div className="mb-6 rounded-none border border-blue-200 bg-blue-50 p-4">
+            <h3 className="mb-3 text-lg font-semibold text-blue-900">
+              Publishing Checklist
+            </h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.title && formData.title.trim().length >= 5 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.title && formData.title.trim().length >= 5 ? 'text-green-700' : 'text-gray-600'}>
-                  Title (5+ characters) {formData.title ? `- ${formData.title.trim().length}/200` : ''}
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.title && formData.title.trim().length >= 5 ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.title && formData.title.trim().length >= 5
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
+                  Title (5+ characters){' '}
+                  {formData.title
+                    ? `- ${formData.title.trim().length}/200`
+                    : ''}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.description && formData.description.trim().length >= 10 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.description && formData.description.trim().length >= 10 ? 'text-green-700' : 'text-gray-600'}>
-                  Description (10+ characters) {formData.description ? `- ${formData.description.trim().length}/2000` : ''}
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.description && formData.description.trim().length >= 10 ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.description &&
+                    formData.description.trim().length >= 10
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
+                  Description (10+ characters){' '}
+                  {formData.description
+                    ? `- ${formData.description.trim().length}/2000`
+                    : ''}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.category ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.category ? 'text-green-700' : 'text-gray-600'}>
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.category ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.category ? 'text-green-700' : 'text-gray-600'
+                  }
+                >
                   Category selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.roleRequired ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.roleRequired ? 'text-green-700' : 'text-gray-600'}>
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.roleRequired ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.roleRequired ? 'text-green-700' : 'text-gray-600'
+                  }
+                >
                   Role required selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.skillsRequired.filter(skill => skill && skill.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.skillsRequired.filter(skill => skill && skill.trim()).length > 0 ? 'text-green-700' : 'text-gray-600'}>
-                  At least one skill required ({formData.skillsRequired.filter(skill => skill && skill.trim()).length} added)
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.skillsRequired.filter((skill) => skill && skill.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.skillsRequired.filter(
+                      (skill) => skill && skill.trim()
+                    ).length > 0
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
+                  At least one skill required (
+                  {
+                    formData.skillsRequired.filter(
+                      (skill) => skill && skill.trim()
+                    ).length
+                  }{' '}
+                  added)
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.deliverables.filter(d => d && d.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.deliverables.filter(d => d && d.trim()).length > 0 ? 'text-green-700' : 'text-gray-600'}>
-                  At least one deliverable ({formData.deliverables.filter(d => d && d.trim()).length} added)
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.deliverables.filter((d) => d && d.trim()).length > 0 ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.deliverables.filter((d) => d && d.trim()).length >
+                    0
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
+                  At least one deliverable (
+                  {formData.deliverables.filter((d) => d && d.trim()).length}{' '}
+                  added)
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.experienceLevel ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.experienceLevel ? 'text-green-700' : 'text-gray-600'}>
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.experienceLevel ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.experienceLevel
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
                   Experience level selected
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`w-4 h-4 rounded-none ${formData.duration && formData.duration.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                <span className={formData.duration && formData.duration.trim() ? 'text-green-700' : 'text-gray-600'}>
+                <span
+                  className={`h-4 w-4 rounded-none ${formData.duration && formData.duration.trim() ? 'bg-green-500' : 'bg-gray-300'}`}
+                ></span>
+                <span
+                  className={
+                    formData.duration && formData.duration.trim()
+                      ? 'text-green-700'
+                      : 'text-gray-600'
+                  }
+                >
                   Project duration selected
                 </span>
               </div>
               {formData.budgetType !== 'negotiable' && (
                 <>
                   <div className="flex items-center space-x-2">
-                    <span className={`w-4 h-4 rounded-none ${formData.budgetMin && formData.budgetMin > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                    <span className={formData.budgetMin && formData.budgetMin > 0 ? 'text-green-700' : 'text-gray-600'}>
+                    <span
+                      className={`h-4 w-4 rounded-none ${formData.budgetMin && formData.budgetMin > 0 ? 'bg-green-500' : 'bg-gray-300'}`}
+                    ></span>
+                    <span
+                      className={
+                        formData.budgetMin && formData.budgetMin > 0
+                          ? 'text-green-700'
+                          : 'text-gray-600'
+                      }
+                    >
                       Minimum budget set
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`w-4 h-4 rounded-none ${formData.budgetMax && formData.budgetMax > 0 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                    <span className={formData.budgetMax && formData.budgetMax > 0 ? 'text-green-700' : 'text-gray-600'}>
+                    <span
+                      className={`h-4 w-4 rounded-none ${formData.budgetMax && formData.budgetMax > 0 ? 'bg-green-500' : 'bg-gray-300'}`}
+                    ></span>
+                    <span
+                      className={
+                        formData.budgetMax && formData.budgetMax > 0
+                          ? 'text-green-700'
+                          : 'text-gray-600'
+                      }
+                    >
                       Maximum budget set
                     </span>
                   </div>
@@ -813,25 +1058,27 @@ export default function EditGigPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Basic Information</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Gig Title *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
                     formErrors.title ? 'border-red-500' : 'border-gray-300'
                   }`}
                   required
                   placeholder="e.g., Create Instagram content for fashion brand"
                 />
                 {formErrors.title && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.title}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {formErrors.title}
+                  </p>
                 )}
                 {shouldPublish && (
                   <p className="mt-1 text-xs text-gray-500">
@@ -841,21 +1088,31 @@ export default function EditGigPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Description *
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    formErrors.description ? 'border-red-500' : 'border-gray-300'
+                  onChange={(e) =>
+                    handleInputChange('description', e.target.value)
+                  }
+                  className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
+                    formErrors.description
+                      ? 'border-red-500'
+                      : 'border-gray-300'
                   }`}
                   rows={shouldPublish ? 6 : 4}
                   required
-                  placeholder={shouldPublish ? "Describe your project, requirements, and what you're looking for..." : "Describe what you need help with..."}
+                  placeholder={
+                    shouldPublish
+                      ? "Describe your project, requirements, and what you're looking for..."
+                      : 'Describe what you need help with...'
+                  }
                 />
                 {formErrors.description && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {formErrors.description}
+                  </p>
                 )}
                 {shouldPublish && (
                   <p className="mt-1 text-xs text-gray-500">
@@ -864,15 +1121,17 @@ export default function EditGigPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Category *
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => handleInputChange('category', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    onChange={(e) =>
+                      handleInputChange('category', e.target.value)
+                    }
+                    className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
                       formErrors.category ? 'border-red-500' : 'border-gray-300'
                     }`}
                     required
@@ -885,24 +1144,30 @@ export default function EditGigPage() {
                     <option value="social-media">Social Media</option>
                     <option value="writing">Writing & Copywriting</option>
                     <option value="web-development">Web Development</option>
-                    <option value="mobile-development">Mobile Development</option>
+                    <option value="mobile-development">
+                      Mobile Development
+                    </option>
                     <option value="marketing">Marketing</option>
                     <option value="consulting">Consulting</option>
                   </select>
                   {formErrors.category && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.category}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {formErrors.category}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Deadline (optional)
                   </label>
                   <input
                     type="date"
                     value={formData.deadline}
-                    onChange={(e) => handleInputChange('deadline', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) =>
+                      handleInputChange('deadline', e.target.value)
+                    }
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -914,22 +1179,28 @@ export default function EditGigPage() {
                     <input
                       type="checkbox"
                       checked={formData.isRemote}
-                      onChange={(e) => handleInputChange('isRemote', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      onChange={(e) =>
+                        handleInputChange('isRemote', e.target.checked)
+                      }
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Remote work</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      Remote work
+                    </span>
                   </label>
                 </div>
                 {!formData.isRemote && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Location
                     </label>
                     <input
                       type="text"
                       value={formData.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) =>
+                        handleInputChange('location', e.target.value)
+                      }
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., San Francisco, CA"
                     />
                   </div>
@@ -938,13 +1209,15 @@ export default function EditGigPage() {
 
               {/* Duration */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Project Duration
                 </label>
                 <select
                   value={formData.duration}
-                  onChange={(e) => handleInputChange('duration', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) =>
+                    handleInputChange('duration', e.target.value)
+                  }
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select duration</option>
                   <option value="1 day">1 day</option>
@@ -964,17 +1237,19 @@ export default function EditGigPage() {
 
           {/* Budget */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Budget</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Budget</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Budget Type *
                 </label>
                 <select
                   value={formData.budgetType}
-                  onChange={(e) => handleInputChange('budgetType', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) =>
+                    handleInputChange('budgetType', e.target.value)
+                  }
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="fixed">Fixed Project Budget</option>
@@ -984,41 +1259,57 @@ export default function EditGigPage() {
               </div>
 
               {formData.budgetType !== 'negotiable' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.budgetType === 'fixed' ? 'Minimum Budget (₹) *' : 'Minimum Rate (₹/hour) *'}
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      {formData.budgetType === 'fixed'
+                        ? 'Minimum Budget (₹) *'
+                        : 'Minimum Rate (₹/hour) *'}
                     </label>
                     <input
                       type="number"
                       value={formData.budgetMin}
-                      onChange={(e) => handleInputChange('budgetMin', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        formErrors.budgetMin ? 'border-red-500' : 'border-gray-300'
+                      onChange={(e) =>
+                        handleInputChange('budgetMin', e.target.value)
+                      }
+                      className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
+                        formErrors.budgetMin
+                          ? 'border-red-500'
+                          : 'border-gray-300'
                       }`}
                       min="0"
                       required
                     />
                     {formErrors.budgetMin && (
-                      <p className="mt-1 text-sm text-red-600">{formErrors.budgetMin}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {formErrors.budgetMin}
+                      </p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.budgetType === 'fixed' ? 'Maximum Budget (₹) *' : 'Maximum Rate (₹/hour) *'}
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      {formData.budgetType === 'fixed'
+                        ? 'Maximum Budget (₹) *'
+                        : 'Maximum Rate (₹/hour) *'}
                     </label>
                     <input
                       type="number"
                       value={formData.budgetMax}
-                      onChange={(e) => handleInputChange('budgetMax', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        formErrors.budgetMax ? 'border-red-500' : 'border-gray-300'
+                      onChange={(e) =>
+                        handleInputChange('budgetMax', e.target.value)
+                      }
+                      className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
+                        formErrors.budgetMax
+                          ? 'border-red-500'
+                          : 'border-gray-300'
                       }`}
                       min="0"
                       required
                     />
                     {formErrors.budgetMax && (
-                      <p className="mt-1 text-sm text-red-600">{formErrors.budgetMax}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {formErrors.budgetMax}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1028,19 +1319,23 @@ export default function EditGigPage() {
 
           {/* Requirements */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Requirements</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Requirements</h2>
+
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Role Required *
                   </label>
                   <select
                     value={formData.roleRequired}
-                    onChange={(e) => handleInputChange('roleRequired', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      formErrors.roleRequired ? 'border-red-500' : 'border-gray-300'
+                    onChange={(e) =>
+                      handleInputChange('roleRequired', e.target.value)
+                    }
+                    className={`w-full rounded-none border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 ${
+                      formErrors.roleRequired
+                        ? 'border-red-500'
+                        : 'border-gray-300'
                     }`}
                     required
                   >
@@ -1051,7 +1346,9 @@ export default function EditGigPage() {
                     <option value="photographer">Photographer</option>
                     <option value="graphic-designer">Graphic Designer</option>
                     <option value="copywriter">Copywriter</option>
-                    <option value="social-media-manager">Social Media Manager</option>
+                    <option value="social-media-manager">
+                      Social Media Manager
+                    </option>
                     <option value="writer">Writer</option>
                     <option value="designer">Designer</option>
                     <option value="editor">Editor</option>
@@ -1059,21 +1356,25 @@ export default function EditGigPage() {
                     <option value="marketer">Marketer</option>
                   </select>
                   {formErrors.roleRequired && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.roleRequired}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {formErrors.roleRequired}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Experience Level
                   </label>
                   <select
                     value={formData.experienceLevel}
-                    onChange={(e) => handleInputChange('experienceLevel', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) =>
+                      handleInputChange('experienceLevel', e.target.value)
+                    }
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Any experience level</option>
-                    {experienceLevels.map(level => (
+                    {experienceLevels.map((level) => (
                       <option key={level} value={level}>
                         {level.charAt(0).toUpperCase() + level.slice(1)}
                       </option>
@@ -1082,17 +1383,19 @@ export default function EditGigPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Urgency
                   </label>
                   <select
                     value={formData.urgency}
-                    onChange={(e) => handleInputChange('urgency', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) =>
+                      handleInputChange('urgency', e.target.value)
+                    }
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   >
-                    {urgencyLevels.map(level => (
+                    {urgencyLevels.map((level) => (
                       <option key={level} value={level}>
                         {level.charAt(0).toUpperCase() + level.slice(1)}
                       </option>
@@ -1101,14 +1404,19 @@ export default function EditGigPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
                     Max Applications (optional)
                   </label>
                   <input
                     type="number"
                     value={formData.maxApplications || ''}
-                    onChange={(e) => handleInputChange('maxApplications', e.target.value ? Number(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) =>
+                      handleInputChange(
+                        'maxApplications',
+                        e.target.value ? Number(e.target.value) : null
+                      )
+                    }
+                    className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                     min="1"
                     placeholder="Leave empty for unlimited"
                   />
@@ -1116,13 +1424,15 @@ export default function EditGigPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Additional Requirements
                 </label>
                 <textarea
                   value={formData.requirements}
-                  onChange={(e) => handleInputChange('requirements', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) =>
+                    handleInputChange('requirements', e.target.value)
+                  }
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   rows={3}
                   placeholder="Any additional requirements or notes for applicants..."
                 />
@@ -1132,20 +1442,26 @@ export default function EditGigPage() {
 
           {/* Skills Required */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Skills Required</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Skills Required</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Skills Required
                 </label>
                 {formData.skillsRequired.map((skill: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2 mb-2">
+                  <div key={index} className="mb-2 flex items-center space-x-2">
                     <input
                       type="text"
                       value={skill}
-                      onChange={(e) => handleArrayChange('skillsRequired', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) =>
+                        handleArrayChange(
+                          'skillsRequired',
+                          index,
+                          e.target.value
+                        )
+                      }
+                      className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., Content Writing, Photo Editing, Social Media"
                     />
                     {formData.skillsRequired.length > 1 && (
@@ -1162,7 +1478,7 @@ export default function EditGigPage() {
                 <button
                   type="button"
                   onClick={() => addArrayItem('skillsRequired')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add skill
                 </button>
@@ -1172,37 +1488,48 @@ export default function EditGigPage() {
 
           {/* Deliverables */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Deliverables</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Deliverables</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Expected Deliverables
                 </label>
-                {formData.deliverables.map((deliverable: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={deliverable}
-                      onChange={(e) => handleArrayChange('deliverables', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., Final logo files, Source files, Brand guidelines"
-                    />
-                    {formData.deliverables.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeArrayItem('deliverables', index)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
+                {formData.deliverables.map(
+                  (deliverable: string, index: number) => (
+                    <div
+                      key={index}
+                      className="mb-2 flex items-center space-x-2"
+                    >
+                      <input
+                        type="text"
+                        value={deliverable}
+                        onChange={(e) =>
+                          handleArrayChange(
+                            'deliverables',
+                            index,
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Final logo files, Source files, Brand guidelines"
+                      />
+                      {formData.deliverables.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeArrayItem('deliverables', index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  )
+                )}
                 <button
                   type="button"
                   onClick={() => addArrayItem('deliverables')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add deliverable
                 </button>
@@ -1212,20 +1539,22 @@ export default function EditGigPage() {
 
           {/* Tags */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Tags</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Tags</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Tags (optional)
                 </label>
                 {formData.tags.map((tag: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2 mb-2">
+                  <div key={index} className="mb-2 flex items-center space-x-2">
                     <input
                       type="text"
                       value={tag}
-                      onChange={(e) => handleArrayChange('tags', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) =>
+                        handleArrayChange('tags', index, e.target.value)
+                      }
+                      className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., urgent, startup, remote"
                     />
                     {formData.tags.length >= 1 && (
@@ -1242,7 +1571,7 @@ export default function EditGigPage() {
                 <button
                   type="button"
                   onClick={() => addArrayItem('tags')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add tag
                 </button>
@@ -1252,18 +1581,20 @@ export default function EditGigPage() {
 
           {/* Campaign Duration */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Campaign Duration</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Campaign Duration</h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Campaign Duration (optional)
                 </label>
                 <input
                   type="text"
                   value={formData.campaignDuration || ''}
-                  onChange={(e) => handleInputChange('campaignDuration', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) =>
+                    handleInputChange('campaignDuration', e.target.value)
+                  }
+                  className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., 3 months, ongoing, 6 weeks"
                 />
                 <p className="mt-1 text-sm text-gray-500">
@@ -1275,35 +1606,50 @@ export default function EditGigPage() {
 
           {/* Platform Requirements */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Platform Requirements</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">
+              Platform Requirements
+            </h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Required Platforms (optional)
                 </label>
-                {formData.platformRequirements.map((platform: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={platform}
-                      onChange={(e) => handleArrayChange('platformRequirements', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., Instagram, YouTube, TikTok, LinkedIn"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('platformRequirements', index)}
-                      className="text-red-600 hover:text-red-800"
+                {formData.platformRequirements.map(
+                  (platform: string, index: number) => (
+                    <div
+                      key={index}
+                      className="mb-2 flex items-center space-x-2"
                     >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                      <input
+                        type="text"
+                        value={platform}
+                        onChange={(e) =>
+                          handleArrayChange(
+                            'platformRequirements',
+                            index,
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Instagram, YouTube, TikTok, LinkedIn"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeArrayItem('platformRequirements', index)
+                        }
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )
+                )}
                 <button
                   type="button"
                   onClick={() => addArrayItem('platformRequirements')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add platform
                 </button>
@@ -1313,45 +1659,64 @@ export default function EditGigPage() {
 
           {/* Follower Requirements */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Follower Requirements</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">
+              Follower Requirements
+            </h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Minimum Follower Requirements (optional)
                 </label>
-                {formData.followerRequirements.map((req: any, index: number) => (
-                  <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={req.platform}
-                      onChange={(e) => handleFollowerRequirementChange(index, 'platform', e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Platform (e.g., Instagram)"
-                    />
-                    <div className="flex items-center space-x-2">
+                {formData.followerRequirements.map(
+                  (req: any, index: number) => (
+                    <div
+                      key={index}
+                      className="mb-2 grid grid-cols-1 gap-2 md:grid-cols-2"
+                    >
                       <input
-                        type="number"
-                        value={req.minFollowers}
-                        onChange={(e) => handleFollowerRequirementChange(index, 'minFollowers', Number(e.target.value))}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Min followers"
-                        min="0"
+                        type="text"
+                        value={req.platform}
+                        onChange={(e) =>
+                          handleFollowerRequirementChange(
+                            index,
+                            'platform',
+                            e.target.value
+                          )
+                        }
+                        className="rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                        placeholder="Platform (e.g., Instagram)"
                       />
-                      <button
-                        type="button"
-                        onClick={() => removeFollowerRequirement(index)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        ✕
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          value={req.minFollowers}
+                          onChange={(e) =>
+                            handleFollowerRequirementChange(
+                              index,
+                              'minFollowers',
+                              Number(e.target.value)
+                            )
+                          }
+                          className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                          placeholder="Min followers"
+                          min="0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeFollowerRequirement(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
                 <button
                   type="button"
                   onClick={addFollowerRequirement}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add follower requirement
                 </button>
@@ -1361,40 +1726,56 @@ export default function EditGigPage() {
 
           {/* Location Requirements */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Location Requirements</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">
+              Location Requirements
+            </h2>
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
                   Target Locations (optional)
                 </label>
-                {formData.locationRequirements.map((location: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={location}
-                      onChange={(e) => handleArrayChange('locationRequirements', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., Mumbai, Delhi, India, Global"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('locationRequirements', index)}
-                      className="text-red-600 hover:text-red-800"
+                {formData.locationRequirements.map(
+                  (location: string, index: number) => (
+                    <div
+                      key={index}
+                      className="mb-2 flex items-center space-x-2"
                     >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                      <input
+                        type="text"
+                        value={location}
+                        onChange={(e) =>
+                          handleArrayChange(
+                            'locationRequirements',
+                            index,
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 rounded-none border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Mumbai, Delhi, India, Global"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeArrayItem('locationRequirements', index)
+                        }
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )
+                )}
                 <button
                   type="button"
                   onClick={() => addArrayItem('locationRequirements')}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   + Add location
                 </button>
                 <p className="mt-1 text-sm text-gray-500">
-                  Specify target geographic locations for the campaign or content audience.
+                  Specify target geographic locations for the campaign or
+                  content audience.
                 </p>
               </div>
             </div>
@@ -1402,18 +1783,23 @@ export default function EditGigPage() {
 
           {/* Clan Settings */}
           <div className="card-glass p-6">
-            <h2 className="text-xl font-semibold mb-4">Clan Settings</h2>
-            
+            <h2 className="mb-4 text-xl font-semibold">Clan Settings</h2>
+
             <div className="space-y-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="isClanAllowed"
                   checked={formData.isClanAllowed}
-                  onChange={(e) => handleInputChange('isClanAllowed', e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  onChange={(e) =>
+                    handleInputChange('isClanAllowed', e.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="isClanAllowed" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="isClanAllowed"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Allow clan applications
                 </label>
               </div>
@@ -1424,14 +1810,17 @@ export default function EditGigPage() {
           {shouldPublish ? (
             // Show publish flow buttons when coming from publish intent
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-none p-4">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Ready to Publish?</h3>
-                <p className="text-blue-700 mb-3">
-                  Please review and complete your gig details before publishing. 
-                  Once published, your gig will be visible to all users in the marketplace.
+              <div className="rounded-none border border-blue-200 bg-blue-50 p-4">
+                <h3 className="mb-2 text-lg font-semibold text-blue-900">
+                  Ready to Publish?
+                </h3>
+                <p className="mb-3 text-blue-700">
+                  Please review and complete your gig details before publishing.
+                  Once published, your gig will be visible to all users in the
+                  marketplace.
                 </p>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Link href={`/gig/${gigId}`} className="btn-secondary">
                   Cancel
@@ -1440,7 +1829,7 @@ export default function EditGigPage() {
                   <button
                     type="submit"
                     disabled={isSaving || isPublishing}
-                    className={`btn-ghost ${(isSaving || isPublishing) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn-ghost ${isSaving || isPublishing ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     {isSaving ? 'Saving...' : 'Save as Draft'}
                   </button>
@@ -1448,7 +1837,7 @@ export default function EditGigPage() {
                     type="button"
                     onClick={handlePublishDraft}
                     disabled={isSaving || isPublishing}
-                    className={`btn-primary ${(isSaving || isPublishing) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`btn-primary ${isSaving || isPublishing ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     {isPublishing ? 'Publishing...' : 'Publish Gig'}
                   </button>
@@ -1464,7 +1853,7 @@ export default function EditGigPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className={`btn-primary ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`btn-primary ${isSaving ? 'cursor-not-allowed opacity-50' : ''}`}
               >
                 {isSaving ? 'Updating...' : 'Update Gig'}
               </button>

@@ -73,6 +73,11 @@ export default function ProfilePage() {
   const filteredRoles = roles.filter((role: string) => role !== 'USER');
   console.log('Filtered Roles:', filteredRoles);
 
+  //normalize social handles by stripping  @
+  const normalizeSocialLink = (link: string) => {
+    return link.startsWith('@') ? link.slice(1) : link;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -246,38 +251,39 @@ export default function ProfilePage() {
               {/* Sidebar */}
               <div className="space-y-1">
                 {/* Contact Info - Only show if showContact is true */}
-                {profile.showContact !== false && (
-                  <div className="card-glass p-1">
-                    <h3 className="mb-1 text-sm font-semibold text-gray-900">
-                      Contact
-                    </h3>
-                    <div className="space-y-1">
-                      {profile.website && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">
-                            <FaGlobeAsia />
-                          </span>
-                          <a
-                            href={profile.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            Website
-                          </a>
-                        </div>
-                      )}
-                      {profile.location && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-gray-600">
-                            <FaMapMarkerAlt />
-                          </span>
-                          <span>{profile.location}</span>
-                        </div>
-                      )}
+                {profile.showContact !== false &&
+                  (profile.website || profile.location) && (
+                    <div className="card-glass p-1">
+                      <h3 className="mb-1 text-sm font-semibold text-gray-900">
+                        Contact
+                      </h3>
+                      <div className="space-y-1">
+                        {profile.website && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-600">
+                              <FaGlobeAsia />
+                            </span>
+                            <a
+                              href={profile.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Website
+                            </a>
+                          </div>
+                        )}
+                        {profile.location && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-600">
+                              <FaMapMarkerAlt />
+                            </span>
+                            <span>{profile.location}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Social Links - Only show if showContact is true */}
                 {profile.showContact !== false &&
@@ -286,7 +292,7 @@ export default function ProfilePage() {
                     profile.linkedinHandle) && (
                     <div className="card-glass p-1">
                       <h3 className="mb-1 text-sm font-semibold text-gray-900">
-                        Social
+                        Social handles
                       </h3>
                       <div className="space-y-1">
                         {profile.instagramHandle && (
@@ -295,12 +301,12 @@ export default function ProfilePage() {
                               <FaInstagram />
                             </span>
                             <a
-                              href={`https://instagram.com/${profile.instagramHandle}`}
+                              href={`https://instagram.com/${normalizeSocialLink(profile.instagramHandle)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:underline"
                             >
-                              {profile.instagramHandle}
+                              {normalizeSocialLink(profile.instagramHandle)}
                             </a>
                           </div>
                         )}

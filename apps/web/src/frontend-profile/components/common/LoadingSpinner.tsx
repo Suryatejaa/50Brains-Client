@@ -19,14 +19,19 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-      <div
-        className={`animate-spin rounded-full border-2 border-gray-300 ${sizeClasses[size]}`}
-        style={{
-          borderTopColor: '#2563eb', // blue-600
-        }}
-      />
+      <div className="relative mb-2">
+        {/* Spinning Circle */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+        </div>
+
+        {/* Brain Icon (or '50' Number) */}
+        <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+          <span className="text-md font-bold text-blue-600">50</span>
+        </div>
+      </div>
       {message && (
-        <p className="mt-2 text-center text-sm text-gray-600">{message}</p>
+        <p className="text-center text-sm text-gray-600">{message}</p>
       )}
     </div>
   );

@@ -183,7 +183,17 @@ export default function MyCampaignsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+          <div className="relative mb-2">
+            {/* Spinning Circle */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+            </div>
+
+            {/* Brain Icon (or '50' Number) */}
+            <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+              <span className="text-md font-bold text-blue-600">50</span>
+            </div>
+          </div>
           <p>Loading your campaigns...</p>
         </div>
       </div>

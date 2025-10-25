@@ -23,7 +23,7 @@ interface AnalyticsData {
   totalEarnings?: number;
   averageRating?: number;
 
-  // Brand analytics  
+  // Brand analytics
   totalCampaigns?: number;
   activeCampaigns?: number;
   totalSpent?: number;
@@ -50,7 +50,9 @@ export default function AnalyticsPage() {
   const { currentRole, getUserTypeForRole } = useRoleSwitch();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [timeRange, setTimeRange] = useState<
+    'week' | 'month' | 'quarter' | 'year'
+  >('month');
 
   const userType = getUserTypeForRole(currentRole);
 
@@ -65,21 +67,24 @@ export default function AnalyticsPage() {
       setIsLoading(true);
 
       // Load different analytics based on user type
-      const endpoints = userType === 'creator' ? [
-        apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
-        apiClient.get(`/api/social-media/analytics/${user?.id}`),
-        apiClient.get(`/api/my/applications/stats`)
-      ] : [
-        apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
-        apiClient.get('/api/my-gigs/stats'),
-        apiClient.get('/api/analytics/spending')
-      ];
+      const endpoints =
+        userType === 'creator'
+          ? [
+              apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
+              apiClient.get(`/api/social-media/analytics/${user?.id}`),
+              apiClient.get(`/api/my/applications/stats`),
+            ]
+          : [
+              apiClient.get(`/api/analytics/dashboard?timeframe=${timeRange}`),
+              apiClient.get('/api/my-gigs/stats'),
+              apiClient.get('/api/analytics/spending'),
+            ];
 
       const results = await Promise.allSettled(endpoints);
 
       let combinedData: AnalyticsData = {
         profileViews: 0,
-        profileViewsChange: 0
+        profileViewsChange: 0,
       };
 
       // Process dashboard analytics
@@ -135,10 +140,12 @@ export default function AnalyticsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="card-glass p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
-          <p className="text-gray-600 mb-6">You need to be signed in to view analytics.</p>
+          <h1 className="mb-4 text-2xl font-bold">Please Sign In</h1>
+          <p className="mb-6 text-gray-600">
+            You need to be signed in to view analytics.
+          </p>
           <Link href="/login" className="btn-primary">
             Sign In
           </Link>
@@ -152,18 +159,22 @@ export default function AnalyticsPage() {
       <div className="mx-auto max-w-7xl px-2 sm:px-2 lg:px-2">
         {/* Header */}
         <div className="mb-2">
-          <div className="flex flex-col lg:flex-row md:flex-row gap-1 items-left justify-between">
+          <div className="items-left flex flex-col justify-between gap-1 md:flex-row lg:flex-row">
             <div className="flex flex-col gap-1">
-              <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Analytics Dashboard
+              </h1>
               <p className="text-gray-600">
-                {userType === 'creator' ? 'Track your creator performance and earnings' : 'Monitor your campaign performance and ROI'}
+                {userType === 'creator'
+                  ? 'Track your creator performance and earnings'
+                  : 'Monitor your campaign performance and ROI'}
               </p>
             </div>
             <div className="flex space-x-1">
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value as any)}
-                className="flex px-5 py-0 lg:py-0 md:py-0 cursor-pointer border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex cursor-pointer rounded-none border border-gray-300 px-5 py-0 focus:border-transparent focus:ring-2 focus:ring-blue-500 md:py-0 lg:py-0"
               >
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -179,25 +190,42 @@ export default function AnalyticsPage() {
 
         {isLoading ? (
           <div className="card-glass p-8 text-center">
-            <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="relative mb-2">
+              {/* Spinning Circle */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+              </div>
+
+              {/* Brain Icon (or '50' Number) */}
+              <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+                <span className="text-md font-bold text-blue-600">50</span>
+              </div>
+            </div>
             <p>Loading your analytics...</p>
           </div>
         ) : analytics ? (
           <div className="space-y-2">
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-1">
+            <div className="grid grid-cols-2 gap-1 md:grid-cols-2 lg:grid-cols-4">
               <div className="card-glass p-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Profile Views</p>
-                    <p className="text-2xl font-bold text-gray-900">{analytics.profileViews?.toLocaleString() || 0}</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Profile Views
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {analytics.profileViews?.toLocaleString() || 0}
+                    </p>
                   </div>
-                  <div className="w-10 h-10 bg-blue-100 rounded-none flex items-center justify-center">
-                    <EyeIcon className="w-6 h-6" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-none bg-blue-100">
+                    <EyeIcon className="h-6 w-6" />
                   </div>
                 </div>
-                <p className={`text-sm mt-2 ${analytics.profileViewsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {analytics.profileViewsChange >= 0 ? '↗️' : '↘️'} {Math.abs(analytics.profileViewsChange || 0)}% vs last period
+                <p
+                  className={`mt-2 text-sm ${analytics.profileViewsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {analytics.profileViewsChange >= 0 ? '↗️' : '↘️'}{' '}
+                  {Math.abs(analytics.profileViewsChange || 0)}% vs last period
                 </p>
               </div>
 
@@ -206,14 +234,18 @@ export default function AnalyticsPage() {
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Applications</p>
-                        <p className="text-2xl font-bold text-gray-900">{analytics.totalApplications || 0}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Total Applications
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {analytics.totalApplications || 0}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-yellow-100 rounded-none flex items-center justify-center">
-                        <FileTextIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-yellow-100">
+                        <FileTextIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="mt-2 text-sm text-gray-600">
                       {analytics.acceptedApplications || 0} accepted
                     </p>
                   </div>
@@ -221,14 +253,18 @@ export default function AnalyticsPage() {
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Followers</p>
-                        <p className="text-2xl font-bold text-gray-900">{analytics.totalFollowers?.toLocaleString() || 0}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Total Followers
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {analytics.totalFollowers?.toLocaleString() || 0}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
-                        <UsersIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-purple-100">
+                        <UsersIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="mt-2 text-sm text-gray-600">
                       {analytics.influencerTier || 'Emerging Creator'}
                     </p>
                   </div>
@@ -236,14 +272,18 @@ export default function AnalyticsPage() {
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Earnings</p>
-                        <p className="text-2xl font-bold text-gray-900">${analytics.totalEarnings?.toLocaleString() || 0}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Total Earnings
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          ${analytics.totalEarnings?.toLocaleString() || 0}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
-                        <DollarSignIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-green-100">
+                        <DollarSignIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="mt-2 text-sm text-gray-600">
                       {analytics.completedCampaigns || 0} campaigns completed
                     </p>
                   </div>
@@ -253,14 +293,18 @@ export default function AnalyticsPage() {
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
-                        <p className="text-2xl font-bold text-gray-900">{analytics.totalCampaigns || 0}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Total Campaigns
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {analytics.totalCampaigns || 0}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-purple-100 rounded-none flex items-center justify-center">
-                        <MegaphoneIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-purple-100">
+                        <MegaphoneIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="mt-2 text-sm text-gray-600">
                       {analytics.activeCampaigns || 0} currently active
                     </p>
                   </div>
@@ -268,31 +312,46 @@ export default function AnalyticsPage() {
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                        <p className="text-2xl font-bold text-gray-900">${analytics.totalSpent?.toLocaleString() || 0}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Total Spent
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          ${analytics.totalSpent?.toLocaleString() || 0}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-red-100 rounded-none flex items-center justify-center">
-                        <CreditCardIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-red-100">
+                        <CreditCardIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Avg: ${analytics.averageCampaignCost?.toLocaleString() || 0} per campaign
+                    <p className="mt-2 text-sm text-gray-600">
+                      Avg: $
+                      {analytics.averageCampaignCost?.toLocaleString() || 0} per
+                      campaign
                     </p>
                   </div>
 
                   <div className="card-glass p-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          Success Rate
+                        </p>
                         <p className="text-2xl font-bold text-gray-900">
-                          {analytics.totalCampaigns ? Math.round(((analytics.successfulCampaigns || 0) / analytics.totalCampaigns) * 100) : 0}%
+                          {analytics.totalCampaigns
+                            ? Math.round(
+                                ((analytics.successfulCampaigns || 0) /
+                                  analytics.totalCampaigns) *
+                                  100
+                              )
+                            : 0}
+                          %
                         </p>
                       </div>
-                      <div className="w-10 h-10 bg-green-100 rounded-none flex items-center justify-center">
-                        <CheckCircleIcon className="w-6 h-6" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-none bg-green-100">
+                        <CheckCircleIcon className="h-6 w-6" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="mt-2 text-sm text-gray-600">
                       {analytics.successfulCampaigns || 0} successful campaigns
                     </p>
                   </div>
@@ -302,27 +361,37 @@ export default function AnalyticsPage() {
 
             {/* Creator Specific Analytics */}
             {userType === 'creator' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                 {/* Social Media Performance */}
                 <div className="card-glass p-3">
-                  <h3 className="text-lg font-semibold mb-4">📱 Social Media Performance</h3>
+                  <h3 className="mb-4 text-lg font-semibold">
+                    📱 Social Media Performance
+                  </h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Total Posts</span>
-                      <span className="font-semibold">{analytics.totalPosts || 0}</span>
+                      <span className="font-semibold">
+                        {analytics.totalPosts || 0}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Average Engagement</span>
-                      <span className="font-semibold">{analytics.averageEngagement?.toFixed(1) || 0}%</span>
+                      <span className="font-semibold">
+                        {analytics.averageEngagement?.toFixed(1) || 0}%
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Influencer Tier</span>
-                      <span className="font-semibold text-purple-600">{analytics.influencerTier || 'Emerging'}</span>
+                      <span className="font-semibold text-purple-600">
+                        {analytics.influencerTier || 'Emerging'}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Average Rating</span>
                       <span className="font-semibold">
-                        {analytics.averageRating ? `${analytics.averageRating.toFixed(1)}/5.0 ⭐` : 'No ratings yet'}
+                        {analytics.averageRating
+                          ? `${analytics.averageRating.toFixed(1)}/5.0 ⭐`
+                          : 'No ratings yet'}
                       </span>
                     </div>
                   </div>
@@ -330,27 +399,48 @@ export default function AnalyticsPage() {
 
                 {/* Application Success */}
                 <div className="card-glass p-3">
-                  <h3 className="text-lg font-semibold mb-4">📈 Application Success</h3>
+                  <h3 className="mb-4 text-lg font-semibold">
+                    📈 Application Success
+                  </h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Acceptance Rate</span>
                       <span className="font-semibold text-green-600">
-                        {analytics.totalApplications ?
-                          Math.round(((analytics.acceptedApplications || 0) / analytics.totalApplications) * 100) : 0}%
+                        {analytics.totalApplications
+                          ? Math.round(
+                              ((analytics.acceptedApplications || 0) /
+                                analytics.totalApplications) *
+                                100
+                            )
+                          : 0}
+                        %
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Completion Rate</span>
                       <span className="font-semibold text-blue-600">
-                        {analytics.acceptedApplications ?
-                          Math.round(((analytics.completedCampaigns || 0) / analytics.acceptedApplications) * 100) : 0}%
+                        {analytics.acceptedApplications
+                          ? Math.round(
+                              ((analytics.completedCampaigns || 0) /
+                                analytics.acceptedApplications) *
+                                100
+                            )
+                          : 0}
+                        %
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Avg Earnings per Campaign</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">
+                        Avg Earnings per Campaign
+                      </span>
                       <span className="font-semibold text-green-600">
-                        ${analytics.completedCampaigns ?
-                          Math.round((analytics.totalEarnings || 0) / analytics.completedCampaigns).toLocaleString() : 0}
+                        $
+                        {analytics.completedCampaigns
+                          ? Math.round(
+                              (analytics.totalEarnings || 0) /
+                                analytics.completedCampaigns
+                            ).toLocaleString()
+                          : 0}
                       </span>
                     </div>
                   </div>
@@ -360,49 +450,76 @@ export default function AnalyticsPage() {
 
             {/* Brand Specific Analytics */}
             {userType === 'brand' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                 {/* Campaign Performance */}
                 <div className="card-glass p-3">
-                  <h3 className="text-lg font-semibold mb-4">📊 Campaign Performance</h3>
+                  <h3 className="mb-4 text-lg font-semibold">
+                    📊 Campaign Performance
+                  </h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Success Rate</span>
                       <span className="font-semibold text-green-600">
-                        {analytics.totalCampaigns ?
-                          Math.round(((analytics.successfulCampaigns || 0) / analytics.totalCampaigns) * 100) : 0}%
+                        {analytics.totalCampaigns
+                          ? Math.round(
+                              ((analytics.successfulCampaigns || 0) /
+                                analytics.totalCampaigns) *
+                                100
+                            )
+                          : 0}
+                        %
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Active Campaigns</span>
-                      <span className="font-semibold text-blue-600">{analytics.activeCampaigns || 0}</span>
+                      <span className="font-semibold text-blue-600">
+                        {analytics.activeCampaigns || 0}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Average Cost</span>
-                      <span className="font-semibold">${analytics.averageCampaignCost?.toLocaleString() || 0}</span>
+                      <span className="font-semibold">
+                        ${analytics.averageCampaignCost?.toLocaleString() || 0}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* ROI Analysis */}
                 <div className="card-glass p-3">
-                  <h3 className="text-lg font-semibold mb-4">💹 ROI Analysis</h3>
+                  <h3 className="mb-4 text-lg font-semibold">
+                    💹 ROI Analysis
+                  </h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Total Investment</span>
-                      <span className="font-semibold">${analytics.totalSpent?.toLocaleString() || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Cost per Success</span>
                       <span className="font-semibold">
-                        ${analytics.successfulCampaigns ?
-                          Math.round((analytics.totalSpent || 0) / analytics.successfulCampaigns).toLocaleString() : 0}
+                        ${analytics.totalSpent?.toLocaleString() || 0}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Cost per Success</span>
+                      <span className="font-semibold">
+                        $
+                        {analytics.successfulCampaigns
+                          ? Math.round(
+                              (analytics.totalSpent || 0) /
+                                analytics.successfulCampaigns
+                            ).toLocaleString()
+                          : 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600">Campaign Efficiency</span>
                       <span className="font-semibold text-purple-600">
-                        {analytics.totalCampaigns ?
-                          ((analytics.successfulCampaigns || 0) / analytics.totalCampaigns * 100).toFixed(1) : 0}% success rate
+                        {analytics.totalCampaigns
+                          ? (
+                              ((analytics.successfulCampaigns || 0) /
+                                analytics.totalCampaigns) *
+                              100
+                            ).toFixed(1)
+                          : 0}
+                        % success rate
                       </span>
                     </div>
                   </div>
@@ -411,30 +528,50 @@ export default function AnalyticsPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-none p-3">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">🚀 Quick Actions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-none border border-blue-200 bg-blue-50 p-3">
+              <h3 className="mb-4 text-lg font-semibold text-blue-900">
+                🚀 Quick Actions
+              </h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {userType === 'creator' ? (
                   <>
-                    <Link href="/marketplace" className="btn-secondary text-center">
+                    <Link
+                      href="/marketplace"
+                      className="btn-secondary text-center"
+                    >
                       🔍 Browse New Gigs
                     </Link>
-                    <Link href="/social-media" className="btn-secondary text-center">
+                    <Link
+                      href="/social-media"
+                      className="btn-secondary text-center"
+                    >
                       📱 Update Social Media
                     </Link>
-                    <Link href="/portfolio" className="btn-secondary text-center">
+                    <Link
+                      href="/portfolio"
+                      className="btn-secondary text-center"
+                    >
                       📁 Manage Portfolio
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link href="/create-gig" className="btn-secondary text-center">
+                    <Link
+                      href="/create-gig"
+                      className="btn-secondary text-center"
+                    >
                       ➕ Create New Campaign
                     </Link>
-                    <Link href={"/my-gigs" as any} className="btn-secondary text-center">
+                    <Link
+                      href={'/my-gigs' as any}
+                      className="btn-secondary text-center"
+                    >
                       📢 Manage Gigs
                     </Link>
-                    <Link href={"/influencers/search" as any} className="btn-secondary text-center">
+                    <Link
+                      href={'/influencers/search' as any}
+                      className="btn-secondary text-center"
+                    >
                       🔍 Find Influencers
                     </Link>
                   </>
@@ -444,9 +581,11 @@ export default function AnalyticsPage() {
           </div>
         ) : (
           <div className="card-glass p-8 text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h3 className="text-xl font-semibold mb-2">No Analytics Data Available</h3>
-            <p className="text-gray-600 mb-6">
+            <div className="mb-4 text-6xl">📊</div>
+            <h3 className="mb-2 text-xl font-semibold">
+              No Analytics Data Available
+            </h3>
+            <p className="mb-6 text-gray-600">
               {userType === 'creator'
                 ? 'Start applying to gigs to see your analytics!'
                 : 'Create your first campaign to see analytics data!'}
