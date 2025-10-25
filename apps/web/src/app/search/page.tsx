@@ -8,25 +8,35 @@ import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 import Link from 'next/link';
 
 interface SearchResult {
-  type: 'GIG' | 'USER' | 'CLAN';
+  rank: number;
   id: string;
-  title?: string;
-  name?: string;
-  description?: string;
-  category?: string;
-  skills?: string[];
-  budget?: {
-    type: string;
-    min?: number;
-    max?: number;
-    currency: string;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  fullName: string;
+  profilePicture: string | null;
+  bio: string | null;
+  location: string | null;
+  roles: string[];
+  isActive: boolean;
+  emailVerified: boolean;
+  lastActiveAt: string;
+  tokenCount: number;
+  equipmentCount: number;
+  reputation: {
+    finalScore: number;
+    tier: string;
+    badges: any[];
+    ranking: {
+      global: number | null;
+    };
   };
-  location?: string;
-  rating?: number;
-  reviewCount?: number;
-  isRemote?: boolean;
-  profilePicture?: string;
-  roles?: string[];
+  // Social media fields (if available)
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+  tiktok?: string;
 }
 
 interface TopUser {
@@ -67,17 +77,15 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [allSearchResults, setAllSearchResults] = useState<SearchResult[]>([]);
   const [topUsers, setTopUsers] = useState<TopUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingTopUsers, setLoadingTopUsers] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showRoadmap, setShowRoadmap] = useState(false);
   const [filters, setFilters] = useState({
     type: searchParams.get('type') || 'users',
-    category: searchParams.get('category') || '',
-    minBudget: searchParams.get('minBudget') || '',
-    maxBudget: searchParams.get('maxBudget') || '',
     location: searchParams.get('location') || '',
-    isRemote: searchParams.get('remote') === 'true',
   });
 
   useEffect(() => {
@@ -94,9 +102,12 @@ export default function SearchPage() {
   const loadTopUsers = async () => {
     try {
       setLoadingTopUsers(true);
-      const response = await apiClient.get('/api/feed/top-users?limit=5&criteria=score');
+      const response = await apiClient.get(
+        '/api/feed/top-users?limit=5&criteria=score'
+      );
+      console.log('Top Users API Response:', response);
       if (response.success) {
-        setTopUsers((response.data as any)?.users as TopUser[] || []);
+        setTopUsers(((response.data as any)?.users as TopUser[]) || []);
       } else {
         console.error('Failed to load top users:', response);
         setTopUsers([]);
@@ -109,11 +120,34 @@ export default function SearchPage() {
     }
   };
 
-  const endpointMap: Record<string, string> = {
-    users: '/api/user/search/users',
-    influencers: '/api/user/search/influencers',
-    brands: '/api/user/search/brands',
-    crew: '/api/user/search/crew',
+  // Single endpoint for all user searches, filter by role on client side
+  const searchEndpoint = '/api/user/search/users';
+
+  // Function to apply filters to existing results
+  const applyFilters = (users: SearchResult[]) => {
+    return users.filter((user) => {
+      // Role filter - only show users that match the selected role
+      if (filters.type === 'influencers') {
+        if (!user.roles.includes('INFLUENCER')) return false;
+      } else if (filters.type === 'brands') {
+        if (!user.roles.includes('BRAND')) return false;
+      } else if (filters.type === 'crew') {
+        if (!user.roles.includes('CREW')) return false;
+      }
+      // If filters.type === 'users', show all users (no role filtering)
+
+      // Location filter (case insensitive partial match)
+      if (filters.location && user.location) {
+        if (
+          !user.location.toLowerCase().includes(filters.location.toLowerCase())
+        )
+          return false;
+      } else if (filters.location && !user.location) {
+        return false; // If location filter is set but user has no location
+      }
+
+      return true;
+    });
   };
 
   const performSearch = async (searchQuery: string = query) => {
@@ -122,20 +156,47 @@ export default function SearchPage() {
       setLoading(true);
       setError(null);
 
+      // Only send the search query to API, no filters
       const params = new URLSearchParams({
         query: searchQuery,
-        ...(filters.category && { category: filters.category }),
-        ...(filters.minBudget && { minBudget: filters.minBudget }),
-        ...(filters.maxBudget && { maxBudget: filters.maxBudget }),
-        ...(filters.location && { location: filters.location }),
-        ...(filters.isRemote && { remote: 'true' }),
       });
 
-      const endpoint = endpointMap[filters.type] || endpointMap['users'];
-      const response = await apiClient.get(`${endpoint}?${params}`);
-      //console.log((response);
+      const response = await apiClient.get(`${searchEndpoint}?${params}`);
+      console.log('Search API Response:', response);
       if (response.success) {
-        setResults(((response.data as any)?.results as SearchResult[]) || []);
+        const allUsers = ((response.data as any)?.results as TopUser[]) || [];
+
+        // Convert TopUser format to SearchResult format for compatibility
+        const searchResults: SearchResult[] = allUsers.map((user) => ({
+          rank: user.rank,
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          fullName: user.fullName,
+          profilePicture: user.profilePicture,
+          bio: user.bio,
+          location: user.location,
+          roles: user.roles,
+          isActive: user.isActive,
+          emailVerified: user.emailVerified,
+          lastActiveAt: user.lastActiveAt,
+          tokenCount: user.tokenCount,
+          equipmentCount: user.equipmentCount,
+          reputation: user.reputation,
+          instagram: user.instagram,
+          twitter: user.twitter,
+          linkedin: user.linkedin,
+          youtube: user.youtube,
+          tiktok: user.tiktok,
+        }));
+
+        // Store all results for filtering
+        setAllSearchResults(searchResults);
+
+        // Apply current filters and set filtered results
+        const filteredResults = applyFilters(searchResults);
+        setResults(filteredResults);
       } else {
         setError('Search failed');
       }
@@ -152,10 +213,8 @@ export default function SearchPage() {
       // Update URL
       const params = new URLSearchParams({
         q: query,
-        ...(filters.type !== 'ALL' && { type: filters.type }),
-        ...(filters.category && { category: filters.category }),
+        ...(filters.type !== 'users' && { type: filters.type }),
         ...(filters.location && { location: filters.location }),
-        ...(filters.isRemote && { remote: 'true' }),
       });
 
       router.push(`/search?${params}`);
@@ -167,183 +226,157 @@ export default function SearchPage() {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
 
-    // Auto-search when filters change if there's a query
-    if (query.trim()) {
-      performSearch();
+    // If we have search results, just re-filter them instead of making new API call
+    if (allSearchResults.length > 0) {
+      // Apply filters with the new filter values
+      const filteredResults = allSearchResults.filter((user) => {
+        // Role filter - only show users that match the selected role
+        if (newFilters.type === 'influencers') {
+          if (!user.roles.includes('INFLUENCER')) return false;
+        } else if (newFilters.type === 'brands') {
+          if (!user.roles.includes('BRAND')) return false;
+        } else if (newFilters.type === 'crew') {
+          if (!user.roles.includes('CREW')) return false;
+        }
+        // If newFilters.type === 'users', show all users (no role filtering)
+
+        // Location filter (case insensitive partial match)
+        if (newFilters.location && user.location) {
+          if (
+            !user.location
+              .toLowerCase()
+              .includes(newFilters.location.toLowerCase())
+          )
+            return false;
+        } else if (newFilters.location && !user.location) {
+          return false; // If location filter is set but user has no location
+        }
+
+        return true;
+      });
+
+      setResults(filteredResults);
     }
   };
 
-  const renderGigResult = (result: SearchResult) => (
-    <div key={result.id} className="card-glass p-3">
-      <div className="flex justify-between items-start">
-        <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-2">
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-              GIG
-            </span>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {result.title}
-            </h3>
-            {result.isRemote && (
-              <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
-                Remote
-              </span>
-            )}
-          </div>
+  // const renderGigResult = (result: SearchResult) => (
+  //   <div key={result.id} className="card-glass p-3">
+  //     <div className="flex items-start justify-between">
+  //       <div className="flex-1">
+  //         <div className="mb-2 flex items-center space-x-3">
+  //           <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+  //             GIG
+  //           </span>
+  //           <h3 className="text-lg font-semibold text-gray-900">
+  //             {result.title}
+  //           </h3>
+  //           {result.isRemote && (
+  //             <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">
+  //               Remote
+  //             </span>
+  //           )}
+  //         </div>
 
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {result.description}
-          </p>
+  //         <p className="mb-3 line-clamp-2 text-sm text-gray-600">
+  //           {result.description}
+  //         </p>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
-            {result.category && <span>🏷️ {result.category}</span>}
-            {result.budget && (
-              <span>
-                💰 {result.budget.type === 'NEGOTIABLE' ? 'Negotiable' :
-                  `${result.budget.currency} ${result.budget.min}${result.budget.max ? ` - ${result.budget.max}` : '+'}`}
-              </span>
-            )}
-            {result.location && <span>📍 {result.location}</span>}
-          </div>
+  //         <div className="mb-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+  //           {result.category && <span>🏷️ {result.category}</span>}
+  //           {result.budget && (
+  //             <span>
+  //               💰{' '}
+  //               {result.budget.type === 'NEGOTIABLE'
+  //                 ? 'Negotiable'
+  //                 : `${result.budget.currency} ${result.budget.min}${result.budget.max ? ` - ${result.budget.max}` : '+'}`}
+  //             </span>
+  //           )}
+  //           {result.location && <span>📍 {result.location}</span>}
+  //         </div>
 
-          {result.skills && result.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {result.skills.slice(0, 5).map((skill) => (
-                <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                  {skill}
-                </span>
-              ))}
-              {result.skills.length > 5 && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                  +{result.skills.length - 5} more
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+  //         {result.skills && result.skills.length > 0 && (
+  //           <div className="flex flex-wrap gap-2">
+  //             {result.skills.slice(0, 5).map((skill) => (
+  //               <span
+  //                 key={skill}
+  //                 className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700"
+  //               >
+  //                 {skill}
+  //               </span>
+  //             ))}
+  //             {result.skills.length > 5 && (
+  //               <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
+  //                 +{result.skills.length - 5} more
+  //               </span>
+  //             )}
+  //           </div>
+  //         )}
+  //       </div>
 
-        <div className="ml-6">
-          <Link
-            href={`/gig/${result.id}` as any}
-            className="btn-primary"
-          >
-            View Gig
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  //       <div className="ml-6">
+  //         <Link href={`/gig/${result.id}` as any} className="btn-primary">
+  //           View Gig
+  //         </Link>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
-  const renderUserResult = (result: SearchResult) => (
-    <div key={result.id} className="card-glass p-3">
-      <div className="flex items-start space-x-4">
-        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold text-lg">
-          {result.profilePicture ? (
-            <img
-              src={result.profilePicture}
-              alt="Profile"
-              className="w-16 h-16 rounded-none object-cover"
-            />
-          ) : (
-            result.name?.[0]?.toUpperCase() || 'U'
-          )}
-        </div>
-
-        <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-2">
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-              {result.roles?.includes('INFLUENCER') ? 'INFLUENCER' :
-                result.roles?.includes('CREW') ? 'CREW' : 'USER'}
-            </span>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {result.name}
-            </h3>
-            {result.rating && (
-              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                <span className="text-yellow-400">★</span>
-                <span>{result.rating.toFixed(1)}</span>
-                <span>({result.reviewCount || 0})</span>
-              </div>
-            )}
-          </div>
-
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {result.description}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
-            {result.category && <span>🏷️ {result.category}</span>}
-            {result.location && <span>📍 {result.location}</span>}
-          </div>
-
-          {result.skills && result.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {result.skills.slice(0, 5).map((skill) => (
-                <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                  {skill}
-                </span>
-              ))}
-              {result.skills.length > 5 && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                  +{result.skills.length - 5} more
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <Link
-            href={`/profile/${result.id}` as any}
-            className="btn-ghost-sm"
-          >
-            View Profile
-          </Link>
-
-          {isAuthenticated && user?.roles?.includes('BRAND') && (
-            <Link
-              href={`/messages/new?to=${result.id}` as any}
-              className="btn-primary-sm"
-            >
-              Contact
-            </Link>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderTopUser = (user: TopUser) => (
-    <div key={user.id} className="card-glass p-3">
+  const renderUserCard = (
+    user: SearchResult | TopUser,
+    isTopUser: boolean = false
+  ) => (
+    <div
+      key={user.id}
+      className="card-glass cursor-pointer p-3 transition-shadow hover:shadow-md"
+      onClick={() => router.push(`/profile/${user.username}`)}
+    >
       <div className="flex items-start space-x-3">
         {/* Profile Picture - Smaller on mobile */}
-        <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold text-sm md:text-lg flex-shrink-0">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-sm font-semibold text-white md:h-16 md:w-16 md:text-lg">
           {user.profilePicture ? (
             <img
               src={user.profilePicture}
               alt="Profile"
-              className="w-12 h-12 md:w-16 md:h-16 rounded-none object-cover"
+              className="h-12 w-12 rounded-full object-cover md:h-16 md:w-16"
             />
           ) : (
-            user.fullName?.[0]?.toUpperCase() || user.username?.[0]?.toUpperCase() || 'U'
+            (user.fullName !== 'null null'
+              ? user.fullName?.[0]
+              : user.username?.[0]
+            )?.toUpperCase() || 'U'
           )}
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {/* Header Row - Stack on mobile */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2">
-            <div className="flex items-center space-x-2 mb-1 sm:mb-0">
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
-                TOP #{user.rank}
+          <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+            <div className="mb-1 flex items-center space-x-2 sm:mb-0">
+              {isTopUser && (
+                <span className="rounded bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">
+                  TOP #{user.rank}
+                </span>
+              )}
+              <span className="rounded bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
+                {user.roles?.includes('BRAND')
+                  ? 'BRAND'
+                  : user.roles?.includes('INFLUENCER') &&
+                      user.roles?.includes('CREW')
+                    ? 'INFLUENCER + CREW'
+                    : user.roles?.includes('INFLUENCER')
+                      ? 'INFLUENCER'
+                      : user.roles?.includes('CREW')
+                        ? 'CREW'
+                        : 'USER'}
               </span>
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 truncate">
+              <h3 className="truncate text-base font-semibold text-gray-900 md:text-lg">
                 {user.fullName !== 'null null' ? user.fullName : user.username}
               </h3>
             </div>
 
-            {/* Stats - Horizontal on mobile, vertical on larger screens */}
-            <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-gray-600">
+            {/* Stats - Horizontal on mobile */}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600 md:text-sm">
               {user.reputation && user.reputation.finalScore !== null && (
                 <div className="flex items-center space-x-1">
                   <span className="text-green-500">🏆</span>
@@ -352,7 +385,7 @@ export default function SearchPage() {
               )}
               {user.reputation && user.reputation.tier && (
                 <div className="flex items-center space-x-1">
-                  <span className="text-green-500">🏆</span>
+                  <span className="text-blue-500">�</span>
                   <span>{user.reputation.tier}</span>
                 </div>
               )}
@@ -360,12 +393,12 @@ export default function SearchPage() {
           </div>
 
           {/* Bio - Truncated on mobile */}
-          <p className="text-gray-600 text-xs md:text-sm mb-1 line-clamp-2">
-            {user.bio || `Top performing user on 50BraIns - ${user.roles.join(', ')}`}
+          <p className="mb-1 line-clamp-2 text-xs text-gray-600 md:text-sm">
+            {user.bio || `User on 50BraIns - ${user.roles.join(', ')}`}
           </p>
 
           {/* Location and Social Media - Compact on mobile */}
-          <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 mb-1">
+          <div className="mb-1 flex flex-wrap items-center gap-1 text-xs text-gray-500">
             {user.location && (
               <span className="flex items-center">
                 <span className="mr-1">📍</span>
@@ -373,28 +406,7 @@ export default function SearchPage() {
               </span>
             )}
 
-            {/* Social Media Icons - Only show on larger screens or as tooltips */}
-            <div className="hidden sm:flex items-center space-x-2">
-              {user.instagram && (
-                <a href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0-3 3V18a3 3 0 1 0 3-3" /><circle cx="12" cy="12" r="3" /><path d="M19.5 6h-15" /><path d="M22 12h-4" /><path d="M18 18h-2" /><path d="M15 15h-3" /></svg>
-                </a>
-              )}
-              {user.twitter && (
-                <a href={`https://twitter.com/${user.twitter}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.5-.5" /><path d="M9 10.5h.01" /><path d="M16 10.5h.01" /><path d="M11 10.5h.01" /><path d="M18 10.5h.01" /></svg>
-                </a>
-              )}
-              {user.linkedin && (
-                <a href={`https://linkedin.com/in/${user.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7H4v-7a6 6 0 0 1 6-6" /><circle cx="12" cy="12" r="3" /></svg>
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Equipment and Tokens - Compact display */}
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
+            {/* Equipment and Tokens - Compact display */}
             {user.equipmentCount > 0 && (
               <div className="flex items-center space-x-1">
                 <span className="text-green-500">⚙️</span>
@@ -409,25 +421,6 @@ export default function SearchPage() {
             )}
           </div>
         </div>
-
-        {/* Action Buttons - Stack vertically on mobile */}
-        <div className="flex flex-col space-y-1 ml-2">
-          <Link
-            href={`/profile/${user.id}` as any}
-            className="btn-ghost-sm text-xs px-2 py-1"
-          >
-            View
-          </Link>
-
-          {isAuthenticated && user?.roles?.includes('BRAND') && (
-            <Link
-              href={`/messages/new?to=${user.id}` as any}
-              className="btn-primary-sm text-xs px-2 py-1"
-            >
-              Contact
-            </Link>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -437,7 +430,7 @@ export default function SearchPage() {
       <div className="page-container min-h-screen pt-1">
         <div className="content-container py-1">
           <div className="mx-auto max-w-6xl">
-            <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+            <nav className="mb-2 flex items-center space-x-2 text-sm text-gray-600">
               <Link href="/marketplace" className="hover:text-brand-primary">
                 Marketplace
               </Link>
@@ -448,9 +441,7 @@ export default function SearchPage() {
             </nav>
             {/* Search Header */}
             <div className="mb-1">
-              <h1 className="text-heading mb-1 text-3xl font-bold">
-                Search
-              </h1>
+              <h1 className="text-heading mb-1 text-3xl font-bold">Search</h1>
 
               <form onSubmit={handleSearch} className="space-y-1">
                 <div className="flex gap-1">
@@ -459,21 +450,21 @@ export default function SearchPage() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search for influencers, brands, or crew members..."
-                    className="input flex-1 text-lg py-1"
+                    className="input flex-1 py-1 text-lg"
                   />
                   <button type="submit" className="btn-primary px-1">
                     Search
                   </button>
                 </div>
 
-                {/* Filters */}
+                {/* User Filters */}
                 <div className="flex flex-wrap gap-4">
                   <select
                     value={filters.type}
                     onChange={(e) => handleFilterChange('type', e.target.value)}
                     className="input w-auto"
                   >
-                    <option value="users">Users</option>
+                    <option value="users">All Users</option>
                     <option value="influencers">Influencers</option>
                     <option value="brands">Brands</option>
                     <option value="crew">Crew</option>
@@ -481,29 +472,13 @@ export default function SearchPage() {
 
                   <input
                     type="text"
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                    placeholder="Category"
-                    className="input w-32"
-                  />
-
-                  <input
-                    type="text"
                     value={filters.location}
-                    onChange={(e) => handleFilterChange('location', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange('location', e.target.value)
+                    }
                     placeholder="Location"
                     className="input w-32"
                   />
-
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={filters.isRemote}
-                      onChange={(e) => handleFilterChange('isRemote', e.target.checked)}
-                      className="rounded"
-                    />
-                    <span className="text-sm">Remote only</span>
-                  </label>
                 </div>
               </form>
             </div>
@@ -535,10 +510,10 @@ export default function SearchPage() {
                 {results.length === 0 ? (
                   <div className="card-glass p-8 text-center">
                     <div className="mb-4">
-                      <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-600">
                         <span className="text-2xl">🔍</span>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900">
                         No results found
                       </h3>
                       <p className="text-gray-600">
@@ -548,9 +523,7 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {results.map((result) =>
-                      result.type === 'GIG' ? renderGigResult(result) : renderUserResult(result)
-                    )}
+                    {results.map((result) => renderUserCard(result, false))}
                   </div>
                 )}
               </>
@@ -558,11 +531,11 @@ export default function SearchPage() {
               <div className="space-y-1">
                 {/* Top Users Section */}
                 <div className="mb-1">
-                  <div className="flex flex-row justify-between items-center sm:flex-row sm:items-center sm:justify-between mb-1">
-                    <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-1 sm:mb-0">
+                  <div className="mb-1 flex flex-row items-center justify-between sm:flex-row sm:items-center sm:justify-between">
+                    <h2 className="mb-1 text-lg font-semibold text-gray-900 sm:mb-0 md:text-xl">
                       Top Users
                     </h2>
-                    <span className="text-xs md:text-sm text-gray-500">
+                    <span className="text-xs text-gray-500 md:text-sm">
                       Highest scoring users on 50BraIns
                     </span>
                   </div>
@@ -574,62 +547,38 @@ export default function SearchPage() {
                     </div>
                   ) : topUsers.length > 0 ? (
                     <div className="space-y-1">
-                      {topUsers.map(renderTopUser)}
+                      {topUsers.map((user) => renderUserCard(user, true))}
                     </div>
                   ) : (
                     <div className="card-glass p-1 text-center">
                       <div className="mb-1">
-                        <div className="mx-auto mb-1 h-12 w-12 md:h-16 md:w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <div className="mx-auto mb-1 flex h-12 w-12 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-600 md:h-16 md:w-16">
                           <span className="text-xl md:text-2xl">👥</span>
                         </div>
-                        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+                        <h3 className="mb-2 text-base font-semibold text-gray-900 md:text-lg">
                           No top users available
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-sm text-gray-600">
                           Top users will appear here
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
-
-                {/* <div className="card-glass p-8 text-center">
-                  <div className="mb-4">
-                    <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                      <span className="text-2xl">🔍</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Search 50Brains
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                      Find influencers, brands, and crew members
-                    </p>
-                  </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                    <div className="p-4 bg-gray-50 rounded-none">
-                      <div className="text-2xl mb-2">👥</div>
-                      <h4 className="font-medium text-gray-900">Find Influencers</h4>
-                      <p className="text-sm text-gray-600">Browse available influencers</p>
-                    </div>
-
-                    <div className="p-4 bg-gray-50 rounded-none">
-                      <div className="text-2xl mb-2">💰</div>
-                      <h4 className="font-medium text-gray-900">Find Brands</h4>
-                      <p className="text-sm text-gray-600">Discover brands</p>
-                    </div>
-
-                    <div className="p-4 bg-gray-50 rounded-none">
-                      <div className="text-2xl mb-2">👥</div>
-                      <h4 className="font-medium text-gray-900">Find Crew</h4>
-                      <p className="text-sm text-gray-600">Discover crew members</p>
-                    </div>
-                  </div> 
-                </div> */}
                 {/* Business Roadmap */}
-                <div className="mt-6">
-                  <BusinessRoadmap />
+                <div className="flex justify-center">
+                  <button
+                    className="btn-ghost px-1 py-1"
+                    onClick={() => setShowRoadmap(!showRoadmap)}
+                  >
+                    {showRoadmap ? 'Hide Roadmap' : 'Show Roadmap'}
+                  </button>
                 </div>
+                {showRoadmap && (
+                  <div className="w-full space-y-1 rounded-none border-none border-black/20 bg-white p-1 shadow-none backdrop-blur-lg">
+                    <BusinessRoadmap />
+                  </div>
+                )}
               </div>
             )}
           </div>

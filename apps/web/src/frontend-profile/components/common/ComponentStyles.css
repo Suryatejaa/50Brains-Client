@@ -298,8 +298,8 @@
 }
 
 .settings-section {
-  margin-bottom: 12px;
-  padding: 10px;
+  margin-bottom: 2px;
+  padding: 12px;
   background: white;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -374,9 +374,12 @@
 }
 
 .danger-actions {
+  position: relative;
+  max-width: fit-content;
+  margin-bottom: 1px;
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .btn--danger {

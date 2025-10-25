@@ -16,6 +16,7 @@ import {
   FaGlobeAsia,
   FaBullseye,
 } from 'react-icons/fa';
+import LoadingSpinner from '@/frontend-profile/components/common/LoadingSpinner';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -50,6 +51,7 @@ export default function ProfilePage() {
           Array.isArray(response.data) &&
           response.data.length > 0
         ) {
+          console.log('Profile loaded successfully:', response.data[0]);
           setProfile(response.data[0]);
         } else {
           setError('Profile not found');
@@ -65,6 +67,12 @@ export default function ProfilePage() {
     loadProfile();
   }, [identifier]);
 
+  const activeFrom = profile?.createdAt ? new Date(profile.createdAt) : null;
+  //exclude role USER
+  const roles = profile?.roles || [];
+  const filteredRoles = roles.filter((role: string) => role !== 'USER');
+  console.log('Filtered Roles:', filteredRoles);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -72,8 +80,7 @@ export default function ProfilePage() {
           <div className="content-container py-1">
             <div className="mx-auto max-w-4xl">
               <div className="card-glass p-8 text-center">
-                <div className="border-brand-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
-                <p className="text-gray-600">Loading profile...</p>
+                <LoadingSpinner size="large" message="Loading profile..." />
               </div>
             </div>
           </div>
@@ -146,11 +153,16 @@ export default function ProfilePage() {
                   <h1 className="mb-2 text-xl font-bold text-gray-900">
                     {profile.displayName ||
                       `${profile.firstName || ''} ${profile.lastName || ''}`.trim() ||
-                      'Anonymous User'}
+                      `${profile.username}`}
                   </h1>
-                  {profile.currentRole && (
+                  {filteredRoles.length > 0 && (
                     <p className="mb-2 text-sm text-gray-600">
-                      {profile.currentRole}
+                      {filteredRoles.join(', ') || 'No Role'}
+                    </p>
+                  )}
+                  {profile.createdAt && (
+                    <p className="mb-2 text-sm text-gray-600">
+                      Active since {activeFrom?.toLocaleDateString()}
                     </p>
                   )}
                   {profile.bio && (

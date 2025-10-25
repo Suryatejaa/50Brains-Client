@@ -402,7 +402,6 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
       {/* Logout Section */}
       <div className="settings-section">
-        <h4>Logout</h4>
         <div className="settings-content">
           <button
             className="btn btn--danger"
@@ -416,7 +415,6 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
       {/* Danger Zone */}
       <div className="settings-section settings-section--danger">
-        <h4>Danger Zone</h4>
         <div className="settings-content">
           <div className="danger-actions">
             <button
@@ -438,9 +436,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
                 : 'Delete Account'}
             </button>
           </div>
-          <p className="danger-warning">
-            These actions are irreversible. Please proceed with caution.
-          </p>
+         
           {accountError && (
             <div
               className="error-message"
