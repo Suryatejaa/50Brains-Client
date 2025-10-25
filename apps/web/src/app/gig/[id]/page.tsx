@@ -202,6 +202,19 @@ export default function GigDetailsPage() {
     //console.log(('================================');
   }, [params]);
 
+  const withdrawApplication = async (applicationId: string) => {
+    try {
+      const response = await apiClient.delete(
+        `/api/gig/applications/${applicationId}`
+      );
+      if (response.success) {
+        await window.location.reload(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Failed to withdraw application:', error);
+    }
+  };
+
   // Show toast notification
   const showToast = (
     type: 'success' | 'error' | 'warning',
@@ -301,17 +314,110 @@ export default function GigDetailsPage() {
     setShowUpiModal(true);
   };
 
+  // Enhanced UPI validation function
+  const validateUpiId = (upiIdValue: string): string | null => {
+    const trimmedUpi = upiIdValue.trim();
+
+    if (!trimmedUpi) {
+      return 'UPI ID is required';
+    }
+
+    if (trimmedUpi.length < 3) {
+      return 'UPI ID is too short';
+    }
+
+    if (trimmedUpi.length > 50) {
+      return 'UPI ID is too long (max 50 characters)';
+    }
+
+    // Enhanced regex for better UPI validation
+    const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/;
+    if (!upiRegex.test(trimmedUpi)) {
+      return 'Invalid UPI ID format. Use format: username@bankname (e.g., john@paytm, user123@phonepe)';
+    }
+
+    // Check for valid UPI provider patterns
+    const validProviders = [
+      'paytm',
+      'phonepe',
+      'gpay',
+      'googlepay',
+      'amazon',
+      'amazonpay',
+      'bharatpe',
+      'mobikwik',
+      'freecharge',
+      'jiomoney',
+      'airtel',
+      'sbi',
+      'icici',
+      'hdfc',
+      'axis',
+      'kotak',
+      'pnb',
+      'bob',
+      'canara',
+      'union',
+      'indusind',
+      'yes',
+      'idbi',
+      'syndicate',
+      'allahabad',
+      'okaxis',
+      'okhdfcbank',
+      'okicici',
+      'oksbi',
+      'ibl',
+      'ybl',
+      'axl',
+      'waaxis',
+      'wahdfcbank',
+      'waicici',
+      'wasbi',
+      'jupiteraxis',
+    ];
+
+    const domain = trimmedUpi.split('@')[1]?.toLowerCase();
+    if (!domain) {
+      return 'Invalid UPI ID: Missing provider after @ symbol';
+    }
+
+    // Check if domain contains known UPI provider or follows bank domain pattern
+    const hasValidProvider = validProviders.some(
+      (provider) => domain.includes(provider) || domain.endsWith('.ifsc.npci')
+    );
+
+    if (
+      !hasValidProvider &&
+      !domain.includes('bank') &&
+      !domain.includes('upi')
+    ) {
+      return 'Please enter a valid UPI ID from a recognized provider (e.g., @paytm, @phonepe, @sbi, etc.)';
+    }
+
+    // Check for invalid characters
+    if (trimmedUpi.includes(' ')) {
+      return 'UPI ID cannot contain spaces';
+    }
+
+    if (trimmedUpi.startsWith('@') || trimmedUpi.endsWith('@')) {
+      return 'UPI ID cannot start or end with @ symbol';
+    }
+
+    if ((trimmedUpi.match(/@/g) || []).length !== 1) {
+      return 'UPI ID must contain exactly one @ symbol';
+    }
+
+    return null; // Valid UPI ID
+  };
+
   const handleUpiSubmit = async () => {
     if (!pendingBidId) return;
 
     // Validate UPI ID format
-    const upiRegex = /^[\w.-]+@[\w.-]+$/;
-    if (!upiId.trim()) {
-      setUpiValidationError('UPI ID is required');
-      return;
-    }
-    if (!upiRegex.test(upiId.trim())) {
-      setUpiValidationError('Please enter a valid UPI ID (e.g., user@paytm)');
+    const validationError = validateUpiId(upiId);
+    if (validationError) {
+      setUpiValidationError(validationError);
       return;
     }
 
@@ -601,7 +707,7 @@ export default function GigDetailsPage() {
     try {
       setApplicationsLoading(true);
       const response = await apiClient.get(`/api/my/${gigId}/applications`);
-      //console.log(('🎯 Loaded my applications:', response);
+      console.log('🎯 Loaded my applications:', response);
       if (response.success && response.data) {
         const formatMyApplications = (response.data as any).applicationStatus;
         const applicantType = (response.data as any).application?.applicantType;
@@ -1831,6 +1937,12 @@ export default function GigDetailsPage() {
                     >
                       View My Applications
                     </Link>
+                    <button
+                      onClick={() => withdrawApplication((myApplications as any)?.applicationId)}
+                      className="btn-secondary mt-2 w-full text-red-600 hover:bg-red-50"
+                    >
+                      Withdraw
+                    </button>
                   </div>
                 ) : (myApplications as any)?.status === 'SUBMITTED' &&
                   (myApplications as any)?.gigId === gigId &&
@@ -2091,24 +2203,63 @@ export default function GigDetailsPage() {
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      UPI ID
+                      UPI ID *
                     </label>
                     <div className="relative">
                       <input
                         type="text"
                         value={application.upiId || ''}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newUpiId = e.target.value;
                           setApplication((prev) => ({
                             ...prev,
-                            upiId: e.target.value,
-                          }))
-                        }
+                            upiId: newUpiId,
+                          }));
+
+                          // Real-time validation feedback
+                          if (newUpiId.trim()) {
+                            const error = validateUpiId(newUpiId);
+                            if (error) {
+                              // Show validation error visually but don't block typing
+                              e.target.style.borderColor = '#ef4444';
+                            } else {
+                              e.target.style.borderColor = '#10b981';
+                            }
+                          } else {
+                            e.target.style.borderColor = '#d1d5db';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Show validation message on blur
+                          const error = validateUpiId(e.target.value);
+                          if (error && e.target.value.trim()) {
+                            showToast('warning', error);
+                          }
+                        }}
                         required
                         className="w-full rounded-none border border-gray-300 py-2 pr-3 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                        placeholder="Your UPI ID for payment"
+                        placeholder="e.g., yourname@paytm, user123@phonepe"
                         style={{ maxWidth: '100%' }}
                       />
+                      {application.upiId && (
+                        <div className="absolute right-2 top-2">
+                          {validateUpiId(application.upiId) ? (
+                            <span className="text-sm text-red-500">❌</span>
+                          ) : (
+                            <span className="text-sm text-green-500">✅</span>
+                          )}
+                        </div>
+                      )}
                     </div>
+                    <p className="mt-1 text-xs text-gray-600">
+                      💡 Enter your UPI ID for secure payments (e.g.,
+                      yourname@paytm, user123@phonepe)
+                    </p>
+                    {application.upiId && validateUpiId(application.upiId) && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {validateUpiId(application.upiId)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Estimated Time */}
@@ -2290,8 +2441,7 @@ export default function GigDetailsPage() {
                         application.coverLetter.trim().length < 10 ||
                         !application.estimatedTime ||
                         !application.upiId ||
-                        application.upiId!.length < 5 ||
-                        application.upiId!.length > 100 ||
+                        validateUpiId(application.upiId) !== null ||
                         application.proposedRate! < gig.budgetMin! ||
                         application.proposedRate! >
                           (gig.budgetMax || Number.MAX_SAFE_INTEGER) ||
@@ -2487,26 +2637,65 @@ export default function GigDetailsPage() {
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 UPI ID *
               </label>
-              <input
-                type="text"
-                value={upiId}
-                onChange={(e) => {
-                  setUpiId(e.target.value);
-                  setUpiValidationError('');
-                }}
-                placeholder="e.g., yourname@paytm, yourname@phonepe"
-                className={`w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  upiValidationError ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={upiId}
+                  onChange={(e) => {
+                    const newUpiId = e.target.value;
+                    setUpiId(newUpiId);
+                    setUpiValidationError('');
+
+                    // Real-time visual feedback
+                    if (newUpiId.trim()) {
+                      const error = validateUpiId(newUpiId);
+                      if (error) {
+                        e.target.style.borderColor = '#ef4444';
+                      } else {
+                        e.target.style.borderColor = '#10b981';
+                      }
+                    } else {
+                      e.target.style.borderColor = '#d1d5db';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Validate on blur and show error
+                    const error = validateUpiId(e.target.value);
+                    if (error) {
+                      setUpiValidationError(error);
+                    }
+                  }}
+                  placeholder="e.g., yourname@paytm, user123@phonepe, john@sbi"
+                  className={`w-full rounded-md border px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    upiValidationError ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {upiId && (
+                  <div className="absolute right-3 top-2.5">
+                    {validateUpiId(upiId) ? (
+                      <span className="text-sm text-red-500">❌</span>
+                    ) : (
+                      <span className="text-sm text-green-500">✅</span>
+                    )}
+                  </div>
+                )}
+              </div>
               {upiValidationError && (
-                <p className="mt-1 text-sm text-red-600">
-                  {upiValidationError}
-                </p>
+                <div className="mt-2 rounded-md border border-red-200 bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-600">
+                    ❌ {upiValidationError}
+                  </p>
+                </div>
               )}
-              <p className="mt-1 text-xs text-gray-500">
-                💡 This UPI ID will be used for payment after work completion
-              </p>
+              <div className="mt-2 rounded-md border border-blue-200 bg-blue-50 p-2">
+                <p className="text-xs text-blue-700">
+                  💡 This UPI ID will be used for payment after work completion
+                </p>
+                <p className="mt-1 text-xs text-blue-600">
+                  ✅ Supported: @paytm, @phonepe, @gpay, @sbi, @hdfc, @icici,
+                  and other bank UPI IDs
+                </p>
+              </div>
             </div>
 
             <div className="flex gap-3">

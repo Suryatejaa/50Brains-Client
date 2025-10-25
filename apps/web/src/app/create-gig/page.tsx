@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGigs } from '@/hooks/useGigs';
 import type { CreateGigData, GigStatus } from '@/types/gig.types';
+import { Map, MapPin } from 'lucide-react';
 
 interface FormData {
   title: string;
@@ -784,7 +785,8 @@ export default function CreateGigPage() {
                             }}
                             className="btn-ghost px-4 py-2 text-sm"
                           >
-                            📍 Use Current Location
+                            <MapPin className="inline-block h-4 w-4 text-green-500" />{' '}
+                            Use Current Location
                           </button>
 
                           <button
@@ -801,71 +803,366 @@ export default function CreateGigPage() {
                                 const searchQuery = encodeURIComponent(
                                   formData.address ||
                                     formData.location ||
-                                    'Delhi, India'
+                                    'Hyderabad, India'
                                 );
 
                                 mapWindow.document.write(`
                                   <!DOCTYPE html>
                                   <html>
                                     <head>
-                                      <title>Select Location</title>
+                                      <title>Select Location - 50Brains</title>
                                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                                      <link rel="preconnect" href="https://fonts.googleapis.com">
+                                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                                      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
                                       <style>
-                                        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                                        #map { height: 500px; width: 100%; border: 1px solid #ccc; border-radius: 8px; }
-                                        .controls { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-                                        .btn { 
-                                          background: #007bff; color: white; border: none; 
-                                          padding: 10px 16px; cursor: pointer; border-radius: 6px; 
-                                          font-size: 14px; transition: background 0.2s;
+                                        * { box-sizing: border-box; }
+                                        body { 
+                                          margin: 0; padding: 0; 
+                                          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                          min-height: 100vh;
+                                          overflow-x: hidden;
                                         }
-                                        .btn:hover { background: #0056b3; }
-                                        .btn.success { background: #28a745; }
-                                        .btn.success:hover { background: #1e7e34; }
-                                        .info { 
-                                          background: #f8f9fa; padding: 15px; border-radius: 8px; 
-                                          margin-top: 15px; border-left: 4px solid #007bff; 
+                                        
+                                        .container {
+                                          max-width: 1200px;
+                                          margin: 0 auto;
+                                          padding: 20px;
+                                          min-height: 100vh;
+                                          display: flex;
+                                          flex-direction: column;
                                         }
-                                        .coordinates { font-family: monospace; font-weight: bold; color: #28a745; }
-                                        .search-container { margin-bottom: 10px; }
-                                        .search-input { 
-                                          padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; 
-                                          width: 300px; margin-right: 10px; 
+                                        
+                                        .header {
+                                          background: rgba(255, 255, 255, 0.95);
+                                          backdrop-filter: blur(20px);
+                                          border-radius: 20px;
+                                          padding: 24px 32px;
+                                          margin-bottom: 20px;
+                                          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                                          border: 1px solid rgba(255, 255, 255, 0.2);
                                         }
-                                        .status { 
-                                          padding: 10px; margin: 10px 0; border-radius: 4px; 
-                                          background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; 
+                                        
+                                        .header h1 {
+                                          margin: 0 0 8px 0;
+                                          font-size: 28px;
+                                          font-weight: 700;
+                                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                          -webkit-background-clip: text;
+                                          -webkit-text-fill-color: transparent;
+                                          background-clip: text;
+                                          display: flex;
+                                          align-items: center;
+                                          gap: 12px;
+                                        }
+                                        
+                                        .header p {
+                                          margin: 0;
+                                          color: #6b7280;
+                                          font-size: 16px;
+                                          font-weight: 400;
+                                        }
+                                        
+                                        .search-section {
+                                          background: rgba(255, 255, 255, 0.95);
+                                          backdrop-filter: blur(20px);
+                                          border-radius: 16px;
+                                          padding: 24px;
+                                          margin-bottom: 20px;
+                                          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+                                          border: 1px solid rgba(255, 255, 255, 0.2);
+                                        }
+                                        
+                                        .search-container {
+                                          display: flex;
+                                          gap: 12px;
+                                          margin-bottom: 16px;
+                                          flex-wrap: wrap;
+                                        }
+                                        
+                                        .search-input {
+                                          flex: 1;
+                                          min-width: 300px;
+                                          padding: 14px 18px;
+                                          border: 2px solid #e5e7eb;
+                                          border-radius: 12px;
+                                          font-size: 15px;
+                                          font-weight: 400;
+                                          transition: all 0.2s ease;
+                                          background: white;
+                                          outline: none;
+                                        }
+                                        
+                                        .search-input:focus {
+                                          border-color: #667eea;
+                                          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                                        }
+                                        
+                                        .controls {
+                                          display: flex;
+                                          gap: 12px;
+                                          flex-wrap: wrap;
+                                        }
+                                        
+                                        .btn {
+                                          display: inline-flex;
+                                          align-items: center;
+                                          gap: 8px;
+                                          padding: 12px 20px;
+                                          border: none;
+                                          border-radius: 12px;
+                                          font-size: 14px;
+                                          font-weight: 500;
+                                          cursor: pointer;
+                                          transition: all 0.2s ease;
+                                          text-decoration: none;
+                                          white-space: nowrap;
+                                          position: relative;
+                                          overflow: hidden;
+                                        }
+                                        
+                                        .btn:before {
+                                          content: '';
+                                          position: absolute;
+                                          top: 0;
+                                          left: -100%;
+                                          width: 100%;
+                                          height: 100%;
+                                          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                                          transition: left 0.5s;
+                                        }
+                                        
+                                        .btn:hover:before {
+                                          left: 100%;
+                                        }
+                                        
+                                        .btn-primary {
+                                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                          color: white;
+                                          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                                        }
+                                        
+                                        .btn-primary:hover {
+                                          transform: translateY(-2px);
+                                          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+                                        }
+                                        
+                                        .btn-secondary {
+                                          background: rgba(255, 255, 255, 0.9);
+                                          color: #374151;
+                                          border: 2px solid #e5e7eb;
+                                          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                                        }
+                                        
+                                        .btn-secondary:hover {
+                                          background: white;
+                                          border-color: #d1d5db;
+                                          transform: translateY(-1px);
+                                          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                                        }
+                                        
+                                        .btn-success {
+                                          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                          color: white;
+                                          box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+                                        }
+                                        
+                                        .btn-success:hover {
+                                          transform: translateY(-2px);
+                                          box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+                                        }
+                                        
+                                        .btn-danger {
+                                          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                          color: white;
+                                          box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+                                        }
+                                        
+                                        .btn-danger:hover {
+                                          transform: translateY(-2px);
+                                          box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+                                        }
+                                        
+                                        .map-container {
+                                          flex: 1;
+                                          background: rgba(255, 255, 255, 0.95);
+                                          backdrop-filter: blur(20px);
+                                          border-radius: 20px;
+                                          padding: 24px;
+                                          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                                          border: 1px solid rgba(255, 255, 255, 0.2);
+                                          display: flex;
+                                          flex-direction: column;
+                                          min-height: 600px;
+                                        }
+                                        
+                                        #map {
+                                          flex: 1;
+                                          min-height: 500px;
+                                          border-radius: 16px;
+                                          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+                                          overflow: hidden;
+                                          border: 2px solid rgba(255, 255, 255, 0.3);
+                                        }
+                                        
+                                        .info-panel {
+                                          background: rgba(255, 255, 255, 0.95);
+                                          backdrop-filter: blur(20px);
+                                          border-radius: 16px;
+                                          padding: 24px;
+                                          margin-top: 20px;
+                                          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+                                          border: 1px solid rgba(255, 255, 255, 0.2);
+                                        }
+                                        
+                                        .status {
+                                          padding: 16px 20px;
+                                          border-radius: 12px;
+                                          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+                                          border: 1px solid #93c5fd;
+                                          color: #1e40af;
+                                          margin-bottom: 20px;
+                                          font-weight: 500;
+                                        }
+                                        
+                                        .coordinates-display {
+                                          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                                          border: 1px solid #86efac;
+                                          color: #166534;
+                                          padding: 20px;
+                                          border-radius: 12px;
+                                          margin: 16px 0;
+                                        }
+                                        
+                                        .coordinates {
+                                          font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                                          font-weight: 600;
+                                          font-size: 16px;
+                                          color: #059669;
+                                          background: rgba(255, 255, 255, 0.8);
+                                          padding: 8px 12px;
+                                          border-radius: 8px;
+                                          display: inline-block;
+                                          margin: 8px 0;
+                                        }
+                                        
+                                        .icon {
+                                          width: 20px;
+                                          height: 20px;
+                                          display: inline-block;
+                                          vertical-align: middle;
+                                        }
+                                        
+                                        .loading {
+                                          display: inline-block;
+                                          width: 16px;
+                                          height: 16px;
+                                          border: 2px solid transparent;
+                                          border-top: 2px solid currentColor;
+                                          border-radius: 50%;
+                                          animation: spin 1s linear infinite;
+                                        }
+                                        
+                                        @keyframes spin {
+                                          0% { transform: rotate(0deg); }
+                                          100% { transform: rotate(360deg); }
+                                        }
+                                        
+                                        @media (max-width: 768px) {
+                                          .container { padding: 16px; }
+                                          .header { padding: 20px 24px; }
+                                          .header h1 { font-size: 24px; }
+                                          .search-container { flex-direction: column; }
+                                          .search-input { min-width: auto; }
+                                          .controls { justify-content: center; }
+                                          .map-container { min-height: 400px; }
+                                          #map { min-height: 350px; }
+                                        }
+                                        
+                                        /* Leaflet popup customization */
+                                        .leaflet-popup-content-wrapper {
+                                          border-radius: 12px !important;
+                                          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+                                        }
+                                        
+                                        .leaflet-popup-tip {
+                                          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
                                         }
                                       </style>
                                     </head>
                                     <body>
-                                      <h3>🗺️ Select Location for Your Gig</h3>
-                                      
-                                      <div class="search-container">
-                                        <input type="text" id="searchInput" class="search-input" placeholder="Search for an address..." value="${formData.address || formData.location || ''}" />
-                                        <button class="btn" onclick="searchAddress()">🔍 Search</button>
-                                      </div>
-                                      
-                                      <div class="controls">
-                                        <button class="btn" onclick="getCurrentLocation()">📍 Use My Location</button>
-                                        <button class="btn" onclick="centerOnIndia()">🇮🇳 Center on India</button>
-                                      </div>
-                                      
-                                      
-                                      <div class="info">
-                                        <div class="status">
-                                          <p><strong>Instructions:</strong> Click anywhere on the map to select a location for your gig.</p>
+                                      <div class="container">
+                                        <div class="header">
+                                          <h1>
+                                            <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                            </svg>
+                                            Select Location for Your Gig
+                                          </h1>
+                                          <p>Choose the perfect location where your project will take place</p>
                                         </div>
                                         
-                                        <div id="selectedCoords" style="display: none;">
-                                          <p>📍 <strong>Selected Location:</strong> <span class="coordinates" id="coordsDisplay"></span></p>
-                                          <button class="btn success" onclick="confirmLocation()">✓ Use This Location</button>
-                                          <button class="btn" onclick="clearSelection()" style="background: #dc3545; margin-left: 10px;">✕ Clear</button>
+                                        <div class="search-section">
+                                          <div class="search-container">
+                                            <input type="text" id="searchInput" class="search-input" placeholder="Search for an address, city, or landmark..." value="${formData.address || formData.location || ''}" />
+                                            <button class="btn btn-primary" onclick="searchAddress()">
+                                              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                              </svg>
+                                              Search
+                                            </button>
+                                          </div>
+                                          
+                                          <div class="controls">
+                                            <button class="btn btn-secondary" onclick="getCurrentLocation()">
+                                              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                              </svg>
+                                              Use My Location
+                                            </button>
+                                            <button class="btn btn-secondary" onclick="centerOnIndia()">
+                                              🇮🇳 Center on India
+                                            </button>
+                                          </div>
+                                        </div>
+                                        
+                                        <div class="map-container">
+                                          <div class="status">
+                                            <strong>💡 Instructions:</strong> Click anywhere on the map to select a location for your gig.
+                                          </div>
+                                          
+                                          <div id="selectedCoords" style="display: none;">
+                                            <div class="coordinates-display">
+                                              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                                <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                                </svg>
+                                                <strong>Selected Location:</strong>
+                                              </div>
+                                              <div class="coordinates" id="coordsDisplay"></div>
+                                              <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+                                                <button class="btn btn-success" onclick="confirmLocation()">
+                                                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                  </svg>
+                                                  Use This Location
+                                                </button>
+                                                <button class="btn btn-danger" onclick="clearSelection()">
+                                                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                  </svg>
+                                                  Clear Selection
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div id="map"></div>
                                         </div>
                                       </div>
-
-                                      <div id="map"></div>
                                       
                                       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
                                       <script>
@@ -1050,7 +1347,8 @@ export default function CreateGigPage() {
                             }}
                             className="btn-ghost ml-2 px-4 py-2 text-sm"
                           >
-                            🗺️ Select on Map
+                            <Map className="inline-block h-4 w-4 text-green-500" />{' '}
+                            Select on Map
                           </button>
                         </div>
 
@@ -1059,7 +1357,8 @@ export default function CreateGigPage() {
                           formData.longitude !== undefined && (
                             <div className="mt-2 rounded border border-green-200 bg-green-50 p-3">
                               <p className="text-sm text-green-700">
-                                📍 Selected coordinates:{' '}
+                                <MapPin className="inline-block h-4 w-4 text-green-500" />{' '}
+                                Selected coordinates:{' '}
                                 {formData.latitude.toFixed(6)},{' '}
                                 {formData.longitude.toFixed(6)}
                               </p>

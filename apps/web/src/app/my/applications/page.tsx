@@ -117,7 +117,7 @@ export default function MyApplicationsPage() {
   const withdrawApplication = async (applicationId: string) => {
     try {
       const response = await apiClient.delete(
-        `/api/applications/${applicationId}`
+        `/api/gig/applications/${applicationId}`
       );
       if (response.success) {
         await loadApplications(); // Refresh the list
@@ -313,7 +313,7 @@ export default function MyApplicationsPage() {
                         application.applicantType !== 'owner' && (
                           <button
                             onClick={() => withdrawApplication(application.id)}
-                            className="btn-secondary-sm text-red-600 hover:bg-red-50"
+                            className="btn-secondary-sm hidden text-red-600 hover:bg-red-50"
                           >
                             Withdraw
                           </button>
