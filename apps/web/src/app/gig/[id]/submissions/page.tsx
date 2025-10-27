@@ -344,15 +344,14 @@ export default function GigSubmissionsPage() {
                         </button>
                       )}
 
-                      <button
+                      {/* <button
                         onClick={() => {
                           setSelectedSubmission(submission);
-                          setShowReviewModal(true);
                         }}
                         className="btn-secondary px-4 py-2 text-sm"
                       >
                         View Details
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>
@@ -441,6 +440,7 @@ export default function GigSubmissionsPage() {
                       setReviewData({ ...reviewData, feedback: e.target.value })
                     }
                     rows={4}
+                    required
                     className="w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                     placeholder="Provide feedback on the submitted work..."
                   />
@@ -458,7 +458,7 @@ export default function GigSubmissionsPage() {
                 <button
                   onClick={handleReview}
                   className="btn-primary flex-1"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || (reviewData.status === 'REJECTED' && !reviewData.feedback.trim())}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Review'}
                 </button>

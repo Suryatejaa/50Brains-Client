@@ -718,7 +718,7 @@ export default function GigDetailsPage() {
           applicantType: applicantType,
           applicationId: applicationId,
         };
-
+        console.log('🎯 Formatted my applications:', applicationWithType);
         setMyApplications(applicationWithType);
       }
     } catch (error) {
@@ -1264,12 +1264,12 @@ export default function GigDetailsPage() {
     (gig.status === 'OPEN' || gig.status === 'ASSIGNED') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
-  //console.log(('🔍 Gig details:', gig);
+  console.log('🔍 Gig details:', gig);
   //console.log(('🔍 Is own gig:', isOwner);
   //console.log(('🔍 My applications:', myApplications);
 
   const myApplicationStatus = (myApplications as any)?.status || null;
-  //console.log(('🔍 My application status:', myApplicationStatus);
+  console.log('🔍 My application status:', myApplicationStatus);
 
   return (
     <div className="min-h-screen bg-gray-50 py-2">

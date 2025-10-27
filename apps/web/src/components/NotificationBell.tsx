@@ -105,8 +105,34 @@ export default function NotificationBell() {
 
     // Debug WebSocket connection
     useEffect(() => {
-        //console.log(('🔌 WebSocket Status:', { isConnected, connectionStatus });
-    }, [isConnected, connectionStatus]);
+        console.log('🔌 WebSocket Status:', { isConnected, connectionStatus });
+        
+        // Auto-reconnect if disconnected and we have a user
+        if (!isConnected && connectionStatus === 'disconnected') {
+            console.log('🔄 WebSocket disconnected, attempting reconnection...');
+            // Attempt reconnection after a short delay
+            const reconnectTimer = setTimeout(() => {
+                if (!isConnected) {
+                    console.log('🔄 Triggering force refresh to check for missed notifications');
+                    forceRefresh();
+                }
+            }, 2000);
+            
+            return () => clearTimeout(reconnectTimer);
+        }
+    }, [isConnected, connectionStatus, forceRefresh]);
+
+    // Periodic health check for WebSocket connection
+    useEffect(() => {
+        const healthCheckInterval = setInterval(() => {
+            if (!isConnected && connectionStatus !== 'connecting') {
+                console.log('🏥 Health check: WebSocket disconnected, forcing refresh');
+                forceRefresh();
+            }
+        }, 10000); // Check every 10 seconds
+        
+        return () => clearInterval(healthCheckInterval);
+    }, [isConnected, connectionStatus, forceRefresh]);
 
     // Reset optimistic count when real count changes
     useEffect(() => {
@@ -178,6 +204,10 @@ export default function NotificationBell() {
     };
 
     const handleBellClick = async () => {
+        // Always force refresh when opening bell to catch any missed notifications
+        console.log('🔔 Bell clicked - forcing refresh to catch missed notifications');
+        await forceRefresh();
+        
         // Mark all as read and clear UI immediately
         if (unreadCount > 0) {
             setOptimisticUnreadCount(0);

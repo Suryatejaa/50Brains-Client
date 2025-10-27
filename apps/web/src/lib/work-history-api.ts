@@ -1,7 +1,16 @@
 import { apiClient } from './api-client';
 
-// Work History - using the summary endpoint for recent work data
-export const getUserWorkHistory = (
+// Comprehensive user summary - single API call for work history, skills, and summary data
+export const getUserSummary = async (userId: string) => {
+  const endpoint = `/api/summary/user/${userId}`;
+  console.log(`Calling getUserSummary with URL: ${endpoint}`);
+  const res = await apiClient.get(endpoint);
+  console.log('getUserSummary response:', res);
+  return res;
+};
+
+// Legacy methods - now use the comprehensive getUserSummary internally
+export const getUserWorkHistory = async (
   userId: string,
   params?: {
     category?: string;
@@ -13,39 +22,33 @@ export const getUserWorkHistory = (
     sortOrder?: 'asc' | 'desc';
   }
 ) => {
-  // Recent work is included in the summary endpoint
-  const endpoint = `/api/summary/user/${userId}`;
-  console.log(
-    `Calling getUserWorkHistory (from summary) with URL: ${endpoint}`
-  );
-  return apiClient.get(endpoint);
+  console.log('getUserWorkHistory: Using comprehensive summary endpoint');
+  return getUserSummary(userId);
 };
 
-export const getUserWorkSummary = (userId: string) => {
-  // Use the actual working endpoint: /summary/user/:userId
-  const endpoint = `/api/summary/user/${userId}`;
-  console.log(`Calling getUserWorkSummary with URL: ${endpoint}`);
-  return apiClient.get(endpoint);
+export const getUserWorkSummary = async (userId: string) => {
+  console.log('getUserWorkSummary: Using comprehensive summary endpoint');
+  return getUserSummary(userId);
 };
 
-// Add reputation API call
-export const getUserReputation = (userId: string) => {
-  const endpoint = `/api/reputation/${userId}`;
-  console.log(`Calling getUserReputation with URL: ${endpoint}`);
-  return apiClient.get(endpoint);
-};
-
-export const getUserSkills = (
+export const getUserSkills = async (
   userId: string,
   params?: {
     level?: string;
     limit?: number;
   }
 ) => {
-  // Skills are included in the summary endpoint
-  const endpoint = `/api/summary/user/${userId}`;
-  console.log(`Calling getUserSkills (from summary) with URL: ${endpoint}`);
-  return apiClient.get(endpoint);
+  console.log('getUserSkills: Using comprehensive summary endpoint');
+  return getUserSummary(userId);
+};
+
+// Reputation data - separate endpoint
+export const getUserReputation = async (userId: string) => {
+  const endpoint = `/api/reputation/${userId}`;
+  console.log(`Calling getUserReputation with URL: ${endpoint}`);
+  const res = await apiClient.get(endpoint);
+  console.log('getUserReputation response:', res);
+  return res;
 };
 
 export const getUserAchievements = (
@@ -92,7 +95,6 @@ export const getWorkRecord = (workRecordId: string) => {
 };
 
 // Portfolio - using the correct backend routes
-
 
 export const getPortfolioItem = (itemId: string) => {
   // Use the correct backend route: /portfolio/item/:itemId
@@ -161,14 +163,6 @@ export const getAchievementStats = () => {
   // Use the correct backend route: /achievements/stats/overview
   const endpoint = '/api/achievements/stats/overview';
   console.log(`Calling getAchievementStats with URL: ${endpoint}`);
-  return apiClient.get(endpoint);
-};
-
-// Summary - using the correct backend routes
-export const getUserSummary = (userId: string) => {
-  // Use the correct backend route: /summary/user/:userId
-  const endpoint = `/api/summary/user/${userId}`;
-  console.log(`Calling getUserSummary with URL: ${endpoint}`);
   return apiClient.get(endpoint);
 };
 

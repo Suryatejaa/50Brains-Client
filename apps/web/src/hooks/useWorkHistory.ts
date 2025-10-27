@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import {
+  getUserSummary,
   getUserWorkHistory,
   getUserWorkSummary,
   getUserSkills,
   getUserAchievements,
   getWorkStatistics,
-  getUserSummary,
   getUserReputation,
   getUserPortfolio,
   updateWorkRecordVerification,
@@ -93,45 +93,44 @@ interface Achievement {
   expiresAt?: string;
 }
 
-interface ReputationData {
+interface WorkHistoryReputationData {
   userId: string;
-  baseScore: number;
-  bonusScore: number;
-  finalScore: number;
-  tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
+  totalScore: number;
+  reliabilityScore: number;
+  qualityScore: number;
+  communicationScore: number;
+  timelinessScore: number;
+  overallRating: number;
+  level: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
+  rank: number;
   badges: string[];
   metrics: {
-    gigsCompleted: number;
-    gigsPosted: number;
-    boostsReceived: number;
-    boostsGiven: number;
-    averageRating: number;
-    profileViews: number;
-    connectionsMade: number;
-    applicationSuccess: number;
-    completionRate: number;
+    totalGigs: number;
+    completedGigs: number;
+    cancelledGigs: number;
+    avgDeliveryTime: number;
+    onTimeDeliveryRate: number;
+    clientSatisfactionRate: number;
     responseTime: number;
-    clanContributions: number;
   };
   ranking: {
     global: {
       userId: string;
       rank: number;
       type: 'global';
-      finalScore: number;
-      tier: string;
+      totalScore: number;
+      level: string;
     };
     tier: {
       userId: string;
       rank: number;
       type: 'tier';
-      finalScore: number;
-      tier: string;
+      totalScore: number;
+      level: string;
     };
   };
-  lastActivityAt: string;
+  lastUpdated: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 interface PortfolioItem {
@@ -169,9 +168,11 @@ export function useWorkHistory(userId?: string) {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [userSummary, setUserSummary] = useState<any>(null);
-  const [reputation, setReputation] = useState<ReputationData | null>(null);
+  const [reputation, setReputation] =
+    useState<WorkHistoryReputationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
   const fetchWorkHistory = useCallback(
     async (params?: {
@@ -189,26 +190,92 @@ export function useWorkHistory(userId?: string) {
         setLoading(true);
         setError(null);
         console.log(
-          'Fetching work history for user:',
+          'Fetching comprehensive user data for user:',
           targetUserId,
           'with params:',
           params
         );
-        const response = await getUserWorkHistory(targetUserId, params);
-        console.log('Work history response:', response);
+        // Use the optimized getUserSummary which consolidates multiple endpoints
+        const response = await getUserSummary(targetUserId);
+        console.log('Comprehensive user data response:', response);
 
         if (response.success) {
-          // The API response has recentWork directly in response.data
-          console.log('Work history data:', response.data);
+          // The API response has comprehensive work data
+          console.log('Comprehensive user data:', response.data);
           const data = response.data as any;
+
+          // Extract all available data from the comprehensive response
           setWorkHistory(data.recentWork || []);
+          setInitialDataLoaded(true);
+
+          // Set work summary if available
+          if (data.workSummary) {
+            const summaryData = data.workSummary;
+            // Calculate success rate from completion data
+            summaryData.successRate =
+              summaryData.totalProjects > 0
+                ? Math.round(
+                    (summaryData.completedProjects /
+                      summaryData.totalProjects) *
+                      100
+                  )
+                : 0;
+            setWorkSummary(summaryData);
+          }
+
+          // Set reputation if available
+          if (data.reputation) {
+            setReputation(data.reputation);
+          }
+
+          // Set skills if available
+          if (data.topSkills) {
+            const skillsWithProficiency = data.topSkills.map(
+              (skill: Skill) => ({
+                ...skill,
+                proficiency: skill.level || 'intermediate',
+              })
+            );
+            setSkills(skillsWithProficiency);
+          }
+
+          // Set achievements if available
+          if (data.recentAchievements) {
+            setAchievements(data.recentAchievements);
+          } else if (data.reputation?.badges) {
+            // Convert badges to achievements format if no achievements data
+            const badges = data.reputation.badges || [];
+            const achievementsFromBadges: Achievement[] = badges.map(
+              (badge: string, index: number) => ({
+                id: `badge-${index}`,
+                type: 'badge',
+                title: String(badge || '')
+                  .replace('_', ' ')
+                  .toLowerCase()
+                  .replace(/\b\w/g, (l) => l.toUpperCase()),
+                description: `Earned ${String(badge || '')} badge`,
+                achievedAt:
+                  data.reputation.lastUpdated || data.reputation.createdAt,
+                verified: true,
+              })
+            );
+            setAchievements(achievementsFromBadges);
+          }
+
+          // Set user summary if profile strength is available
+          if (data.profileStrength) {
+            setUserSummary({
+              profileStrength: data.profileStrength,
+              lastUpdated: data.lastUpdated,
+            });
+          }
         } else {
-          console.error('Work history response not successful:', response);
-          setError('Failed to load work history');
+          console.error('User data response not successful:', response);
+          setError('Failed to load user data');
         }
       } catch (error: any) {
-        console.error('Failed to fetch work history:', error);
-        setError(error.message || 'Failed to load work history');
+        console.error('Failed to fetch user data:', error);
+        setError(error.message || 'Failed to load user data');
       } finally {
         setLoading(false);
       }
@@ -217,7 +284,13 @@ export function useWorkHistory(userId?: string) {
   );
 
   const fetchWorkSummary = useCallback(async () => {
-    if (!targetUserId) return;
+    if (!targetUserId || initialDataLoaded) return;
+
+    // Skip if initial data is already loaded from comprehensive response
+    if (workSummary) {
+      console.log('Work summary already available, skipping separate API call');
+      return;
+    }
 
     try {
       const response = await getUserWorkSummary(targetUserId);
@@ -246,11 +319,17 @@ export function useWorkHistory(userId?: string) {
     } catch (error) {
       console.error('Failed to fetch work summary:', error);
     }
-  }, [targetUserId]);
+  }, [targetUserId, initialDataLoaded, workSummary]);
 
   const fetchSkills = useCallback(
     async (params?: { level?: string; limit?: number }) => {
-      if (!targetUserId) return;
+      if (!targetUserId || initialDataLoaded) return;
+
+      // Skip if skills are already loaded from comprehensive response
+      if (skills.length > 0) {
+        console.log('Skills already available, skipping separate API call');
+        return;
+      }
 
       try {
         const response = await getUserSkills(targetUserId, params);
@@ -268,7 +347,7 @@ export function useWorkHistory(userId?: string) {
         console.error('Failed to fetch skills:', error);
       }
     },
-    [targetUserId]
+    [targetUserId, initialDataLoaded, skills]
   );
 
   const fetchAchievements = useCallback(
@@ -279,7 +358,15 @@ export function useWorkHistory(userId?: string) {
       limit?: number;
       includeExpired?: boolean;
     }) => {
-      if (!targetUserId) return;
+      if (!targetUserId || initialDataLoaded) return;
+
+      // Skip if achievements are already loaded from comprehensive response
+      if (achievements.length > 0) {
+        console.log(
+          'Achievements already available, skipping separate API call'
+        );
+        return;
+      }
 
       try {
         const response = await getUserAchievements(targetUserId, params);
@@ -310,7 +397,7 @@ export function useWorkHistory(userId?: string) {
         console.error('Failed to fetch achievements:', error);
       }
     },
-    [targetUserId]
+    [targetUserId, initialDataLoaded, achievements]
   );
 
   const fetchPortfolio = useCallback(
@@ -351,19 +438,25 @@ export function useWorkHistory(userId?: string) {
   }, [targetUserId]);
 
   const fetchReputation = useCallback(async () => {
-    if (!targetUserId) return;
+    if (!targetUserId || initialDataLoaded) return;
+
+    // Skip if reputation is already loaded from comprehensive response
+    if (reputation) {
+      console.log('Reputation already available, skipping separate API call');
+      return;
+    }
 
     try {
       const response = await getUserReputation(targetUserId);
       console.log('Reputation API Response:', response);
       if (response.success && response.data) {
-        const data = response.data as ReputationData;
+        const data = response.data as WorkHistoryReputationData;
         setReputation(data);
       }
     } catch (error) {
       console.error('Failed to fetch reputation:', error);
     }
-  }, [targetUserId]);
+  }, [targetUserId, initialDataLoaded, reputation]);
 
   const fetchWorkStatistics = useCallback(
     async (params?: {
@@ -435,24 +528,12 @@ export function useWorkHistory(userId?: string) {
   );
 
   useEffect(() => {
-    if (targetUserId) {
+    if (targetUserId && !initialDataLoaded) {
+      console.log('Initial comprehensive data load for user:', targetUserId);
+      // Fetch comprehensive data in a single call
       fetchWorkHistory();
-      fetchWorkSummary();
-      fetchSkills();
-      fetchAchievements();
-      fetchReputation();
-      fetchUserSummary();
-      fetchPortfolio();
     }
-  }, [
-    targetUserId,
-    fetchWorkHistory,
-    fetchWorkSummary,
-    fetchSkills,
-    fetchAchievements,
-    fetchUserSummary,
-    fetchPortfolio,
-  ]);
+  }, [targetUserId, initialDataLoaded]);
 
   return {
     workHistory,
@@ -465,13 +546,14 @@ export function useWorkHistory(userId?: string) {
     loading,
     error,
     refresh: () => {
+      console.log('Refreshing all user data');
+      setInitialDataLoaded(false);
+      // Primary comprehensive data fetch
       fetchWorkHistory();
-      fetchWorkSummary();
-      fetchSkills();
-      fetchAchievements();
-      fetchReputation();
-      fetchUserSummary();
+      // Supplementary data that might not be in the summary
       fetchPortfolio();
+      // Fetch reputation separately as it has its own endpoint
+      fetchReputation();
     },
     fetchWorkHistory,
     fetchWorkSummary,

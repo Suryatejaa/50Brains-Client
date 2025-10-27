@@ -76,13 +76,13 @@ export const InfluencerDashboard: React.FC = () => {
   } = useWorkHistory(user?.id);
 
   //console.log(('🎯 Influencer Dashboard Data:', data);
-  //console.log(('📊 Work History Data:', {
-  //   workSummary,
-  //   skills,
-  //   portfolio,
-  //   achievements,
-  //   reputation,
-  // });
+  console.log('📊 Work History Data:', {
+    workSummary,
+    skills,
+    portfolio,
+    achievements,
+    reputation,
+  });
 
   const [applications, setApplications] = React.useState<Application[]>([]);
   const [stats, setStats] = React.useState({
@@ -645,28 +645,28 @@ export const InfluencerDashboard: React.FC = () => {
                 </div>
                 <div className="items-center text-center">
                   <div className="text-brand-primary mb-2 text-2xl font-bold md:text-3xl">
-                    {reputation?.tier || 'UNRANKED'}
+                    {reputation?.level || 'UNRANKED'}
                   </div>
                   <div className="mb-2 flex items-center justify-center">
-                    {reputation?.tier === 'BRONZE' && (
+                    {reputation?.level === 'BRONZE' && (
                       <TrophyIcon className="h-12 w-12 text-amber-600" />
                     )}
-                    {reputation?.tier === 'SILVER' && (
+                    {reputation?.level === 'SILVER' && (
                       <TrophyIcon className="h-12 w-12 text-gray-400" />
                     )}
-                    {reputation?.tier === 'GOLD' && (
+                    {reputation?.level === 'GOLD' && (
                       <TrophyIcon className="h-12 w-12 text-yellow-500" />
                     )}
-                    {reputation?.tier === 'DIAMOND' && (
+                    {reputation?.level === 'DIAMOND' && (
                       <TrophyIcon className="h-12 w-12 text-cyan-400" />
                     )}
                     {!['BRONZE', 'SILVER', 'GOLD', 'DIAMOND'].includes(
-                      reputation?.tier || data?.influencerTier?.current || ''
+                      reputation?.level || data?.influencerTier?.current || ''
                     ) && <StarIcon className="h-12 w-12 text-gray-400" />}
                   </div>
                   <p className="text-muted mb-3 text-sm">
                     Score:{' '}
-                    {reputation?.finalScore || data?.influencerTier?.score || 0}
+                    {reputation?.totalScore || data?.influencerTier?.score || 0}
                     {reputation ? '' : '/100'}
                   </p>
 

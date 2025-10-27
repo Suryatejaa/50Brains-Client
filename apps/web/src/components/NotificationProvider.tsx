@@ -50,7 +50,7 @@ interface NotificationProviderProps {
 export function NotificationProvider({
     children,
     autoRefresh = true,
-    refreshInterval = 3000, // Reduced from 5000 to 3000 (3 seconds)
+    refreshInterval = 2000, // Reduced from 3000 to 2000 (2 seconds) for faster missed notification detection
     initialLimit = 20
 }: NotificationProviderProps) {
     const context = useNotifications();

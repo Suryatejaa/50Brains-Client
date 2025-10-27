@@ -17,9 +17,11 @@ export const WorkHistoryList: React.FC<WorkHistoryListProps> = ({
 }) => {
   const { workHistory, loading, error, fetchWorkHistory } =
     useWorkHistory(userId);
+  console.log('Work History:', workHistory);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+
 
   //console.log(('Work History:', workHistory);
   const filteredWorkHistory = workHistory.filter((item) => {

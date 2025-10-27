@@ -209,6 +209,7 @@ export default function NotificationsPage() {
   // Force refresh when page loads
   useEffect(() => {
     if (user) {
+      console.log('🔄 Notifications page loaded - force refreshing to catch missed notifications');
       // Force immediate refresh to get latest notifications
       fetchNotifications();
       fetchCounts();
@@ -225,6 +226,19 @@ export default function NotificationsPage() {
     notifications,
     markAllNotificationsAsRead,
   ]);
+
+  // Add periodic refresh to catch missed notifications
+  useEffect(() => {
+    if (!user) return;
+    
+    const missedNotificationCheck = setInterval(() => {
+      console.log('🔎 Periodic check for missed notifications');
+      fetchNotifications();
+      fetchCounts();
+    }, 15000); // Check every 15 seconds
+    
+    return () => clearInterval(missedNotificationCheck);
+  }, [user, fetchNotifications, fetchCounts]);
 
   const handlePreferenceUpdate = async (
     updates: Partial<NotificationPreferences>

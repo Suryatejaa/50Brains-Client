@@ -15,27 +15,27 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
 
     useEffect(() => {
         if (!enabled || notifications.length === 0) {
-            //console.log(('🔔 NotificationToast: Disabled or no notifications');
+            console.log('🔔 NotificationToast: Disabled or no notifications');
             return;
         }
 
-        // //console.log(('🔔 NotificationToast: Checking for new notifications...');
-        // //console.log(('🔔 Current notifications count:', notifications.length);
-        // //console.log(('🔔 Last processed ID:', lastProcessedId.current);
+        console.log('🔔 NotificationToast: Checking for new notifications...');
+        console.log('🔔 Current notifications count:', notifications.length);
+        console.log('🔔 Last processed ID:', lastProcessedId.current);
 
         // Get the most recent notification (first in the array)
         const mostRecentNotification = notifications[0];
 
-        // //console.log(('🔔 Most recent notification:', mostRecentNotification?.title);
-        // //console.log(('🔔 Most recent notification ID:', mostRecentNotification?.id);
-        // //console.log(('🔔 Most recent notification read status:', mostRecentNotification?.read);
+        console.log('🔔 Most recent notification:', mostRecentNotification?.title);
+        console.log('🔔 Most recent notification ID:', mostRecentNotification?.id);
+        console.log('🔔 Most recent notification read status:', mostRecentNotification?.read);
 
         // Check if this is a new notification we haven't processed yet
         if (mostRecentNotification &&
             mostRecentNotification.id !== lastProcessedId.current &&
             !mostRecentNotification.read) {
 
-            // //console.log(('🔔 Showing toast for new notification:', mostRecentNotification.title);
+            console.log('🔔 Showing toast for new notification:', mostRecentNotification.title);
 
             // Play sound for new notifications
             playNotificationSound();
@@ -56,7 +56,7 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
                     </div>
                 </div>,
                 {
-                    duration: 1500,
+                    duration: 2500, // Increased duration for better visibility
                     action: {
                         label: 'View',
                         onClick: () => {
@@ -71,19 +71,19 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
 
             // Mark this notification as processed
             lastProcessedId.current = mostRecentNotification.id;
-            //console.log(('🔔 Updated lastProcessedId to:', lastProcessedId.current);
+            console.log('🔔 Updated lastProcessedId to:', lastProcessedId.current);
         } else {
-            //console.log(('🔔 Skipping toast - notification already processed or read');
+            console.log('🔔 Skipping toast - notification already processed or read');
         }
 
         // Also handle the case where notifications are loaded initially
         if (notifications.length > lastNotificationCount) {
-            //console.log(('🔔 Handling initial notification load...');
+            console.log('🔔 Handling initial notification load...');
             const newNotifications = notifications.slice(0, notifications.length - lastNotificationCount);
 
             newNotifications.forEach((notification) => {
                 if (!notification.read && notification.id !== lastProcessedId.current) {
-                    //console.log(('🔔 Showing toast for loaded notification:', notification.title);
+                    console.log('🔔 Showing toast for loaded notification:', notification.title);
 
                     // Play sound for new notifications
                     playNotificationSound();
@@ -104,7 +104,7 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
                             </div>
                         </div>,
                         {
-                            duration: 1500,
+                            duration: 2500, // Increased duration
                             action: {
                                 label: 'View',
                                 onClick: () => {

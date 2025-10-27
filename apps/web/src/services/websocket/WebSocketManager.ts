@@ -163,7 +163,7 @@ export class WebSocketManager {
   // Add connection health monitoring
   private startHealthCheck(ws: ExtendedWebSocket, connectionId: string, service: WebSocketService, params: any): void {
     const healthCheckInterval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
+      if (ws.readyState === WebSocket.OPEN && !ws.healthCheckPaused) {
         // Send ping to keep connection alive
         try {
           ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
@@ -172,11 +172,14 @@ export class WebSocketManager {
           console.error('❌ WebSocketManager: Health check failed for', connectionId, error);
           this.handleConnectionFailure(connectionId, service, params);
         }
+      } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+        console.log('❌ WebSocketManager: Connection closed during health check, attempting reconnection');
+        clearInterval(healthCheckInterval);
+        this.handleConnectionFailure(connectionId, service, params);
       } else {
         console.log('❌ WebSocketManager: Connection not open during health check, state:', ws.readyState);
-        clearInterval(healthCheckInterval);
       }
-    }, 30000); // Every 30 seconds
+    }, 15000); // Every 15 seconds (reduced from 30)
 
     // Store interval reference for cleanup
     ws.healthCheckInterval = healthCheckInterval;
@@ -196,6 +199,17 @@ export class WebSocketManager {
       ws.close();
       this.connections.delete(connectionId);
       this.emit('disconnected', { service, params, code: 1006 });
+      
+      // For notifications service, attempt immediate reconnection
+      if (service === 'notifications') {
+        console.log('🔄 Critical service failed, attempting immediate reconnection');
+        setTimeout(() => {
+          this.handleReconnection(service, params, connectionId);
+        }, 1000); // Reconnect after 1 second
+      } else {
+        // For other services, use standard reconnection logic
+        this.handleReconnection(service, params, connectionId);
+      }
     }
   }
 
@@ -392,17 +406,22 @@ export class WebSocketManager {
     const attempts = this.reconnectAttempts.get(connectionId) || 0;
 
     if (attempts < this.maxReconnectAttempts) {
-      const delay = this.reconnectDelay * Math.pow(2, attempts);
+      // Faster initial reconnection for notifications, then exponential backoff
+      const baseDelay = service === 'notifications' ? 500 : this.reconnectDelay;
+      const delay = Math.min(baseDelay * Math.pow(1.5, attempts), 30000); // Cap at 30 seconds
 
-      console.log(`↻ WebSocketManager: Scheduling reconnection to ${service} in ${delay}ms (attempt ${attempts + 1})`);
+      console.log(`↻ WebSocketManager: Scheduling reconnection to ${service} in ${delay}ms (attempt ${attempts + 1}/${this.maxReconnectAttempts})`);
 
       setTimeout(() => {
         console.log(`↻ WebSocketManager: Attempting to reconnect to ${service} (attempt ${attempts + 1})`);
         this.reconnectAttempts.set(connectionId, attempts + 1);
-        this.connect(service, params);
+        this.connect(service, params).catch(error => {
+          console.error(`❌ Reconnection attempt ${attempts + 1} failed:`, error);
+        });
       }, delay);
     } else {
       console.error(`❌ WebSocketManager: Max reconnection attempts reached for ${service}`);
+      this.reconnectAttempts.delete(connectionId);
       this.emit('reconnection_failed', { service, params });
     }
   }
