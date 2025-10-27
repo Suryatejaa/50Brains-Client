@@ -441,7 +441,7 @@ export const CrewDashboard: React.FC = () => {
                 </div>
 
                 {/* Recent Work and Achievements Grid */}
-                <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-1 md:grid-cols-1 lg:grid-cols-1">
                   <div>
                     <h4 className="text-heading mb-2 text-sm font-medium md:text-base">
                       Recent Work
@@ -455,8 +455,8 @@ export const CrewDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
+                  <div className='hidden'>
+                    <h4 className="text-heading  mb-1 text-sm font-medium md:text-base">
                       Recent Achievements
                     </h4>
                     <div className="max-h-64 overflow-y-auto">
@@ -469,7 +469,7 @@ export const CrewDashboard: React.FC = () => {
                 </div>
 
                 {/* Portfolio Preview */}
-                <div className="mt-1">
+                <div className="mt-1 hidden">
                   <h4 className="text-heading mb-1 text-sm font-medium md:text-base">
                     Portfolio Highlights
                   </h4>

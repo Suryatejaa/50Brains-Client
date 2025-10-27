@@ -36,7 +36,10 @@ export class WebSocketManager {
     // Listen for tab visibility changes and page unload
     if (typeof window !== 'undefined') {
       // Handle tab visibility change
-      document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+      document.addEventListener(
+        'visibilitychange',
+        this.handleVisibilityChange.bind(this)
+      );
 
       // Handle page unload
       window.addEventListener('beforeunload', this.handlePageUnload.bind(this));
@@ -53,15 +56,28 @@ export class WebSocketManager {
     const uniqueParams = { ...params, tabId: this.tabId };
     const connectionId = `${service}_${JSON.stringify(uniqueParams)}`;
 
-    console.log('🔌 WebSocketManager: Attempting to connect to service:', service, 'with params:', uniqueParams);
+    console.log(
+      '🔌 WebSocketManager: Attempting to connect to service:',
+      service,
+      'with params:',
+      uniqueParams
+    );
     console.log('🔌 WebSocketManager: Tab ID:', this.tabId);
     console.log('🔌 WebSocketManager: Connection ID:', connectionId);
-    console.log('🔌 WebSocketManager: Current connections:', Array.from(this.connections.keys()));
+    console.log(
+      '🔌 WebSocketManager: Current connections:',
+      Array.from(this.connections.keys())
+    );
 
     if (this.connections.has(connectionId)) {
-      console.log('🔌 WebSocketManager: Connection already exists, returning existing connection');
+      console.log(
+        '🔌 WebSocketManager: Connection already exists, returning existing connection'
+      );
       const existingWs = this.connections.get(connectionId)!;
-      console.log('🔌 WebSocketManager: Existing WebSocket state:', existingWs.readyState);
+      console.log(
+        '🔌 WebSocketManager: Existing WebSocket state:',
+        existingWs.readyState
+      );
       return Promise.resolve(existingWs);
     }
 
@@ -73,18 +89,34 @@ export class WebSocketManager {
       const ws = new WebSocket(wsUrl) as ExtendedWebSocket;
 
       // Set up WebSocket event handlers
-      this.setupWebSocketHandlers(ws, connectionId, service, uniqueParams, resolve, reject);
+      this.setupWebSocketHandlers(
+        ws,
+        connectionId,
+        service,
+        uniqueParams,
+        resolve,
+        reject
+      );
 
       // Set connection timeout
       setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) {
           console.log(`⏰ WebSocketManager: Connection timeout for ${service}`);
-          console.log(`⏰ WebSocketManager: Current readyState:`, ws.readyState);
+          console.log(
+            `⏰ WebSocketManager: Current readyState:`,
+            ws.readyState
+          );
           ws.close();
 
           // Don't automatically fall back to mock server - let the user decide
-          console.log('❌ WebSocketManager: WebSocket connection timeout. Please check if your backend server is running.');
-          reject(new Error(`Connection timeout for ${service}. Check if backend server is running.`));
+          console.log(
+            '❌ WebSocketManager: WebSocket connection timeout. Please check if your backend server is running.'
+          );
+          reject(
+            new Error(
+              `Connection timeout for ${service}. Check if backend server is running.`
+            )
+          );
         }
       }, 10000);
     });
@@ -102,9 +134,15 @@ export class WebSocketManager {
     ws.onopen = () => {
       console.log(`✅ WebSocketManager: Successfully connected to ${service}`);
       console.log(`✅ WebSocketManager: WebSocket readyState:`, ws.readyState);
-      console.log(`✅ WebSocketManager: Adding connection to map with ID:`, connectionId);
+      console.log(
+        `✅ WebSocketManager: Adding connection to map with ID:`,
+        connectionId
+      );
       this.connections.set(connectionId, ws);
-      console.log(`✅ WebSocketManager: Current connections after adding:`, Array.from(this.connections.keys()));
+      console.log(
+        `✅ WebSocketManager: Current connections after adding:`,
+        Array.from(this.connections.keys())
+      );
       this.emit('connected', { service, params });
 
       // Start health check
@@ -116,15 +154,27 @@ export class WebSocketManager {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('📨 WebSocketManager: Received message from', service, ':', data);
+        console.log(
+          '📨 WebSocketManager: Received message from',
+          service,
+          ':',
+          data
+        );
         this.handleMessage(service, data);
       } catch (error) {
-        console.error('❌ WebSocketManager: Failed to parse WebSocket message:', error);
+        console.error(
+          '❌ WebSocketManager: Failed to parse WebSocket message:',
+          error
+        );
       }
     };
 
     ws.onclose = (event) => {
-      console.log(`❌ WebSocketManager: Connection closed for ${service}:`, event.code, event.reason);
+      console.log(
+        `❌ WebSocketManager: Connection closed for ${service}:`,
+        event.code,
+        event.reason
+      );
       console.log(`❌ WebSocketManager: Close event details:`, event);
 
       // Clear health check interval
@@ -136,9 +186,13 @@ export class WebSocketManager {
       this.emit('disconnected', { service, params, code: event.code });
 
       // Don't automatically fall back to mock server - let the user decide
-      console.log('❌ WebSocketManager: WebSocket connection failed. Please check if your backend server is running.');
+      console.log(
+        '❌ WebSocketManager: WebSocket connection failed. Please check if your backend server is running.'
+      );
       console.log('🔧 WebSocketManager: To fix this:');
-      console.log('   • Make sure your backend clan service is running on port 4003');
+      console.log(
+        '   • Make sure your backend clan service is running on port 4003'
+      );
       console.log('   • Check if WebSocket endpoint /ws is available');
       console.log('   • Verify firewall/network settings');
       console.log('   • Use Mock Server for testing without backend');
@@ -146,38 +200,67 @@ export class WebSocketManager {
       // Attempt reconnection
       this.handleReconnection(service, params, connectionId);
 
-      reject(new Error(`WebSocket connection failed for ${service}. Check if backend server is running.`));
+      reject(
+        new Error(
+          `WebSocket connection failed for ${service}. Check if backend server is running.`
+        )
+      );
     };
 
     ws.onerror = (error) => {
-      console.error(`❌ WebSocketManager: WebSocket error for ${service}:`, error);
+      console.error(
+        `❌ WebSocketManager: WebSocket error for ${service}:`,
+        error
+      );
       console.error(`❌ WebSocketManager: Error details:`, error);
 
       // Don't automatically fall back to mock server - let the user decide
-      console.log('❌ WebSocketManager: WebSocket error occurred. Please check if your backend server is running.');
+      console.log(
+        '❌ WebSocketManager: WebSocket error occurred. Please check if your backend server is running.'
+      );
       this.handleConnectionFailure(connectionId, service, params);
       reject(error);
     };
   }
 
   // Add connection health monitoring
-  private startHealthCheck(ws: ExtendedWebSocket, connectionId: string, service: WebSocketService, params: any): void {
+  private startHealthCheck(
+    ws: ExtendedWebSocket,
+    connectionId: string,
+    service: WebSocketService,
+    params: any
+  ): void {
     const healthCheckInterval = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN && !ws.healthCheckPaused) {
         // Send ping to keep connection alive
         try {
           ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
-          console.log('💓 WebSocketManager: Health check ping sent for', connectionId);
+          console.log(
+            '💓 WebSocketManager: Health check ping sent for',
+            connectionId
+          );
         } catch (error) {
-          console.error('❌ WebSocketManager: Health check failed for', connectionId, error);
+          console.error(
+            '❌ WebSocketManager: Health check failed for',
+            connectionId,
+            error
+          );
           this.handleConnectionFailure(connectionId, service, params);
         }
-      } else if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
-        console.log('❌ WebSocketManager: Connection closed during health check, attempting reconnection');
+      } else if (
+        ws.readyState === WebSocket.CLOSED ||
+        ws.readyState === WebSocket.CLOSING
+      ) {
+        console.log(
+          '❌ WebSocketManager: Connection closed during health check, attempting reconnection'
+        );
         clearInterval(healthCheckInterval);
         this.handleConnectionFailure(connectionId, service, params);
       } else {
-        console.log('❌ WebSocketManager: Connection not open during health check, state:', ws.readyState);
+        console.log(
+          '❌ WebSocketManager: Connection not open during health check, state:',
+          ws.readyState
+        );
       }
     }, 15000); // Every 15 seconds (reduced from 30)
 
@@ -185,8 +268,15 @@ export class WebSocketManager {
     ws.healthCheckInterval = healthCheckInterval;
   }
 
-  private handleConnectionFailure(connectionId: string, service: WebSocketService, params: any): void {
-    console.log('❌ WebSocketManager: Handling connection failure for', connectionId);
+  private handleConnectionFailure(
+    connectionId: string,
+    service: WebSocketService,
+    params: any
+  ): void {
+    console.log(
+      '❌ WebSocketManager: Handling connection failure for',
+      connectionId
+    );
     const ws = this.connections.get(connectionId);
 
     if (ws) {
@@ -199,10 +289,12 @@ export class WebSocketManager {
       ws.close();
       this.connections.delete(connectionId);
       this.emit('disconnected', { service, params, code: 1006 });
-      
+
       // For notifications service, attempt immediate reconnection
       if (service === 'notifications') {
-        console.log('🔄 Critical service failed, attempting immediate reconnection');
+        console.log(
+          '🔄 Critical service failed, attempting immediate reconnection'
+        );
         setTimeout(() => {
           this.handleReconnection(service, params, connectionId);
         }, 1000); // Reconnect after 1 second
@@ -216,10 +308,14 @@ export class WebSocketManager {
   // Browser tab event handlers
   private handleVisibilityChange(): void {
     if (document.hidden) {
-      console.log('👁️ WebSocketManager: Tab became hidden, pausing health checks');
+      console.log(
+        '👁️ WebSocketManager: Tab became hidden, pausing health checks'
+      );
       this.pauseHealthChecks();
     } else {
-      console.log('👁️ WebSocketManager: Tab became visible, resuming health checks');
+      console.log(
+        '👁️ WebSocketManager: Tab became visible, resuming health checks'
+      );
       this.resumeHealthChecks();
     }
   }
@@ -268,7 +364,10 @@ export class WebSocketManager {
   private checkAllConnections(): void {
     this.connections.forEach((ws, connectionId) => {
       if (ws.readyState !== WebSocket.OPEN) {
-        console.log('❌ WebSocketManager: Found dead connection, removing:', connectionId);
+        console.log(
+          '❌ WebSocketManager: Found dead connection, removing:',
+          connectionId
+        );
         this.connections.delete(connectionId);
       }
     });
@@ -292,7 +391,10 @@ export class WebSocketManager {
     reject: (error: any) => void
   ): Promise<void> {
     try {
-      console.log('🎭 WebSocketManager: Attempting to connect to mock server for:', service);
+      console.log(
+        '🎭 WebSocketManager: Attempting to connect to mock server for:',
+        service
+      );
       this.useMockServer = true;
 
       const success = await this.mockServer.simulateConnection(service, params);
@@ -301,36 +403,60 @@ export class WebSocketManager {
         const mockWs = this.createMockWebSocket(connectionId, service, params);
         this.connections.set(connectionId, mockWs);
 
-        console.log('✅ WebSocketManager: Successfully connected to mock server for:', service);
+        console.log(
+          '✅ WebSocketManager: Successfully connected to mock server for:',
+          service
+        );
         this.emit('connected', { service, params });
         resolve(mockWs);
       } else {
         reject(new Error(`Failed to connect to mock server for ${service}`));
       }
     } catch (error) {
-      console.error('❌ WebSocketManager: Failed to connect to mock server:', error);
+      console.error(
+        '❌ WebSocketManager: Failed to connect to mock server:',
+        error
+      );
       reject(error);
     }
   }
 
-  private createMockWebSocket(connectionId: string, service: string, params: any): any {
+  private createMockWebSocket(
+    connectionId: string,
+    service: string,
+    params: any
+  ): any {
     const mockWs = {
       readyState: WebSocket.OPEN,
       send: (data: string) => {
-        console.log('📤 WebSocketManager: Mock WebSocket sending message:', data);
+        console.log(
+          '📤 WebSocketManager: Mock WebSocket sending message:',
+          data
+        );
         // The mock server will handle this message
-        this.mockServer.simulateMessage(connectionId, service, params, JSON.parse(data));
+        this.mockServer.simulateMessage(
+          connectionId,
+          service,
+          params,
+          JSON.parse(data)
+        );
       },
       close: () => {
-        console.log('🔌 WebSocketManager: Mock WebSocket closing connection:', connectionId);
+        console.log(
+          '🔌 WebSocketManager: Mock WebSocket closing connection:',
+          connectionId
+        );
         this.connections.delete(connectionId);
         this.mockServer.disconnectClient(connectionId);
-      }
+      },
     };
 
     // Set up message handling from mock server
     this.mockServer.onMessage(connectionId, (message: any) => {
-      console.log('📨 WebSocketManager: Mock WebSocket received message:', message);
+      console.log(
+        '📨 WebSocketManager: Mock WebSocket received message:',
+        message
+      );
       this.handleMessage(service, message);
     });
 
@@ -339,7 +465,7 @@ export class WebSocketManager {
 
   private buildWebSocketUrl(service: WebSocketService, params: any): string {
     // All services connect to the central WebSocket Gateway on port 4000
-    const baseUrl = 'ws://localhost:4000/ws';  // WebSocket Gateway
+    const baseUrl = 'ws://localhost:4000/ws'; // WebSocket Gateway
 
     // Add service type to params so the gateway knows how to route
     const gatewayParams = { ...params, serviceType: service };
@@ -347,24 +473,35 @@ export class WebSocketManager {
     const fullUrl = `${baseUrl}?${queryParams.toString()}`;
 
     console.log('🔌 WebSocketManager: Built URL for', service, ':', fullUrl);
-    console.log('🔌 WebSocketManager: Using central WebSocket Gateway for all services');
+    console.log(
+      '🔌 WebSocketManager: Using central WebSocket Gateway for all services'
+    );
     return fullUrl;
   }
 
   // Event-driven message handling
   private handleMessage(service: string, data: any) {
     const eventType = `${service}.${data.type}`;
-    console.log('📡 WebSocketManager: Emitting event:', eventType, 'with data:', data);
+    console.log(
+      '📡 WebSocketManager: Emitting event:',
+      eventType,
+      'with data:',
+      data
+    );
 
     // Emit service-specific event
     this.emit(eventType, data);
 
     // Only emit generic message event for non-chat messages to prevent duplicates
     if (data.type !== 'chat') {
-      console.log('📡 WebSocketManager: Emitting generic message event for non-chat message');
+      console.log(
+        '📡 WebSocketManager: Emitting generic message event for non-chat message'
+      );
       this.emit('message', { service, data });
     } else {
-      console.log('📡 WebSocketManager: Skipping generic message event for chat message to prevent duplicates');
+      console.log(
+        '📡 WebSocketManager: Skipping generic message event for chat message to prevent duplicates'
+      );
     }
   }
 
@@ -380,7 +517,10 @@ export class WebSocketManager {
 
     // Return unsubscribe function
     return () => {
-      console.log('🎧 WebSocketManager: Unregistering event handler for:', event);
+      console.log(
+        '🎧 WebSocketManager: Unregistering event handler for:',
+        event
+      );
       this.eventHandlers.get(event)?.delete(handler);
     };
   }
@@ -388,21 +528,37 @@ export class WebSocketManager {
   emit(event: string, data: any) {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
-      console.log('📡 WebSocketManager: Emitting event:', event, 'to', handlers.size, 'handlers');
-      handlers.forEach(handler => {
+      console.log(
+        '📡 WebSocketManager: Emitting event:',
+        event,
+        'to',
+        handlers.size,
+        'handlers'
+      );
+      handlers.forEach((handler) => {
         try {
           handler(data);
         } catch (error) {
-          console.error(`❌ WebSocketManager: Error in event handler for ${event}:`, error);
+          console.error(
+            `❌ WebSocketManager: Error in event handler for ${event}:`,
+            error
+          );
         }
       });
     } else {
-      console.log('⚠️ WebSocketManager: No handlers registered for event:', event);
+      console.log(
+        '⚠️ WebSocketManager: No handlers registered for event:',
+        event
+      );
     }
   }
 
   // Automatic reconnection with exponential backoff
-  private handleReconnection(service: WebSocketService, params: any, connectionId: string) {
+  private handleReconnection(
+    service: WebSocketService,
+    params: any,
+    connectionId: string
+  ) {
     const attempts = this.reconnectAttempts.get(connectionId) || 0;
 
     if (attempts < this.maxReconnectAttempts) {
@@ -410,17 +566,26 @@ export class WebSocketManager {
       const baseDelay = service === 'notifications' ? 500 : this.reconnectDelay;
       const delay = Math.min(baseDelay * Math.pow(1.5, attempts), 30000); // Cap at 30 seconds
 
-      console.log(`↻ WebSocketManager: Scheduling reconnection to ${service} in ${delay}ms (attempt ${attempts + 1}/${this.maxReconnectAttempts})`);
+      console.log(
+        `↻ WebSocketManager: Scheduling reconnection to ${service} in ${delay}ms (attempt ${attempts + 1}/${this.maxReconnectAttempts})`
+      );
 
       setTimeout(() => {
-        console.log(`↻ WebSocketManager: Attempting to reconnect to ${service} (attempt ${attempts + 1})`);
+        console.log(
+          `↻ WebSocketManager: Attempting to reconnect to ${service} (attempt ${attempts + 1})`
+        );
         this.reconnectAttempts.set(connectionId, attempts + 1);
-        this.connect(service, params).catch(error => {
-          console.error(`❌ Reconnection attempt ${attempts + 1} failed:`, error);
+        this.connect(service, params).catch((error) => {
+          console.error(
+            `❌ Reconnection attempt ${attempts + 1} failed:`,
+            error
+          );
         });
       }, delay);
     } else {
-      console.error(`❌ WebSocketManager: Max reconnection attempts reached for ${service}`);
+      console.error(
+        `❌ WebSocketManager: Max reconnection attempts reached for ${service}`
+      );
       this.reconnectAttempts.delete(connectionId);
       this.emit('reconnection_failed', { service, params });
     }
@@ -433,10 +598,21 @@ export class WebSocketManager {
     const connectionId = `${service}_${JSON.stringify(uniqueParams)}`;
     const ws = this.connections.get(connectionId);
 
-    console.log('📤 WebSocketManager: Attempting to send message to', service, ':', message);
+    console.log(
+      '📤 WebSocketManager: Attempting to send message to',
+      service,
+      ':',
+      message
+    );
     console.log('📤 WebSocketManager: Connection ID:', connectionId);
-    console.log('📤 WebSocketManager: WebSocket state:', ws ? ws.readyState : 'null');
-    console.log('📤 WebSocketManager: All available connections:', Array.from(this.connections.keys()));
+    console.log(
+      '📤 WebSocketManager: WebSocket state:',
+      ws ? ws.readyState : 'null'
+    );
+    console.log(
+      '📤 WebSocketManager: All available connections:',
+      Array.from(this.connections.keys())
+    );
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       const messageStr = JSON.stringify(message);
@@ -445,11 +621,22 @@ export class WebSocketManager {
       console.log('✅ WebSocketManager: Message sent successfully');
       return true;
     } else {
-      console.log('❌ WebSocketManager: Cannot send message - WebSocket not ready');
+      console.log(
+        '❌ WebSocketManager: Cannot send message - WebSocket not ready'
+      );
       console.log('❌ WebSocketManager: WebSocket exists:', !!ws);
-      console.log('❌ WebSocketManager: WebSocket state:', ws ? ws.readyState : 'null');
-      console.log('❌ WebSocketManager: Available connections:', Array.from(this.connections.keys()));
-      console.log('❌ WebSocketManager: Looking for connection ID:', connectionId);
+      console.log(
+        '❌ WebSocketManager: WebSocket state:',
+        ws ? ws.readyState : 'null'
+      );
+      console.log(
+        '❌ WebSocketManager: Available connections:',
+        Array.from(this.connections.keys())
+      );
+      console.log(
+        '❌ WebSocketManager: Looking for connection ID:',
+        connectionId
+      );
       return false;
     }
   }
@@ -461,7 +648,12 @@ export class WebSocketManager {
     const connectionId = `${service}_${JSON.stringify(uniqueParams)}`;
     const ws = this.connections.get(connectionId);
 
-    console.log('🔌 WebSocketManager: Disconnecting from', service, 'with connection ID:', connectionId);
+    console.log(
+      '🔌 WebSocketManager: Disconnecting from',
+      service,
+      'with connection ID:',
+      connectionId
+    );
 
     if (ws) {
       // Clear health check interval
@@ -472,14 +664,25 @@ export class WebSocketManager {
       ws.close();
       this.connections.delete(connectionId);
       this.reconnectAttempts.delete(connectionId);
-      console.log('🔌 WebSocketManager: Successfully disconnected from', service);
+      console.log(
+        '🔌 WebSocketManager: Successfully disconnected from',
+        service
+      );
     } else {
-      console.log('⚠️ WebSocketManager: No connection found for', service, 'with connection ID:', connectionId);
+      console.log(
+        '⚠️ WebSocketManager: No connection found for',
+        service,
+        'with connection ID:',
+        connectionId
+      );
     }
   }
 
   // Get connection status
-  getConnectionStatus(service: string, params: any): 'connected' | 'connecting' | 'disconnected' {
+  getConnectionStatus(
+    service: string,
+    params: any
+  ): 'connected' | 'connecting' | 'disconnected' {
     // Include tab ID in params for connection lookup
     const uniqueParams = { ...params, tabId: this.tabId };
     const connectionId = `${service}_${JSON.stringify(uniqueParams)}`;
@@ -497,7 +700,14 @@ export class WebSocketManager {
       status = 'disconnected';
     }
 
-    console.log('🔍 WebSocketManager: Connection status for', service, ':', status, 'WebSocket state:', ws ? ws.readyState : 'null');
+    console.log(
+      '🔍 WebSocketManager: Connection status for',
+      service,
+      ':',
+      status,
+      'WebSocket state:',
+      ws ? ws.readyState : 'null'
+    );
     return status;
   }
 

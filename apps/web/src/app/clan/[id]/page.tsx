@@ -971,7 +971,7 @@ export default function ClanDetailPage() {
                 </span>
               )}
               {menuOpen && (
-                <div className="absolute right-0 top-10 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1">
+                <div className="absolute right-0 top-10 z-50 w-48 bg-white border border-gray-200 rounded-md py-1">
                   {canManage && (
                     <Link
                       href={`/clan/${clan.id}/manage`}

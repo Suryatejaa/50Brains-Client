@@ -102,9 +102,7 @@ export class GigAPI {
       });
     }
 
-    const response = await apiClient.get(
-      `/api/gig/feed?${params.toString()}`
-    );
+    const response = await apiClient.get(`/api/gig/feed?${params.toString()}`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch gigs');
     }
@@ -133,9 +131,7 @@ export class GigAPI {
       });
     }
 
-    const response = await apiClient.get(
-      `/api/gig/feed?${params.toString()}`
-    );
+    const response = await apiClient.get(`/api/gig/feed?${params.toString()}`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to search gigs');
     }
@@ -322,7 +318,9 @@ export class GigAPI {
       });
     }
 
-    const response = await apiClient.get(`/api/my/applications?${params.toString()}`);
+    const response = await apiClient.get(
+      `/api/my/applications?${params.toString()}`
+    );
     if (!response.success) {
       throw new Error(
         (response as any).error || 'Failed to fetch applications'
@@ -360,8 +358,14 @@ export class GigAPI {
   }
 
   // Application Management
-  static async applyToGig(gigId: string, data: CreateApplicationData): Promise<Application> {
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/apply`, data);
+  static async applyToGig(
+    gigId: string,
+    data: CreateApplicationData
+  ): Promise<Application> {
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/apply`,
+      data
+    );
     console.log('🎯 GigAPI: Apply to gig response:', response);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to apply to gig');
@@ -445,11 +449,17 @@ export class GigAPI {
     console.log('🔍 === GIG API DEBUG ===');
     console.log('🆔 Gig ID parameter:', gigId);
     console.log('📤 createSubmission called with data:', data);
-    console.log('🌐 Making POST request to:', `${GIG_API_BASE}/${gigId}/submit`);
+    console.log(
+      '🌐 Making POST request to:',
+      `${GIG_API_BASE}/${gigId}/submit`
+    );
     console.log('📋 Request payload:', JSON.stringify(data, null, 2));
     console.log('================================');
 
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/submit`, data);
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/submit`,
+      data
+    );
 
     console.log('📥 API Response received:', response);
 
@@ -483,11 +493,17 @@ export class GigAPI {
     return response.data as Submission[];
   }
 
-  static async getMySubmissions(queryParams?: string): Promise<{ submissions: Submission[]; pagination: any }> {
-    const url = queryParams ? `api/my/submissions?${queryParams}` : `api/my/submissions`;
+  static async getMySubmissions(
+    queryParams?: string
+  ): Promise<{ submissions: Submission[]; pagination: any }> {
+    const url = queryParams
+      ? `api/my/submissions?${queryParams}`
+      : `api/my/submissions`;
     const response = await apiClient.get(url);
     if (!response.success) {
-      throw new Error((response as any).error || 'Failed to fetch my submissions');
+      throw new Error(
+        (response as any).error || 'Failed to fetch my submissions'
+      );
     }
     return response.data as { submissions: Submission[]; pagination: any };
   }
@@ -495,35 +511,38 @@ export class GigAPI {
   static async approveSubmission(
     submissionId: string,
     rating?: number,
-    feedback?: string,
+    feedback?: string
   ): Promise<Submission> {
     // Create explicit payload object
     const payload = {
       status: 'APPROVED' as const,
       ...(rating && { rating }),
-      ...(feedback?.trim() && { feedback: feedback.trim() })
+      ...(feedback?.trim() && { feedback: feedback.trim() }),
     };
-    
+
     console.log('🔍 === APPROVE SUBMISSION DEBUG ===');
     console.log('📝 Input params:', { submissionId, rating, feedback });
     console.log('📦 Final payload:', payload);
-    console.log('🔗 URL:', `${GIG_API_BASE}/submissions/${submissionId}/review`);
+    console.log(
+      '🔗 URL:',
+      `${GIG_API_BASE}/submissions/${submissionId}/review`
+    );
     console.log('🔍 Payload JSON:', JSON.stringify(payload));
     console.log('✅ Status field present:', 'status' in payload);
     console.log('🎯 Status value:', payload.status);
     console.log('==================================');
-    
+
     if (!payload.status) {
       throw new Error('CRITICAL: Status field is missing from payload');
     }
-    
+
     const response = await apiClient.post(
       `${GIG_API_BASE}/submissions/${submissionId}/review`,
       payload
     );
-    
+
     console.log('📥 Approve submission response:', response);
-    
+
     if (!response.success) {
       throw new Error(
         (response as any).error || 'Failed to approve submission'
@@ -538,32 +557,35 @@ export class GigAPI {
   ): Promise<Submission> {
     const payload = {
       status: 'REJECTED' as const,
-      feedback: feedback?.trim() || ''
+      feedback: feedback?.trim() || '',
     };
-    
+
     console.log('🔍 === REJECT SUBMISSION DEBUG ===');
     console.log('📝 Input params:', { submissionId, feedback });
     console.log('📦 Final payload:', payload);
-    console.log('🔗 URL:', `${GIG_API_BASE}/submissions/${submissionId}/review`);
+    console.log(
+      '🔗 URL:',
+      `${GIG_API_BASE}/submissions/${submissionId}/review`
+    );
     console.log('🔍 Payload JSON:', JSON.stringify(payload));
     console.log('✅ Status field present:', 'status' in payload);
     console.log('🎯 Status value:', payload.status);
     console.log('🔤 Status type:', typeof payload.status);
     console.log('📋 Payload keys:', Object.keys(payload));
     console.log('=================================');
-    
+
     // Verify payload before sending
     if (!payload.status) {
       throw new Error('CRITICAL: Status field is missing from payload');
     }
-    
+
     const response = await apiClient.post(
       `${GIG_API_BASE}/submissions/${submissionId}/review`,
       payload
     );
-    
+
     console.log('📥 Reject submission response:', response);
-    
+
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to reject submission');
     }
@@ -576,29 +598,32 @@ export class GigAPI {
   ): Promise<Submission> {
     const payload = {
       status: 'REVISION' as const,
-      feedback: feedback?.trim() || ''
+      feedback: feedback?.trim() || '',
     };
-    
+
     console.log('🔍 === REQUEST REVISION DEBUG ===');
     console.log('📝 Input params:', { submissionId, feedback });
     console.log('📦 Final payload:', payload);
-    console.log('🔗 URL:', `${GIG_API_BASE}/submissions/${submissionId}/review`);
+    console.log(
+      '🔗 URL:',
+      `${GIG_API_BASE}/submissions/${submissionId}/review`
+    );
     console.log('🔍 Payload JSON:', JSON.stringify(payload));
     console.log('✅ Status field present:', 'status' in payload);
     console.log('🎯 Status value:', payload.status);
     console.log('=================================');
-    
+
     if (!payload.status) {
       throw new Error('CRITICAL: Status field is missing from payload');
     }
-    
+
     const response = await apiClient.post(
       `${GIG_API_BASE}/submissions/${submissionId}/review`,
       payload
     );
-    
+
     console.log('📥 Request revision response:', response);
-    
+
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to request revision');
     }
@@ -651,14 +676,20 @@ export class GigAPI {
   // New GIG-CLAN Workflow Methods
 
   // Create milestone
-  static async createMilestone(gigId: string, data: {
-    title: string;
-    description?: string;
-    dueAt: string;
-    amount: number;
-    deliverables: string[];
-  }): Promise<GigMilestone> {
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones`, data);
+  static async createMilestone(
+    gigId: string,
+    data: {
+      title: string;
+      description?: string;
+      dueAt: string;
+      amount: number;
+      deliverables: string[];
+    }
+  ): Promise<GigMilestone> {
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/milestones`,
+      data
+    );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to create milestone');
     }
@@ -666,11 +697,18 @@ export class GigAPI {
   }
 
   // Submit milestone
-  static async submitMilestone(gigId: string, milestoneId: string, data: {
-    deliverables: string[];
-    notes?: string;
-  }): Promise<GigMilestone> {
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/submit`, data);
+  static async submitMilestone(
+    gigId: string,
+    milestoneId: string,
+    data: {
+      deliverables: string[];
+      notes?: string;
+    }
+  ): Promise<GigMilestone> {
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/submit`,
+      data
+    );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to submit milestone');
     }
@@ -678,10 +716,17 @@ export class GigAPI {
   }
 
   // Approve milestone
-  static async approveMilestone(gigId: string, milestoneId: string, data: {
-    feedback?: string;
-  }): Promise<GigMilestone> {
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/approve`, data);
+  static async approveMilestone(
+    gigId: string,
+    milestoneId: string,
+    data: {
+      feedback?: string;
+    }
+  ): Promise<GigMilestone> {
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/milestones/${milestoneId}/approve`,
+      data
+    );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to approve milestone');
     }
@@ -689,15 +734,21 @@ export class GigAPI {
   }
 
   // Create task
-  static async createTask(gigId: string, data: {
-    title: string;
-    description?: string;
-    assigneeUserId: string;
-    milestoneId?: string;
-    estimatedHours?: number;
-    deliverables: string[];
-  }): Promise<GigTask> {
-    const response = await apiClient.post(`${GIG_API_BASE}/${gigId}/tasks`, data);
+  static async createTask(
+    gigId: string,
+    data: {
+      title: string;
+      description?: string;
+      assigneeUserId: string;
+      milestoneId?: string;
+      estimatedHours?: number;
+      deliverables: string[];
+    }
+  ): Promise<GigTask> {
+    const response = await apiClient.post(
+      `${GIG_API_BASE}/${gigId}/tasks`,
+      data
+    );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to create task');
     }
@@ -705,17 +756,24 @@ export class GigAPI {
   }
 
   // Update task
-  static async updateTask(gigId: string, taskId: string, data: {
-    title?: string;
-    description?: string;
-    assigneeUserId?: string;
-    status?: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'COMPLETED';
-    estimatedHours?: number;
-    actualHours?: number;
-    deliverables?: string[];
-    notes?: string;
-  }): Promise<GigTask> {
-    const response = await apiClient.patch(`${GIG_API_BASE}/${gigId}/tasks/${taskId}`, data);
+  static async updateTask(
+    gigId: string,
+    taskId: string,
+    data: {
+      title?: string;
+      description?: string;
+      assigneeUserId?: string;
+      status?: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'COMPLETED';
+      estimatedHours?: number;
+      actualHours?: number;
+      deliverables?: string[];
+      notes?: string;
+    }
+  ): Promise<GigTask> {
+    const response = await apiClient.patch(
+      `${GIG_API_BASE}/${gigId}/tasks/${taskId}`,
+      data
+    );
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to update task');
     }
@@ -738,6 +796,15 @@ export class GigAPI {
       throw new Error((response as any).error || 'Failed to fetch tasks');
     }
     return response.data as GigTask[];
+  }
+
+  // Work History from Gig Service
+  static async getWorkHistoryForApplicant(applicantId: string): Promise<any> {
+    const endpoint = `${GIG_API_BASE}/work-history/applicant/${applicantId}`;
+    console.log(`Calling getWorkHistoryForApplicant with URL: ${endpoint}`);
+    const response = await apiClient.get(endpoint);
+    console.log('getWorkHistoryForApplicant response:', response);
+    return response;
   }
 }
 

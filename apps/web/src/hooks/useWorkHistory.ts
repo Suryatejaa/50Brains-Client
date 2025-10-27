@@ -369,7 +369,10 @@ export function useWorkHistory(userId?: string) {
       }
 
       try {
-        const response = await getUserAchievements(targetUserId, params);
+        const response = (await getUserAchievements(
+          targetUserId,
+          params
+        )) as any;
         const data = response.data as any;
         console.log('Achievements API Response:', data);
         if (response.success && data) {
@@ -411,7 +414,7 @@ export function useWorkHistory(userId?: string) {
       if (!targetUserId) return;
 
       try {
-        const response = await getUserPortfolio(targetUserId, params);
+        const response = (await getUserPortfolio(targetUserId, params)) as any;
         console.log('Portfolio API Response:', response);
         if (response.success && response.data) {
           const data = response.data as any;

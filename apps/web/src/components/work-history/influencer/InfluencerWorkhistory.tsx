@@ -60,13 +60,13 @@ const InfluencerWorkHistory: React.FC = () => {
                 {activeTab === 'overview' && (
                     <div className="space-y-6">
                         <WorkHistorySummary userId={user.id} />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                             <div>
                                 <h2 className="text-xl font-semibold mb-4">Recent Work</h2>
                                 <WorkHistoryList userId={user.id} showFilters={false} limit={5} />
                             </div>
-                            <div>
-                                <h2 className="text-xl font-semibold mb-4">Recent Achievements</h2>
+                            <div className='hidden'>
+                                <h2 className="text-xl hidden font-semibold mb-4">Recent Achievements</h2>
                                 <Achievements userId={user.id} showVerifiedOnly={false} />
                             </div>
                         </div>
