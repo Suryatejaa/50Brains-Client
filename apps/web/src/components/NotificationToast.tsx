@@ -13,10 +13,46 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
     useNotificationContext();
   const [lastNotificationCount, setLastNotificationCount] = useState(0);
   const lastProcessedId = useRef<string | null>(null);
+  const [shownNotifications, setShownNotifications] = useState<Set<string>>(
+    new Set()
+  );
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Load shown notifications from sessionStorage on mount
+  useEffect(() => {
+    const storedShownNotifications =
+      sessionStorage.getItem('shownNotifications');
+    if (storedShownNotifications) {
+      setShownNotifications(new Set(JSON.parse(storedShownNotifications)));
+    }
+
+    // Mark initial load as complete after a brief delay
+    const timer = setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Save shown notifications to sessionStorage
+  useEffect(() => {
+    if (shownNotifications.size > 0) {
+      sessionStorage.setItem(
+        'shownNotifications',
+        JSON.stringify(Array.from(shownNotifications))
+      );
+    }
+  }, [shownNotifications]);
 
   useEffect(() => {
     if (!enabled || notifications.length === 0) {
       console.log('🔔 NotificationToast: Disabled or no notifications');
+      return;
+    }
+
+    // Skip showing toasts during initial load to prevent spam on refresh
+    if (isInitialLoad) {
+      console.log('🔔 NotificationToast: Skipping toasts during initial load');
       return;
     }
 
@@ -38,7 +74,8 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
     if (
       mostRecentNotification &&
       mostRecentNotification.id !== lastProcessedId.current &&
-      !mostRecentNotification.read
+      !mostRecentNotification.read &&
+      !shownNotifications.has(mostRecentNotification.id)
     ) {
       console.log(
         '🔔 Showing toast for new notification:',
@@ -75,66 +112,22 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
         }
       );
 
-      // Mark this notification as processed
+      // Mark this notification as processed and shown
       lastProcessedId.current = mostRecentNotification.id;
+      setShownNotifications(
+        (prev) => new Set(Array.from(prev).concat(mostRecentNotification.id))
+      );
       console.log('🔔 Updated lastProcessedId to:', lastProcessedId.current);
     } else {
       console.log('🔔 Skipping toast - notification already processed or read');
     }
-
-    // Also handle the case where notifications are loaded initially
-    if (notifications.length > lastNotificationCount) {
-      console.log('🔔 Handling initial notification load...');
-      const newNotifications = notifications.slice(
-        0,
-        notifications.length - lastNotificationCount
-      );
-
-      newNotifications.forEach((notification) => {
-        if (!notification.read && notification.id !== lastProcessedId.current) {
-          console.log(
-            '🔔 Showing toast for loaded notification:',
-            notification.title
-          );
-
-          // Play sound for new notifications
-          playNotificationSound();
-
-          // Show toast
-          toast(
-            <div className="flex items-start space-x-3">
-              <span className="text-lg">{notification.icon || '🔔'}</span>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-gray-900">
-                  {notification.title}
-                </div>
-                <div className="mt-1 line-clamp-2 text-xs text-gray-600">
-                  {notification.message}
-                </div>
-              </div>
-            </div>,
-            {
-              duration: 2500, // Increased duration
-              action: {
-                label: 'View',
-                onClick: () => {
-                  // Navigate to notification or mark as read
-                  handleNotificationClick(notification);
-                },
-              },
-              dismissible: true,
-              className: 'mt-10',
-            }
-          );
-
-          // Mark this notification as processed
-          lastProcessedId.current = notification.id;
-        }
-      });
-
-      setLastNotificationCount(notifications.length);
-    }
-  }, [notifications, lastNotificationCount, enabled, playNotificationSound]);
+  }, [
+    notifications,
+    enabled,
+    playNotificationSound,
+    isInitialLoad,
+    shownNotifications,
+  ]);
 
   const handleNotificationClick = (notification: Notification) => {
     // Mark as read and navigate if needed

@@ -9,12 +9,38 @@ import {
   FiEye,
   FiEyeOff,
   FiHelpCircle,
+  FiPlay,
+  FiSend,
+  FiEyeOff as FiHide,
+  FiX,
+  FiCheck,
+  FiSave,
+  FiArchive,
+  FiRotateCcw,
+  FiShield,
+  FiShieldOff,
 } from 'react-icons/fi';
 import './MiniConfirmDialog.css';
 
 interface MiniConfirmDialogProps {
   isOpen: boolean;
-  type: 'logout' | 'deactivate' | 'delete';
+  type:
+    | 'logout'
+    | 'deactivate'
+    | 'delete'
+    | 'pause'
+    | 'resume'
+    | 'publish'
+    | 'unpublish'
+    | 'cancel'
+    | 'close'
+    | 'save'
+    | 'submit'
+    | 'confirm'
+    | 'archive'
+    | 'restore'
+    | 'block'
+    | 'unblock';
   onConfirm: (password?: string) => void;
   onCancel: () => void;
   loading?: boolean;
@@ -87,13 +113,152 @@ const MiniConfirmDialog: React.FC<MiniConfirmDialogProps> = ({
       case 'delete':
         return {
           icon: <FiAlertTriangle />,
-          title: 'Delete Account',
+          title: 'Delete Item',
           message:
-            'This action cannot be undone and all your data will be lost forever. Please enter your password to confirm.',
+            'This action cannot be undone and all related data will be lost forever. Please confirm to proceed.',
           confirmText: 'Delete Forever',
           confirmClass: 'btn--danger',
           iconClass: 'icon--danger',
-          requiresPassword: true,
+          requiresPassword: false,
+        };
+      case 'pause':
+        return {
+          icon: <FiPause />,
+          title: 'Pause Item',
+          message:
+            'This will temporarily pause the item. You can resume it later.',
+          confirmText: 'Pause',
+          confirmClass: 'btn--warning',
+          iconClass: 'icon--warning',
+          requiresPassword: false,
+        };
+      case 'resume':
+        return {
+          icon: <FiPlay />,
+          title: 'Resume Item',
+          message: 'This will reactivate the item and make it active again.',
+          confirmText: 'Resume',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'publish':
+        return {
+          icon: <FiSend />,
+          title: 'Publish Item',
+          message:
+            'This will make the item visible to the public. Are you sure you want to proceed?',
+          confirmText: 'Publish',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'unpublish':
+        return {
+          icon: <FiHide />,
+          title: 'Unpublish Item',
+          message:
+            'This will hide the item from public view. It can be published again later.',
+          confirmText: 'Unpublish',
+          confirmClass: 'btn--warning',
+          iconClass: 'icon--warning',
+          requiresPassword: false,
+        };
+      case 'cancel':
+        return {
+          icon: <FiX />,
+          title: 'Cancel Action',
+          message:
+            'This will cancel the current action. Any unsaved changes will be lost.',
+          confirmText: 'Cancel',
+          confirmClass: 'btn--danger',
+          iconClass: 'icon--danger',
+          requiresPassword: false,
+        };
+      case 'close':
+        return {
+          icon: <FiX />,
+          title: 'Close Item',
+          message:
+            'This will close the item. Are you sure you want to proceed?',
+          confirmText: 'Close',
+          confirmClass: 'btn--warning',
+          iconClass: 'icon--warning',
+          requiresPassword: false,
+        };
+      case 'save':
+        return {
+          icon: <FiSave />,
+          title: 'Save Changes',
+          message: 'This will save all your changes. Do you want to continue?',
+          confirmText: 'Save',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'submit':
+        return {
+          icon: <FiSend />,
+          title: 'Submit Form',
+          message:
+            'This will submit the form. Please review your information before proceeding.',
+          confirmText: 'Submit',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'confirm':
+        return {
+          icon: <FiCheck />,
+          title: 'Confirm Action',
+          message: 'Please confirm that you want to proceed with this action.',
+          confirmText: 'Confirm',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'archive':
+        return {
+          icon: <FiArchive />,
+          title: 'Archive Item',
+          message:
+            'This will move the item to archives. It can be restored later.',
+          confirmText: 'Archive',
+          confirmClass: 'btn--warning',
+          iconClass: 'icon--warning',
+          requiresPassword: false,
+        };
+      case 'restore':
+        return {
+          icon: <FiRotateCcw />,
+          title: 'Restore Item',
+          message:
+            'This will restore the item from archives and make it active again.',
+          confirmText: 'Restore',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
+        };
+      case 'block':
+        return {
+          icon: <FiShield />,
+          title: 'Block Item',
+          message:
+            'This will block the item. This action can be reversed later.',
+          confirmText: 'Block',
+          confirmClass: 'btn--danger',
+          iconClass: 'icon--danger',
+          requiresPassword: false,
+        };
+      case 'unblock':
+        return {
+          icon: <FiShieldOff />,
+          title: 'Unblock Item',
+          message: 'This will unblock the item and restore normal access.',
+          confirmText: 'Unblock',
+          confirmClass: 'btn--primary',
+          iconClass: 'icon--primary',
+          requiresPassword: false,
         };
       default:
         return {

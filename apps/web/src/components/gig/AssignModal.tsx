@@ -145,7 +145,7 @@ export default function AssignModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-lg bg-white shadow-lg">
+      <div className="flex max-h-[85vh] sm:w-1/2 lg:w-1/3  max-w-2xl flex-col rounded-lg bg-white shadow-lg">
         {/* Header */}
         <div className="border-b border-gray-200 px-6 py-2">
           <div className="flex items-center justify-between">
@@ -234,8 +234,22 @@ export default function AssignModal({
         <div className="flex-1 overflow-y-auto px-2 py-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-2">
-              <div className="h-8 w-8 animate-spin rounded-sm border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading users...</span>
+               <div className="p-3 text-center md:p-3">
+            <div className="relative mb-2">
+              {/* Spinning Circle */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500"></div>
+              </div>
+
+              {/* Brain Icon (or '50' Number) */}
+              <div className="relative mx-auto flex h-10 w-10 items-center justify-center">
+                <span className="text-md font-bold text-blue-600">50</span>
+              </div>
+            </div>
+            <p className="text-muted text-sm md:text-base">
+              Loading users... 
+            </p>
+          </div>
             </div>
           ) : creators.length === 0 ? (
             <div className="py-12 text-center">
@@ -248,7 +262,7 @@ export default function AssignModal({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-1 md:grid-cols-1">
               {creators.map((creator) => (
                 <div
                   key={creator.id}

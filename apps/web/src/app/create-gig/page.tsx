@@ -12,6 +12,7 @@ interface FormData {
   category: string;
   roleRequired: string;
   skillsRequired: string[];
+  isPublic: boolean;
   experienceLevel: 'beginner' | 'intermediate' | 'expert';
   location?: string;
   latitude?: number;
@@ -68,6 +69,7 @@ export default function CreateGigPage() {
     latitude: undefined,
     longitude: undefined,
     isRemote: true,
+    isPublic: true,
     gigType: 'REMOTE',
     address: '',
     deadline: '',
@@ -1781,6 +1783,58 @@ export default function CreateGigPage() {
                           </div>
                           <div className="text-muted text-xs">
                             {urgency.description}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  {/*Visibility Public or private toggle isPublic true or false*/}
+                  <div>
+                    <label className="text-body mb-3 block text-sm font-medium">
+                      Visibility
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        {
+                          value: true,  
+                          label: 'Public',
+                          description: 'Visible to everyone',
+                        },
+                        {
+                          value: false,
+                          label: 'Private',
+                          description: 'Visible to invited creators only',
+                        },
+                      ].map((visibility) => (
+                        <label
+                          key={String(visibility.value)}
+                          className={`
+                            cursor-pointer rounded-none border p-3 transition-all duration-200
+                            ${
+                              formData.isPublic === visibility.value
+                                ? 'border-brand-primary bg-brand-light-blue/20'
+                                : 'border-brand-border hover:border-brand-primary/50 hover:bg-brand-light-blue/10'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="visibility"
+                            value={String(visibility.value)}
+                            checked={formData.isPublic === visibility.value}
+                            onChange={(e) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                isPublic: e.target.value === 'true'
+                              }));
+                            }}
+                            className="sr-only"
+                          />
+                          <div className="text-body text-sm font-medium">
+                            {visibility.label}
+                          </div>
+                          <div className="text-muted text-xs">
+                            {visibility.description}
                           </div>
                         </label>
                       ))}

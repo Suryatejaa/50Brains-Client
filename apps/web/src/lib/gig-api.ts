@@ -180,7 +180,7 @@ export class GigAPI {
       });
     }
 
-    const response = await apiClient.get(`/api/my/posted?${params.toString()}`);
+    const response = await apiClient.get(`/api/gig/my-posted?${params.toString()}`);
     if (!response.success) {
       throw new Error((response as any).error || 'Failed to fetch posted gigs');
     }

@@ -17,6 +17,9 @@ import {
   FaBullseye,
 } from 'react-icons/fa';
 import LoadingSpinner from '@/frontend-profile/components/common/LoadingSpinner';
+import AssignGigModal from '@/components/gig/AssignGigModal';
+import { useAuth } from '@/hooks/useAuth';
+import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -24,7 +27,15 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
 
+  const { user, isAuthenticated } = useAuth();
+  const { currentRole, getUserTypeForRole } = useRoleSwitch();
+  const userType = getUserTypeForRole(currentRole);
+  console.log('Current User Type:', userType);
+  console.log('Current Role:', currentRole);
+  console.log('Current User:', user);
+  console.log('Current Profile', profile);
   // Helper function to check if identifier is a UUID
   const isUUID = (str: string) => {
     const uuidRegex =
@@ -77,6 +88,20 @@ export default function ProfilePage() {
   const normalizeSocialLink = (link: string) => {
     return link.startsWith('@') ? link.slice(1) : link;
   };
+
+  // Handle successful assignment
+  const handleAssignSuccess = (gigId: string, userId: string) => {
+    console.log(`Successfully assigned gig ${gigId} to user ${userId}`);
+    setShowAssignModal(false);
+  };
+
+  // Check if current user can assign gigs (is a brand and not viewing own profile)
+  const canAssignGigs =
+    isAuthenticated &&
+    userType === 'brand' &&
+    user?.id !== profile?.id &&
+    profile?.id &&
+    (profile.roles?.includes('INFLUENCER') || profile.roles?.includes('CREW'));
 
   if (loading) {
     return (
@@ -155,37 +180,55 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h1 className="mb-2 text-xl font-bold text-gray-900">
-                    {profile.displayName ||
-                      `${profile.firstName || ''} ${profile.lastName || ''}`.trim() ||
-                      `${profile.username}`}
-                  </h1>
-                  {filteredRoles.length > 0 && (
-                    <p className="mb-2 text-sm text-gray-600">
-                      {filteredRoles.join(', ') || 'No Role'}
-                    </p>
-                  )}
-                  {profile.createdAt && (
-                    <p className="mb-2 text-sm text-gray-600">
-                      Active since {activeFrom?.toLocaleDateString()}
-                    </p>
-                  )}
-                  {profile.bio && (
-                    <p className="mb-4 text-gray-700">{profile.bio}</p>
-                  )}
-                  <div className="flex items-center space-x-1 text-xs text-gray-600">
-                    {profile.location && (
-                      <span className="relative flex gap-1">
-                        <FaMapMarkerAlt /> {profile.location}
-                      </span>
-                    )}
-                    {profile.totalGigs > 0 && (
-                      <span>
-                        <FaBullseye /> {profile.totalGigs} gigs
-                      </span>
-                    )}
-                    {profile.averageRating > 0 && (
-                      <span>⭐ {profile.averageRating.toFixed(1)} rating</span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h1 className="mb-2 text-xl font-bold text-gray-900">
+                        {profile.displayName ||
+                          `${profile.firstName || ''} ${profile.lastName || ''}`.trim() ||
+                          `${profile.username}`}
+                      </h1>
+                      {filteredRoles.length > 0 && (
+                        <p className="mb-2 text-sm text-gray-600">
+                          {filteredRoles.join(', ') || 'No Role'}
+                        </p>
+                      )}
+                      {profile.createdAt && (
+                        <p className="mb-2 text-sm text-gray-600">
+                          Active since {activeFrom?.toLocaleDateString()}
+                        </p>
+                      )}
+                      {profile.bio && (
+                        <p className="mb-4 text-gray-700">{profile.bio}</p>
+                      )}
+                      <div className="flex items-center space-x-1 text-xs text-gray-600">
+                        {profile.location && (
+                          <span className="relative flex gap-1">
+                            <FaMapMarkerAlt /> {profile.location}
+                          </span>
+                        )}
+                        {profile.totalGigs > 0 && (
+                          <span>
+                            <FaBullseye /> {profile.totalGigs} gigs
+                          </span>
+                        )}
+                        {profile.averageRating > 0 && (
+                          <span>
+                            ⭐ {profile.averageRating.toFixed(1)} rating
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Assign Button */}
+                    {canAssignGigs && (
+                      <div className="ml-4">
+                        <button
+                          onClick={() => setShowAssignModal(true)}
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                        >
+                          Assign Gig
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -360,6 +403,16 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Assign Gig Modal */}
+      {showAssignModal && profile && (
+        <AssignGigModal
+          isOpen={showAssignModal}
+          onClose={() => setShowAssignModal(false)}
+          user={profile}
+          onAssignSuccess={handleAssignSuccess}
+        />
+      )}
     </div>
   );
 }

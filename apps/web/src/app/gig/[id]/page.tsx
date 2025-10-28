@@ -15,6 +15,7 @@ import WorkSubmissionForm from '@/components/gig/WorkSubmissionForm';
 import AssignModal from '@/components/gig/AssignModal';
 import { FaBullseye, FaAccessibleIcon } from 'react-icons/fa';
 import { m } from 'framer-motion';
+import MiniConfirmDialog from '@/frontend-profile/components/common/MiniConfirmDialog';
 
 interface Gig {
   id: string;
@@ -38,6 +39,7 @@ interface Gig {
   deadline?: string;
   createdAt: string;
   updatedAt: string;
+  isPublic: boolean;
   assignedToId?: string | null;
   assignedToType?: string | null;
   completedAt?: string | null;
@@ -173,6 +175,142 @@ export default function GigDetailsPage() {
   const [upiId, setUpiId] = useState('');
   const [upiValidationError, setUpiValidationError] = useState('');
   const userType = getUserTypeForRole(currentRole);
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    type: 'pause' | 'visibility' | 're-open' | null;
+    loading: boolean;
+    error: string | null;
+    actionData?: any;
+  }>({
+    isOpen: false,
+    type: null,
+    loading: false,
+    error: null,
+    actionData: null,
+  });
+  const openDialog = (
+    type: 'pause' | 'visibility' | 're-open',
+    actionData?: any
+  ) => {
+    setConfirmDialog({
+      isOpen: true,
+      type,
+      loading: false,
+      error: null,
+      actionData,
+    });
+  };
+
+  const closeDialog = () => {
+    if (!confirmDialog.loading) {
+      setConfirmDialog({
+        isOpen: false,
+        type: null,
+        loading: false,
+        error: null,
+        actionData: null,
+      });
+    }
+  };
+
+  // Get dialog configuration for different gig actions
+  const getDialogType = ():
+    | 'logout'
+    | 'deactivate'
+    | 'delete'
+    | 'pause'
+    | 'resume'
+    | 'publish'
+    | 'unpublish'
+    | 'cancel'
+    | 'close'
+    | 'save'
+    | 'submit'
+    | 'confirm'
+    | 'archive'
+    | 'restore'
+    | 'block'
+    | 'unblock' => {
+    switch (confirmDialog.type) {
+      case 'pause':
+        return 'pause'; // Uses pause-specific styling and messaging
+      case 're-open':
+        return 'resume'; // Uses resume-specific styling and messaging
+      case 'visibility':
+        return confirmDialog.actionData?.newVisibility
+          ? 'publish'
+          : 'unpublish'; // Uses publish/unpublish based on action
+      default:
+        return 'confirm';
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    setConfirmDialog((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      let success = false;
+      let successMessage = '';
+
+      switch (confirmDialog.type) {
+        case 'pause':
+          await changeGigStatus('PAUSED');
+          success = true;
+          successMessage = 'Gig paused successfully';
+          break;
+        case 'visibility':
+          const newVisibility =
+            confirmDialog.actionData?.newVisibility ?? !gig?.isPublic;
+          await changeGigVisibility(newVisibility);
+          success = true;
+          successMessage = `Gig is now ${newVisibility ? 'public' : 'private'}`;
+          break;
+        case 're-open':
+          await changeGigStatus('OPEN');
+          success = true;
+          successMessage = 'Gig reopened successfully';
+          break;
+      }
+
+      console.log(`result of ${confirmDialog.type}:`, success);
+      if (success) {
+        closeDialog();
+        showToast('success', successMessage);
+      } else {
+        setConfirmDialog((prev) => ({
+          ...prev,
+          loading: false,
+          error: `Failed to ${confirmDialog.type} gig. Please try again.`,
+        }));
+      }
+    } catch (error: any) {
+      console.error(`Failed to ${confirmDialog.type} gig:`, error);
+      console.log('🔍 Error object structure:', {
+        message: error?.message,
+        error: error?.error,
+        statusCode: error?.statusCode,
+        status: error?.status,
+        details: error?.details,
+        fullError: error,
+      });
+
+      // Extract error message from various possible structures
+      const errorMessage =
+        error?.error ||
+        error?.message ||
+        error?.data?.message ||
+        error?.response?.data?.message ||
+        `Failed to ${confirmDialog.type} gig. Please try again.`;
+
+      console.log('📝 Final error message to display:', errorMessage);
+      setConfirmDialog((prev) => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
+    }
+  };
 
   // Extract gigId from params with debugging and fallback
   useEffect(() => {
@@ -762,6 +900,40 @@ export default function GigDetailsPage() {
     }
   };
 
+  const changeGigVisibility = async (isPublic: boolean) => {
+    if (!gigId || !user?.id) {
+      showToast('error', 'Missing required data');
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const response = await apiClient.put(
+        `/api/gig/${gigId}/change-visibility`,
+        {
+          isPublic,
+        }
+      );
+      if (response.success) {
+        showToast(
+          'success',
+          `Gig visibility changed to ${isPublic ? 'Public' : 'Private'}`
+        );
+        loadGigDetails(true); // Refresh gig data
+      } else {
+        const errorMessage =
+          typeof response === 'object' && response.message
+            ? String(response.message)
+            : 'Failed to change visibility';
+        showToast('error', errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Error changing gig visibility:', error);
+      showToast('error', error.message || 'Failed to change visibility');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loadGigDetails = async (forceRefresh = false) => {
     if (!gigId) {
       //console.log(('⚠️ Skipping gig details load - gigId not available');
@@ -1322,6 +1494,42 @@ export default function GigDetailsPage() {
                       Applications ({gig.applicationCount || 0})
                     </Link>
                   )}
+
+                  {/* Gig Management Actions */}
+                  {gig.status !== 'DRAFT' && (
+                    <>
+                      <span> | </span>
+                      {gig.status === 'PAUSED' ? (
+                        <button
+                          onClick={() => openDialog('re-open')}
+                          className="cursor-pointer text-sm text-green-600 hover:underline"
+                          title="Reactivate this gig"
+                        >
+                          Resume
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => openDialog('pause')}
+                          className="cursor-pointer text-sm text-yellow-600 hover:underline"
+                          title="Pause this gig temporarily"
+                        >
+                          Pause
+                        </button>
+                      )}
+                      <span> | </span>
+                      <button
+                        onClick={() =>
+                          openDialog('visibility', {
+                            newVisibility: !gig.isPublic,
+                          })
+                        }
+                        className="cursor-pointer text-sm text-blue-600 hover:underline"
+                        title={`Make gig ${gig.isPublic ? 'private' : 'public'}`}
+                      >
+                        {gig.isPublic ? 'Make Private' : 'Make Public'}
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
               <span> | </span>
@@ -1509,6 +1717,7 @@ export default function GigDetailsPage() {
                   <h1 className="mb-2 text-3xl font-bold text-gray-900">
                     {gig.title}
                   </h1>
+                  Created at: <span>{new Date(gig.createdAt).toLocaleDateString()}</span>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       {gig.brand?.logo && (
@@ -1938,7 +2147,11 @@ export default function GigDetailsPage() {
                       View My Applications
                     </Link>
                     <button
-                      onClick={() => withdrawApplication((myApplications as any)?.applicationId)}
+                      onClick={() =>
+                        withdrawApplication(
+                          (myApplications as any)?.applicationId
+                        )
+                      }
                       className="btn-secondary mt-2 w-full text-red-600 hover:bg-red-50"
                     >
                       Withdraw
@@ -2042,32 +2255,41 @@ export default function GigDetailsPage() {
                 {/* // If owner change status of gig */}
                 {/* </div>
               <div> */}
-                {isOwner &&
-                  (gig.status === 'OPEN' || gig.status === 'ASSIGNED') && (
-                    <button
-                      onClick={() =>
-                        confirm(
-                          'This gig wont recive new applications if paused'
-                        ) && changeGigStatus('PAUSED')
-                      }
-                      className="btn-secondary mt-2 w-full"
-                    >
-                      Pause Gig
-                    </button>
-                  )}
-
-                {isOwner &&
-                  (gig.status === 'PAUSED' || gig.status === 'IN_REVIEW') && (
-                    <button
-                      onClick={() =>
-                        confirm('Reopen gig will allow new applications') &&
-                        changeGigStatus('OPEN')
-                      }
-                      className="btn-secondary mt-2 w-full"
-                    >
-                      Reopen Gig
-                    </button>
-                  )}
+                {isOwner && (
+                  <div>
+                    {isOwner &&
+                      (gig.status === 'OPEN' || gig.status === 'ASSIGNED') && (
+                        <button
+                          onClick={() => openDialog('pause')}
+                          className="btn-secondary mt-2 w-full"
+                        >
+                          Pause Gig
+                        </button>
+                      )}
+                    {isOwner &&
+                      (gig.status === 'PAUSED' ||
+                        gig.status === 'IN_REVIEW') && (
+                        <button
+                          onClick={() => openDialog('re-open')}
+                          className="btn-secondary mt-2 w-full"
+                        >
+                          Reopen Gig
+                        </button>
+                      )}
+                    {isOwner && (
+                      <button
+                        onClick={() =>
+                          openDialog('visibility', {
+                            newVisibility: !gig.isPublic,
+                          })
+                        }
+                        className="btn-secondary mt-2 w-full"
+                      >
+                        {gig.isPublic ? 'Make Gig Private' : 'Make Gig Public'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -2720,6 +2942,16 @@ export default function GigDetailsPage() {
           </div>
         </div>
       )}
+
+      {/* Confirm Dialog */}
+      <MiniConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        type={getDialogType()}
+        onConfirm={handleConfirmAction}
+        onCancel={closeDialog}
+        loading={confirmDialog.loading}
+        error={confirmDialog.error}
+      />
 
       {/* Toast Notification */}
       {toast && (
