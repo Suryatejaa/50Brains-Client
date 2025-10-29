@@ -427,7 +427,8 @@ export default function MyCampaignsPage() {
                     <div className="text-center">
                       <div className="text-sm text-gray-600">Engagement</div>
                       <div className="text-lg font-semibold">
-                        {(campaign.totalEngagement || 0).toLocaleString() || '--'}
+                        {(campaign.totalEngagement || 0).toLocaleString() ||
+                          '--'}
                       </div>
                     </div>
                     <div className="text-center">
@@ -540,7 +541,7 @@ export default function MyCampaignsPage() {
               </div>
             </Link>
             {/* <Link
-              href="/analytics"
+              href={"/analytics" as any}
               className="rounded-none border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-blue-500 hover:bg-blue-50"
             >
               <div className="mb-2 text-2xl">📊</div>

@@ -1,3 +1,4 @@
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,12 +31,12 @@ interface Influencer {
 }
 
 const tierColors = {
-  'BRONZE': 'bg-amber-100 text-amber-700',
-  'SILVER': 'bg-gray-100 text-gray-700',
-  'GOLD': 'bg-yellow-100 text-yellow-700',
-  'PLATINUM': 'bg-purple-100 text-purple-700',
-  'DIAMOND': 'bg-blue-100 text-blue-700',
-  'LEGEND': 'bg-red-100 text-red-700',
+  BRONZE: 'bg-amber-100 text-amber-700',
+  SILVER: 'bg-gray-100 text-gray-700',
+  GOLD: 'bg-yellow-100 text-yellow-700',
+  PLATINUM: 'bg-purple-100 text-purple-700',
+  DIAMOND: 'bg-blue-100 text-blue-700',
+  LEGEND: 'bg-red-100 text-red-700',
 };
 
 export default function InfluencersPage() {
@@ -62,7 +63,7 @@ export default function InfluencersPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         ...(searchQuery && { q: searchQuery }),
         ...(filters.category && { category: filters.category }),
@@ -72,9 +73,11 @@ export default function InfluencersPage() {
         ...(filters.tier && { tier: filters.tier }),
         ...(filters.verified && { verified: 'true' }),
       });
-      
-      const response = await apiClient.get(`/api/user/search/influencers?${params}`);
-      
+
+      const response = await apiClient.get(
+        `/api/user/search/influencers?${params}`
+      );
+
       if (response.success) {
         setInfluencers(Array.isArray(response.data) ? response.data : []);
       } else {
@@ -93,7 +96,7 @@ export default function InfluencersPage() {
   };
 
   const handleFilterChange = (key: string, value: string | boolean) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const clearFilters = () => {
@@ -124,7 +127,10 @@ export default function InfluencersPage() {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}>
+      <span
+        key={i}
+        className={i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}
+      >
         ★
       </span>
     ));
@@ -141,12 +147,13 @@ export default function InfluencersPage() {
                 Discover Influencers
               </h1>
               <p className="text-muted">
-                Find and connect with top creators and influencers for your brand campaigns
+                Find and connect with top creators and influencers for your
+                brand campaigns
               </p>
             </div>
 
             {/* Search and Filters */}
-            <div className="mb-8 card-glass p-3">
+            <div className="card-glass mb-8 p-3">
               <form onSubmit={handleSearch} className="space-y-4">
                 <div className="flex gap-4">
                   <input
@@ -160,12 +167,14 @@ export default function InfluencersPage() {
                     Search
                   </button>
                 </div>
-                
+
                 {/* Filters Row */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
                   <select
                     value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange('category', e.target.value)
+                    }
                     className="input"
                   >
                     <option value="">All Categories</option>
@@ -178,18 +187,22 @@ export default function InfluencersPage() {
                     <option value="Food">Food</option>
                     <option value="Gaming">Gaming</option>
                   </select>
-                  
+
                   <input
                     type="text"
                     value={filters.location}
-                    onChange={(e) => handleFilterChange('location', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange('location', e.target.value)
+                    }
                     placeholder="Location"
                     className="input"
                   />
-                  
+
                   <select
                     value={filters.minFollowers}
-                    onChange={(e) => handleFilterChange('minFollowers', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange('minFollowers', e.target.value)
+                    }
                     className="input"
                   >
                     <option value="">Min Followers</option>
@@ -198,7 +211,7 @@ export default function InfluencersPage() {
                     <option value="100000">100K+</option>
                     <option value="1000000">1M+</option>
                   </select>
-                  
+
                   <select
                     value={filters.tier}
                     onChange={(e) => handleFilterChange('tier', e.target.value)}
@@ -212,27 +225,31 @@ export default function InfluencersPage() {
                     <option value="DIAMOND">Diamond</option>
                     <option value="LEGEND">Legend</option>
                   </select>
-                  
+
                   <input
                     type="number"
                     value={filters.maxRate}
-                    onChange={(e) => handleFilterChange('maxRate', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange('maxRate', e.target.value)
+                    }
                     placeholder="Max Rate (₹)"
                     className="input"
                   />
-                  
+
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       checked={filters.verified}
-                      onChange={(e) => handleFilterChange('verified', e.target.checked)}
+                      onChange={(e) =>
+                        handleFilterChange('verified', e.target.checked)
+                      }
                       className="rounded"
                     />
                     <span className="text-sm">Verified only</span>
                   </label>
                 </div>
-                
-                <div className="flex justify-between items-center">
+
+                <div className="flex items-center justify-between">
                   <button
                     type="button"
                     onClick={clearFilters}
@@ -256,19 +273,19 @@ export default function InfluencersPage() {
 
             {/* Influencers Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }, (_, i) => (
-                  <div key={i} className="card-glass p-3 animate-pulse">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+                  <div key={i} className="card-glass animate-pulse p-3">
+                    <div className="mb-4 flex items-center space-x-4">
+                      <div className="h-16 w-16 rounded-full bg-gray-300"></div>
                       <div className="flex-1">
-                        <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                        <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                        <div className="mb-2 h-4 rounded bg-gray-300"></div>
+                        <div className="h-3 w-2/3 rounded bg-gray-300"></div>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-3 bg-gray-300 rounded"></div>
-                      <div className="h-3 bg-gray-300 rounded w-4/5"></div>
+                      <div className="h-3 rounded bg-gray-300"></div>
+                      <div className="h-3 w-4/5 rounded bg-gray-300"></div>
                     </div>
                   </div>
                 ))}
@@ -276,134 +293,155 @@ export default function InfluencersPage() {
             ) : influencers.length === 0 ? (
               <div className="card-glass p-8 text-center">
                 <div className="mb-4">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-none bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-600">
                     <span className="text-2xl">👥</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-900">
                     No influencers found
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="mb-6 text-gray-600">
                     Try adjusting your search criteria or filters
                   </p>
                 </div>
-                
-                <button
-                  onClick={clearFilters}
-                  className="btn-primary"
-                >
+
+                <button onClick={clearFilters} className="btn-primary">
                   Clear All Filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {influencers.map((influencer) => (
-                  <div key={influencer.id} className="card-glass p-3 hover:shadow-lg transition-shadow">
+                  <div
+                    key={influencer.id}
+                    className="card-glass p-3 transition-shadow hover:shadow-lg"
+                  >
                     {/* Header */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-none flex items-center justify-center text-white font-semibold text-lg">
+                    <div className="mb-4 flex items-start space-x-4">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-r from-blue-500 to-purple-600 text-lg font-semibold text-white">
                         {influencer.profilePicture ? (
-                          <img 
-                            src={influencer.profilePicture} 
-                            alt="Profile" 
-                            className="w-16 h-16 rounded-none object-cover"
+                          <img
+                            src={influencer.profilePicture}
+                            alt="Profile"
+                            className="h-16 w-16 rounded-none object-cover"
                           />
                         ) : (
                           getInfluencerName(influencer)[0]?.toUpperCase() || 'I'
                         )}
                       </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">
+
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center space-x-2">
+                          <h3 className="truncate font-semibold text-gray-900">
                             {getInfluencerName(influencer)}
                           </h3>
                           {influencer.isVerified && (
-                            <span className="text-blue-500 text-sm">✓</span>
+                            <span className="text-sm text-blue-500">✓</span>
                           )}
                         </div>
-                        
+
                         {influencer.tier && (
-                          <span className={`px-2 py-1 rounded-none text-xs font-medium ${
-                            tierColors[influencer.tier as keyof typeof tierColors] || 'bg-gray-100 text-gray-700'
-                          }`}>
+                          <span
+                            className={`rounded-none px-2 py-1 text-xs font-medium ${
+                              tierColors[
+                                influencer.tier as keyof typeof tierColors
+                              ] || 'bg-gray-100 text-gray-700'
+                            }`}
+                          >
                             {influencer.tier}
                           </span>
                         )}
-                        
+
                         {influencer.location && (
-                          <p className="text-sm text-gray-600 mt-1">📍 {influencer.location}</p>
+                          <p className="mt-1 text-sm text-gray-600">
+                            📍 {influencer.location}
+                          </p>
                         )}
                       </div>
                     </div>
 
                     {/* Bio */}
                     {influencer.bio && (
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      <p className="mb-4 line-clamp-2 text-sm text-gray-600">
                         {influencer.bio}
                       </p>
                     )}
 
                     {/* Stats */}
-                    <div className="space-y-3 mb-4">
+                    <div className="mb-4 space-y-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Followers</span>
                         <span className="font-medium">
-                          {influencer.totalFollowers ? formatFollowers(influencer.totalFollowers) : 'N/A'}
+                          {influencer.totalFollowers
+                            ? formatFollowers(influencer.totalFollowers)
+                            : 'N/A'}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Rating</span>
                         <div className="flex items-center space-x-1">
                           {renderStars(influencer.averageRating)}
-                          <span className="text-gray-600 ml-1">
+                          <span className="ml-1 text-gray-600">
                             ({influencer.reviewCount})
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Completed Gigs</span>
-                        <span className="font-medium">{influencer.completedGigs}</span>
+                        <span className="font-medium">
+                          {influencer.completedGigs}
+                        </span>
                       </div>
-                      
+
                       {influencer.collaborationRates?.postRate && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Post Rate</span>
-                          <span className="font-medium">₹{influencer.collaborationRates.postRate}</span>
+                          <span className="font-medium">
+                            ₹{influencer.collaborationRates.postRate}
+                          </span>
                         </div>
                       )}
                     </div>
 
                     {/* Categories */}
-                    {influencer.contentCategories && influencer.contentCategories.length > 0 && (
-                      <div className="mb-4">
-                        <div className="flex flex-wrap gap-2">
-                          {influencer.contentCategories.slice(0, 3).map((category) => (
-                            <span key={category} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                              {category}
-                            </span>
-                          ))}
-                          {influencer.contentCategories.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                              +{influencer.contentCategories.length - 3}
-                            </span>
-                          )}
+                    {influencer.contentCategories &&
+                      influencer.contentCategories.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex flex-wrap gap-2">
+                            {influencer.contentCategories
+                              .slice(0, 3)
+                              .map((category) => (
+                                <span
+                                  key={category}
+                                  className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700"
+                                >
+                                  {category}
+                                </span>
+                              ))}
+                            {influencer.contentCategories.length > 3 && (
+                              <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
+                                +{influencer.contentCategories.length - 3}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Skills */}
                     {influencer.skills && influencer.skills.length > 0 && (
                       <div className="mb-4">
                         <div className="flex flex-wrap gap-2">
                           {influencer.skills.slice(0, 4).map((skill) => (
-                            <span key={skill} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">
+                            <span
+                              key={skill}
+                              className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-700"
+                            >
                               {skill}
                             </span>
                           ))}
                           {influencer.skills.length > 4 && (
-                            <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">
+                            <span className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-700">
                               +{influencer.skills.length - 4}
                             </span>
                           )}
@@ -419,7 +457,7 @@ export default function InfluencersPage() {
                       >
                         View Profile
                       </Link>
-                      
+
                       {isAuthenticated && user?.roles?.includes('BRAND') && (
                         <Link
                           href={`/messages/new?to=${influencer.id}` as any}

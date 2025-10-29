@@ -647,7 +647,7 @@ export default function CreditsHistoryPage() {
                       📝 View My Applications
                     </Link>
                     <Link
-                      href="/analytics"
+                      href={'/analytics' as any}
                       className="btn-secondary text-center"
                     >
                       📊 View Analytics

@@ -643,7 +643,7 @@ export default function BrandProfilePage() {
                   🔍 Find Influencers
                 </Link>
                 {/* <Link
-                  href="/analytics"
+                  href={"/analytics" as any}
                   className="btn-secondary w-full text-center"
                 >
                   📊 View Analytics
