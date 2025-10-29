@@ -362,7 +362,7 @@ export function CrewDashboardClient() {
                 View Applications
               </a>
               <a
-                href="/profile/edit"
+                href="/profile"
                 className="btn-ghost block w-full text-center"
               >
                 Update Profile
