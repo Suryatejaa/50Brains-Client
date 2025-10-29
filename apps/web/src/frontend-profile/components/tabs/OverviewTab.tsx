@@ -153,7 +153,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <div className="overview-tab__field">
                     <label>Content Categories:</label>
                     <div className="overview-tab__tags">
-                      {user.contentCategories.map((category, index) => (
+                      {user.contentCategories?.map((category, index) => (
                         <span key={index} className="overview-tab__tag">
                           {category}
                         </span>
@@ -219,7 +219,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <div className="overview-tab__field">
                     <label>Target Audience:</label>
                     <div className="overview-tab__tags">
-                      {user.targetAudience.map((audience, index) => (
+                      {user.targetAudience?.map((audience, index) => (
                         <span key={index} className="overview-tab__tag">
                           {audience}
                         </span>
@@ -290,7 +290,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <div className="overview-tab__field">
                     <label>Skills:</label>
                     <div className="overview-tab__tags">
-                      {user.crewSkills.map((skill, index) => (
+                      {user.crewSkills?.map((skill, index) => (
                         <span key={index} className="overview-tab__tag">
                           {skill}
                         </span>
@@ -306,7 +306,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                           window.location.href = `/equipment`;
                         }}
                       >
-                        Manage Equipment ({user.equipmentOwned.length})
+                        Manage Equipment ({user.equipmentOwned?.length})
                       </span>
                     </div>
                   </div>

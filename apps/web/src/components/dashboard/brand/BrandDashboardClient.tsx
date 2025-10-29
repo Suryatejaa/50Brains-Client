@@ -163,7 +163,7 @@ export function BrandDashboardClient() {
                 .slice(0, 3)
             : [],
       };
-
+      console.log('Loaded Brand Dashboard Data:', data);
       setDashboardData(data);
     } catch (error) {
       console.error('Failed to load brand dashboard data:', error);

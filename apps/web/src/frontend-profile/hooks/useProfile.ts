@@ -52,17 +52,17 @@ export const useProfile = (userId?: string) => {
       // Determine API endpoints based on whether it's own profile or public view
       const endpoints = isPublicView
         ? {
-          user: `/api/public/users/${targetUserId}`,
-          workHistory: `/api/work-history/users/${targetUserId}/summary`,
-          analytics: `/api/analytics/user-insights/${targetUserId}`,
-          reputation: `/api/reputation/users/${targetUserId}`,
-        }
+            user: `/api/public/users/${targetUserId}`,
+            workHistory: `/api/work-history/users/${targetUserId}/summary`,
+            analytics: `/api/analytics/user-insights/${targetUserId}`,
+            reputation: `/api/reputation/users/${targetUserId}`,
+          }
         : {
-          user: '/api/user/profile',
-          workHistory: '/api/work-history/profile/summary',
-          analytics: '/api/analytics/dashboard',
-          reputation: '/api/reputation/profile',
-        };
+            user: '/api/user/profile',
+            workHistory: '/api/work-history/profile/summary',
+            analytics: '/api/analytics/dashboard',
+            reputation: '/api/reputation/profile',
+          };
 
       // Fetch data from all services in parallel
       const [userResult, workHistoryResult, analyticsResult, reputationResult] =
@@ -78,21 +78,21 @@ export const useProfile = (userId?: string) => {
         user:
           userResult.status === 'fulfilled' && userResult.value.success
             ? (userResult.value.data as any).user ||
-            (userResult.value.data as any)
+              (userResult.value.data as any)
             : null,
         workHistory:
           workHistoryResult.status === 'fulfilled' &&
-            workHistoryResult.value.success
+          workHistoryResult.value.success
             ? (workHistoryResult.value.data as any)
             : null,
         analytics:
           analyticsResult.status === 'fulfilled' &&
-            analyticsResult.value.success
+          analyticsResult.value.success
             ? (analyticsResult.value.data as any)
             : null,
         reputation:
           reputationResult.status === 'fulfilled' &&
-            reputationResult.value.success
+          reputationResult.value.success
             ? (reputationResult.value.data as any)
             : null,
       };
@@ -119,7 +119,7 @@ export const useProfile = (userId?: string) => {
         //console.log(('💾 Caching profile data for 60 seconds');
         setInCache(profile, targetUserId, 60 * 1000); // 60 seconds
       }
-
+      console.log('Fetched profile data:', profile);
       // Track profile view for analytics
       if (isPublicView && profile.user) {
         trackProfileView(profile.user.id);
@@ -202,12 +202,12 @@ export const useProfile = (userId?: string) => {
 
         const updatedProfile = state.profile
           ? {
-            ...state.profile,
-            user: {
-              ...state.profile.user,
-              ...updatedUserData,
-            },
-          }
+              ...state.profile,
+              user: {
+                ...state.profile.user,
+                ...updatedUserData,
+              },
+            }
           : null;
 
         //console.log(('📱 Updated profile:', updatedProfile);
@@ -316,9 +316,9 @@ export const useProfile = (userId?: string) => {
           ...prev,
           profile: prev.profile
             ? {
-              ...prev.profile,
-              [section]: response.data,
-            }
+                ...prev.profile,
+                [section]: response.data,
+              }
             : null,
         }));
       }
