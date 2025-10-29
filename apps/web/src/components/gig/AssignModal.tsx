@@ -145,10 +145,10 @@ export default function AssignModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex max-h-[85vh] sm:w-1/2 lg:w-1/3  max-w-2xl flex-col rounded-lg bg-white shadow-lg">
+      <div className="flex max-h-[75vh] min-w-[350px] sm:min-w-[800px] lg:min-w-[1000px] flex-col rounded-lg bg-white shadow-lg">
         {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-2">
-          <div className="flex items-center justify-between">
+        <div className="border-b items-start border-gray-200 px-2 py-2">
+          <div className="flex items-start justify-between">
             <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
             <button
               onClick={onClose}
@@ -337,7 +337,7 @@ export default function AssignModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 px-6 py-4">
+        <div className="border-t border-gray-200 px-2 py-2">
           <div className="flex justify-end space-x-3">
             <button
               onClick={onClose}
