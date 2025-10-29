@@ -5,8 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
-import { GigAPI } from '@/lib/gig-api';
 import { useParams, useRouter } from 'next/navigation';
+import { GigAPI } from '@/lib/gig-api';
 import { useClanSearch } from '@/hooks/useClanSearch';
 import { useMemberSuggest } from '@/hooks/useMemberSuggest';
 import { Submission, SubmissionStatus } from '@/types/gig.types';
@@ -16,7 +16,7 @@ import AssignModal from '@/components/gig/AssignModal';
 import { FaBullseye, FaAccessibleIcon } from 'react-icons/fa';
 import { m } from 'framer-motion';
 import MiniConfirmDialog from '@/frontend-profile/components/common/MiniConfirmDialog';
-
+import {GigDetailLoadingSkeleton} from '@/components/gig/ssr/GigDetailSkeleton'
 interface Gig {
   id: string;
   title: string;
@@ -273,7 +273,7 @@ export default function GigDetailsPage() {
           break;
       }
 
-      console.log(`result of ${confirmDialog.type}:`, success);
+      // console.log(`result of ${confirmDialog.type}:`, success);
       if (success) {
         closeDialog();
         showToast('success', successMessage);
@@ -836,22 +836,28 @@ export default function GigDetailsPage() {
     };
   }, [gigId]);
 
+  const isOwner =
+    isAuthenticated &&
+    userType === 'brand' &&
+    (gig?.brand?.id === user?.id || gig?.postedById === user?.id);
+  console.log('🔍 Is owner:', isOwner);
+
   const loadMyApplications = async () => {
-    if (!gigId || !user?.id) {
-      //console.log(('⚠️ Skipping application load - missing gigId or userId');
+    if (!gigId || !user?.id || isOwner) {
+      //console.log(('⚠️ Skipping application load - missing gigId or userId or isOwner');
       return;
     }
 
     try {
       setApplicationsLoading(true);
       const response = await apiClient.get(`/api/my/${gigId}/applications`);
-      console.log('🎯 Loaded my applications:', response);
+      // console.log('🎯 Loaded my applications:', response);
       if (response.success && response.data) {
         const formatMyApplications = (response.data as any).applicationStatus;
         const applicantType = (response.data as any).application?.applicantType;
         const applicationId = (response.data as any).application?.id;
         const applicationData = (response.data as any).application;
-        console.log('🎯 Application data:', applicationData);
+        // console.log('🎯 Application data:', applicationData);
         // Add applicantType to the application status object
         const applicationWithType = {
           ...formatMyApplications,
@@ -861,7 +867,7 @@ export default function GigDetailsPage() {
           applicantType: applicantType,
           applicationId: applicationId,
         };
-        console.log('🎯 Formatted my applications:', applicationWithType);
+        // console.log('🎯 Formatted my applications:', applicationWithType);
         setMyApplications(applicationWithType);
       }
     } catch (error) {
@@ -1322,10 +1328,6 @@ export default function GigDetailsPage() {
   };
 
   // Check if current user owns this gig (is the brand who posted it)
-  const isOwner =
-    isAuthenticated &&
-    userType === 'brand' &&
-    (gig?.brand?.id === user?.id || gig?.postedById === user?.id);
 
   // Only load applications if user is authenticated and it's not their own gig
   useEffect(() => {
@@ -1395,27 +1397,10 @@ export default function GigDetailsPage() {
     };
   }, []);
 
-  // Show loading if gigId is not available yet
-  if (isGigIdLoading || !gigId) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="text-gray-600">Loading gig details...</p>
-        </div>
-      </div>
-    );
-  }
+ 
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="card-glass p-8 text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
-          <p>Loading gig details...</p>
-        </div>
-      </div>
-    );
+  if(isLoading) {
+    return <GigDetailLoadingSkeleton/>
   }
 
   if (!gig) {
@@ -1441,13 +1426,13 @@ export default function GigDetailsPage() {
     (gig.status === 'OPEN' || gig.status === 'ASSIGNED') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
 
-  console.log('🔍 Gig details:', gig);
+  // console.log('🔍 Gig details:', gig);
   //console.log(('🔍 Is own gig:', isOwner);
   //console.log(('🔍 My applications:', myApplications);
 
   const myApplicationStatus = (myApplications as any)?.status || null;
-  console.log('🔍 My application status:', myApplicationStatus);
-  console.log('🔍 My applications data:', (myApplications as any).quotedPrice);
+  // console.log('🔍 My application status:', myApplicationStatus);
+  // console.log('🔍 My applications data:', (myApplications as any).quotedPrice);
 
   return (
     <div className="min-h-screen bg-gray-50 py-2">

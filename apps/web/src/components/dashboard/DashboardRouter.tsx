@@ -6,9 +6,9 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { isFeatureEnabled } from '@/utils/feature-flags';
 import { CreatorDashboardClient } from './creator/CreatorDashboardClient';
-import { InfluencerDashboard } from './influencer/InfluencerDashboard';
-import { CrewDashboard } from './crew/CrewDashboard';
-import { BrandDashboard } from './brand/BrandDashboard';
+import InfluencerDashboardSSR from './influencer/InfluencerDashboardSSR';
+import CrewDashboardSSR from './crew/CrewDashboardSSR';
+import BrandDashboardSSR from './brand/BrandDashboardSSR';
 import { ClanDashboard } from './clan/ClanDashboard';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { RoleSwitchDebugger } from '../debug/RoleSwitchDebugger';
@@ -84,7 +84,7 @@ export const DashboardRouter: React.FC = () => {
                 Available: {availableRoles.join(', ')}
               </div>
             )}
-            <InfluencerDashboard />
+            <InfluencerDashboardSSR />
           </div>
         );
       } else if (currentRole === 'CREW') {
@@ -96,7 +96,7 @@ export const DashboardRouter: React.FC = () => {
                 {availableRoles.join(', ')}
               </div>
             )}
-            <CrewDashboard />
+            <CrewDashboardSSR />
           </div>
         );
       } else {
@@ -124,7 +124,7 @@ export const DashboardRouter: React.FC = () => {
               {availableRoles.join(', ')}
             </div>
           )}
-          <BrandDashboard />
+          <BrandDashboardSSR />
         </div>
       );
 

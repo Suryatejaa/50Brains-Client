@@ -539,7 +539,7 @@ export default function MyCampaignsPage() {
                 Browse our creator marketplace
               </div>
             </Link>
-            <Link
+            {/* <Link
               href="/analytics"
               className="rounded-none border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-blue-500 hover:bg-blue-50"
             >
@@ -548,7 +548,7 @@ export default function MyCampaignsPage() {
               <div className="text-sm text-gray-600">
                 Track your campaign performance
               </div>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

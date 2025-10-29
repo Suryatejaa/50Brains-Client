@@ -18,12 +18,16 @@ export default function MarketplacePage() {
               <div className="flex flex-col gap-1">
                 <div className="flex flex-row justify-between sm:gap-4 md:gap-4 lg:gap-4">
                   <h1 className="text-heading flex text-4xl font-bold">
-                    Marketplace
+                    Marketplace ⚡ SSR
                   </h1>
                   <a href="/search" className="btn-primary flex px-3 py-2">
                     Search People
                   </a>
-                </div>                
+                </div>
+                <p className="text-muted flex">
+                  ⚡ Server-side rendered for instant loading - Discover amazing
+                  opportunities
+                </p>
               </div>
             </div>
           </div>
@@ -70,7 +74,7 @@ export default function MarketplacePage() {
             </form>
 
             {/* 🚀 INSTANT SSR TABS - Static HTML, enhanced with JS later */}
-            <div className="flex hidden space-x-1 rounded-none bg-white p-1">
+            <div className="flex space-x-1 rounded-none bg-white p-1">
               <a
                 href="/marketplace?tab=all"
                 className="flex-1 rounded-none bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white"

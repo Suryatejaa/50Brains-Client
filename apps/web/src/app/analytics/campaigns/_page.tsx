@@ -83,10 +83,10 @@ export default function CampaignAnalyticsPage() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (userType !== 'brand') {
-        router.push('/analytics');
-        return;
-      }
+      // if (userType !== 'brand') {
+      //   router.push('/analytics');
+      //   return;
+      // }
       loadCampaignAnalytics();
     }
   }, [isAuthenticated, user, userType, timeRange]);
@@ -171,9 +171,9 @@ export default function CampaignAnalyticsPage() {
           <p className="mb-6 text-gray-600">
             This page is only available for brand accounts.
           </p>
-          <Link href="/analytics" className="btn-primary">
+          {/* <Link href="/analytics" className="btn-primary">
             Go to Analytics
-          </Link>
+          </Link> */}
         </div>
       </div>
     );
@@ -214,9 +214,9 @@ export default function CampaignAnalyticsPage() {
                 <option value="roi">Sort by ROI</option>
                 <option value="applications">Sort by Applications</option>
               </select>
-              <Link href="/analytics" className="btn-secondary">
+              {/* <Link href="/analytics" className="btn-secondary">
                 ← Back to Analytics
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
