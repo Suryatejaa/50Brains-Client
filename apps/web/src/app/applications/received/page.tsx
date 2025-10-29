@@ -432,7 +432,7 @@ export default function ReceivedApplicationsPage() {
                               {application.proposedRate && (
                                 <span>
                                   💰 Proposed: $
-                                  {application.proposedRate.toLocaleString() ?? 0}
+                                  {(application.proposedRate || 0).toLocaleString() ?? 0}
                                 </span>
                               )}
                               {application.applicant.stats && (
@@ -529,7 +529,7 @@ export default function ReceivedApplicationsPage() {
                                       </span>
                                       <span className="font-medium">
                                         $
-                                        {application.applicant.stats.totalEarnings.toLocaleString() ?? 0}
+                                        {(application.applicant.stats.totalEarnings || 0).toLocaleString() ?? 0}
                                       </span>
                                     </div>
                                     <div className="flex justify-between">
@@ -567,7 +567,7 @@ export default function ReceivedApplicationsPage() {
                                               {social.handle})
                                             </span>
                                             <span className="font-medium">
-                                              {social.followers.toLocaleString() ?? 0}{' '}
+                                              {(social.followers || 0).toLocaleString() ?? 0}{' '}
                                               followers •{' '}
                                               {social.engagementRate.toFixed(1)}
                                               % engagement

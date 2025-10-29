@@ -1031,7 +1031,7 @@ export default function EnhancedProfilePage() {
                                   className={`h-4 w-4 text-${platform.color}-500`}
                                 />
                                 <span className="text-sm">
-                                  {count.toLocaleString()}
+                                  {(count || 0).toLocaleString()}
                                 </span>
                               </div>
                             );

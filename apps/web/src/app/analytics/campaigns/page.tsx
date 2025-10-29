@@ -267,7 +267,7 @@ export default function CampaignAnalyticsPage() {
                         Total Spent
                       </p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${summary.totalSpent?.toLocaleString() ?? '0'}
+                        ${(summary.totalSpent || 0).toLocaleString() ?? '0'}
                       </p>
                     </div>
                     <div className="flex h-10 w-10 items-center justify-center rounded-none bg-red-100">
@@ -408,14 +408,14 @@ export default function CampaignAnalyticsPage() {
                               </p>
                               <p className="text-lg font-semibold text-gray-900">
                                 $
-                                {campaign.analytics.totalSpent?.toLocaleString() ??
+                                {(campaign.analytics.totalSpent || 0).toLocaleString() ??
                                   '0'}
                               </p>
                             </div>
                             <div>
                               <p className="text-sm text-gray-600">Reach</p>
                               <p className="text-lg font-semibold text-purple-600">
-                                {campaign.analytics.reach?.toLocaleString() ??
+                                {(campaign.analytics.reach || 0).toLocaleString() ??
                                   '0'}
                               </p>
                             </div>
@@ -455,7 +455,7 @@ export default function CampaignAnalyticsPage() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-gray-600">Views</span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.views?.toLocaleString() ??
+                                    {(campaign.analytics.views || 0).toLocaleString() ??
                                       '0'}
                                   </span>
                                 </div>
@@ -464,14 +464,14 @@ export default function CampaignAnalyticsPage() {
                                     Impressions
                                   </span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.impressions?.toLocaleString() ??
+                                    {(campaign.analytics.impressions || 0).toLocaleString() ??
                                       '0'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between">
                                   <span className="text-gray-600">Clicks</span>
                                   <span className="font-semibold">
-                                    {campaign.analytics.clicks?.toLocaleString() ??
+                                    {(campaign.analytics.clicks || 0).toLocaleString() ??
                                       '0'}
                                   </span>
                                 </div>
@@ -514,10 +514,10 @@ export default function CampaignAnalyticsPage() {
                                   </span>
                                   <span className="font-semibold">
                                     $
-                                    {campaign.budgetMin?.toLocaleString() ??
+                                    {(campaign.budgetMin || 0).toLocaleString() ??
                                       '0'}{' '}
                                     - $
-                                    {campaign.budgetMax?.toLocaleString() ??
+                                    {(campaign.budgetMax || 0).toLocaleString() ??
                                       '0'}
                                   </span>
                                 </div>

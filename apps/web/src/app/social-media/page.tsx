@@ -175,13 +175,13 @@ export default function SocialMediaPage() {
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600">
-                      {analytics.totalFollowers.toLocaleString() ?? 0}
+                      {(analytics.totalFollowers || 0).toLocaleString()}
                     </div>
                     <div className="text-gray-600">Total Followers</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-600">
-                      {analytics.totalPosts.toLocaleString() ?? 0}
+                      {(analytics.totalPosts || 0).toLocaleString()}
                     </div>
                     <div className="text-gray-600">Total Posts</div>
                   </div>
@@ -232,7 +232,7 @@ export default function SocialMediaPage() {
                               @{account.username}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {account.followerCount.toLocaleString() ?? 0} followers
+                              {(account.followerCount || 0).toLocaleString()} followers
                               {account.isVerified && ' ✓'}
                             </div>
                           </div>

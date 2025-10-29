@@ -235,13 +235,11 @@ export const CrewDashboard: React.FC = () => {
                 <p className="text-muted text-xs md:text-sm">Monthly Revenue</p>
                 <p className="text-heading text-lg font-semibold md:text-xl">
                   ₹
-                  {data?.businessMetrics?.monthlyRevenue?.toLocaleString() ||
-                    '0'}
+                  {(data?.businessMetrics?.monthlyRevenue || 0).toLocaleString()}
                 </p>
                 <p className="text-muted text-xs">
                   Avg: ₹
-                  {data?.projectMetrics?.avgProjectValue?.toLocaleString() ||
-                    '0'}
+                  {(data?.projectMetrics?.avgProjectValue || 0).toLocaleString()}
                 </p>
               </div>
               <div className="text-2xl md:text-3xl">
@@ -690,8 +688,7 @@ export const CrewDashboard: React.FC = () => {
                       </span>
                       <span className="text-heading font-semibold">
                         ₹
-                        {data?.businessMetrics?.monthlyRevenue?.toLocaleString() ||
-                          '0'}
+                        {(data?.businessMetrics?.monthlyRevenue || 0).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">

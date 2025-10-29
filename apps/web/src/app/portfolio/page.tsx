@@ -102,10 +102,10 @@ export default function PortfolioPage() {
     
     return (
       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
-        {metrics.views && <span>👁️ {metrics.views.toLocaleString() ?? 0} views</span>}
-        {metrics.engagement && <span>❤️ {metrics.engagement}% engagement</span>}
-        {metrics.reach && <span>📊 {metrics.reach.toLocaleString() ?? 0} reach</span>}
-        {metrics.conversions && <span>🎯 {metrics.conversions} conversions</span>}
+        {metrics.views && <span>👁️ {(metrics.views || 0).toLocaleString()} views</span>}
+        {metrics.engagement && <span>❤️ {(metrics.engagement || 0).toLocaleString()}% engagement</span>}
+        {metrics.reach && <span>📊 {(metrics.reach || 0).toLocaleString()} reach</span>}
+        {metrics.conversions && <span>🎯 {(metrics.conversions || 0).toLocaleString()} conversions</span>}
       </div>
     );
   };

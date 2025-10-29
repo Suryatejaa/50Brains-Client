@@ -246,7 +246,7 @@ export default function MyCampaignsPage() {
                 Total Spent
               </div>
               <div className="text-2xl font-bold text-gray-900">
-                ${stats.totalSpent.toLocaleString() ?? 0}
+                ${(stats.totalSpent || 0).toLocaleString()}
               </div>
             </div>
             <div className="card-glass p-3">
@@ -359,7 +359,7 @@ export default function MyCampaignsPage() {
                       <div>
                         Budget:{' '}
                         <span className="font-semibold text-green-600">
-                          ${campaign.budget.toLocaleString() ?? 0}
+                          ${(campaign.budget || 0).toLocaleString()}
                         </span>
                       </div>
                       <div>
@@ -377,7 +377,7 @@ export default function MyCampaignsPage() {
                   </div>
                   <div className="ml-6 text-right">
                     <div className="text-2xl font-bold text-gray-900">
-                      ${campaign.budget.toLocaleString() ?? 0}
+                      ${(campaign.budget || 0).toLocaleString() ?? 0}
                     </div>
                     <div className="text-sm text-gray-500">Budget</div>
                   </div>
@@ -421,13 +421,13 @@ export default function MyCampaignsPage() {
                     <div className="text-center">
                       <div className="text-sm text-gray-600">Total Reach</div>
                       <div className="text-lg font-semibold">
-                        {campaign.totalReach?.toLocaleString() || '--'}
+                        {(campaign.totalReach || 0).toLocaleString() || '--'}
                       </div>
                     </div>
                     <div className="text-center">
                       <div className="text-sm text-gray-600">Engagement</div>
                       <div className="text-lg font-semibold">
-                        {campaign.totalEngagement?.toLocaleString() || '--'}
+                        {(campaign.totalEngagement || 0).toLocaleString() || '--'}
                       </div>
                     </div>
                     <div className="text-center">

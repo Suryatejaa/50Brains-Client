@@ -372,7 +372,7 @@ const RoleBasedProfileSections = ({
                             {platform}
                           </div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {(count as number)?.toLocaleString() ?? 0 || count}
+                            {(count as number || 0).toLocaleString() ?? 0 || count}
                           </div>
                         </div>
                       )

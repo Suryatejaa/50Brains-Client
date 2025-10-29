@@ -102,7 +102,7 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
           <>
             <div className="stat-item">
               <span className="stat-value">
-                {user.estimatedFollowers?.toLocaleString() || 'N/A'}
+                {(user.estimatedFollowers || 0).toLocaleString() || 'N/A'}
               </span>
               <span className="stat-label">Followers</span>
             </div>

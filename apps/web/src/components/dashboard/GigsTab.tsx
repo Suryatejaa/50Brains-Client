@@ -180,7 +180,7 @@ export function GigsTab({ userRole }: GigsTabProps) {
           </div>
           <div className="card-glass p-4 text-center">
             <div className="text-2xl font-bold text-purple-600">
-              ${gigStats.totalEarnings.toLocaleString() ?? 0}
+              ${(gigStats.totalEarnings || 0).toLocaleString()}
             </div>
             <div className="text-sm text-gray-600">Total Earnings</div>
           </div>

@@ -570,7 +570,7 @@ export default function BrandProfilePage() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Spent</span>
                     <span className="font-semibold">
-                      ${profile.stats.totalSpent.toLocaleString() ?? 0}
+                      ${(profile.stats.totalSpent || 0).toLocaleString() ?? 0}
                     </span>
                   </div>
                   <div className="flex justify-between">

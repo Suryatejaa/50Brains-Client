@@ -265,107 +265,113 @@ export default function MyBidsPage() {
           </div>
         ) : (
           <div className="space-y-1">
-            {bids.map((bid) => (
-              <div
-                key={bid.id}
-                className="card-glass p-2"
-                onClick={() => router.push(`/gig/${bid.projectId}`)}
-              >
-                <div className="mb-1 flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="mb-1 flex items-center space-x-1">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {bid.projectTitle}
-                      </h3>
-                    </div>
-                    <span
-                      className={`rounded px-2 py-1 text-sm font-medium ${getStatusColor(bid.status)}`}
-                    >
-                      {bid.status}
-                    </span>
-
-                    <p className="mb-1 line-clamp-2 text-sm text-gray-600">
-                      {bid.message}
-                    </p>
-
-                    <div className="mb-1 grid grid-cols-2 gap-1 text-sm text-gray-500 md:grid-cols-4">
-                      <div>
-                        <span className="font-medium">Bid Amount:</span>
-                        <div className="font-semibold text-green-600">
-                          ₹{bid.bidAmount.toLocaleString() ?? 0}
-                        </div>
+            {bids
+              .filter((bid) => bid && bid.id)
+              .map((bid) => (
+                <div
+                  key={bid.id}
+                  className="card-glass p-2"
+                  onClick={() => router.push(`/gig/${bid.projectId}`)}
+                >
+                  <div className="mb-1 flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="mb-1 flex items-center space-x-1">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {bid.projectTitle || 'Untitled Project'}
+                        </h3>
                       </div>
-                      <div>
-                        <span className="font-medium">Duration:</span>
-                        <div>{bid.proposedDuration}</div>
-                      </div>
-                      <div>
-                        <span className="font-medium">Project Budget:</span>
+                      <span
+                        className={`rounded px-2 py-1 text-sm font-medium ${getStatusColor(bid.status || 'PENDING')}`}
+                      >
+                        {bid.status || 'PENDING'}
+                      </span>
+                      <p className="mb-1 line-clamp-2 text-sm text-gray-600">
+                        {bid.message || 'No message provided'}
+                      </p>{' '}
+                      <div className="mb-1 grid grid-cols-2 gap-1 text-sm text-gray-500 md:grid-cols-4">
                         <div>
-                          ₹{bid.projectBudget.min.toLocaleString() ?? 0} - ₹
-                          {bid.projectBudget.max.toLocaleString() ?? 0}
+                          <span className="font-medium">Bid Amount:</span>
+                          <div className="font-semibold text-green-600">
+                            ₹{(bid.bidAmount || 0).toLocaleString()}
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <span className="font-medium">Deadline:</span>
                         <div>
-                          {new Date(bid.projectDeadline).toLocaleDateString()}
+                          <span className="font-medium">Duration:</span>
+                          <div>{bid.proposedDuration || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <span className="font-medium">Project Budget:</span>
+                          <div>
+                            ₹{(bid.projectBudget?.min || 0).toLocaleString()} -
+                            ₹{(bid.projectBudget?.max || 0).toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium">Deadline:</span>
+                          <div>
+                            {bid.projectDeadline
+                              ? new Date(
+                                  bid.projectDeadline
+                                ).toLocaleDateString()
+                              : 'N/A'}
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    {bid.skills.length > 0 && (
-                      <div className="mb-3 flex flex-wrap gap-2">
-                        {bid.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="ml-4 flex flex-col space-y-2">                  
-                    {bid.status === 'PENDING' &&
-                      bid.applicantType === 'owner' && (
-                        <div className="flex flex-col space-y-1">
-                          <button
-                            className="btn-primary "
-                            onClick={() => handleAcceptAssignment(bid.id)}
-                          >
-                            Accept
-                          </button>
-                          <button
-                            className="btn-secondary text-red-600 hover:bg-red-50"
-                            onClick={() => handleReject(bid.id)}
-                          >
-                            Reject
-                          </button>
+                      {bid.skills && bid.skills.length > 0 && (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {bid.skills.map((skill) => (
+                            <span
+                              key={skill}
+                              className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700"
+                            >
+                              {skill}
+                            </span>
+                          ))}
                         </div>
                       )}
+                    </div>
 
-                    {bid.status === 'PENDING' &&
-                      bid.applicantType !== 'owner' && (
-                        <button
-                          onClick={() => handleWithdraw(bid.id)}
-                          className="btn-secondary-sm text-red-600 hover:bg-red-50"
-                        >
-                          Withdraw
-                        </button>
-                      )}
+                    <div className="ml-4 flex flex-col space-y-2">
+                      {bid.status === 'PENDING' &&
+                        bid.applicantType === 'owner' && (
+                          <div className="flex flex-col space-y-1">
+                            <button
+                              className="btn-primary "
+                              onClick={() => handleAcceptAssignment(bid.id)}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className="btn-secondary text-red-600 hover:bg-red-50"
+                              onClick={() => handleReject(bid.id)}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+
+                      {bid.status === 'PENDING' &&
+                        bid.applicantType !== 'owner' && (
+                          <button
+                            onClick={() => handleWithdraw(bid.id)}
+                            className="btn-secondary-sm text-red-600 hover:bg-red-50"
+                          >
+                            Withdraw
+                          </button>
+                        )}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-500">
+                    Submitted:{' '}
+                    {bid.submittedAt
+                      ? new Date(bid.submittedAt).toLocaleDateString()
+                      : 'N/A'}
+                    {bid.responseAt &&
+                      ` • Responded: ${new Date(bid.responseAt).toLocaleDateString()}`}
                   </div>
                 </div>
-
-                <div className="text-xs text-gray-500">
-                  Submitted: {new Date(bid.submittedAt).toLocaleDateString()}
-                  {bid.responseAt &&
-                    ` • Responded: ${new Date(bid.responseAt).toLocaleDateString()}`}
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>

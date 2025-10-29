@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
                       Profile Views
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {analytics.profileViews?.toLocaleString() || 0}
+                      {(analytics?.profileViews || 0).toLocaleString() || 0}
                     </p>
                   </div>
                   <div className="flex h-10 w-10 items-center justify-center rounded-none bg-blue-100">
@@ -257,7 +257,7 @@ export default function AnalyticsPage() {
                           Total Followers
                         </p>
                         <p className="text-2xl font-bold text-gray-900">
-                          {analytics.totalFollowers?.toLocaleString() || 0}
+                          {(analytics?.totalFollowers || 0).toLocaleString() || 0}
                         </p>
                       </div>
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-purple-100">
@@ -276,7 +276,7 @@ export default function AnalyticsPage() {
                           Total Earnings
                         </p>
                         <p className="text-2xl font-bold text-gray-900">
-                          ${analytics.totalEarnings?.toLocaleString() || 0}
+                          ${(analytics.totalEarnings || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-green-100">
@@ -316,7 +316,7 @@ export default function AnalyticsPage() {
                           Total Spent
                         </p>
                         <p className="text-2xl font-bold text-gray-900">
-                          ${analytics.totalSpent?.toLocaleString() || 0}
+                          ${(analytics.totalSpent || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-red-100">
@@ -325,7 +325,7 @@ export default function AnalyticsPage() {
                     </div>
                     <p className="mt-2 text-sm text-gray-600">
                       Avg: $
-                      {analytics.averageCampaignCost?.toLocaleString() || 0} per
+                      {(analytics.averageCampaignCost || 0).toLocaleString()} per
                       campaign
                     </p>
                   </div>
@@ -479,7 +479,7 @@ export default function AnalyticsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-600">Average Cost</span>
                       <span className="font-semibold">
-                        ${analytics.averageCampaignCost?.toLocaleString() || 0}
+                        ${(analytics.averageCampaignCost || 0).toLocaleString() || 0}
                       </span>
                     </div>
                   </div>
@@ -494,7 +494,7 @@ export default function AnalyticsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-600">Total Investment</span>
                       <span className="font-semibold">
-                        ${analytics.totalSpent?.toLocaleString() || 0}
+                        ${(analytics.totalSpent || 0).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">

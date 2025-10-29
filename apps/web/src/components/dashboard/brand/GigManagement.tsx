@@ -277,7 +277,7 @@ export const GigManagement: React.FC<GigManagementProps> = ({
                     <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 md:grid-cols-4">
                       <div>
                         <span className="font-medium">Budget:</span>
-                        <br />₹{gig.budget.toLocaleString() ?? 0}
+                        <br />₹{(gig.budget || 0).toLocaleString()}
                       </div>
                       <div>
                         <span className="font-medium">Applications:</span>

@@ -505,7 +505,7 @@ export default function CampaignsPage() {
                         <p className="text-xs text-gray-600">Applications</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-bold text-gray-900">{campaign.performance.views.toLocaleString() ?? 0}</p>
+                        <p className="font-bold text-gray-900">{(campaign.performance.views || 0).toLocaleString() ?? 0}</p>
                         <p className="text-xs text-gray-600">Views</p>
                       </div>
                     </div>

@@ -286,9 +286,9 @@ export default function AssignGigModal({
                         <span className="text-gray-500">Budget:</span>
                         <span className="font-medium">
                           {gig.budgetType === 'fixed'
-                            ? `₹${gig.budgetMin.toLocaleString()}`
+                            ? `₹${(gig.budget || 0).toLocaleString()}`
                             : gig.budgetType === 'hourly'
-                              ? `₹${gig.budgetMin}/hr - ₹${gig.budgetMax}/hr`
+                              ? `₹${(gig.budgetMin || 0).toLocaleString()}/hr - ₹${(gig.budgetMax || 0).toLocaleString()}/hr`
                               : 'Negotiable'}
                         </span>
                       </div>

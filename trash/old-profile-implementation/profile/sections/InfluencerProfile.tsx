@@ -154,7 +154,7 @@ export const InfluencerProfile: React.FC<ProfileComponentProps> = ({
                       </div>
                       <div className="text-lg font-semibold text-gray-900">
                         {typeof count === 'number'
-                          ? count.toLocaleString()
+                          ? (count || 0).toLocaleString()
                           : String(count)}
                       </div>
                     </div>

@@ -850,9 +850,14 @@ export default function GigDetailsPage() {
         const formatMyApplications = (response.data as any).applicationStatus;
         const applicantType = (response.data as any).application?.applicantType;
         const applicationId = (response.data as any).application?.id;
+        const applicationData = (response.data as any).application;
+        console.log('🎯 Application data:', applicationData);
         // Add applicantType to the application status object
         const applicationWithType = {
           ...formatMyApplications,
+          quotedPrice: applicationData.quotedPrice,
+          estimatedTime: applicationData.estimatedTime,
+          proposal: applicationData.proposal,
           applicantType: applicantType,
           applicationId: applicationId,
         };
@@ -1442,6 +1447,7 @@ export default function GigDetailsPage() {
 
   const myApplicationStatus = (myApplications as any)?.status || null;
   console.log('🔍 My application status:', myApplicationStatus);
+  console.log('🔍 My applications data:', (myApplications as any).quotedPrice);
 
   return (
     <div className="min-h-screen bg-gray-50 py-2">
@@ -1717,7 +1723,8 @@ export default function GigDetailsPage() {
                   <h1 className="mb-2 text-3xl font-bold text-gray-900">
                     {gig.title}
                   </h1>
-                  Created at: <span>{new Date(gig.createdAt).toLocaleDateString()}</span>
+                  Created at:{' '}
+                  <span>{new Date(gig.createdAt).toLocaleDateString()}</span>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       {gig.brand?.logo && (
@@ -1740,7 +1747,7 @@ export default function GigDetailsPage() {
                     <div className="text-3xl font-bold text-green-600">
                       ₹{(gig.budgetMin || 0).toLocaleString() ?? 0}
                       {gig.budgetMax && gig.budgetMax !== gig.budgetMin
-                        ? ` - ₹${gig.budgetMax?.toLocaleString() ?? 0}`
+                        ? ` - ₹${(gig.budgetMax || 0).toLocaleString() ?? 0}`
                         : ''}
                     </div>
                     <div className="text-sm text-gray-600">
@@ -2108,6 +2115,32 @@ export default function GigDetailsPage() {
                     <p className="mb-4 text-sm text-gray-600">
                       Accept or reject the assignment in your applications
                     </p>
+                    <div className="mb-4 flex flex-col items-start rounded-xl border border-blue-400 bg-blue-50 p-4">
+                      <div className="space-y-2 text-left">
+                        <div className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-600">
+                            Bid amount:
+                          </span>{' '}
+                          ₹{(myApplications as any)?.quotedPrice || 0}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-600">
+                            Estimated time:
+                          </span>{' '}
+                          {(myApplications as any)?.estimatedTime ||
+                            'Not specified'}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <div className="mb-1 font-semibold text-gray-600">
+                            Proposal:
+                          </div>
+                          <div className="break-words leading-relaxed text-gray-700">
+                            {(myApplications as any)?.proposal ||
+                              'No proposal provided'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div className="flex flex-col space-y-1">
                       <button
                         className="btn-primary "
@@ -2415,9 +2448,9 @@ export default function GigDetailsPage() {
                       />
                     </div>
                     <p className="mt-1 text-xs text-gray-600">
-                      Budget: ₹{gig.budgetMin?.toLocaleString() ?? 0}
+                      Budget: ₹{(gig.budgetMin || 0).toLocaleString() ?? 0}
                       {gig.budgetMax && gig.budgetMax !== gig.budgetMin
-                        ? ` - ₹${gig.budgetMax?.toLocaleString() ?? 0}`
+                        ? ` - ₹${(gig.budgetMax || 0).toLocaleString() ?? 0}`
                         : ''}{' '}
                       ({gig.budgetType})
                     </p>
@@ -2774,9 +2807,9 @@ export default function GigDetailsPage() {
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-600">
-                    Budget: ₹{gig?.budgetMin?.toLocaleString() ?? 0}
+                    Budget: ₹{(gig?.budgetMin || 0).toLocaleString() ?? 0}
                     {gig?.budgetMax && gig.budgetMax !== gig.budgetMin
-                      ? ` - ₹${gig.budgetMax?.toLocaleString() ?? 0}`
+                      ? ` - ₹${(gig.budgetMax || 0).toLocaleString() ?? 0}`
                       : ''}{' '}
                     ({gig?.budgetType})
                   </p>
