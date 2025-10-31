@@ -57,15 +57,8 @@ export default function LoginPage() {
 
     try {
       await login(formData);
-
-      // Check for saved redirect URL
-      const savedRedirectUrl = localStorage.getItem('authRedirectUrl');
-      if (savedRedirectUrl) {
-        localStorage.removeItem('authRedirectUrl');
-        router.push(savedRedirectUrl as any);
-      } else {
-        router.push('/dashboard');
-      }
+      // The login function will handle the redirect to dashboard
+      console.log('Login successful - redirect handled by useAuth');
     } catch (error: any) {
       setError(error.message || 'Login failed. Please try again.');
     } finally {

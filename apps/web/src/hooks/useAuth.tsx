@@ -453,7 +453,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // Redirect to login if not already on an auth page
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname;
-            const authPages = ['/login', '/register', '/forgot-password'];
+            const authPages = [
+              '/login',
+              '/register',
+              '/forgot-password',
+              '/login/otp',
+            ];
             const isOnAuthPage = authPages.some((page) =>
               currentPath.startsWith(page)
             );
@@ -688,9 +693,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         '/api/auth/login',
         credentials
       );
-
+      console.log('🔍 Login response:', response);
       // Handle both nested and flat response structures
-      const responseData = response.data || response;
+      const responseData = response;
 
       if (responseData.success) {
         // For cookie-based auth, we don't need to store tokens
@@ -698,12 +703,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log('✅ Login successful, setting user data');
 
         // Check if user is in nested data structure or directly available
-        const userData = responseData.data?.user || responseData.user;
+        const userData = responseData.data?.user || responseData.data.user;
 
         if (userData) {
           setUser(userData);
           // Force save to cache immediately
           saveUserToCache(userData);
+          console.log('🏠 Redirecting to dashboard...');
+          router.push('/dashboard');
           return;
         } else {
           throw new Error(
