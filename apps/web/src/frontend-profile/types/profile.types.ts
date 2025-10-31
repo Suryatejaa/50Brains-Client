@@ -29,6 +29,7 @@ export interface UserProfileData {
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  lastUsernameUpdated?: string;
 
   // Influencer Data
   contentCategories: string[];

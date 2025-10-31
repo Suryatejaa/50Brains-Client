@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAccountActions } from '@/hooks/useAccountActions';
 import { OtpVerificationModal } from '@/components/auth/OtpVerificationModal';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '../../services/apiClient';
 
 interface SettingsTabProps {
   user: UserProfileData;
@@ -82,6 +83,26 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     loading: false,
     error: '',
   });
+
+  // Username update state
+  const [usernameUpdate, setUsernameUpdate] = useState({
+    loading: false,
+    error: '',
+    success: '',
+  });
+
+  // Email update state
+  const [emailUpdate, setEmailUpdate] = useState({
+    isOpen: false,
+    step: 'initiate' as 'initiate' | 'verify',
+    newEmail: '',
+    loading: false,
+    error: '',
+    success: '',
+  });
+
+  // Account section loading
+  const [accountLoading, setAccountLoading] = useState(false);
 
   const openDialog = (type: 'logout' | 'deactivate' | 'delete') => {
     setConfirmDialog({
@@ -192,8 +213,178 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     });
   };
 
+  const handleUsernameUpdate = async () => {
+    const newUsername = editing.data.username;
+
+    if (!newUsername || newUsername === user.username) {
+      setUsernameUpdate({
+        loading: false,
+        error: 'Please enter a different username',
+        success: '',
+      });
+      return;
+    }
+
+    if (!canChangeUsername) {
+      setUsernameUpdate({
+        loading: false,
+        error: `Username can be changed in ${getDaysUntilUsernameChange()} more days`,
+        success: '',
+      });
+      return;
+    }
+
+    try {
+      setUsernameUpdate({ loading: true, error: '', success: '' });
+      const response = await apiClient.put('/api/auth/update/username', {
+        username: newUsername.trim(),
+      });
+
+      if (response.success) {
+        setUsernameUpdate({
+          loading: false,
+          error: '',
+          success: 'Username updated successfully!',
+        });
+        // Update the editing data to reflect the change
+        editing.data.username = newUsername;
+        // Refresh profile data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setUsernameUpdate({
+          loading: false,
+          error: response.message || 'Failed to update username',
+          success: '',
+        });
+      }
+    } catch (error: any) {
+      console.error('Username update error:', error);
+      const errorMessage =
+        error?.message || error?.error || 'Failed to update username';
+      setUsernameUpdate({
+        loading: false,
+        error: errorMessage,
+        success: '',
+      });
+    }
+  };
+
+  const handleEmailUpdateInitiate = async () => {
+    const newEmail = editing.data.email;
+
+    if (!newEmail || newEmail === user.email) {
+      setEmailUpdate((prev) => ({
+        ...prev,
+        error: 'Please enter a different email address',
+      }));
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      setEmailUpdate((prev) => ({
+        ...prev,
+        error: 'Please enter a valid email address',
+      }));
+      return;
+    }
+
+    try {
+      setEmailUpdate((prev) => ({ ...prev, loading: true, error: '' }));
+      const response = await apiClient.post('/api/auth/update/email-initiate', {
+        newEmail: newEmail.trim(),
+      });
+
+      if (response.success) {
+        setEmailUpdate({
+          isOpen: true,
+          step: 'verify',
+          newEmail: newEmail.trim(),
+          loading: false,
+          error: '',
+          success: '',
+        });
+      } else {
+        setEmailUpdate((prev) => ({
+          ...prev,
+          loading: false,
+          error: response.message || 'Failed to initiate email update',
+        }));
+      }
+    } catch (error: any) {
+      console.error('Email update initiate error:', error);
+      const errorMessage =
+        error?.message || error?.error || 'Failed to initiate email update';
+      setEmailUpdate((prev) => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
+    }
+  };
+
+  const handleEmailUpdateComplete = async (otp: string) => {
+    try {
+      const response = await apiClient.post('/api/auth/update/email-complete', {
+        newEmail: emailUpdate.newEmail,
+        otp: otp,
+      });
+
+      if (response.success) {
+        setEmailUpdate({
+          isOpen: false,
+          step: 'initiate',
+          newEmail: '',
+          loading: false,
+          error: '',
+          success: 'Email updated successfully!',
+        });
+        // Update the editing data to reflect the change
+        editing.data.email = emailUpdate.newEmail;
+        // Refresh profile data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        throw new Error(response.message || 'Failed to complete email update');
+      }
+    } catch (error: any) {
+      console.error('Email update complete error:', error);
+      throw new Error(
+        error?.message || error?.error || 'Failed to verify email update'
+      );
+    }
+  };
+
+  const handleEmailUpdateResend = async () => {
+    try {
+      await apiClient.post('/api/auth/update/email-initiate', {
+        newEmail: emailUpdate.newEmail,
+      });
+    } catch (error: any) {
+      throw new Error(
+        error?.message || error?.error || 'Failed to resend verification code'
+      );
+    }
+  };
+
+  const handleEmailUpdateCancel = () => {
+    setEmailUpdate({
+      isOpen: false,
+      step: 'initiate',
+      newEmail: '',
+      loading: false,
+      error: '',
+      success: '',
+    });
+  };
+
   const handleSave = async (section: string, data: any) => {
-    const result = await onUpdateSection('settings', { [section]: data });
+    // This function is now only used for non-account sections
+    const result = await onUpdateSection('basicInfo', { [section]: data });
     if (!result.success) {
       console.error(`Failed to update ${section}:`, result.error);
     }
@@ -429,6 +620,22 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     }
   };
 
+  // Calculate days until username can be changed
+  const getDaysUntilUsernameChange = () => {
+    if (!user.lastUsernameUpdated) return 0;
+
+    const lastUpdate = new Date(user.lastUsernameUpdated);
+    const now = new Date();
+    const daysSinceUpdate = Math.floor(
+      (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const daysRemaining = 15 - daysSinceUpdate;
+
+    return Math.max(0, daysRemaining);
+  };
+
+  const canChangeUsername = getDaysUntilUsernameChange() === 0;
+
   return (
     <div className="settings-tab">
       <h3>Account Settings</h3>
@@ -446,31 +653,120 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
         {isEditingAccount ? (
           <div className="settings-edit">
-            <EditableField
-              label="Email"
-              value={editing.data.email}
-              type="email"
-              isEditing={true}
-              onChange={(value) => {
-                editing.data.email = value;
-              }}
-            />
-            <EditableField
-              label="Username"
-              value={editing.data.username}
-              type="text"
-              isEditing={true}
-              onChange={(value) => {
-                editing.data.username = value;
-              }}
-            />
+            {/* Email Section */}
+            <div className="mb-4">
+              <EditableField
+                label="Email"
+                value={editing.data.email}
+                type="email"
+                isEditing={true}
+                onChange={(value) => {
+                  editing.data.email = value;
+                  // Clear previous messages when user types
+                  setEmailUpdate((prev) => ({
+                    ...prev,
+                    error: '',
+                    success: '',
+                  }));
+                }}
+              />
+              {emailUpdate.error && (
+                <p className="mt-1 text-sm text-red-600">
+                  ❌ {emailUpdate.error}
+                </p>
+              )}
+              {emailUpdate.success && (
+                <p className="mt-1 text-sm text-green-600">
+                  ✅ {emailUpdate.success}
+                </p>
+              )}
+              <div className="mt-2">
+                <button
+                  onClick={handleEmailUpdateInitiate}
+                  disabled={
+                    emailUpdate.loading ||
+                    !editing.data.email ||
+                    editing.data.email === user.email
+                  }
+                  className="btn btn--primary btn--sm"
+                >
+                  {emailUpdate.loading ? (
+                    <div className="flex items-center">
+                      <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      Sending OTP...
+                    </div>
+                  ) : (
+                    'Update Email'
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Username Section */}
+            <div className="mb-4">
+              <EditableField
+                label="Username"
+                value={editing.data.username}
+                type="text"
+                disabled={!canChangeUsername}
+                isEditing={canChangeUsername}
+                onChange={(value) => {
+                  if (canChangeUsername) {
+                    editing.data.username = value;
+                    // Clear previous messages when user types
+                    setUsernameUpdate({
+                      loading: false,
+                      error: '',
+                      success: '',
+                    });
+                  }
+                }}
+              />
+              {!canChangeUsername && (
+                <p className="mt-1 text-sm text-amber-600">
+                  ⚠️ Username can be changed in {getDaysUntilUsernameChange()}{' '}
+                  more days
+                </p>
+              )}
+              {canChangeUsername && (
+                <p className="mt-1 text-sm text-gray-500">
+                  💡 Username can only be changed once every 15 days
+                </p>
+              )}
+              {usernameUpdate.error && (
+                <p className="mt-1 text-sm text-red-600">
+                  ❌ {usernameUpdate.error}
+                </p>
+              )}
+              {usernameUpdate.success && (
+                <p className="mt-1 text-sm text-green-600">
+                  ✅ {usernameUpdate.success}
+                </p>
+              )}
+              <div className="mt-2">
+                <button
+                  onClick={handleUsernameUpdate}
+                  disabled={
+                    usernameUpdate.loading ||
+                    !canChangeUsername ||
+                    !editing.data.username ||
+                    editing.data.username === user.username
+                  }
+                  className="btn btn--primary btn--sm"
+                >
+                  {usernameUpdate.loading ? (
+                    <div className="flex items-center">
+                      <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      Updating...
+                    </div>
+                  ) : (
+                    'Update Username'
+                  )}
+                </button>
+              </div>
+            </div>
+
             <div className="settings-edit__actions">
-              <button
-                onClick={() => handleSave('account', editing.data)}
-                className="btn btn--primary"
-              >
-                Save Changes
-              </button>
               <button onClick={onCancelEditing} className="btn btn--secondary">
                 Cancel
               </button>
@@ -485,6 +781,11 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
             <div className="settings-field">
               <label>Username:</label>
               <span>{user.username}</span>
+              {!canChangeUsername && user.lastUsernameUpdated && (
+                <small className="mt-1 block text-amber-600">
+                  Can be changed in {getDaysUntilUsernameChange()} days
+                </small>
+              )}
             </div>
             <div className="settings-field">
               <label>Account Status:</label>
@@ -1070,6 +1371,18 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
         title="Verify Your Email"
         description="We've sent a verification code to your email address. Enter it below to verify your email."
         error={emailVerification.error}
+      />
+
+      {/* Email Update OTP Modal */}
+      <OtpVerificationModal
+        isOpen={emailUpdate.isOpen}
+        onClose={handleEmailUpdateCancel}
+        onVerify={handleEmailUpdateComplete}
+        onResend={handleEmailUpdateResend}
+        email={emailUpdate.newEmail}
+        title="Verify Email Update"
+        description={`We've sent a verification code to ${emailUpdate.newEmail}. Enter it below to complete your email update.`}
+        error={emailUpdate.error}
       />
     </div>
   );

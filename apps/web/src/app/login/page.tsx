@@ -234,7 +234,7 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-            <p className="mt-2 text-black/60">
+            <p className="mt-2 hidden text-black/60">
               Prefer OTP login?{' '}
               <Link
                 href="/login/otp"

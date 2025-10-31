@@ -8,6 +8,7 @@ interface EditableFieldProps {
   isEditing: boolean;
   onChange: (value: string | number) => void;
   className?: string;
+  disabled?: boolean;
   required?: boolean;
   maxLength?: number;
   rows?: number;
@@ -19,6 +20,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
   type = 'text',
   placeholder,
   isEditing,
+  disabled,
   onChange,
   className = '',
   required = false,
@@ -70,6 +72,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
           rows={rows}
           maxLength={maxLength}
           required={required}
+          disabled={disabled}
         />
       ) : (
         <input
