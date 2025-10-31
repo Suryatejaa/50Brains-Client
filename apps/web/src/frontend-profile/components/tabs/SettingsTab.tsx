@@ -37,8 +37,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     deactivateAccount,
     deleteAccount,
     isLoading,
-    initiatePasswordChange,
-    completePasswordChange,
+    changePassword,
     sendEmailVerificationOtp,
     verifyEmailOtp,
   } = useAuth();
@@ -61,11 +60,11 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
   // Password change state
   const [passwordChange, setPasswordChange] = useState({
     isOpen: false,
-    step: 'password' as 'password' | 'otp',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
     error: '',
+    success: '',
     loading: false,
     showCurrentPassword: false,
     showNewPassword: false,
@@ -454,11 +453,11 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
   const handlePasswordChangeStart = () => {
     setPasswordChange({
       isOpen: true,
-      step: 'password',
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
       error: '',
+      success: '',
       loading: false,
       showCurrentPassword: false,
       showNewPassword: false,
@@ -471,7 +470,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     });
   };
 
-  const handlePasswordChangeNext = async () => {
+  const handlePasswordChangeSubmit = async () => {
     // Validate all fields and update errors
     const fieldErrors = {
       currentPassword: !passwordChange.currentPassword
@@ -514,34 +513,20 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
           confirmPassword: '',
         },
       }));
-      const response = await initiatePasswordChange({
-        currentPassword: passwordChange.currentPassword,
-      });
-      console.log('Password change initiated successfully:', response);
-      setPasswordChange((prev) => ({ ...prev, step: 'otp', loading: false }));
-    } catch (error: any) {
-      setPasswordChange((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.message || 'Failed to initiate password change',
-      }));
-    }
-  };
 
-  const handlePasswordChangeComplete = async (otp: string) => {
-    try {
-      await completePasswordChange({
-        otp,
+      await changePassword({
+        currentPassword: passwordChange.currentPassword,
         newPassword: passwordChange.newPassword,
-        confirmPassword: passwordChange.confirmPassword,
       });
+
+      // Success - show success message first, then close modal after delay
       setPasswordChange({
-        isOpen: false,
-        step: 'password',
+        isOpen: true,
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
         error: '',
+        success: 'Password changed successfully!',
         loading: false,
         showCurrentPassword: false,
         showNewPassword: false,
@@ -552,20 +537,44 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
           confirmPassword: '',
         },
       });
-      // Show success message or refresh user data
+
+      // Close modal after showing success message
+      setTimeout(() => {
+        setPasswordChange({
+          isOpen: false,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+          error: '',
+          success: '',
+          loading: false,
+          showCurrentPassword: false,
+          showNewPassword: false,
+          showConfirmPassword: false,
+          fieldErrors: {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          },
+        });
+      }, 2000);
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to change password');
+      setPasswordChange((prev) => ({
+        ...prev,
+        loading: false,
+        error: error.message || 'Failed to change password',
+      }));
     }
   };
 
   const handlePasswordChangeCancel = () => {
     setPasswordChange({
       isOpen: false,
-      step: 'password',
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
       error: '',
+      success: '',
       loading: false,
       showCurrentPassword: false,
       showNewPassword: false,
@@ -1074,7 +1083,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
       />
 
       {/* Password Change Modal */}
-      {passwordChange.isOpen && passwordChange.step === 'password' && (
+      {passwordChange.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <h3 className="mb-4 text-lg font-semibold text-gray-900">
@@ -1084,6 +1093,14 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
             {passwordChange.error && (
               <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
                 <p className="text-sm text-red-600">{passwordChange.error}</p>
+              </div>
+            )}
+
+            {passwordChange.success && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3">
+                <p className="text-sm text-green-600">
+                  ✅ {passwordChange.success}
+                </p>
               </div>
             )}
 
@@ -1323,17 +1340,19 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
             <div className="mt-6 flex space-x-3">
               <button
-                onClick={handlePasswordChangeNext}
-                disabled={passwordChange.loading}
+                onClick={handlePasswordChangeSubmit}
+                disabled={passwordChange.loading || passwordChange.success}
                 className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {passwordChange.loading ? (
                   <div className="flex items-center justify-center">
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                    Sending OTP...
+                    Changing...
                   </div>
+                ) : passwordChange.success ? (
+                  'Success!'
                 ) : (
-                  'Next'
+                  'Change Password'
                 )}
               </button>
               <button
@@ -1341,23 +1360,12 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
                 disabled={passwordChange.loading}
                 className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Cancel
+                {passwordChange.success ? 'Close' : 'Cancel'}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Password Change OTP Modal */}
-      <OtpVerificationModal
-        isOpen={passwordChange.isOpen && passwordChange.step === 'otp'}
-        onClose={handlePasswordChangeCancel}
-        onVerify={handlePasswordChangeComplete}
-        email={user.email}
-        title="Verify Password Change"
-        description="We've sent a verification code to your email. Enter it below to complete your password change."
-        error={passwordChange.error}
-      />
 
       {/* Email Verification Modal */}
       <OtpVerificationModal

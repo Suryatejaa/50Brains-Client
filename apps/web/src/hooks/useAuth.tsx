@@ -1045,32 +1045,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      const response = await apiClient.post<{ message: string }>(
-        '/api/auth/change-password',
-        data
-      );
+      const response = await apiClient.post<{
+        success?: boolean;
+        message?: string;
+        error?: string;
+      }>('/api/auth/change-password', {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
 
-      if (response.success) {
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || (response as any).success) {
         return {
-          message: response.data.message || 'Password changed successfully',
+          message:
+            responseData.message ||
+            (response as any).message ||
+            'Password changed successfully',
         };
       } else {
         const errorMessage =
-          response.message || 'Failed to change password. Please try again.';
+          responseData.error ||
+          responseData.message ||
+          (response as any).message ||
+          'Failed to change password. Please try again.';
 
         switch (errorMessage) {
+          case 'Current password is required':
           case 'Invalid current password':
             throw new Error('The current password you entered is incorrect.');
-          case 'Validation failed':
-            if (response.details?.password) {
-              throw new Error(response.details.password);
-            }
-            throw new Error('Password does not meet security requirements.');
+          case 'New password must be at least 8 characters long':
+          case 'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character':
+            throw new Error(errorMessage);
+          case 'New password is required':
+            throw new Error('New password is required.');
           default:
             throw new Error(errorMessage);
         }
       }
     } catch (error: any) {
+      console.error('Change password error:', error);
       const errorMessage =
         error.message || 'Failed to change password. Please try again.';
       setError(errorMessage);
