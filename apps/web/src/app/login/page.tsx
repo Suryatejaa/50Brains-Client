@@ -1,12 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isLoading, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -14,8 +15,21 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
+
+  // Check for success message from URL parameters
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message) {
+      setSuccessMessage(message);
+      // Clear the URL parameter after displaying the message
+      const url = new URL(window.location.href);
+      url.searchParams.delete('message');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams]);
 
   // Remove the useEffect that was causing the redirect loop
   // RouteGuard will handle redirecting authenticated users away from login page
@@ -32,6 +46,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setSuccessMessage(''); // Clear success message when attempting login
 
     try {
       await login(formData);
@@ -60,13 +75,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col space-y-2 min-h-screen items-center justify-center bg-white p-1">
+    <div className="flex min-h-screen flex-col items-center justify-center space-y-2 bg-white p-1">
       <div className="w-full max-w-md space-y-1">
         <div className="rounded-none border-none border-black/20 bg-white/10 p-1 shadow-none backdrop-blur-lg">
           <div className="text-center">
             <h2 className="mb-2 text-3xl font-bold text-black">Welcome Back</h2>
             <p className="text-black/80">Sign in to your account</p>
           </div>
+
+          {successMessage && (
+            <div className="mt-6 rounded-xl border border-green-500/30 bg-green-500/20 p-4 text-sm text-green-800">
+              {successMessage}
+            </div>
+          )}
 
           {error && (
             <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/20 p-4 text-sm text-red-800">
@@ -177,7 +198,7 @@ export default function LoginPage() {
 
               <div className="text-sm">
                 <Link
-                  href="/forgot-password"
+                  href="/reset-password"
                   className="text-accent font-medium transition-colors duration-200 hover:text-blue-100"
                 >
                   Forgot your password?
@@ -213,22 +234,31 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
+            <p className="mt-2 text-black/60">
+              Prefer OTP login?{' '}
+              <Link
+                href="/login/otp"
+                className="text-accent font-medium hover:underline"
+              >
+                Sign in with OTP
+              </Link>
+            </p>
           </div>
         </div>
       </div>
       <div className="flex justify-center">
-          <button
-            className="btn-ghost px-1 py-1"
-            onClick={() => setShowRoadmap(!showRoadmap)}
-          >
-            {showRoadmap ? 'Hide Roadmap' : 'Show Roadmap'}
-          </button>
+        <button
+          className="btn-ghost px-1 py-1"
+          onClick={() => setShowRoadmap(!showRoadmap)}
+        >
+          {showRoadmap ? 'Hide Roadmap' : 'Show Roadmap'}
+        </button>
+      </div>
+      {showRoadmap && (
+        <div className="w-full space-y-1 rounded-none border-none border-black/20 bg-white p-1 shadow-none backdrop-blur-lg">
+          <BusinessRoadmap />
         </div>
-        {showRoadmap && (
-          <div className="w-full space-y-1 rounded-none border-none border-black/20 bg-white p-1 shadow-none backdrop-blur-lg">
-            <BusinessRoadmap />
-          </div>
-        )}
+      )}
     </div>
   );
 }

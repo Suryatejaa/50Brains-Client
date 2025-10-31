@@ -141,7 +141,7 @@ const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
           <div className="profile-header__actions">
             {showEditButton ? (
               <div className="profile-header__owner-actions">
-                <a href="/profile/edit" className="profile-header__edit-btn">
+                <a href="/profile" className="profile-header__edit-btn">
                   ✏️ Edit Profile
                 </a>
               </div>

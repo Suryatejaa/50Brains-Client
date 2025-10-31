@@ -16,7 +16,7 @@ import AssignModal from '@/components/gig/AssignModal';
 import { FaBullseye, FaAccessibleIcon } from 'react-icons/fa';
 import { m } from 'framer-motion';
 import MiniConfirmDialog from '@/frontend-profile/components/common/MiniConfirmDialog';
-import {GigDetailLoadingSkeleton} from '@/components/gig/ssr/GigDetailSkeleton'
+import { GigDetailLoadingSkeleton } from '@/components/gig/ssr/GigDetailSkeleton';
 interface Gig {
   id: string;
   title: string;
@@ -1043,10 +1043,35 @@ export default function GigDetailsPage() {
         .map((item) => item.url)
         .filter((url) => url.trim());
 
+      // Validate portfolio URLs
+      for (const url of portfolioUrls) {
+        const isValidUrl =
+          /^https?:\/\/.+/.test(url) ||
+          /^www\..+/.test(url) ||
+          /^.+\..+/.test(url);
+        if (!isValidUrl) {
+          showToast(
+            'warning',
+            `Invalid portfolio URL: "${url}". Please use a valid format like https://example.com or www.example.com`
+          );
+          return;
+        }
+      }
+
+      // Normalize portfolio URLs to include protocol if missing
+      const normalizedPortfolioUrls = portfolioUrls.map((url) => {
+        if (url.startsWith('www.')) {
+          return `https://${url}`;
+        } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          return `https://${url}`;
+        }
+        return url;
+      });
+
       // Base payload
       let applicationData: any = {
         proposal: application.coverLetter.trim(),
-        portfolio: portfolioUrls,
+        portfolio: normalizedPortfolioUrls,
         quotedPrice: application.proposedRate || 0,
         upiId: application.upiId?.trim() || undefined,
         estimatedTime: application.estimatedTime,
@@ -1220,13 +1245,8 @@ export default function GigDetailsPage() {
 
         // Reload the page to get fresh data
         // If applied as clan, navigate to the workflow to assign tasks
-        if (application.applicantType === 'clan' && application.clanId) {
-          router.push(
-            `/clan/${application.clanId}/gig-workflow?gigId=${gigId}&tab=tasks`
-          );
-        } else {
-          window.location.reload();
-        }
+
+        window.location.reload();
       }
     } catch (error: any) {
       console.error('❌ Failed to apply to gig:', error);
@@ -1305,6 +1325,19 @@ export default function GigDetailsPage() {
       ...prev,
       portfolio: [...prev.portfolio, { title: '', url: '' }],
     }));
+  };
+
+  const validatePortfolioUrl = (url: string): string | null => {
+    if (!url.trim()) return null; // Empty URLs are allowed, will be filtered out
+
+    // Basic URL pattern validation
+    const urlPattern =
+      /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/;
+    if (!urlPattern.test(url.trim())) {
+      return 'Please enter a valid URL (e.g., https://example.com or www.example.com)';
+    }
+
+    return null;
   };
 
   const updatePortfolioItem = (
@@ -1397,10 +1430,8 @@ export default function GigDetailsPage() {
     };
   }, []);
 
- 
-
-  if(isLoading) {
-    return <GigDetailLoadingSkeleton/>
+  if (isLoading) {
+    return <GigDetailLoadingSkeleton />;
   }
 
   if (!gig) {
@@ -1423,9 +1454,12 @@ export default function GigDetailsPage() {
   const canApply =
     isAuthenticated &&
     !gig.isApplied &&
+    userType === 'creator' &&
     (gig.status === 'OPEN' || gig.status === 'ASSIGNED') &&
     (!gig.maxApplications || gig.applicationCount < gig.maxApplications);
-
+  console.log(
+    `User type: ${userType}, Gig status: ${gig.status}, Can apply: ${canApply}`
+  );
   // console.log('🔍 Gig details:', gig);
   //console.log(('🔍 Is own gig:', isOwner);
   //console.log(('🔍 My applications:', myApplications);
@@ -2246,7 +2280,9 @@ export default function GigDetailsPage() {
                     <p className="mb-4 text-sm text-gray-600">
                       {gig.status !== 'OPEN'
                         ? 'This gig is no longer active'
-                        : 'Application limit reached'}
+                        : userType !== 'creator'
+                          ? 'Only creators can apply for gigs'
+                          : 'Application limit reached'}
                     </p>
                   </div>
                 ) : (
@@ -2646,16 +2682,36 @@ export default function GigDetailsPage() {
                           style={{ maxWidth: '100%' }}
                         />
                         <div className="flex space-x-2">
-                          <input
-                            type="url"
-                            value={item.url}
-                            onChange={(e) =>
-                              updatePortfolioItem(index, 'url', e.target.value)
-                            }
-                            className="flex-1 rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                            placeholder="URL"
-                            style={{ maxWidth: '100%' }}
-                          />
+                          <div className="flex-1">
+                            <input
+                              type="url"
+                              value={item.url}
+                              onChange={(e) => {
+                                const newValue = e.target.value;
+                                updatePortfolioItem(index, 'url', newValue);
+
+                                // Real-time validation feedback
+                                if (newValue.trim()) {
+                                  const error = validatePortfolioUrl(newValue);
+                                  if (error) {
+                                    e.target.style.borderColor = '#ef4444';
+                                  } else {
+                                    e.target.style.borderColor = '#10b981';
+                                  }
+                                } else {
+                                  e.target.style.borderColor = '#d1d5db';
+                                }
+                              }}
+                              className="w-full rounded-none border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                              placeholder="https://example.com or www.example.com"
+                              style={{ maxWidth: '100%' }}
+                            />
+                            {item.url && validatePortfolioUrl(item.url) && (
+                              <p className="mt-1 text-xs text-red-600">
+                                {validatePortfolioUrl(item.url)}
+                              </p>
+                            )}
+                          </div>
                           <button
                             onClick={() => removePortfolioItem(index)}
                             className="btn-ghost btn-sm px-2 text-xs text-red-600"
@@ -2688,6 +2744,10 @@ export default function GigDetailsPage() {
                         (gig.gigType === 'PRODUCT' &&
                           (!application.address ||
                             application.address.trim().length < 15)) ||
+                        application.portfolio.some(
+                          (item) =>
+                            item.url.trim() && validatePortfolioUrl(item.url)
+                        ) ||
                         isApplying
                       }
                       className="btn-primary flex-1 py-0 text-sm disabled:opacity-50"

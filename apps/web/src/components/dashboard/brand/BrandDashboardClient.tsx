@@ -286,7 +286,7 @@ export function BrandDashboardClient() {
 
                   <div className="border-t border-gray-200 pt-2">
                     <a
-                      href="/profile/edit"
+                      href="/profile"
                       className="btn-secondary w-full text-center"
                     >
                       Edit Profile

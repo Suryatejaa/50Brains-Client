@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
+import { OtpVerificationModal } from '@/components/auth/OtpVerificationModal';
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -22,7 +23,10 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
-  const { register, isAuthenticated, clearError } = useAuth();
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [registrationEmail, setRegistrationEmail] = useState('');
+  const { register, verifyRegistrationOtp, isAuthenticated, clearError } =
+    useAuth();
   const router = useRouter();
 
   // Remove the useEffect that was causing the redirect loop
@@ -165,8 +169,27 @@ export default function RegisterPage() {
         instagramHandle: formData.instagramHandle.trim(),
       });
 
-      // Registration successful - redirect to dashboard
-      console.log('Registration successful:', result.message);
+      // Registration initiated - now show OTP verification modal
+      console.log('Registration initiated:', result.message);
+      setRegistrationEmail(formData.email);
+      setShowOtpModal(true);
+      setIsLoading(false); // Allow user to interact with OTP modal
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  // Handle OTP verification
+  const handleOtpVerification = async (otp: string) => {
+    try {
+      const result = await verifyRegistrationOtp({
+        email: registrationEmail,
+        otp,
+      });
+
+      console.log('Registration verified successfully:', result.message);
+      setShowOtpModal(false);
 
       // Check for saved redirect URL (similar to login)
       const savedRedirectUrl = localStorage.getItem('authRedirectUrl');
@@ -177,9 +200,35 @@ export default function RegisterPage() {
         router.push('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      throw new Error(
+        err.message || 'OTP verification failed. Please try again.'
+      );
+    }
+  };
+
+  // Handle OTP resend (re-register)
+  const handleOtpResend = async () => {
+    try {
+      const formatUsername = (email: string): string => {
+        const baseUsername = email.split('@')[0];
+        const cleanUsername = baseUsername.replace(/[^a-zA-Z0-9._-]/g, '');
+        if (cleanUsername.length < 3) {
+          return cleanUsername.padEnd(3, '0');
+        }
+        return cleanUsername.substring(0, 30);
+      };
+
+      await register({
+        email: String(formData.email || '')
+          .toLowerCase()
+          .trim(),
+        password: formData.password,
+        username: formatUsername(formData.email),
+        roles: formData.roles as any[],
+        instagramHandle: formData.instagramHandle.trim(),
+      });
+    } catch (err: any) {
+      throw new Error(err.message || 'Failed to resend verification code.');
     }
   };
 
@@ -764,6 +813,18 @@ export default function RegisterPage() {
           </div>
         )}
       </div>
+
+      {/* OTP Verification Modal */}
+      <OtpVerificationModal
+        isOpen={showOtpModal}
+        onClose={() => setShowOtpModal(false)}
+        onVerify={handleOtpVerification}
+        onResend={handleOtpResend}
+        email={registrationEmail}
+        title="Verify Your Email"
+        description="We've sent a 6-digit verification code to your email address. Please enter it below to complete your registration."
+        error={error}
+      />
     </div>
   );
 }

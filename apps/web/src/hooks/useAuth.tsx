@@ -85,6 +85,42 @@ interface ChangePasswordRequest {
   newPassword: string;
 }
 
+// OTP-based authentication interfaces
+interface VerifyRegistrationOtpRequest {
+  email: string;
+  otp: string;
+}
+
+interface InitiateOtpLoginRequest {
+  email: string;
+}
+
+interface CompleteOtpLoginRequest {
+  email: string;
+  otp: string;
+}
+
+interface InitiatePasswordChangeRequest {
+  currentPassword: string;
+}
+
+interface CompletePasswordChangeRequest {
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface ResetPasswordOtpRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface VerifyEmailOtpRequest {
+  otp: string;
+}
+
 // API Response Types matching backend patterns
 interface LoginResponse {
   user: User;
@@ -119,6 +155,28 @@ interface ResetPasswordResponse {
   expiresIn?: number;
 }
 
+// OTP-based response interfaces
+interface OtpResponse {
+  success: boolean;
+  message: string;
+  otpSent: boolean;
+}
+
+interface OtpAuthResponse {
+  success: boolean;
+  message: string;
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn?: number;
+}
+
+interface OtpVerificationResponse {
+  success: boolean;
+  message: string;
+  user?: User;
+}
+
 // Context interface with additional methods
 interface AuthContextType {
   user: User | null;
@@ -148,6 +206,30 @@ interface AuthContextType {
   }>;
   deactivateAccount: (password: string) => Promise<boolean>;
   deleteAccount: (password: string) => Promise<boolean>;
+  // OTP-based authentication methods
+  verifyRegistrationOtp: (
+    data: VerifyRegistrationOtpRequest
+  ) => Promise<{ message: string; user: User }>;
+  initiateOtpLogin: (
+    data: InitiateOtpLoginRequest
+  ) => Promise<{ message: string; otpSent: boolean }>;
+  completeOtpLogin: (data: CompleteOtpLoginRequest) => Promise<void>;
+  initiatePasswordChange: (
+    data: InitiatePasswordChangeRequest
+  ) => Promise<{ message: string; otpSent: boolean }>;
+  completePasswordChange: (
+    data: CompletePasswordChangeRequest
+  ) => Promise<{ message: string }>;
+  resetPasswordWithOtp: (
+    data: ResetPasswordOtpRequest
+  ) => Promise<{ message: string; user?: User; autoLogin: boolean }>;
+  sendEmailVerificationOtp: () => Promise<{
+    message: string;
+    otpSent: boolean;
+  }>;
+  verifyEmailOtp: (
+    data: VerifyEmailOtpRequest
+  ) => Promise<{ message: string; user: User }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -602,39 +684,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      const response = await apiClient.post<{ user: User; message?: string }>(
+      const response = await apiClient.post<any>(
         '/api/auth/login',
         credentials
       );
 
-      if (response.success) {
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success) {
         // For cookie-based auth, we don't need to store tokens
         // The server will set auth cookies automatically
-        //console.log('✅ Login successful, setting user data');
-        setUser(response.data.user);
-        // Force save to cache immediately
-        saveUserToCache(response.data.user);
-        return;
+        console.log('✅ Login successful, setting user data');
+
+        // Check if user is in nested data structure or directly available
+        const userData = responseData.data?.user || responseData.user;
+
+        if (userData) {
+          setUser(userData);
+          // Force save to cache immediately
+          saveUserToCache(userData);
+          return;
+        } else {
+          throw new Error(
+            'Login successful but user data not found in response'
+          );
+        }
       } else {
         // Handle specific login errors based on API documentation
         const errorMessage =
-          response.message || 'Login failed. Please try again.';
+          responseData.message || 'Login failed. Please try again.';
 
         // Map specific error messages to user-friendly messages
         switch (errorMessage) {
           case 'Invalid credentials':
+          case 'Invalid email or password':
             throw new Error('Email or password is incorrect.');
+          case 'Account not verified':
+            throw new Error(
+              'Please verify your email address before signing in.'
+            );
           case 'Account suspended':
             throw new Error(
-              'Your account has been suspended. Contact support.'
+              'Your account has been suspended. Please contact support.'
             );
-          case 'Account locked':
-            const lockMessage = response.details?.remainingTime
-              ? `Account locked for ${Math.ceil(response.details.remainingTime / 60)} minutes.`
-              : 'Account is temporarily locked due to too many failed attempts.';
-            throw new Error(lockMessage);
-          case 'Validation failed':
-            throw new Error('Please check your email and password format.');
+          case 'Account deactivated':
+            throw new Error(
+              'Your account has been deactivated. Please contact support to reactivate.'
+            );
           default:
             throw new Error(errorMessage);
         }
@@ -702,44 +799,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      const response = await apiClient.post<{ user: User; message?: string }>(
+      const response = await apiClient.post<any>(
         '/api/auth/register',
         userData
       );
 
-      if (response.success) {
-        // For cookie-based auth, auto-login after successful registration
-        // The server will set auth cookies automatically
-        setUser(response.data.user);
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
 
-        return {
-          user: response.data.user,
-          message: 'User registered successfully. Please verify your email.',
-        };
+      if (responseData.success) {
+        console.log('✅ Registration successful, user data received');
+
+        // Check if user is in nested data structure or directly available
+        const userProfile = responseData.data?.user || responseData.user;
+
+        if (userProfile) {
+          // For cookie-based auth, auto-login after successful registration
+          // The server will set auth cookies automatically
+          setUser(userProfile);
+
+          return {
+            user: userProfile,
+            message:
+              responseData.message ||
+              'Registration successful! Please check your email to verify your account.',
+          };
+        } else {
+          throw new Error(
+            'Registration successful but user data not found in response'
+          );
+        }
       } else {
-        // Handle specific registration errors
         const errorMessage =
-          response.message || 'Registration failed. Please try again.';
+          responseData.message || 'Registration failed. Please try again.';
 
+        // Handle specific registration errors
         switch (errorMessage) {
-          case 'Email already registered':
+          case 'Email already exists':
+          case 'User already exists':
             throw new Error(
               'An account with this email already exists. Please sign in instead.'
             );
-          case 'Validation failed':
-            // Handle validation details if available
-            if (response.details) {
-              const validationErrors = Object.values(response.details).join(
-                ', '
-              );
-              throw new Error(`Please check your input: ${validationErrors}`);
-            }
-            throw new Error('Please check your input and try again.');
+          case 'Username already taken':
+            throw new Error(
+              'This username is already taken. Please choose a different one.'
+            );
+          case 'Invalid email format':
+            throw new Error('Please enter a valid email address.');
           default:
             throw new Error(errorMessage);
         }
       }
     } catch (error: any) {
+      console.error('Registration error:', error);
       const errorMessage =
         error.message || 'Registration failed. Please try again.';
       setError(errorMessage);
@@ -751,20 +863,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      const response = await apiClient.post<ForgotPasswordResponse>(
+      const response = await apiClient.post<any>(
         '/api/auth/forgot-password',
         data
       );
 
-      if (response.success) {
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || responseData.otpSent) {
+        console.log('✅ Password reset email sent successfully');
         return {
-          message: 'Password reset email sent successfully',
-          email: response.data.email,
-          expiresIn: response.data.expiresIn,
+          message:
+            responseData.message || 'Password reset email sent successfully',
+          email: data.email, // Use the email from request since server may not return it
+          expiresIn: responseData.expiresIn || 300, // Default 5 minutes if not provided
         };
       } else {
         const errorMessage =
-          response.message || 'Failed to send reset email. Please try again.';
+          responseData.message ||
+          'Failed to send reset email. Please try again.';
 
         switch (errorMessage) {
           case 'User not found':
@@ -778,6 +896,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     } catch (error: any) {
+      console.error('Forgot password error:', error);
       const errorMessage =
         error.message || 'Failed to send reset email. Please try again.';
       setError(errorMessage);
@@ -789,48 +908,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setError(null);
 
-      const response = await apiClient.post<ResetPasswordResponse>(
+      const response = await apiClient.post<any>(
         '/api/auth/reset-password',
         data
       );
 
-      if (response.success) {
-        // Auto-login after successful password reset
-        if (response.data.accessToken && response.data.refreshToken) {
-          apiClient.setAuthTokens(
-            response.data.accessToken,
-            response.data.refreshToken
-          );
-          setUser(response.data.user);
-        }
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
 
-        return {
-          message: 'Password reset successfully',
-          user: response.data.user,
-        };
+      if (responseData.success) {
+        console.log('✅ Password reset successful, setting user data');
+
+        // Check if user is in nested data structure or directly available
+        const userData = responseData.data?.user || responseData.user;
+
+        if (userData) {
+          setUser(userData);
+          saveUserToCache(userData);
+
+          return {
+            message: responseData.message || 'Password reset successfully',
+            user: userData,
+          };
+        } else {
+          throw new Error(
+            'Password reset successful but user data not found in response'
+          );
+        }
       } else {
         const errorMessage =
-          response.message || 'Failed to reset password. Please try again.';
+          responseData.message || 'Failed to reset password. Please try again.';
 
         switch (errorMessage) {
-          case 'Invalid reset token':
-            throw new Error(
-              'Reset link is invalid or has expired. Please request a new one.'
-            );
+          case 'Invalid token':
           case 'Token expired':
             throw new Error(
-              'Reset link has expired. Please request a new one.'
+              'Reset link has expired. Please request a new password reset.'
             );
-          case 'Validation failed':
-            if (response.details?.password) {
-              throw new Error(response.details.password);
-            }
-            throw new Error('Password does not meet security requirements.');
+          case 'Token already used':
+            throw new Error(
+              'This reset link has already been used. Please request a new password reset.'
+            );
+          case 'User not found':
+            throw new Error(
+              'Account not found. Please check your email and try again.'
+            );
           default:
             throw new Error(errorMessage);
         }
       }
     } catch (error: any) {
+      console.error('Reset password error:', error);
       const errorMessage =
         error.message || 'Failed to reset password. Please try again.';
       setError(errorMessage);
@@ -1096,6 +1224,318 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // OTP-based authentication methods
+  const verifyRegistrationOtp = async (data: VerifyRegistrationOtpRequest) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<any>(
+        '/api/auth/verify-registration-otp',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success) {
+        console.log(
+          '✅ Registration OTP verified successfully, setting user data'
+        );
+
+        // Check if user is in nested data structure or directly available
+        const userData = responseData.data?.user || responseData.user;
+
+        if (userData) {
+          setUser(userData);
+          saveUserToCache(userData);
+
+          return {
+            message:
+              responseData.message || 'Registration verified successfully',
+            user: userData,
+          };
+        } else {
+          throw new Error(
+            'Registration verified but user data not found in response'
+          );
+        }
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to verify registration OTP';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Verify registration OTP error:', error);
+      const errorMessage =
+        error.message || 'Failed to verify registration OTP. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const initiateOtpLogin = async (data: InitiateOtpLoginRequest) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<OtpResponse>(
+        '/api/auth/otp-login/initiate',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || responseData.otpSent) {
+        return {
+          message: responseData.message || 'OTP sent to your email',
+          otpSent: responseData.otpSent || true,
+        };
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to initiate OTP login';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Initiate OTP login error:', error);
+      const errorMessage =
+        error.message || 'Failed to initiate OTP login. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const completeOtpLogin = async (data: CompleteOtpLoginRequest) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<any>(
+        '/api/auth/otp-login/complete',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success) {
+        console.log('✅ OTP login successful, setting user data');
+
+        // Check if user is in nested data structure or directly available
+        const userData = responseData.data?.user || responseData.user;
+
+        if (userData) {
+          setUser(userData);
+          saveUserToCache(userData);
+        } else {
+          throw new Error(
+            'OTP login successful but user data not found in response'
+          );
+        }
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to complete OTP login';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Complete OTP login error:', error);
+      const errorMessage =
+        error.message || 'Failed to complete OTP login. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const initiatePasswordChange = async (
+    data: InitiatePasswordChangeRequest
+  ) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<OtpResponse>(
+        '/api/auth/change-password/initiate',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || responseData.otpSent) {
+        return {
+          message: responseData.message || 'OTP sent for password change',
+          otpSent: responseData.otpSent || true,
+        };
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to initiate password change';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Initiate password change error:', error);
+      const errorMessage =
+        error.message ||
+        'Failed to initiate password change. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const completePasswordChange = async (
+    data: CompletePasswordChangeRequest
+  ) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<{
+        message: string;
+        success?: boolean;
+      }>('/api/auth/change-password/complete', data);
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || responseData.message) {
+        console.log('✅ Password change completed successfully');
+        return {
+          message: responseData.message || 'Password changed successfully',
+        };
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to change password';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Complete password change error:', error);
+      const errorMessage =
+        error.message || 'Failed to change password. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const resetPasswordWithOtp = async (data: ResetPasswordOtpRequest) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<any>(
+        '/api/auth/reset-password',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success) {
+        console.log('✅ Password reset with OTP successful');
+
+        // If user data is provided, log them in automatically
+        const userData = responseData.data?.user || responseData.user;
+        if (userData) {
+          setUser(userData);
+          saveUserToCache(userData);
+          return {
+            message: responseData.message || 'Password reset successfully',
+            user: userData,
+            autoLogin: true,
+          };
+        } else {
+          // Password reset successful, but user needs to login again
+          return {
+            message:
+              responseData.message ||
+              'Password reset successfully. Please login with your new password.',
+            autoLogin: false,
+          };
+        }
+      } else {
+        const errorMessage = responseData.message || 'Failed to reset password';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Reset password with OTP error:', error);
+      const errorMessage =
+        error.message || 'Failed to reset password. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const sendEmailVerificationOtp = async () => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<OtpResponse>(
+        '/api/auth/email-verification/send'
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success || responseData.otpSent) {
+        return {
+          message:
+            responseData.message || 'Verification OTP sent to your email',
+          otpSent: responseData.otpSent || true,
+        };
+      } else {
+        const errorMessage =
+          responseData.message || 'Failed to send verification OTP';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Send email verification OTP error:', error);
+      const errorMessage =
+        error.message || 'Failed to send verification OTP. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const verifyEmailOtp = async (data: VerifyEmailOtpRequest) => {
+    try {
+      setError(null);
+
+      const response = await apiClient.post<any>(
+        '/api/auth/email-verification/verify',
+        data
+      );
+
+      // Handle both nested and flat response structures
+      const responseData = response.data || response;
+
+      if (responseData.success) {
+        // Check if user is in nested data structure or directly available
+        const userData = responseData.data?.user || responseData.user;
+
+        if (userData) {
+          console.log('✅ Email OTP verified successfully, updating user data');
+          setUser(userData);
+          saveUserToCache(userData);
+        }
+
+        return {
+          message: responseData.message || 'Email verified successfully',
+          user: userData || user!,
+        };
+      } else {
+        const errorMessage = responseData.message || 'Failed to verify email';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error('Verify email OTP error:', error);
+      const errorMessage =
+        error.message || 'Failed to verify email. Please try again.';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -1114,6 +1554,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     checkAuthStatus,
     verifyEmail,
     resendVerification,
+    // OTP-based authentication methods
+    verifyRegistrationOtp,
+    initiateOtpLogin,
+    completeOtpLogin,
+    initiatePasswordChange,
+    completePasswordChange,
+    resetPasswordWithOtp,
+    sendEmailVerificationOtp,
+    verifyEmailOtp,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1586,7 +1586,7 @@ export default function CreateGigPage() {
                     <label className="text-body mb-2 block text-sm font-medium">
                       Budget Type
                     </label>
-                    <div className="grid grid-cols-3 gap-1">
+                    <div className="grid grid-cols-2 gap-1">
                       {[
                         {
                           value: 'fixed',
@@ -1597,12 +1597,12 @@ export default function CreateGigPage() {
                           value: 'hourly',
                           label: 'Hourly Rate',
                           description: 'Pay per hour',
-                        },
-                        {
-                          value: 'negotiable',
-                          label: 'Negotiable',
-                          description: 'Discuss with applicants',
-                        },
+                        }
+                        // {
+                        //   value: 'negotiable',
+                        //   label: 'Negotiable',
+                        //   description: 'Discuss with applicants',
+                        // },
                       ].map((type) => (
                         <label
                           key={type.value}

@@ -156,7 +156,7 @@ export const CreatorDashboardClient: React.FC<CreatorDashboardClientProps> = ({
       permission: 'portfolio.manage',
     },
     {
-      href: '/profile/edit',
+      href: '/profile',
       icon: '✏️',
       label: 'Edit Profile',
       description: 'Update your info',

@@ -255,7 +255,7 @@ export const DashboardRouter: React.FC = () => {
                   Browse Marketplace
                 </button>
                 <button
-                  onClick={() => (window.location.href = '/profile/edit')}
+                  onClick={() => (window.location.href = '/profile')}
                   className="btn-secondary px-3 py-1.5 text-sm md:px-4 md:py-2 md:text-base"
                 >
                   Complete Profile

@@ -12,7 +12,7 @@ interface TestResult {
 
 const implementedPages = [
   // High Priority Pages (Completed in Phase 1)
-  { path: '/profile/edit', name: 'Profile Edit', category: 'Profile' },
+  { path: '/profile', name: 'Profile Edit', category: 'Profile' },
   { path: '/portfolio', name: 'Portfolio Management', category: 'Portfolio' },
   { path: '/applications', name: 'Applications', category: 'Gigs' },
   { path: '/search', name: 'Search', category: 'Discovery' },

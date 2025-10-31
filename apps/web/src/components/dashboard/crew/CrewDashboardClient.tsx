@@ -307,7 +307,7 @@ export function CrewDashboardClient() {
               <div className="py-6 text-center">
                 <div className="mb-2 text-3xl">🔧</div>
                 <p className="mb-3 text-gray-600">No skills listed yet</p>
-                <a href="/profile/edit" className="btn-secondary">
+                <a href="/profile" className="btn-secondary">
                   Add Skills
                 </a>
               </div>

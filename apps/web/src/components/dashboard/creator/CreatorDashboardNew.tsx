@@ -139,7 +139,7 @@ export const CreatorDashboard: React.FC = () => {
       permission: 'portfolio.manage',
     },
     {
-      href: '/profile/edit',
+      href: '/profile',
       icon: '✏️',
       label: 'Edit Profile',
       description: 'Update your info',
