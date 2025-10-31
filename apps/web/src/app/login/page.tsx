@@ -19,6 +19,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
 
+  useEffect(() => {
+    // Wait for auth to load before redirecting
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   // Check for success message from URL parameters
   useEffect(() => {
     const message = searchParams.get('message');

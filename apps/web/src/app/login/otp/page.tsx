@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -8,12 +8,20 @@ import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
 
 export default function OtpLoginPage() {
   const router = useRouter();
-  const { initiateOtpLogin, completeOtpLogin, isLoading } = useAuth();
+  const { initiateOtpLogin, completeOtpLogin, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
+
+  useEffect(() => {
+      // Wait for auth to load before redirecting
+      console.log('isLoading:', isLoading, 'isAuthenticated:', isAuthenticated);
+      if (!isLoading && isAuthenticated) {
+        router.push('/dashboard');
+      }
+    }, [isAuthenticated, isLoading, router]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

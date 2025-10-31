@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,16 +18,28 @@ export default function RegisterPage() {
     agreedToTerms: false,
     subscribeToNewsletter: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingInternal, setIsLoadingInternal] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
-  const { register, verifyRegistrationOtp, isAuthenticated, clearError } =
-    useAuth();
+  const {
+    register,
+    verifyRegistrationOtp,
+    isAuthenticated,
+    isLoading,
+    clearError,
+  } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    // Wait for auth to load before redirecting
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   // Remove the useEffect that was causing the redirect loop
   // RouteGuard will handle redirecting authenticated users away from register page
@@ -142,7 +154,7 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingInternal(true);
     setError('');
     clearError();
 
@@ -173,10 +185,10 @@ export default function RegisterPage() {
       console.log('Registration initiated:', result.message);
       setRegistrationEmail(formData.email);
       setShowOtpModal(true);
-      setIsLoading(false); // Allow user to interact with OTP modal
+      setIsLoadingInternal(false); // Allow user to interact with OTP modal
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
-      setIsLoading(false);
+      setIsLoadingInternal(false);
     }
   };
 
@@ -726,7 +738,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={handlePrevious}
                   className="btn-ghost border border-gray-300 px-1 py-1"
-                  disabled={isLoading}
+                  disabled={isLoadingInternal}
                 >
                   Previous
                 </button>
@@ -736,7 +748,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={
-                    isLoading ||
+                    isLoadingInternal ||
                     (step === 3 &&
                       (formData.roles.length === 0 ||
                         !formData.agreedToTerms ||
@@ -747,7 +759,7 @@ export default function RegisterPage() {
                   }
                   className="btn-primary flex items-center justify-center px-1 py-1 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isLoading ? (
+                  {isLoadingInternal ? (
                     <>
                       <svg
                         className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
