@@ -182,7 +182,9 @@ export default function RegisterPage() {
       });
 
       // Registration initiated - now show OTP verification modal
-      console.log('Registration initiated:', result.message);
+      console.log('Registration initiated:', result);
+      console.log('OTP sent:', result.otpSent);
+      console.log('Setting registration email:', formData.email);
       setRegistrationEmail(formData.email);
       setShowOtpModal(true);
       setIsLoadingInternal(false); // Allow user to interact with OTP modal

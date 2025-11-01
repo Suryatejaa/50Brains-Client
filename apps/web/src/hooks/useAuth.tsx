@@ -186,7 +186,7 @@ interface AuthContextType {
   login: (credentials: LoginRequest) => Promise<void>;
   register: (
     userData: RegisterRequest
-  ) => Promise<{ user: User; message: string }>;
+  ) => Promise<{ user: User; message: string; otpSent?: boolean }>;
   logout: () => Promise<void>;
   forgotPassword: (
     data: ForgotPasswordRequest
@@ -814,28 +814,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Handle both nested and flat response structures
       const responseData = response.data || response;
 
-      if (responseData.success) {
+      if (response.success) {
         console.log('✅ Registration successful, user data received');
 
-        // Check if user is in nested data structure or directly available
-        const userProfile = responseData.data?.user || responseData.user;
-
-        if (userProfile) {
-          // For cookie-based auth, auto-login after successful registration
-          // The server will set auth cookies automatically
-          setUser(userProfile);
-
-          return {
-            user: userProfile,
-            message:
-              responseData.message ||
-              'Registration successful! Please check your email to verify your account.',
-          };
-        } else {
-          throw new Error(
-            'Registration successful but user data not found in response'
-          );
-        }
+        // The registration is successful but user needs OTP verification
+        // Don't set user yet since they need to verify OTP first
+        return {
+          user: responseData.data?.user || responseData.user,
+          message:
+            response.message ||
+            'Registration successful! Please check your email to verify your account.',
+          otpSent: responseData.otpSent || true,
+        };
       } else {
         const errorMessage =
           responseData.message || 'Registration failed. Please try again.';
@@ -1265,7 +1255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
 
         // Check if user is in nested data structure or directly available
-        const userData = responseData.data?.user || responseData.user;
+        const userData = responseData.user || responseData.data?.user;
 
         if (userData) {
           setUser(userData);
