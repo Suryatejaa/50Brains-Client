@@ -5,10 +5,21 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { RoleSwitcher } from './RoleSwitcher';
 import NotificationBell from '@/components/NotificationBell';
+import {
+  QuestionMarkCircleIcon,
+  DocumentTextIcon,
+  ShieldCheckIcon,
+  CurrencyDollarIcon,
+  InformationCircleIcon,
+  PhoneIcon,
+  UserIcon,
+  HomeIcon,
+} from '@heroicons/react/24/outline';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   const hasMultiRoles = user?.roles && user.roles.length > 2;
@@ -26,7 +37,76 @@ export function Header() {
 
             {/* 📱 Mobile Header Actions */}
             <div className="flex items-center space-x-0 md:hidden">
-              {/* Notifications for Mobile */}
+              {/* Help Menu for Mobile */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
+                  className="text-body hover:text-accent p-1 transition-colors"
+                >
+                  <QuestionMarkCircleIcon className="h-6 w-6" />
+                </button>
+
+                {/* Mobile Help Dropdown */}
+                {isHelpMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsHelpMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white shadow-lg">
+                      <div className="p-2">
+                        <div className="mb-2 border-b border-gray-200 px-3 py-2">
+                          <div className="font-medium text-gray-900">
+                            Help & Legal
+                          </div>
+                        </div>
+                        <Link
+                          href="/terms"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>📋</span>
+                          <span>Terms & Conditions</span>
+                        </Link>
+                        <Link
+                          href="/privacy"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>🔒</span>
+                          <span>Privacy Policy</span>
+                        </Link>
+                        <Link
+                          href="/refund"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>💰</span>
+                          <span>Refund Policy</span>
+                        </Link>
+                        <Link
+                          href="/about"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>ℹ️</span>
+                          <span>About Us</span>
+                        </Link>
+                        <div className="mt-2 border-t border-gray-200 pt-2">
+                          <Link
+                            href="/contact"
+                            onClick={() => setIsHelpMenuOpen(false)}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <span>📞</span>
+                            <span>Contact Support</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
               <NotificationBell />
 
               {/* Mobile menu button */}
@@ -55,9 +135,83 @@ export function Header() {
             </div>
 
             {/* 🚀 Desktop User Menu */}
-            <div className="hidden items-center space-x-4 md:flex">
+            <div className="hidden items-center space-x-0 md:flex">
               {/* Role Switcher - Only show if user has multiple roles */}
               {hasMultiRoles && <RoleSwitcher />}
+
+              {/* Help Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
+                  className="text-body hover:text-accent p-0 transition-colors"
+                >
+                  <QuestionMarkCircleIcon className="h-6 w-6" />
+                </button>
+
+                {/* Desktop Help Dropdown */}
+                {isHelpMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsHelpMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-20 mt-2 w-64 rounded-md border border-gray-200 bg-white shadow-lg">
+                      <div className="p-2">
+                        <div className="mb-2 border-b border-gray-200 px-3 py-3">
+                          <div className="font-medium text-gray-900">
+                            Help & Legal
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Support and information
+                          </div>
+                        </div>
+                        <Link
+                          href="/terms"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>📋</span>
+                          <span>Terms & Conditions</span>
+                        </Link>
+                        <Link
+                          href="/privacy"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>🔒</span>
+                          <span>Privacy Policy</span>
+                        </Link>
+                        <Link
+                          href="/refund"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>💰</span>
+                          <span>Refund Policy</span>
+                        </Link>
+                        <Link
+                          href="/about"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <span>ℹ️</span>
+                          <span>About Us</span>
+                        </Link>
+                        <div className="mt-2 border-t border-gray-200 pt-2">
+                          <Link
+                            href="/contact"
+                            onClick={() => setIsHelpMenuOpen(false)}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <span>📞</span>
+                            <span>Contact Support</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
 
               {/* Notifications */}
               <NotificationBell />
@@ -103,7 +257,7 @@ export function Header() {
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>👤</span>
+                          <UserIcon className="h-4 w-4 text-gray-500" />
                           <span>Profile</span>
                         </Link>
 
@@ -121,7 +275,7 @@ export function Header() {
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>🏠</span>
+                          <HomeIcon className="h-4 w-4 text-gray-500" />
                           <span>Dashboard</span>
                         </Link>
 
@@ -137,7 +291,7 @@ export function Header() {
           {/* 📱 Mobile User Menu */}
           {isMenuOpen && (
             <div className="md:hidden">
-              <div className="border-brand-border space-y-1 border-none bg-brand-glass">
+              <div className="border-brand-border bg-brand-glass space-y-1 border-none">
                 {/* User Info Header */}
                 <div className="border-brand-border border-b px-2 py-2">
                   <div className="flex items-center space-x-3">
@@ -164,7 +318,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                   >
-                    <span>�</span>
+                    <UserIcon className="h-4 w-4 text-gray-500" />
                     <span>Profile</span>
                   </Link>
 
@@ -173,7 +327,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                   >
-                    <span>🏠</span>
+                    <HomeIcon className="h-4 w-4 text-gray-500" />
                     <span>Dashboard</span>
                   </Link>
                 </div>

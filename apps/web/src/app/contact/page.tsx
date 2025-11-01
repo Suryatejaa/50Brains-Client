@@ -4,6 +4,17 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
+import {
+  ChatBubbleLeftIcon,
+  CreditCardIcon,
+  EnvelopeIcon,
+  ExclamationTriangleIcon,
+  LightBulbIcon,
+  MapPinIcon,
+  UserIcon,
+  WrenchScrewdriverIcon,
+} from '@heroicons/react/24/outline';
+import { TagIcon, BuildingOffice2Icon } from '@heroicons/react/24/solid';
 
 interface ContactForm {
   name: string;
@@ -15,14 +26,18 @@ interface ContactForm {
 }
 
 const contactCategories = [
-  { value: 'general', label: 'General Inquiry', icon: '💬' },
-  { value: 'technical', label: 'Technical Support', icon: '🔧' },
-  { value: 'billing', label: 'Billing & Payments', icon: '💳' },
-  { value: 'account', label: 'Account Issues', icon: '👤' },
-  { value: 'gig', label: 'Gig Related', icon: '🎯' },
-  { value: 'partnership', label: 'Business Partnership', icon: '🤝' },
-  { value: 'feedback', label: 'Feedback & Suggestions', icon: '💡' },
-  { value: 'report', label: 'Report Abuse', icon: '⚠️' },
+  { value: 'general', label: 'General Inquiry', icon: ChatBubbleLeftIcon },
+  {
+    value: 'technical',
+    label: 'Technical Support',
+    icon: WrenchScrewdriverIcon,
+  },
+  { value: 'billing', label: 'Billing & Payments', icon: CreditCardIcon },
+  { value: 'account', label: 'Account Issues', icon: UserIcon },
+  { value: 'gig', label: 'Gig Related', icon: TagIcon },
+  { value: 'partnership', label: 'Business Partnership', icon: LightBulbIcon },
+  { value: 'partnership', label: 'Business Partnership', icon: BuildingOffice2Icon },
+  { value: 'report', label: 'Report Abuse', icon: ExclamationTriangleIcon },
 ];
 
 const priorityLevels = [
@@ -180,16 +195,16 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="font-inter min-h-screen bg-gray-50">
       <div className="page-container min-h-screen pt-16">
         <div className="content-container py-8">
           <div className="mx-auto max-w-4xl">
             {/* Header */}
             <div className="mb-12 text-center">
-              <h1 className="text-heading mb-4 text-4xl font-bold">
+              <h1 className="text-heading mb-4 text-4xl font-semibold tracking-tight">
                 Contact Us
               </h1>
-              <p className="text-muted mx-auto max-w-2xl text-lg">
+              <p className="text-muted mx-auto max-w-2xl text-lg font-normal">
                 Have a question or need help? We're here to assist you. Send us
                 a message and we'll get back to you as soon as possible.
               </p>
@@ -206,7 +221,7 @@ export default function ContactPage() {
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-blue-100">
-                        <span className="text-xl">📧</span>
+                        <EnvelopeIcon className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Email</p>
@@ -218,7 +233,7 @@ export default function ContactPage() {
 
                     <div className="flex items-center space-x-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-green-100">
-                        <span className="text-xl">💬</span>
+                        <ChatBubbleLeftIcon className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Live Chat</p>
@@ -230,7 +245,7 @@ export default function ContactPage() {
 
                     <div className="flex items-center space-x-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-none bg-purple-100">
-                        <span className="text-xl">📍</span>
+                        <MapPinIcon className="h-5 w-5 text-purple-600" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Address</p>
@@ -355,7 +370,7 @@ export default function ContactPage() {
                         >
                           {contactCategories.map((cat) => (
                             <option key={cat.value} value={cat.value}>
-                              {cat.icon} {cat.label}
+                              {cat.label}
                             </option>
                           ))}
                         </select>

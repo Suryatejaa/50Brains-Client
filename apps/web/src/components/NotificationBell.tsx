@@ -238,7 +238,7 @@ export default function NotificationBell() {
   return (
     <div className="relative" ref={dropdownRef} style={{ zIndex: 99999 }}>
       <button
-        className="relative rounded-full  p-2 transition-colors hover:bg-gray-100"
+        className="relative rounded-full p-2 transition-colors hover:bg-gray-100"
         onClick={handleBellClick}
         aria-label="Notifications"
       >

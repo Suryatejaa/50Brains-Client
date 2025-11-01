@@ -3,6 +3,23 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { BusinessRoadmap } from '@/components/landing/BusinessRoadmap';
+import {
+  RocketLaunchIcon,
+  MapPinIcon as TargetIcon,
+  CurrencyDollarIcon,
+  UsersIcon,
+  GlobeAltIcon,
+  PaintBrushIcon,
+  MagnifyingGlassIcon,
+  LightBulbIcon,
+  UserGroupIcon as HandshakeIcon,
+  StarIcon,
+  ChartBarIcon,
+  BuildingOfficeIcon,
+  CheckCircleIcon,
+  BookOpenIcon,
+  SparklesIcon as GemIcon,
+} from '@heroicons/react/24/outline';
 
 const teamMembers = [
   {
@@ -47,32 +64,32 @@ const milestones = [
     year: '2023',
     title: 'Company Founded',
     description: 'Started with a vision to revolutionize the creator economy',
-    icon: '🚀',
+    icon: RocketLaunchIcon,
   },
   {
     year: '2023',
     title: 'Beta Launch',
     description: 'Launched beta platform with 100+ creators and brands',
-    icon: '🎯',
+    icon: TargetIcon,
   },
   {
     year: '2024',
     title: 'Series A Funding',
     description: 'Raised $5M to scale platform and expand team',
-    icon: '💰',
+    icon: CurrencyDollarIcon,
   },
   {
     year: '2024',
     title: '10K+ Users',
     description: 'Reached 10,000+ active users across all categories',
-    icon: '👥',
+    icon: UsersIcon,
   },
   {
     year: '2025',
     title: 'Global Expansion',
     description:
       'Expanding to international markets and new creator categories',
-    icon: '🌍',
+    icon: GlobeAltIcon,
   },
 ];
 
@@ -81,43 +98,43 @@ const values = [
     title: 'Creator First',
     description:
       'Everything we build puts creators and their success at the center.',
-    icon: '🎨',
+    icon: PaintBrushIcon,
   },
   {
     title: 'Transparency',
     description:
       'Open communication, fair pricing, and honest business practices.',
-    icon: '🔍',
+    icon: MagnifyingGlassIcon,
   },
   {
     title: 'Innovation',
     description:
       'Constantly pushing boundaries to improve the creator experience.',
-    icon: '💡',
+    icon: LightBulbIcon,
   },
   {
     title: 'Community',
     description: 'Building lasting relationships and fostering collaboration.',
-    icon: '🤝',
+    icon: HandshakeIcon,
   },
   {
     title: 'Quality',
     description: 'Maintaining high standards in everything we do.',
-    icon: '⭐',
+    icon: StarIcon,
   },
   {
     title: 'Growth',
     description:
       'Empowering creators and brands to reach their full potential.',
-    icon: '📈',
+    icon: ChartBarIcon,
   },
 ];
 
 const stats = [
-  { label: 'Active Creators', value: '25,000+', icon: '🎨' },
-  { label: 'Brands & Companies', value: '5,000+', icon: '🏢' },
-  { label: 'Projects Completed', value: '100,000+', icon: '✅' },
-  { label: 'Total Earnings', value: '$50M+', icon: '💰' },
+  { label: 'Active Creators', value: '25,000+', icon: PaintBrushIcon },
+  { label: 'Brands & Companies', value: '5,000+', icon: BuildingOfficeIcon },
+  { label: 'Projects Completed', value: '100,000+', icon: CheckCircleIcon },
+  { label: 'Total Earnings', value: '$50M+', icon: CurrencyDollarIcon },
 ];
 
 export default function AboutPage() {
@@ -126,16 +143,16 @@ export default function AboutPage() {
   >('story');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="font-inter min-h-screen bg-gray-50">
       <div className="page-container min-h-screen pt-16">
         <div className="content-container py-8">
           <div className="mx-auto max-w-6xl">
             {/* Hero Section */}
             <div className="mb-16 text-center">
-              <h1 className="text-heading mb-6 text-5xl font-bold">
+              <h1 className="text-heading mb-6 text-5xl font-semibold tracking-tight">
                 About 50BraIns
               </h1>
-              <p className="text-muted mx-auto max-w-3xl text-xl leading-relaxed">
+              <p className="text-muted mx-auto max-w-3xl text-xl font-normal leading-relaxed">
                 We're building the future of the creator economy by connecting
                 talented creators, influencers, and brands in a transparent,
                 fair, and innovative marketplace.
@@ -143,16 +160,23 @@ export default function AboutPage() {
             </div>
 
             {/* Stats Section */}
-            <div className="mb-16 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {stats.map((stat, index) => (
-                <div key={index} className="card-glass p-3 text-center">
-                  <div className="mb-2 text-3xl">{stat.icon}</div>
-                  <div className="mb-1 text-2xl font-bold text-gray-900">
-                    {stat.value}
+            <div className="mb-16 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {stats.map((stat, index) => {
+                const IconComponent = stat.icon;
+                return (
+                  <div key={index} className="card-glass p-6 text-center">
+                    <div className="mb-3 flex justify-center">
+                      <IconComponent className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div className="mb-2 text-2xl font-semibold text-gray-900">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm font-medium text-gray-600">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Business Roadmap */}
@@ -163,24 +187,27 @@ export default function AboutPage() {
             {/* Navigation Tabs */}
             <div className="mb-8 flex flex-wrap justify-center border-b border-gray-200">
               {[
-                { key: 'story', label: 'Our Story', icon: '📖' },
-                { key: 'team', label: 'Meet the Team', icon: '👥' },
-                { key: 'values', label: 'Our Values', icon: '💎' },
-                { key: 'careers', label: 'Careers', icon: '🚀' },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
-                  className={`border-b-2 px-6 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab.key
-                      ? 'border-brand-primary text-brand-primary'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <span className="mr-2">{tab.icon}</span>
-                  {tab.label}
-                </button>
-              ))}
+                { key: 'story', label: 'Our Story', icon: BookOpenIcon },
+                { key: 'team', label: 'Meet the Team', icon: UsersIcon },
+                { key: 'values', label: 'Our Values', icon: GemIcon },
+                { key: 'careers', label: 'Careers', icon: RocketLaunchIcon },
+              ].map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key as any)}
+                    className={`flex items-center border-b-2 px-6 py-3 text-sm font-medium transition-colors ${
+                      activeTab === tab.key
+                        ? 'border-brand-primary text-brand-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <IconComponent className="mr-2 h-4 w-4" />
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Content Sections */}
@@ -278,34 +305,37 @@ export default function AboutPage() {
                   <div className="relative">
                     <div className="absolute left-4 h-full w-1 transform bg-gradient-to-b from-blue-500 to-purple-600 md:left-1/2 md:-translate-x-1/2"></div>
                     <div className="space-y-8">
-                      {milestones.map((milestone, index) => (
-                        <div
-                          key={index}
-                          className={`flex items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
-                        >
-                          <div className="flex-1"></div>
-                          <div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-none border-4 border-blue-500 bg-white">
-                            <span className="text-xs">{milestone.icon}</span>
-                          </div>
-                          <div className="ml-4 flex-1 md:ml-0">
-                            <div
-                              className={`card-glass p-4 ${index % 2 === 0 ? 'md:mr-8' : 'md:ml-8'}`}
-                            >
-                              <div className="mb-2 flex items-center space-x-2">
-                                <span className="text-lg font-bold text-blue-600">
-                                  {milestone.year}
-                                </span>
-                                <h4 className="font-semibold text-gray-900">
-                                  {milestone.title}
-                                </h4>
+                      {milestones.map((milestone, index) => {
+                        const IconComponent = milestone.icon;
+                        return (
+                          <div
+                            key={index}
+                            className={`flex items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+                          >
+                            <div className="flex-1"></div>
+                            <div className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-4 border-blue-500 bg-white">
+                              <IconComponent className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div className="ml-4 flex-1 md:ml-0">
+                              <div
+                                className={`card-glass p-4 ${index % 2 === 0 ? 'md:mr-8' : 'md:ml-8'}`}
+                              >
+                                <div className="mb-2 flex items-center space-x-2">
+                                  <span className="text-lg font-semibold text-blue-600">
+                                    {milestone.year}
+                                  </span>
+                                  <h4 className="font-semibold text-gray-900">
+                                    {milestone.title}
+                                  </h4>
+                                </div>
+                                <p className="text-sm font-normal text-gray-600">
+                                  {milestone.description}
+                                </p>
                               </div>
-                              <p className="text-sm text-gray-600">
-                                {milestone.description}
-                              </p>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -408,16 +438,23 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                  {values.map((value, index) => (
-                    <div key={index} className="card-glass p-3 text-center">
-                      <div className="mb-4 text-4xl">{value.icon}</div>
-                      <h3 className="mb-3 text-xl font-bold text-gray-900">
-                        {value.title}
-                      </h3>
-                      <p className="text-gray-600">{value.description}</p>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {values.map((value, index) => {
+                    const IconComponent = value.icon;
+                    return (
+                      <div key={index} className="card-glass p-6 text-center">
+                        <div className="mb-4 flex justify-center">
+                          <IconComponent className="h-10 w-10 text-blue-600" />
+                        </div>
+                        <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                          {value.title}
+                        </h3>
+                        <p className="font-normal text-gray-600">
+                          {value.description}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Call to Action */}
