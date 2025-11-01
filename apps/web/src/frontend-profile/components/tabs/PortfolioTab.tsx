@@ -1,16 +1,16 @@
 // components/tabs/PortfolioTab.tsx
 import React from 'react';
-import { UserProfileData, WorkHistoryData } from '../../types/profile.types';
+import { UserProfileData } from '../../types/profile.types';
 
 interface PortfolioTabProps {
   user: UserProfileData;
-  workHistory?: WorkHistoryData | null;
+  // workHistory?: WorkHistoryData | null;
   isOwner: boolean;
 }
 
 const PortfolioTab: React.FC<PortfolioTabProps> = ({
   user,
-  workHistory,
+  // workHistory,
   isOwner,
 }) => {
   return (
@@ -38,7 +38,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
       )}
 
       {/* Skills showcase */}
-      {workHistory?.skills && workHistory.skills.length > 0 && (
+      {/* {workHistory?.skills && workHistory.skills.length > 0 && (
         <div className="skills-showcase">
           <h4>Skills & Expertise</h4>
           <div className="skills-grid">
@@ -75,10 +75,10 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Recent work showcase */}
-      {workHistory?.recentWork && workHistory.recentWork.length > 0 && (
+      {/* {workHistory?.recentWork && workHistory.recentWork.length > 0 && (
         <div className="recent-work-showcase">
           <h4>Recent Work</h4>
           <div className="work-grid">
@@ -101,10 +101,10 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Achievements */}
-      {workHistory?.achievements && workHistory.achievements.length > 0 && (
+      {/* {workHistory?.achievements && workHistory.achievements.length > 0 && (
         <div className="achievements-showcase">
           <h4>Achievements</h4>
           <div className="achievements-list">
@@ -128,7 +128,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Role-specific portfolio content */}
       {user.roles.includes('CREW') && user.equipmentOwned.length > 0 && (
@@ -145,7 +145,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
       )}
 
       {/* Empty state */}
-      {(!workHistory ||
+      {/* {(!workHistory ||
         (!workHistory.skills?.length && !workHistory.recentWork?.length)) &&
         !user.portfolioUrl && (
           <div className="portfolio-empty">
@@ -161,7 +161,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({
               )}
             </div>
           </div>
-        )}
+        )} */}
     </div>
   );
 };

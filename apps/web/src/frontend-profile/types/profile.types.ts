@@ -59,36 +59,36 @@ export interface UserProfileData {
   specializations: string[];
 }
 
-export interface WorkHistoryData {
-  workSummary: {
-    totalProjects: number;
-    averageRating: number;
-    onTimeDeliveryRate: number;
-    totalEarnings: number;
-    completionRate: number;
-  };
-  skills: Array<{
-    skill: string;
-    level: string;
-    score: number;
-    projectCount: number;
-    averageRating: number;
-  }>;
-  achievements: Array<{
-    type: string;
-    title: string;
-    description: string;
-    achievedAt: string;
-    verified: boolean;
-  }>;
-  recentWork: Array<{
-    title: string;
-    category: string;
-    clientRating: number;
-    completedAt: string;
-    verified: boolean;
-  }>;
-}
+// export interface WorkHistoryData {
+//   workSummary: {
+//     totalProjects: number;
+//     averageRating: number;
+//     onTimeDeliveryRate: number;
+//     totalEarnings: number;
+//     completionRate: number;
+//   };
+//   skills: Array<{
+//     skill: string;
+//     level: string;
+//     score: number;
+//     projectCount: number;
+//     averageRating: number;
+//   }>;
+//   achievements: Array<{
+//     type: string;
+//     title: string;
+//     description: string;
+//     achievedAt: string;
+//     verified: boolean;
+//   }>;
+//   recentWork: Array<{
+//     title: string;
+//     category: string;
+//     clientRating: number;
+//     completedAt: string;
+//     verified: boolean;
+//   }>;
+// }
 
 export interface AnalyticsData {
   profileViews: number;
@@ -98,46 +98,46 @@ export interface AnalyticsData {
   lastViewedAt?: string;
 }
 
-export interface ReputationData {
-  userId: string;
-  baseScore: number;
-  bonusScore: number;
-  finalScore: number;
-  tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
-  badges: string[];
-  metrics: {
-    gigsCompleted: number;
-    gigsPosted: number;
-    boostsReceived: number;
-    boostsGiven: number;
-    averageRating: number;
-    profileViews: number;
-    connectionsMade: number;
-    applicationSuccess: number;
-    completionRate: number;
-    responseTime: number;
-    clanContributions: number;
-  };
-  ranking: {
-    global: {
-      userId: string;
-      rank: number;
-      type: 'global' | 'tier';
-      finalScore: number;
-      tier: string;
-    };
-    tier: {
-      userId: string;
-      rank: number;
-      type: 'global' | 'tier';
-      finalScore: number;
-      tier: string;
-    };
-  };
-  lastActivityAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// export interface ReputationData {
+//   userId: string;
+//   baseScore: number;
+//   bonusScore: number;
+//   finalScore: number;
+//   tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
+//   badges: string[];
+//   metrics: {
+//     gigsCompleted: number;
+//     gigsPosted: number;
+//     boostsReceived: number;
+//     boostsGiven: number;
+//     averageRating: number;
+//     profileViews: number;
+//     connectionsMade: number;
+//     applicationSuccess: number;
+//     completionRate: number;
+//     responseTime: number;
+//     clanContributions: number;
+//   };
+//   ranking: {
+//     global: {
+//       userId: string;
+//       rank: number;
+//       type: 'global' | 'tier';
+//       finalScore: number;
+//       tier: string;
+//     };
+//     tier: {
+//       userId: string;
+//       rank: number;
+//       type: 'global' | 'tier';
+//       finalScore: number;
+//       tier: string;
+//     };
+//   };
+//   lastActivityAt: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 export interface CompleteProfileData {
   user: UserProfileData;

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   UserProfileData,
   AnalyticsData,
-  ReputationData,
+  // ReputationData,
 } from '../types/profile.types';
 import RoleBadges from './common/RoleBadges';
 import EditableField from './common/EditableField';
@@ -14,7 +14,7 @@ import { Pen, PenIcon } from 'lucide-react';
 interface ProfileHeaderProps {
   user: UserProfileData;
   analytics?: AnalyticsData | null;
-  reputation?: ReputationData | null;
+  // reputation?: ReputationData | null;
   isOwner: boolean;
   isEditing: boolean;
   onEditClick: () => void;
@@ -25,7 +25,7 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   user,
   analytics,
-  reputation,
+  // reputation,
   isOwner,
   isEditing,
   onEditClick,
@@ -235,7 +235,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </>
             )}
 
-            {reputation &&
+            {/* {reputation &&
               reputation.metrics &&
               typeof reputation.metrics.averageRating === 'number' && (
                 <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">
@@ -246,7 +246,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     ({reputation.metrics.gigsCompleted || 0} gigs)
                   </span>
                 </div>
-              )}
+              )} */}
 
             {user.roles.includes('INFLUENCER') && user.estimatedFollowers && (
               <div className="profile-header__stat rounded-none bg-gray-50 p-3 text-center">

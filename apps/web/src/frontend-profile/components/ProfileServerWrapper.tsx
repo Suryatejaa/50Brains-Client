@@ -16,7 +16,7 @@ const ProfileServerWrapper: React.FC<ProfileServerWrapperProps> = ({
   userId,
   isPublicView,
 }) => {
-  const { user, analytics, reputation, workHistory } = initialProfileData;
+  const { user, analytics } = initialProfileData;
 
   if (!user) {
     return (
@@ -38,7 +38,7 @@ const ProfileServerWrapper: React.FC<ProfileServerWrapperProps> = ({
       <ProfileHeaderStatic
         user={user}
         analytics={analytics}
-        reputation={reputation}
+        // reputation={reputation}
         showEditButton={!isPublicView}
       />
 

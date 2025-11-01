@@ -3,14 +3,14 @@ import React from 'react';
 import {
   UserProfileData,
   AnalyticsData,
-  ReputationData,
+  // ReputationData,
 } from '../types/profile.types';
 import './ProfileHeader.css';
 
 interface ProfileHeaderStaticProps {
   user: UserProfileData;
   analytics?: AnalyticsData | null;
-  reputation?: ReputationData | null;
+  // reputation?: ReputationData | null;
   showEditButton?: boolean;
 }
 
@@ -18,7 +18,7 @@ interface ProfileHeaderStaticProps {
 const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
   user,
   analytics,
-  reputation,
+  // reputation,
   showEditButton = false,
 }) => {
   const formatNumber = (num: number) => {
@@ -114,7 +114,7 @@ const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
               </>
             )}
 
-            {reputation &&
+            {/* {reputation &&
               reputation.metrics &&
               typeof reputation.metrics.averageRating === 'number' && (
                 <div className="profile-header__stat">
@@ -125,7 +125,7 @@ const ProfileHeaderStatic: React.FC<ProfileHeaderStaticProps> = ({
                     ({reputation.metrics.gigsCompleted || 0} gigs)
                   </span>
                 </div>
-              )}
+              )} */}
 
             {user.roles.includes('INFLUENCER') && user.estimatedFollowers && (
               <div className="profile-header__stat">

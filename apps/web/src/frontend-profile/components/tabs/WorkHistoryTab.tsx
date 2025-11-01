@@ -2,18 +2,18 @@
 'use client';
 
 import React from 'react';
-import { UserProfileData, WorkHistoryData } from '../../types/profile.types';
+import { UserProfileData } from '../../types/profile.types';
 
 interface WorkHistoryTabProps {
   user: UserProfileData;
-  workHistory?: WorkHistoryData | null;
+  // workHistory?: WorkHistoryData | null;
   isOwner: boolean;
   onRefresh: () => Promise<void>;
 }
 
 const WorkHistoryTab: React.FC<WorkHistoryTabProps> = ({
   user,
-  workHistory,
+  // workHistory,
   isOwner,
   onRefresh,
 }) => {
@@ -28,7 +28,7 @@ const WorkHistoryTab: React.FC<WorkHistoryTabProps> = ({
         )}
       </div>
 
-      {workHistory ? (
+      {/* {workHistory ? (
         <div className="work-history-content">
           <div className="work-history-summary">
             <h4>Summary</h4>
@@ -111,7 +111,7 @@ const WorkHistoryTab: React.FC<WorkHistoryTabProps> = ({
         <div className="work-history-empty">
           <p>No work history available</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

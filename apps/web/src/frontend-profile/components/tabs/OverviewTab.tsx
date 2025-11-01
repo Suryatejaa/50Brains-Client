@@ -3,7 +3,7 @@ import React from 'react';
 import {
   UserProfileData,
   AnalyticsData,
-  ReputationData,
+  // ReputationData,
 } from '../../types/profile.types';
 import SocialLinksSection from '../sections/SocialLinksSection';
 import StatsOverviewSection from '../sections/StatsOverviewSection';
@@ -16,7 +16,7 @@ import '../forms/RoleInfoEditForm.css';
 interface OverviewTabProps {
   user: UserProfileData;
   analytics?: AnalyticsData | null;
-  reputation?: ReputationData | null;
+  // reputation?: ReputationData | null;
   isOwner: boolean;
   editing: { section: string | null; data: any };
   onStartEditing: (section: string, data: any) => void;
@@ -30,7 +30,7 @@ interface OverviewTabProps {
 const OverviewTab: React.FC<OverviewTabProps> = ({
   user,
   analytics,
-  reputation,
+  // reputation,
   isOwner,
   editing,
   onStartEditing,

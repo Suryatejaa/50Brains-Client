@@ -69,7 +69,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
       <ProfileHeader
         user={profile.user}
         analytics={profile.analytics}
-        reputation={profile.reputation}
+        // reputation={profile.reputation}
         isOwner={isOwner}
         isEditing={editing.section === 'header'}
         onEditClick={() =>

@@ -47,7 +47,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           <OverviewTab
             user={profile.user}
             analytics={profile.analytics}
-            reputation={profile.reputation}
+            // reputation={profile.reputation}
             isOwner={isOwner}
             editing={editing}
             onStartEditing={onStartEditing}

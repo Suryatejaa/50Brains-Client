@@ -67,9 +67,9 @@ export async function getProfileData(
 
     return {
       user: userData.data.user || userData.data,
-      workHistory: workHistoryData?.success ? workHistoryData.data : null,
+      // workHistory: workHistoryData?.success ? workHistoryData.data : null,
       analytics: analyticsData?.success ? analyticsData.data : null,
-      reputation: reputationData?.success ? reputationData.data : null,
+      // reputation: reputationData?.success ? reputationData.data : null,
     };
   } catch (error) {
     console.error('Server-side profile fetch error:', error);

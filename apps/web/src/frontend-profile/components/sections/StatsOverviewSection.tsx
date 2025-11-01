@@ -3,19 +3,19 @@ import React from 'react';
 import {
   UserProfileData,
   AnalyticsData,
-  ReputationData,
+  // ReputationData,
 } from '../../types/profile.types';
 
 interface StatsOverviewSectionProps {
   user: UserProfileData;
   analytics?: AnalyticsData | null;
-  reputation?: ReputationData | null;
+  // reputation?: ReputationData | null;
 }
 
 const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
   user,
   analytics,
-  reputation,
+  // reputation,
 }) => {
   return (
     <div className="stats-overview-section">
@@ -67,7 +67,7 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
         )}
 
         {/* Reputation Stats */}
-        {reputation && (
+        {/* {reputation && (
           <>
             <div className="stat-item">
               <span className="stat-value">
@@ -95,7 +95,7 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
               <span className="stat-label">Badges Earned</span>
             </div>
           </>
-        )}
+        )} */}
 
         {/* Role-specific stats */}
         {user.roles.includes('INFLUENCER') && (
@@ -139,7 +139,7 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
       </div>
 
       {/* Badges Section */}
-      {reputation?.badges && reputation.badges.length > 0 && (
+      {/* {reputation?.badges && reputation.badges.length > 0 && (
         <div className="badges-section">
           <h4>Badges</h4>
           <div className="badges-list">
@@ -150,7 +150,7 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Verification Status */}
       <div className="verification-section">
@@ -162,13 +162,13 @@ const StatsOverviewSection: React.FC<StatsOverviewSectionProps> = ({
             {user.emailVerified ? '✓' : '⚠'} Email Verified
           </div>
 
-          {reputation?.tier && (
+          {/* {reputation?.tier && (
             <div
               className={`verification-item ${reputation.tier !== 'BRONZE' ? 'verified' : 'unverified'}`}
             >
               {reputation.tier !== 'BRONZE' ? '✓' : '⚠'} {reputation.tier} Tier
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

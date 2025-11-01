@@ -13,7 +13,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
   profile,
   isPublicView,
 }) => {
-  const { user, analytics, reputation, workHistory } = profile;
+  const { user, analytics } = profile;
 
   return (
     <div className="overview-tab">
@@ -31,7 +31,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
               </span>
               <span className="stat-label">Popularity</span>
             </div>
-            {reputation && (
+            {/* {reputation && (
               <div className="stat-item">
                 <span className="stat-value">
                   {reputation.metrics?.averageRating?.toFixed(1) || '0.0'} ⭐
@@ -40,7 +40,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
                   {reputation.metrics?.gigsCompleted || 0} Gigs
                 </span>
               </div>
-            )}
+            )} */}
           </div>
         )}
 
@@ -85,7 +85,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
         </div>
 
         {/* Skills Section */}
-        {workHistory?.skills && workHistory.skills.length > 0 && (
+        {/* {workHistory?.skills && workHistory.skills.length > 0 && (
           <div className="overview-skills">
             <h3>Top Skills</h3>
             <div className="overview-skills-grid">
@@ -98,7 +98,7 @@ const OverviewTabServer: React.FC<OverviewTabServerProps> = ({
                 ))}
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Verification Status */}
         <div className="verification-section">
