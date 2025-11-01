@@ -141,9 +141,9 @@ export interface ReputationData {
 
 export interface CompleteProfileData {
   user: UserProfileData;
-  workHistory: WorkHistoryData | null;
   analytics: AnalyticsData | null;
-  reputation: ReputationData | null;
+  // workHistory: WorkHistoryData | null;
+  // reputation: ReputationData | null;
 }
 
 export interface ProfileState {

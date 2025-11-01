@@ -3,6 +3,12 @@ const path = require('path');
 
 const nextConfig = {
     typedRoutes: true,
+    // Remove console logs in production
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production' ? {
+            exclude: ['error', 'warn'] // Keep error and warn logs for debugging
+        } : false,
+    },
     images: {
         domains: [
             'api.50brains.com',

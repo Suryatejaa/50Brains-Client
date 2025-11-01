@@ -65,13 +65,12 @@ export const useProfile = (userId?: string) => {
           };
 
       // Fetch data from all services in parallel
-      const [userResult, workHistoryResult, analyticsResult, reputationResult] =
-        await Promise.allSettled([
-          apiClient.get(endpoints.user),
-          apiClient.get(endpoints.workHistory),
-          apiClient.get(endpoints.analytics),
-          apiClient.get(endpoints.reputation),
-        ]);
+      const [userResult, analyticsResult] = await Promise.allSettled([
+        apiClient.get(endpoints.user),
+        apiClient.get(endpoints.analytics),
+        // apiClient.get(endpoints.workHistory),
+        // apiClient.get(endpoints.reputation),
+      ]);
 
       // Process results with fallbacks for failed requests
       const profile: CompleteProfileData = {
@@ -80,32 +79,32 @@ export const useProfile = (userId?: string) => {
             ? (userResult.value.data as any).user ||
               (userResult.value.data as any)
             : null,
-        workHistory:
-          workHistoryResult.status === 'fulfilled' &&
-          workHistoryResult.value.success
-            ? (workHistoryResult.value.data as any)
-            : null,
+        // workHistory:
+        //   workHistoryResult.status === 'fulfilled' &&
+        //   workHistoryResult.value.success
+        //     ? (workHistoryResult.value.data as any)
+        //     : null,
         analytics:
           analyticsResult.status === 'fulfilled' &&
           analyticsResult.value.success
             ? (analyticsResult.value.data as any)
             : null,
-        reputation:
-          reputationResult.status === 'fulfilled' &&
-          reputationResult.value.success
-            ? (reputationResult.value.data as any)
-            : null,
+        // reputation:
+        //   reputationResult.status === 'fulfilled' &&
+        //   reputationResult.value.success
+        //     ? (reputationResult.value.data as any)
+        //     : null,
       };
 
       // Log any failed requests (non-critical)
       if (userResult.status === 'rejected')
         console.warn('Failed to fetch user data:', userResult.reason);
-      if (workHistoryResult.status === 'rejected')
-        console.warn('Failed to fetch work history:', workHistoryResult.reason);
       if (analyticsResult.status === 'rejected')
         console.warn('Failed to fetch analytics:', analyticsResult.reason);
-      if (reputationResult.status === 'rejected')
-        console.warn('Failed to fetch reputation:', reputationResult.reason);
+      // if (workHistoryResult.status === 'rejected')
+      // console.warn('Failed to fetch work history:', workHistoryResult.reason);
+      // if (reputationResult.status === 'rejected')
+      // console.warn('Failed to fetch reputation:', reputationResult.reason);
 
       setState((prev) => ({
         ...prev,
