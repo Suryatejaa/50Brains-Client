@@ -1,455 +1,277 @@
-import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions - 50BraIns',
-  description:
-    'Terms and conditions for using 50BraIns marketplace platform connecting brands with creators in India.',
+  title: 'Terms & Conditions | 50BraIns',
+  description: 'Terms and conditions for using the 50BraIns marketplace platform connecting brands with content creators.',
 };
 
-export default function TermsOfServicePage() {
+export default function TermsPage() {
   return (
-    <div className="font-inter min-h-screen bg-gray-50">
-      <div className="page-container min-h-screen pt-16">
-        <div className="content-container py-8">
-          <div className="mx-auto max-w-4xl">
-            {/* Header */}
-            <div className="mb-12 text-center">
-              <h1 className="text-heading mb-4 text-4xl font-semibold tracking-tight">
-                Terms & Conditions
-              </h1>
-              <p className="text-muted mx-auto max-w-2xl text-lg font-normal">
-                Please read these Terms & Conditions carefully before using
-                50BraIns platform
-              </p>
-              <div className="mt-4 text-sm font-medium text-gray-500">
-                Last updated: November 1, 2025
-              </div>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms & Conditions</h1>
+        <p className="text-sm text-gray-600 mb-8">Last Updated: November 3, 2025</p>
+
+        <div className="prose prose-sm max-w-none space-y-6">
+          {/* 1. Introduction */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Introduction</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Welcome to 50BraIns ("Platform", "we", "us", or "our"), operated under UDYAM-TS-09-0192429. 
+              By accessing or using our marketplace platform at www.50brains.com, you agree to be bound by these 
+              Terms and Conditions. If you do not agree, please do not use our services.
+            </p>
+          </section>
+
+          {/* 2. Definitions */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Definitions</h2>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li><strong>"Brand"</strong> refers to businesses, companies, or individuals seeking content creation services.</li>
+              <li><strong>"Creator"</strong> refers to content creators, influencers, or freelancers offering services.</li>
+              <li><strong>"Gig"</strong> refers to a project or campaign posted by a Brand.</li>
+              <li><strong>"Platform"</strong> refers to the 50BraIns marketplace and all associated services.</li>
+              <li><strong>"User"</strong> refers to any person accessing or using the Platform.</li>
+            </ul>
+          </section>
+
+          {/* 3. Eligibility */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Eligibility</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">To use 50BraIns, you must:</p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Be at least 18 years of age</li>
+              <li>Have the legal capacity to enter into binding contracts</li>
+              <li>Provide accurate and complete registration information</li>
+              <li>Maintain the security of your account credentials</li>
+              <li>Comply with all applicable laws and regulations in India</li>
+            </ul>
+          </section>
+
+          {/* 4. Platform Services */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Platform Services</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">50BraIns provides:</p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>A marketplace connecting Brands with Creators</li>
+              <li>Secure payment processing and escrow services</li>
+              <li>Communication tools for project collaboration</li>
+              <li>Dispute resolution assistance (best effort basis)</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              We act as an intermediary platform only. We do not employ Creators, nor do we guarantee 
+              the quality, safety, or legality of services provided through the Platform.
+            </p>
+          </section>
+
+          {/* 5. Account Registration */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Account Registration</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">Users must:</p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Provide valid email address and phone number</li>
+              <li>Choose a secure password</li>
+              <li>Complete KYC verification for payment transactions (PAN required)</li>
+              <li>Not create multiple accounts or share account access</li>
+              <li>Notify us immediately of any unauthorized account use</li>
+            </ul>
+          </section>
+
+          {/* 6. Payment Terms */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Payment Terms</h2>
+            
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.1 Platform Commission</h3>
+            <p className="text-gray-700 leading-relaxed">
+              50BraIns charges a <strong>15% service fee</strong> on the total transaction value. 
+              This fee is deducted from payments before release to Creators.
+            </p>
+
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.2 Payment Flow</h3>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Brands pay the full gig amount upfront</li>
+              <li>Funds are held in secure escrow until work is delivered and approved</li>
+              <li>Upon approval, 85% is released to Creator, 15% retained by Platform</li>
+              <li>All payments processed via Razorpay with applicable payment gateway charges</li>
+            </ul>
+
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.3 Escrow Protection</h3>
+            <p className="text-gray-700 leading-relaxed">
+              Funds remain in escrow until the Brand approves deliverables or the dispute resolution 
+              period expires (7 days from delivery). This protects both Brands and Creators.
+            </p>
+
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.4 Taxes</h3>
+            <p className="text-gray-700 leading-relaxed">
+              Users are responsible for all applicable taxes (GST, TDS, income tax) as per Indian tax laws. 
+              Platform fees are exclusive of GST where applicable.
+            </p>
+          </section>
+
+          {/* 7. Gig Posting & Applications */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Gig Posting & Applications</h2>
+            
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">7.1 Brand Responsibilities</h3>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Provide clear, accurate gig descriptions</li>
+              <li>Specify deliverables, timelines, and budget</li>
+              <li>Respond to Creator applications within 48 hours</li>
+              <li>Pay promptly upon accepting a Creator</li>
+            </ul>
+
+            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">7.2 Creator Responsibilities</h3>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Apply only to gigs you can deliver</li>
+              <li>Meet agreed deadlines and quality standards</li>
+              <li>Communicate proactively with Brands</li>
+              <li>Deliver work that complies with all laws and platform policies</li>
+            </ul>
+          </section>
+
+          {/* 8. Prohibited Activities */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Prohibited Activities</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">Users must NOT:</p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Engage in fraudulent, misleading, or illegal activities</li>
+              <li>Post offensive, defamatory, or infringing content</li>
+              <li>Circumvent platform fees by transacting off-platform</li>
+              <li>Harass, threaten, or abuse other users</li>
+              <li>Use bots, scrapers, or automated tools without permission</li>
+              <li>Violate intellectual property rights</li>
+              <li>Share or sell account access</li>
+            </ul>
+          </section>
+
+          {/* 9. Intellectual Property */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">9. Intellectual Property</h2>
+            <p className="text-gray-700 leading-relaxed">
+              All Platform content (logo, design, code, text) is owned by 50BraIns or licensed to us. 
+              Users retain ownership of content they create but grant us a worldwide, non-exclusive license 
+              to display, reproduce, and distribute such content for platform operations.
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              For work commissioned through gigs, IP rights transfer as agreed between Brand and Creator. 
+              Platform assumes no liability for IP disputes between parties.
+            </p>
+          </section>
+
+          {/* 10. Dispute Resolution */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">10. Dispute Resolution</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">
+              If a dispute arises between Brand and Creator:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Parties should first attempt direct resolution</li>
+              <li>Either party may request Platform mediation within 7 days of delivery</li>
+              <li>Platform will review evidence and make a binding decision on escrow release</li>
+              <li>Decisions are final unless legal proceedings are initiated</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Platform mediation is offered as a courtesy. We are not liable for outcomes and may charge 
+              a dispute handling fee in case of frivolous claims.
+            </p>
+          </section>
+
+          {/* 11. Refunds & Cancellations */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">11. Refunds & Cancellations</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Refer to our <a href="/refund" className="text-blue-600 hover:underline">Refund Policy</a> for 
+              detailed terms on cancellations, refunds, and escrow release conditions.
+            </p>
+          </section>
+
+          {/* 12. Limitation of Liability */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">12. Limitation of Liability</h2>
+            <p className="text-gray-700 leading-relaxed">
+              To the maximum extent permitted by law, 50BraIns is not liable for:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Quality, legality, or safety of services provided by Creators</li>
+              <li>Actions or omissions of Brands or Creators</li>
+              <li>Loss of data, revenue, or business opportunities</li>
+              <li>Indirect, incidental, or consequential damages</li>
+              <li>Failures caused by third-party services (payment gateways, hosting providers)</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Our maximum liability is limited to the platform fees paid by the affected party in the 
+              3 months prior to the claim.
+            </p>
+          </section>
+
+          {/* 13. Account Termination */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">13. Account Termination</h2>
+            <p className="text-gray-700 leading-relaxed mb-2">
+              We may suspend or terminate accounts for:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <li>Violation of these Terms</li>
+              <li>Fraudulent or illegal activity</li>
+              <li>Repeated disputes or poor conduct</li>
+              <li>Non-payment or chargebacks</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Users may close accounts at any time, but remain liable for pending obligations. 
+              Termination does not affect accrued rights or obligations.
+            </p>
+          </section>
+
+          {/* 14. Privacy */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">14. Privacy</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Your use of the Platform is subject to our{' '}
+              <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>, 
+              which explains how we collect, use, and protect your personal data.
+            </p>
+          </section>
+
+          {/* 15. Modifications */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">15. Modifications to Terms</h2>
+            <p className="text-gray-700 leading-relaxed">
+              We reserve the right to update these Terms at any time. Changes will be effective upon 
+              posting. Continued use after changes constitutes acceptance. Material changes will be 
+              notified via email or platform notification.
+            </p>
+          </section>
+
+          {/* 16. Governing Law */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">16. Governing Law & Jurisdiction</h2>
+            <p className="text-gray-700 leading-relaxed">
+              These Terms are governed by the laws of India. Any disputes shall be subject to the 
+              exclusive jurisdiction of courts in Hyderabad, Telangana.
+            </p>
+          </section>
+
+          {/* 17. Contact */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">17. Contact Information</h2>
+            <p className="text-gray-700 leading-relaxed">
+              For questions about these Terms, contact us at:
+            </p>
+            <div className="mt-3 p-4 bg-gray-50 rounded-md">
+              <p className="text-gray-700"><strong>50BraIns</strong></p>
+              <p className="text-gray-700">UDYAM Registration: UDYAM-TS-09-0192429</p>
+              <p className="text-gray-700">Email: legal@50brains.com</p>
+              <p className="text-gray-700">Website: www.50brains.com</p>
             </div>
+          </section>
 
-            <div className="card-glass p-8">
-              <div className="prose prose-lg max-w-none">
-                {/* 1. Agreement to Terms */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    1. Agreement to Terms
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    By accessing and using 50BraIns ("Platform," "we," "our," or
-                    "us"), you ("User," "you," or "your") accept and agree to be
-                    bound by these Terms & Conditions. If you do not agree to
-                    these terms, please do not use this platform.
-                  </p>
-                  <p className="text-gray-700">
-                    50BraIns is operated under Indian jurisdiction and complies
-                    with the Information Technology Act, 2000, Consumer
-                    Protection Act, 2019, and other applicable Indian laws.
-                    These Terms constitute a legal agreement between you and
-                    50BraIns for use of our marketplace platform.
-                  </p>
-                </section>
-
-                {/* 2. Platform Description */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    2. Platform Description
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    50BraIns is a digital marketplace registered in India that
-                    connects brands, businesses, and individuals with talented
-                    creators, influencers, freelancers, and content creators
-                    across India. Our platform facilitates:
-                  </p>
-                  <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="rounded-none border border-blue-200 bg-blue-50 p-4">
-                      <h4 className="mb-2 font-semibold text-blue-800">
-                        For Brands & Businesses:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
-                        <li>Access to verified creators and freelancers</li>
-                        <li>Project posting and management tools</li>
-                        <li>Secure payment processing via UPI/Bank transfer</li>
-                        <li>Performance analytics and ROI tracking</li>
-                        <li>Dispute resolution mechanisms</li>
-                      </ul>
-                    </div>
-                    <div className="rounded-none border border-green-200 bg-green-50 p-4">
-                      <h4 className="mb-2 font-semibold text-green-800">
-                        For Creators & Freelancers:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-green-700">
-                        <li>Portfolio showcase and skill verification</li>
-                        <li>Gig application and proposal systems</li>
-                        <li>Secure payment guarantee with escrow</li>
-                        <li>Reputation and rating systems</li>
-                        <li>Direct communication with clients</li>
-                      </ul>
-                    </div>
-                  </div>
-                </section>
-
-                {/* 3. User Registration & Eligibility */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    3. User Registration & Eligibility
-                  </h2>
-                  <div className="mb-4 rounded-none border border-red-200 bg-red-50 p-4">
-                    <h4 className="mb-2 font-semibold text-red-800">
-                      Eligibility Requirements:
-                    </h4>
-                    <ul className="list-inside list-disc space-y-1 text-red-700">
-                      <li>
-                        Must be at least 18 years old or have parental consent
-                      </li>
-                      <li>
-                        Must be a legal resident of India or registered Indian
-                        entity
-                      </li>
-                      <li>
-                        Must have a valid Indian mobile number and email address
-                      </li>
-                      <li>
-                        Must provide accurate identity verification documents
-                      </li>
-                      <li>
-                        Must have a valid Indian bank account or UPI ID for
-                        payments
-                      </li>
-                    </ul>
-                  </div>
-                  <p className="mb-4 text-gray-700">
-                    By creating an account, you represent that all information
-                    provided is accurate, complete, and current. You are
-                    responsible for maintaining the confidentiality of your
-                    account credentials and for all activities that occur under
-                    your account.
-                  </p>
-                  <div className="mb-4 rounded-none border border-amber-200 bg-amber-50 p-4">
-                    <h4 className="mb-2 font-semibold text-amber-800">
-                      Account Security & KYC Compliance:
-                    </h4>
-                    <ul className="list-inside list-disc space-y-1 text-amber-700">
-                      <li>Complete KYC verification as per RBI guidelines</li>
-                      <li>
-                        Maintain accurate PAN/Aadhaar information for tax
-                        compliance
-                      </li>
-                      <li>Secure your account with strong passwords and 2FA</li>
-                      <li>Report suspicious activities immediately</li>
-                      <li>
-                        Comply with FEMA regulations for international
-                        transactions
-                      </li>
-                    </ul>
-                  </div>
-                </section>
-
-                {/* 4. User Conduct */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    4. User Conduct
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    You agree not to use the Service to:
-                  </p>
-                  <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="rounded-none border border-red-200 bg-red-50 p-4">
-                      <h4 className="mb-2 font-semibold text-red-800">
-                        Prohibited Activities:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-red-700">
-                        <li>Upload harmful or malicious content</li>
-                        <li>Violate intellectual property rights</li>
-                        <li>Engage in fraudulent activities</li>
-                        <li>Harass or abuse other users</li>
-                        <li>Spam or send unsolicited messages</li>
-                      </ul>
-                    </div>
-                    <div className="rounded-none border border-green-200 bg-green-50 p-4">
-                      <h4 className="mb-2 font-semibold text-green-800">
-                        Expected Behavior:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-green-700">
-                        <li>Treat all users with respect</li>
-                        <li>Provide accurate work samples</li>
-                        <li>Honor commitments and deadlines</li>
-                        <li>Communicate professionally</li>
-                        <li>Report violations to our team</li>
-                      </ul>
-                    </div>
-                  </div>
-                </section>
-
-                {/* 5. Payment Terms & Indian Compliance */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    5. Payment Terms & Indian Compliance
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    50BraIns operates an escrow-based payment system in
-                    compliance with RBI guidelines. All transactions are
-                    processed through authorized Indian payment gateways.
-                  </p>
-                  <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="rounded-none border border-blue-200 bg-blue-50 p-4">
-                      <h4 className="mb-2 font-semibold text-blue-800">
-                        Accepted Payment Methods:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
-                        <li>UPI (PhonePe, Google Pay, Paytm, etc.)</li>
-                        <li>Net Banking (all major Indian banks)</li>
-                        <li>Credit/Debit Cards (Visa, Mastercard, RuPay)</li>
-                        <li>Digital wallets (Paytm, PhonePe, etc.)</li>
-                        <li>RTGS/NEFT for large transactions</li>
-                      </ul>
-                    </div>
-                    <div className="rounded-none border border-green-200 bg-green-50 p-4">
-                      <h4 className="mb-2 font-semibold text-green-800">
-                        Tax & Compliance:
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-green-700">
-                        <li>GST applicable as per Indian tax laws</li>
-                        <li>TDS deduction for payments above ₹30,000</li>
-                        <li>Form 16A/TDS certificates provided</li>
-                        <li>Annual tax statements for income reporting</li>
-                        <li>PAN mandatory for payments above ₹50,000</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="mb-4 rounded-none border border-purple-200 bg-purple-50 p-4">
-                    <h4 className="mb-2 font-semibold text-purple-800">
-                      Escrow & Payment Security:
-                    </h4>
-                    <ul className="list-inside list-disc space-y-1 text-purple-700">
-                      <li>
-                        Payments held in escrow until work completion and
-                        approval
-                      </li>
-                      <li>
-                        7-day approval window for clients to review deliverables
-                      </li>
-                      <li>
-                        Automatic release if no disputes raised within approval
-                        period
-                      </li>
-                      <li>Platform fee: 5% for creators, 2% for clients</li>
-                      <li>Refunds processed as per our Refund Policy</li>
-                      <li>Dispute resolution through platform mediation</li>
-                    </ul>
-                  </div>
-                </section>
-
-                {/* 6. Intellectual Property */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    6. Intellectual Property
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    The Service and its original content, features and
-                    functionality are and will remain the exclusive property of
-                    50BraIns and its licensors. Users retain ownership of
-                    content they create and upload.
-                  </p>
-                  <div className="mb-4 rounded-none border border-purple-200 bg-purple-50 p-4">
-                    <h4 className="mb-2 font-semibold text-purple-800">
-                      Content Rights:
-                    </h4>
-                    <p className="text-sm text-purple-700">
-                      By uploading content, you grant 50BraIns a non-exclusive,
-                      worldwide, royalty-free license to use, display, and
-                      distribute your content solely for the purpose of
-                      operating and promoting the Service.
-                    </p>
-                  </div>
-                </section>
-
-                {/* 7. Privacy and Data Protection */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    7. Privacy and Data Protection
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    Your privacy is important to us. Please review our Privacy
-                    Policy, which also governs your use of the Service, to
-                    understand our practices.
-                  </p>
-                  <div className="flex items-center space-x-4">
-                    <Link href="/privacy" className="btn-primary-sm">
-                      Read Privacy Policy
-                    </Link>
-                  </div>
-                </section>
-
-                {/* 8. Termination */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    8. Termination
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    We may terminate or suspend your account and bar access to
-                    the Service immediately, without prior notice or liability,
-                    under our sole discretion, for any reason whatsoever,
-                    including but not limited to a breach of the Terms.
-                  </p>
-                  <p className="text-gray-700">
-                    Upon termination, your right to use the Service will cease
-                    immediately. If you wish to terminate your account, you may
-                    simply discontinue using the Service.
-                  </p>
-                </section>
-
-                {/* 9. Disclaimer */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    9. Disclaimer
-                  </h2>
-                  <div className="mb-4 rounded-none border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-sm text-gray-700">
-                      THE INFORMATION ON THIS WEBSITE IS PROVIDED ON AN "AS IS"
-                      BASIS. TO THE FULLEST EXTENT PERMITTED BY LAW, 50BRAINS
-                      EXCLUDES ALL REPRESENTATIONS, WARRANTIES, CONDITIONS OR
-                      OTHER TERMS WHICH, BUT FOR THIS LEGAL NOTICE, MIGHT HAVE
-                      EFFECT IN RELATION TO THIS WEBSITE.
-                    </p>
-                  </div>
-                </section>
-
-                {/* 10. Limitation of Liability */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    10. Limitation of Liability
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    In no event shall 50BraIns, nor its directors, employees,
-                    partners, agents, suppliers, or affiliates, be liable for
-                    any indirect, incidental, special, consequential, or
-                    punitive damages, including without limitation, loss of
-                    profits, data, use, goodwill, or other intangible losses.
-                  </p>
-                </section>
-
-                {/* 11. Governing Law & Jurisdiction */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    11. Governing Law & Jurisdiction
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    These Terms shall be governed by and construed in accordance
-                    with the laws of India, including but not limited to:
-                  </p>
-                  <div className="mb-4 rounded-none border border-indigo-200 bg-indigo-50 p-4">
-                    <h4 className="mb-2 font-semibold text-indigo-800">
-                      Applicable Indian Laws:
-                    </h4>
-                    <ul className="list-inside list-disc space-y-1 text-sm text-indigo-700">
-                      <li>
-                        Information Technology Act, 2000 and IT Rules 2021
-                      </li>
-                      <li>Consumer Protection Act, 2019</li>
-                      <li>Indian Contract Act, 1872</li>
-                      <li>Payment and Settlement Systems Act, 2007</li>
-                      <li>Income Tax Act, 1961 and GST laws</li>
-                      <li>Foreign Exchange Management Act (FEMA), 1999</li>
-                    </ul>
-                  </div>
-                  <p className="text-gray-700">
-                    Any disputes arising from these Terms shall be subject to
-                    the exclusive jurisdiction of courts in [City], India. Users
-                    agree to submit to such jurisdiction and waive any
-                    objections to venue.
-                  </p>
-                </section>
-
-                {/* 12. Changes to Terms */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    12. Changes to Terms
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    We reserve the right, at our sole discretion, to modify or
-                    replace these Terms at any time. If a revision is material,
-                    we will provide at least 30 days notice prior to any new
-                    terms taking effect.
-                  </p>
-                  <div className="rounded-none border border-yellow-200 bg-yellow-50 p-4">
-                    <p className="text-sm text-yellow-700">
-                      <strong>Important:</strong> What constitutes a material
-                      change will be determined at our sole discretion. Your
-                      continued use of the Service after we post any
-                      modifications to the Terms constitutes acceptance of those
-                      changes.
-                    </p>
-                  </div>
-                </section>
-
-                {/* Contact Information */}
-                <section className="mb-8">
-                  <h2 className="mb-4 border-b border-gray-200 pb-2 text-2xl font-bold text-gray-900">
-                    Contact Information
-                  </h2>
-                  <p className="mb-4 text-gray-700">
-                    For any questions regarding these Terms & Conditions, please
-                    contact us:
-                  </p>
-                  <div className="rounded-none border border-gray-200 bg-gray-50 p-4">
-                    <div className="space-y-2 text-sm text-gray-700">
-                      <div>
-                        <strong>Legal Queries:</strong> legal@50brains.com
-                      </div>
-                      <div>
-                        <strong>General Support:</strong> support@50brains.com
-                      </div>
-                      <div>
-                        <strong>Grievance Officer:</strong>{' '}
-                        grievance@50brains.com
-                      </div>
-                      <div>
-                        <strong>Phone:</strong> +91-XXXXX-XXXXX
-                      </div>
-                      <div>
-                        <strong>Registered Address:</strong> [To be filled -
-                        Indian registered office address]
-                      </div>
-                      <div>
-                        <strong>CIN:</strong> [Company Identification Number]
-                      </div>
-                      <div>
-                        <strong>GST No:</strong> [GSTIN Number]
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 rounded-none border border-yellow-200 bg-yellow-50 p-4">
-                    <p className="text-sm text-yellow-700">
-                      <strong>Grievance Redressal:</strong> As per IT Rules
-                      2021, we have appointed a Grievance Officer to address
-                      user complaints. Grievances will be acknowledged within 24
-                      hours and resolved within 15 days.
-                    </p>
-                  </div>
-                </section>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-8 space-y-4 text-center">
-              <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                <Link href="/privacy" className="btn-secondary">
-                  Privacy Policy
-                </Link>
-                <Link href="/contact" className="btn-ghost">
-                  Contact Us
-                </Link>
-                <Link href="/dashboard" className="btn-primary">
-                  Back to Dashboard
-                </Link>
-              </div>
-
-              <p className="mt-6 text-sm text-gray-500">
-                By using 50BraIns, you acknowledge that you have read and
-                understood these Terms of Service and agree to be bound by them.
-              </p>
-            </div>
-          </div>
+          {/* Acceptance */}
+          <section className="mt-8 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-600 italic">
+              By using 50BraIns, you acknowledge that you have read, understood, and agree to be bound 
+              by these Terms and Conditions.
+            </p>
+          </section>
         </div>
       </div>
     </div>

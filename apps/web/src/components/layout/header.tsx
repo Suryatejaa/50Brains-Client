@@ -14,6 +14,7 @@ import {
   PhoneIcon,
   UserIcon,
   HomeIcon,
+  TruckIcon,
 } from '@heroicons/react/24/outline';
 
 export function Header() {
@@ -65,7 +66,7 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>📋</span>
+                          <DocumentTextIcon className="h-4 w-4 text-gray-500" />
                           <span>Terms & Conditions</span>
                         </Link>
                         <Link
@@ -73,7 +74,7 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>🔒</span>
+                          <ShieldCheckIcon className="h-4 w-4 text-gray-500" />
                           <span>Privacy Policy</span>
                         </Link>
                         <Link
@@ -81,15 +82,23 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>💰</span>
+                          <CurrencyDollarIcon className="h-4 w-4 text-gray-500" />
                           <span>Refund Policy</span>
+                        </Link>
+                        <Link
+                          href="/shipping"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <TruckIcon className="h-4 w-4 text-gray-500" />
+                          <span>Service Delivery</span>
                         </Link>
                         <Link
                           href="/about"
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>ℹ️</span>
+                          <InformationCircleIcon className="h-4 w-4 text-gray-500" />
                           <span>About Us</span>
                         </Link>
                         <div className="mt-2 border-t border-gray-200 pt-2">
@@ -98,7 +107,7 @@ export function Header() {
                             onClick={() => setIsHelpMenuOpen(false)}
                             className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                           >
-                            <span>📞</span>
+                            <PhoneIcon className="h-4 w-4 text-gray-500" />
                             <span>Contact Support</span>
                           </Link>
                         </div>
@@ -143,7 +152,7 @@ export function Header() {
               <div className="relative">
                 <button
                   onClick={() => setIsHelpMenuOpen(!isHelpMenuOpen)}
-                  className="text-body hover:text-accent p-0 transition-colors"
+                  className="text-body hover:text-accent p-2 transition-colors"
                 >
                   <QuestionMarkCircleIcon className="h-6 w-6" />
                 </button>
@@ -170,7 +179,7 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>📋</span>
+                          <DocumentTextIcon className="h-4 w-4 text-gray-500" />
                           <span>Terms & Conditions</span>
                         </Link>
                         <Link
@@ -178,7 +187,7 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>🔒</span>
+                          <ShieldCheckIcon className="h-4 w-4 text-gray-500" />
                           <span>Privacy Policy</span>
                         </Link>
                         <Link
@@ -186,15 +195,23 @@ export function Header() {
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>💰</span>
+                          <CurrencyDollarIcon className="h-4 w-4 text-gray-500" />
                           <span>Refund Policy</span>
+                        </Link>
+                        <Link
+                          href="/shipping"
+                          onClick={() => setIsHelpMenuOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                        >
+                          <TruckIcon className="h-4 w-4 text-gray-500" />
+                          <span>Service Delivery</span>
                         </Link>
                         <Link
                           href="/about"
                           onClick={() => setIsHelpMenuOpen(false)}
                           className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                         >
-                          <span>ℹ️</span>
+                          <InformationCircleIcon className="h-4 w-4 text-gray-500" />
                           <span>About Us</span>
                         </Link>
                         <div className="mt-2 border-t border-gray-200 pt-2">
@@ -203,7 +220,7 @@ export function Header() {
                             onClick={() => setIsHelpMenuOpen(false)}
                             className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                           >
-                            <span>📞</span>
+                            <PhoneIcon className="h-4 w-4 text-gray-500" />
                             <span>Contact Support</span>
                           </Link>
                         </div>
