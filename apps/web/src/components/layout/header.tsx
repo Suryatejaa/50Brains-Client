@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { RoleSwitcher } from './RoleSwitcher';
 import NotificationBell from '@/components/NotificationBell';
+import { GuidelinesModal } from '@/components/modals/GuidelinesModal';
+import { useGuidelinesModal } from '@/hooks/useGuidelinesModal';
 import {
   QuestionMarkCircleIcon,
   DocumentTextIcon,
@@ -15,6 +17,7 @@ import {
   UserIcon,
   HomeIcon,
   TruckIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
 export function Header() {
@@ -22,6 +25,8 @@ export function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { isOpen, guidelinesType, openGuidelines, closeGuidelines } =
+    useGuidelinesModal();
 
   const hasMultiRoles = user?.roles && user.roles.length > 2;
 
@@ -101,6 +106,33 @@ export function Header() {
                           <InformationCircleIcon className="h-4 w-4 text-gray-500" />
                           <span>About Us</span>
                         </Link>
+                        <div className="mt-2 border-t border-gray-200 pt-2">
+                          <div className="mb-2 px-3 py-1">
+                            <div className="text-xs font-medium text-gray-600">
+                              Community Guidelines
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              openGuidelines('brand');
+                              setIsHelpMenuOpen(false);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <ExclamationTriangleIcon className="h-4 w-4 text-gray-500" />
+                            <span>Brand Guidelines</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              openGuidelines('creator');
+                              setIsHelpMenuOpen(false);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <ExclamationTriangleIcon className="h-4 w-4 text-gray-500" />
+                            <span>Creator Guidelines</span>
+                          </button>
+                        </div>
                         <div className="mt-2 border-t border-gray-200 pt-2">
                           <Link
                             href="/contact"
@@ -214,6 +246,33 @@ export function Header() {
                           <InformationCircleIcon className="h-4 w-4 text-gray-500" />
                           <span>About Us</span>
                         </Link>
+                        <div className="mt-2 border-t border-gray-200 pt-2">
+                          <div className="mb-2 px-3 py-1">
+                            <div className="text-xs font-medium text-gray-600">
+                              Community Guidelines
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              openGuidelines('brand');
+                              setIsHelpMenuOpen(false);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <ExclamationTriangleIcon className="h-4 w-4 text-gray-500" />
+                            <span>Brand Guidelines</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              openGuidelines('creator');
+                              setIsHelpMenuOpen(false);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-none px-3 py-2 text-left text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+                          >
+                            <ExclamationTriangleIcon className="h-4 w-4 text-gray-500" />
+                            <span>Creator Guidelines</span>
+                          </button>
+                        </div>
                         <div className="mt-2 border-t border-gray-200 pt-2">
                           <Link
                             href="/contact"
@@ -453,6 +512,13 @@ export function Header() {
           </div>
         )}
       </div>
+
+      {/* Guidelines Modal */}
+      <GuidelinesModal
+        isOpen={isOpen}
+        onClose={closeGuidelines}
+        type={guidelinesType}
+      />
     </header>
   );
 }

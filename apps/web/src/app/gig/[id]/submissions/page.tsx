@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { GigAPI } from '@/lib/gig-api';
 import { Submission, SubmissionStatus } from '@/types/gig.types';
 import { toast } from 'react-hot-toast';
+import { GigChat } from '@/components/chat/GigChat';
 
 export default function GigSubmissionsPage() {
   const params = useParams();
@@ -344,6 +345,25 @@ export default function GigSubmissionsPage() {
                         </button>
                       )}
 
+                      {/* Chat button for all submissions */}
+                      <button
+                        onClick={() => {
+                          const applicationId =
+                            submission.applicationId || submission.id;
+                          const params = new URLSearchParams({
+                            gigTitle: `Work Submission - ${submission.title}`,
+                            applicantName: 'Creator',
+                            brandName: 'Brand',
+                          });
+                          router.push(
+                            `/chat/${applicationId}?${params.toString()}`
+                          );
+                        }}
+                        className="btn-secondary px-4 py-2 text-sm"
+                      >
+                        💬 Chat with Creator
+                      </button>
+
                       {/* <button
                         onClick={() => {
                           setSelectedSubmission(submission);
@@ -458,7 +478,11 @@ export default function GigSubmissionsPage() {
                 <button
                   onClick={handleReview}
                   className="btn-primary flex-1"
-                  disabled={isSubmitting || (reviewData.status === 'REJECTED' && !reviewData.feedback.trim())}
+                  disabled={
+                    isSubmitting ||
+                    (reviewData.status === 'REJECTED' &&
+                      !reviewData.feedback.trim())
+                  }
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Review'}
                 </button>

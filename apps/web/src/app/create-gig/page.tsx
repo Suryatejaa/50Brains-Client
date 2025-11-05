@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useGigs } from '@/hooks/useGigs';
 import type { CreateGigData, GigStatus } from '@/types/gig.types';
 import { Map, MapPin } from 'lucide-react';
+import { GuidelinesModal } from '@/components/modals/GuidelinesModal';
+import { useGuidelinesModal } from '@/hooks/useGuidelinesModal';
 
 interface FormData {
   title: string;
@@ -29,6 +31,7 @@ interface FormData {
   urgency: 'urgent' | 'normal' | 'flexible';
   deliverables: string[];
   isClanAllowed: boolean;
+  agreedToTerms: boolean;
 }
 
 interface FormErrors {
@@ -81,10 +84,13 @@ export default function CreateGigPage() {
     urgency: 'normal',
     deliverables: [],
     isClanAllowed: true,
+    agreedToTerms: false,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isDraft, setIsDraft] = useState(false);
+  const { isOpen, guidelinesType, openGuidelines, closeGuidelines } =
+    useGuidelinesModal();
 
   // Load categories and skills on mount
   useEffect(() => {
@@ -153,6 +159,12 @@ export default function CreateGigPage() {
       newErrors.address = 'Address is required for visit-type gigs';
     }
 
+    // Terms agreement validation
+    if (!formData.agreedToTerms) {
+      newErrors.general =
+        'You must agree to the Terms of Service and Community Guidelines';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -196,6 +208,7 @@ export default function CreateGigPage() {
         urgency: formData.urgency,
         deliverables: formData.deliverables.filter((d) => d.trim()),
         isClanAllowed: formData.isClanAllowed,
+        agreedToTerms: formData.agreedToTerms,
       };
 
       // Add new optional fields only if they have values
@@ -1597,7 +1610,7 @@ export default function CreateGigPage() {
                           value: 'hourly',
                           label: 'Hourly Rate',
                           description: 'Pay per hour',
-                        }
+                        },
                         // {
                         //   value: 'negotiable',
                         //   label: 'Negotiable',
@@ -1796,7 +1809,7 @@ export default function CreateGigPage() {
                     <div className="grid grid-cols-2 gap-3">
                       {[
                         {
-                          value: true,  
+                          value: true,
                           label: 'Public',
                           description: 'Visible to everyone',
                         },
@@ -1823,9 +1836,9 @@ export default function CreateGigPage() {
                             value={String(visibility.value)}
                             checked={formData.isPublic === visibility.value}
                             onChange={(e) => {
-                              setFormData(prev => ({
+                              setFormData((prev) => ({
                                 ...prev,
-                                isPublic: e.target.value === 'true'
+                                isPublic: e.target.value === 'true',
                               }));
                             }}
                             className="sr-only"
@@ -1938,12 +1951,52 @@ export default function CreateGigPage() {
                   <p>• Respond quickly to applications</p>
                 </div>
               </div>
-
+              <div className="mb-4">
+                <label className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    name="agreedToTerms"
+                    checked={formData.agreedToTerms}
+                    onChange={handleChange}
+                    className="mt-1"
+                  />
+                  <span className="text-sm text-gray-700">
+                    I agree to the{' '}
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline hover:text-blue-700"
+                    >
+                      Terms of Service
+                    </a>
+                    ,{' '}
+                    <a
+                      href="/refund"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline hover:text-blue-700"
+                    >
+                      Refund Policy
+                    </a>
+                    , and{' '}
+                    <button
+                      type="button"
+                      onClick={() => openGuidelines('brand')}
+                      className="text-blue-600 underline hover:text-blue-700"
+                    >
+                      Community Guidelines
+                    </button>
+                    . I confirm this gig does NOT violate 50BraIns policies and
+                    commit to fair, honest promotion.
+                  </span>
+                </label>
+              </div>
               {/* Actions */}
               <div className="space-y-3">
                 <button
                   type="submit"
-                  disabled={creating}
+                  disabled={creating || !formData.agreedToTerms}
                   className="btn-primary flex w-full items-center justify-center py-3"
                 >
                   {creating ? (
@@ -1974,19 +2027,26 @@ export default function CreateGigPage() {
                     'Publish Gig'
                   )}
                 </button>
-                <button
+                {/* <button
                   type="button"
                   className="btn-ghost w-full py-3"
                   onClick={(e) => handleSubmit(e, true)}
                   disabled={creating}
                 >
                   Save as Draft
-                </button>
+                </button> */}
               </div>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Guidelines Modal */}
+      <GuidelinesModal
+        isOpen={isOpen}
+        onClose={closeGuidelines}
+        type={guidelinesType}
+      />
     </div>
   );
 }

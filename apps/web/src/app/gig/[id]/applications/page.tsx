@@ -11,6 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 
 interface Applicant {
   id: string;
+  username: string;
   firstName: string;
   lastName: string;
   upiId?: string;
@@ -88,7 +89,9 @@ export default function GigApplicationsPage() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [approveApplication, setApproveApplication] =
     useState<Application | null>(null);
-
+  const [applicantProfiles, setApplicantProfiles] = useState<{
+    [key: string]: Applicant;
+  }>({});
   const gigId = params.id as string;
   const userType = getUserTypeForRole(currentRole);
 
@@ -188,6 +191,13 @@ export default function GigApplicationsPage() {
         //   rawApplicationsResponse: applicationsResponse.value,
         // });
         setApplications(extractedApplications);
+        const applicantIds = extractedApplications.map(
+          (app: any) => app.applicantId
+        );
+        console.log('Applicant IDs to fetch details for:', applicantIds);
+        const res = await fetchApplicantDetailsbyIds(applicantIds);
+
+        console.log('Fetch response:', res);
       } else {
         console.error(
           '❌ Failed to load applications:',
@@ -271,7 +281,7 @@ export default function GigApplicationsPage() {
       setProcessingApplicationId(null);
     }
   };
-
+  console.log('Gig details:', gig?.brand.name);
   const handleRejectApplication = async () => {
     if (!rejectApplicationId || !rejectionReason.trim()) return;
 
@@ -360,6 +370,49 @@ export default function GigApplicationsPage() {
       String(selectedStatus || '').toLowerCase()
     );
   });
+
+  const fetchApplicantDetailsbyIds = async (applicantIds: string[]) => {
+    try {
+      const response = await apiClient.post(
+        '/api/public/profiles/internal/by-ids',
+        {
+          userIds: applicantIds,
+        }
+      );
+      console.log('Response from applicant details API:', response);
+      if (response.success) {
+        const profiles = Array.isArray(response.data) ? response.data : [];
+        setApplicantProfiles((prev) => ({
+          ...prev,
+          ...Object.fromEntries(profiles.map((p) => [p.id, p])),
+        }));
+        console.log('Applicant profiles fetched:', profiles.length);
+        console.log('Applicant Profiles Data:', profiles);
+      }
+    } catch (error) {
+      console.error('Error fetching applicant details:', error);
+    }
+  };
+
+  const getApplicantName = (applicationId: string) => {
+    // Find the application first, then get the applicant profile
+    const application = applications.find((app) => app.id === applicationId);
+    if (!application) {
+      console.log('Application not found for ID:', applicationId);
+      return 'Unknown Applicant';
+    }
+
+    const profile = applicantProfiles[application.applicantId];
+    console.log(
+      'Getting name for application ID:',
+      applicationId,
+      'Applicant ID:',
+      application.applicantId,
+      'Profile:',
+      profile
+    );
+    return profile ? profile.username : 'Unknown Applicant';
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -582,7 +635,9 @@ export default function GigApplicationsPage() {
                     </div>
                     <div>
                       <h3 className="cursor-pointer text-lg font-semibold hover:underline">
-                        Applicant {application.applicantId.slice(-8)}
+                        Applicant{' '}
+                        {(applicantProfiles[application.applicantId] as any)
+                          ?.username || 'Unknown'}
                       </h3>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span>Type: {application.applicantType}</span>
@@ -625,7 +680,9 @@ export default function GigApplicationsPage() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">
-                            ₹{(application.quotedPrice || 0).toLocaleString() ?? '0'}
+                            ₹
+                            {(application.quotedPrice || 0).toLocaleString() ??
+                              '0'}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -712,9 +769,9 @@ export default function GigApplicationsPage() {
                     </div>
                   )}
 
-                {/* Status Display for Processed Applications */}
+                {/* Status Display and Chat for Processed Applications */}
                 {application.status !== 'PENDING' && (
-                  <div className="flex items-center justify-end space-x-3">
+                  <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
                       {application.status === 'APPROVED' &&
                         '✅ Application Approved'}
@@ -723,6 +780,24 @@ export default function GigApplicationsPage() {
                       {application.status === 'WITHDRAWN' &&
                         '↩️ Application Withdrawn'}
                     </div>
+                    {application.status === 'APPROVED' && (
+                      <button
+                        onClick={() => {
+                          const params = new URLSearchParams({
+                            gigTitle: gig?.title || 'Gig Chat',
+                            applicantName:
+                              getApplicantName(application.id) || 'Applicant',
+                            brandName: gig?.brand?.name || 'Brand',
+                          });
+                          router.push(
+                            `/chat/${application.id}?${params.toString()}`
+                          );
+                        }}
+                        className="btn-secondary text-sm"
+                      >
+                        💬 Chat with Applicant
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -802,7 +877,10 @@ export default function GigApplicationsPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Quoted Price</span>
                       <span className="font-medium">
-                        ₹{(approveApplication.quotedPrice || 0).toLocaleString() ?? '0'}
+                        ₹
+                        {(
+                          approveApplication.quotedPrice || 0
+                        ).toLocaleString() ?? '0'}
                       </span>
                     </div>
                     {approveApplication.estimatedTime && (
@@ -844,7 +922,7 @@ export default function GigApplicationsPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Payout % Total</span>
-                          <span className="font-medium">{(pctTotal || 0)}%</span>
+                          <span className="font-medium">{pctTotal || 0}%</span>
                         </div>
                         {msTotal > approveApplication.quotedPrice && (
                           <div className="text-xs text-red-600">

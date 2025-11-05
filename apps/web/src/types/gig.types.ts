@@ -102,6 +102,7 @@ export interface CreateGigData {
   deliverables?: string[];
   requirements?: string;
   deadline?: string;
+  agreedToTerms?: boolean;
 }
 
 export interface Application {

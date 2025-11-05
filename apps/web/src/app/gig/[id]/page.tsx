@@ -17,6 +17,9 @@ import { FaBullseye, FaAccessibleIcon } from 'react-icons/fa';
 import { m } from 'framer-motion';
 import MiniConfirmDialog from '@/frontend-profile/components/common/MiniConfirmDialog';
 import { GigDetailLoadingSkeleton } from '@/components/gig/ssr/GigDetailSkeleton';
+import { GuidelinesModal } from '@/components/modals/GuidelinesModal';
+import { useGuidelinesModal } from '@/hooks/useGuidelinesModal';
+import { GigChat } from '@/components/chat/GigChat';
 interface Gig {
   id: string;
   title: string;
@@ -125,6 +128,8 @@ export default function GigDetailsPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const { currentRole, getUserTypeForRole } = useRoleSwitch();
+  const { isOpen, guidelinesType, openGuidelines, closeGuidelines } =
+    useGuidelinesModal();
   const [gig, setGig] = useState<Gig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
@@ -174,6 +179,7 @@ export default function GigDetailsPage() {
   const [pendingBidId, setPendingBidId] = useState<string | null>(null);
   const [upiId, setUpiId] = useState('');
   const [upiValidationError, setUpiValidationError] = useState('');
+  const [agreed, setAgreed] = useState(false);
   const userType = getUserTypeForRole(currentRole);
 
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -562,7 +568,7 @@ export default function GigDetailsPage() {
     try {
       const response = await apiClient.post(
         `/api/gig/applications/${pendingBidId}/accept-invitation`,
-        { upiId: upiId.trim() }
+        { upiId: upiId.trim(), agreedToTerms: true }
       );
       if (response.success) {
         showToast('success', 'Assignment accepted successfully!');
@@ -963,7 +969,7 @@ export default function GigDetailsPage() {
 
       if (response.success && response.data) {
         const gigData = response.data as Gig;
-        //console.log(('🎯 Loaded gig data:', gigData);
+        console.log('🎯 Loaded gig data:', gigData);
         setGig(gigData);
       } else {
         // Go back to previous page or fallback to marketplace
@@ -1521,7 +1527,7 @@ export default function GigDetailsPage() {
                   )}
 
                   {/* Gig Management Actions */}
-                  {gig.status !== 'DRAFT' && (
+                  {/* {gig.status !== 'DRAFT' && (
                     <>
                       <span> | </span>
                       {gig.status === 'PAUSED' ? (
@@ -1554,7 +1560,7 @@ export default function GigDetailsPage() {
                         {gig.isPublic ? 'Make Private' : 'Make Public'}
                       </button>
                     </>
-                  )}
+                  )} */}
                 </div>
               )}
               <span> | </span>
@@ -2037,6 +2043,25 @@ export default function GigDetailsPage() {
                         View Submissions
                       </Link>
                     </div>
+                    {/* Chat with approved applicant */}
+                    {(myApplications as any)?.status === 'APPROVED' &&
+                      (myApplications as any)?.applicationId && (
+                        <button
+                          onClick={() => {
+                            const params = new URLSearchParams({
+                              gigTitle: gig?.title || 'Gig Chat',
+                              applicantName: 'Creator',
+                              brandName: gig?.brand?.name || 'Brand',
+                            });
+                            router.push(
+                              `/chat/${(myApplications as any)?.applicationId}?${params.toString()}`
+                            );
+                          }}
+                          className="btn-secondary mt-2 w-full"
+                        >
+                          💬 Chat with Creator
+                        </button>
+                      )}
                     <div className="mt-3">
                       <button
                         onClick={() => {
@@ -2108,6 +2133,21 @@ export default function GigDetailsPage() {
                     >
                       Submit Work
                     </button>
+                    <button
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          gigTitle: gig?.title || 'Gig Chat',
+                          applicantName: 'Applicant',
+                          brandName: gig?.brand?.name || 'Brand',
+                        });
+                        router.push(
+                          `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                        );
+                      }}
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      💬 Chat with Brand
+                    </button>
                     {gig.deadline && new Date() > new Date(gig.deadline) && (
                       <div>
                         <p className="mb-2 text-sm text-red-600">
@@ -2178,6 +2218,21 @@ export default function GigDetailsPage() {
                         }
                       >
                         Reject
+                      </button>
+                      <button
+                        onClick={() => {
+                          const params = new URLSearchParams({
+                            gigTitle: gig?.title || 'Gig Chat',
+                            applicantName: 'Applicant',
+                            brandName: gig?.brand?.name || 'Brand',
+                          });
+                          router.push(
+                            `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                          );
+                        }}
+                        className="btn-secondary mt-2 w-full"
+                      >
+                        💬 Chat with Brand
                       </button>
                     </div>
                   </div>
@@ -2723,6 +2778,31 @@ export default function GigDetailsPage() {
                     ))}
                   </div>
 
+                  <div className="mb-4">
+                    <label className="flex items-start gap-2 sm:gap-3">
+                      <div className='w-4 h-4'>
+                        <input
+                          type="checkbox"
+                          checked={agreed}
+                          onChange={(e) => setAgreed(e.target.checked)}
+                          className="mt-1 h-4 w-4 flex-shrink-0 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+                        />
+                      </div>
+                      <p className="min-w-0 flex-1 break-words text-xs leading-relaxed text-gray-700 sm:text-sm">
+                        I will disclose this is a paid promotion and will only
+                        promote legal, ethical products/services. I have read{' '}
+                        <button
+                          type="button"
+                          onClick={() => openGuidelines('creator')}
+                          className="inline text-blue-600 underline transition-colors hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                        >
+                          Creator Guidelines
+                        </button>
+                        .
+                      </p>
+                    </label>
+                  </div>
+
                   {/* Submit Buttons */}
                   <div className="flex gap-2 pt-2">
                     <button
@@ -2748,6 +2828,7 @@ export default function GigDetailsPage() {
                           (item) =>
                             item.url.trim() && validatePortfolioUrl(item.url)
                         ) ||
+                        !agreed ||
                         isApplying
                       }
                       className="btn-primary flex-1 py-0 text-sm disabled:opacity-50"
@@ -2998,6 +3079,29 @@ export default function GigDetailsPage() {
               </div>
             </div>
 
+            <div className="mb-4">
+              <label className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-1"
+                />
+                <span className="text-sm text-gray-700">
+                  I will disclose this is a paid promotion and will only promote
+                  legal, ethical products/services. I have read{' '}
+                  <button
+                    type="button"
+                    onClick={() => openGuidelines('creator')}
+                    className="text-blue-600 underline hover:text-blue-700"
+                  >
+                    Creator Guidelines
+                  </button>
+                  .
+                </span>
+              </label>
+            </div>
+
             <div className="flex gap-3">
               <button
                 onClick={() => {
@@ -3013,6 +3117,7 @@ export default function GigDetailsPage() {
               <button
                 onClick={handleUpiSubmit}
                 className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                disabled={!upiId || Boolean(validateUpiId(upiId)) || !agreed}
               >
                 Accept Assignment
               </button>
@@ -3064,6 +3169,13 @@ export default function GigDetailsPage() {
           </div>
         </div>
       )}
+
+      {/* Guidelines Modal */}
+      <GuidelinesModal
+        isOpen={isOpen}
+        onClose={closeGuidelines}
+        type={guidelinesType}
+      />
     </div>
   );
 }

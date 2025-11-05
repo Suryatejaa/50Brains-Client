@@ -69,7 +69,7 @@ export default function ContactPage() {
                 Hyderabad, Telangana<br />
                 India
               </p>
-              <p className="text-sm text-gray-600 mt-2">UDYAM Registration: UDYAM-TS-09-0192429</p>
+              {/* <p className="text-sm text-gray-600 mt-2">UDYAM Registration: UDYAM-TS-09-0192429</p> */}
             </div>
           </div>
 

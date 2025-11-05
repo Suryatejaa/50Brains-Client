@@ -69,11 +69,11 @@ const statusColors = {
 export default function MyGigsPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const [gigs, setGigs] = useState<Gig[]>([]);
+  const [gigs, setGigs] = useState < Gig[] > ([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'ALL' | GigStatus>('ALL');
-  const [refreshMessage, setRefreshMessage] = useState<string | null>(null);
+  const [error, setError] = useState < string | null > (null);
+  const [filter, setFilter] = useState < 'ALL' | GigStatus > ('ALL');
+  const [refreshMessage, setRefreshMessage] = useState < string | null > (null);
 
   // Redirect if not authenticated or not a brand
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function MyGigsPage() {
         ? `/api/gig/my-posted?_t=${Date.now()}`
         : '/api/gig/my-posted';
 
-      const response = await apiClient.get<GigsResponse>(url);
+      const response = await apiClient.get < GigsResponse > (url);
       //console.log((
       //   'Fetched gigs:',
       //   response.data,
@@ -320,19 +320,18 @@ export default function MyGigsPage() {
                 <button
                   key={status}
                   onClick={() => setFilter(status)}
-                  className={`rounded-none px-1 py-1 text-sm font-medium transition-colors ${
-                    filter === status
+                  className={`rounded-none px-1 py-1 text-sm font-medium transition-colors ${filter === status
                       ? 'bg-brand-primary text-white'
                       : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {status === 'ALL'
                     ? 'All Gigs'
                     : String(status || '').charAt(0) +
-                      String(status || '')
-                        .slice(1)
-                        .toLowerCase()
-                        .replace('_', ' ')}
+                    String(status || '')
+                      .slice(1)
+                      .toLowerCase()
+                      .replace('_', ' ')}
                   {` (${getStatusCount(status)})`}
                 </button>
               ))}
@@ -374,10 +373,12 @@ export default function MyGigsPage() {
                   <div
                     key={gig.id}
                     className="card-glass cursor-pointer p-2"
-                    onClick={() => router.push(`/gig/${gig.id}`)}
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex-1">
+                      <div className="flex-1"
+                        onClick={() => router.push(`/gig/${gig.id}`)}
+
+                      >
                         <div className="mb-3 flex flex-wrap items-center gap-3">
                           <h3 className="text-lg font-semibold text-gray-900">
                             {gig.title}

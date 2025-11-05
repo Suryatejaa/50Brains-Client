@@ -17,7 +17,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
-              Welcome to 50BraIns ("Platform", "we", "us", or "our"), operated under UDYAM-TS-09-0192429. 
+              {/* Welcome to 50BraIns ("Platform", "we", "us", or "our"), operated under UDYAM-TS-09-0192429.  */}
               By accessing or using our marketplace platform at www.50brains.com, you agree to be bound by these 
               Terms and Conditions. If you do not agree, please do not use our services.
             </p>
@@ -259,7 +259,7 @@ export default function TermsPage() {
             </p>
             <div className="mt-3 p-4 bg-gray-50 rounded-md">
               <p className="text-gray-700"><strong>50BraIns</strong></p>
-              <p className="text-gray-700">UDYAM Registration: UDYAM-TS-09-0192429</p>
+              {/* <p className="text-gray-700">UDYAM Registration: UDYAM-TS-09-0192429</p> */}
               <p className="text-gray-700">Email: legal@50brains.com</p>
               <p className="text-gray-700">Website: www.50brains.com</p>
             </div>

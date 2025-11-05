@@ -225,9 +225,9 @@ export default function PrivacyPage() {
             </p>
             <div className="mt-3 p-4 bg-gray-50 rounded-md">
               <p className="text-gray-700"><strong>50BraIns - Data Protection Officer</strong></p>
-              <p className="text-gray-700">Email: privacy@50brains.com</p>
-              <p className="text-gray-700">Website: www.50brains.com</p>
-              <p className="text-gray-700">UDYAM: UDYAM-TS-09-0192429</p>
+              <p className="text-gray-700">Email: echoliftagency@gmail.com</p>
+              <p className="text-gray-700">Website: www.50brains.in</p>
+              {/* <p className="text-gray-700">UDYAM: UDYAM-TS-09-0192429</p> */}
             </div>
           </section>
 
