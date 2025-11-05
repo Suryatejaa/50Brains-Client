@@ -13,7 +13,7 @@ const nextConfig = {
         domains: [
             'api.50brains.com',
             'localhost',
-            'api-gateway-production-c8bc.up.railway.app',
+            'api.50brains.in',
             'websocket-gateway-production-dbb2.up.railway.app'
         ],
         formats: ['image/webp', 'image/avif'],

@@ -13,7 +13,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://api-gateway-production-c8bc.up.railway.app/api/$1"
+      "destination": "https://api.50brains.in/api/$1"
     }
   ],
   "headers": [
@@ -47,7 +47,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://api-gateway-production-c8bc.up.railway.app"
+          "value": "https://api.50brains.in"
         },
         {
           "key": "Access-Control-Allow-Methods",
@@ -62,7 +62,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "NEXT_PUBLIC_API_URL": "https://api-gateway-production-c8bc.up.railway.app",
+    "NEXT_PUBLIC_API_URL": "https://api.50brains.in",
     "NEXT_PUBLIC_WEBSOCKET_URL": "wss://websocket-gateway-production-dbb2.up.railway.app",
     "NEXT_PUBLIC_APP_URL": "https://50-brains-client-web.vercel.app/",
     "VERCEL_FORCE_DEPLOY": "true"

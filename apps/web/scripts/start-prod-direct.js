@@ -2,13 +2,13 @@
 
 console.log('🚀 Starting 50BraIns Web App in Production Mode...');
 console.log('📡 Railway Production URLs:');
-console.log('   API: https://api-gateway-production-c8bc.up.railway.app');
+console.log('   API: https://api.50brains.in');
 console.log('   WebSocket: wss://websocket-gateway-production-dbb2.up.railway.app');
 console.log('   Frontend: http://localhost:5174\n');
 
 // Set production environment variables
 process.env.NODE_ENV = 'production';
-process.env.NEXT_PUBLIC_API_BASE_URL = 'https://api-gateway-production-c8bc.up.railway.app';
+process.env.NEXT_PUBLIC_API_BASE_URL = 'https://api.50brains.in';
 process.env.NEXT_PUBLIC_WEBSOCKET_URL = 'wss://websocket-gateway-production-dbb2.up.railway.app';
 process.env.NEXT_PUBLIC_APP_URL = 'https://your-production-domain.com';
 

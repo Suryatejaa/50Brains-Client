@@ -40,13 +40,13 @@ Next.js loads environment variables in this order (highest to lowest priority):
 
 ## Quick Reference
 
-| Command                | Environment | URL Used                                             |
-| ---------------------- | ----------- | ---------------------------------------------------- |
-| `npm run dev`          | Local       | `http://localhost:3000`                              |
-| `npm run dev:local`    | Local       | `http://localhost:3000`                              |
-| `npm run build:prod`   | Production  | `https://api-gateway-production-c8bc.up.railway.app` |
-| `npm run start:prod`   | Production  | `https://api-gateway-production-c8bc.up.railway.app` |
-| `npm run preview:prod` | Production  | `https://api-gateway-production-c8bc.up.railway.app` |
+| Command                | Environment | URL Used                  |
+| ---------------------- | ----------- | ------------------------- |
+| `npm run dev`          | Local       | `http://localhost:3000`   |
+| `npm run dev:local`    | Local       | `http://localhost:3000`   |
+| `npm run build:prod`   | Production  | `https://api.50brains.in` |
+| `npm run start:prod`   | Production  | `https://api.50brains.in` |
+| `npm run preview:prod` | Production  | `https://api.50brains.in` |
 
 ## Environment Files
 
@@ -64,7 +64,7 @@ NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:4000
 Used when deploying to production.
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=https://api-gateway-production-c8bc.up.railway.app
+NEXT_PUBLIC_API_BASE_URL=https://api.50brains.in
 NEXT_PUBLIC_WEBSOCKET_URL=wss://websocket-gateway-production-dbb2.up.railway.app
 ```
 
@@ -80,7 +80,7 @@ Template file showing all available environment variables with examples for both
 
 ### Production URLs
 
-- **API Gateway**: `https://api-gateway-production-c8bc.up.railway.app`
+- **API Gateway**: `https://api.50brains.in`
 - **WebSocket Gateway**: `wss://websocket-gateway-production-dbb2.up.railway.app`
 
 ### Local Development URLs
@@ -123,7 +123,7 @@ Template file showing all available environment variables with examples for both
 
    ```bash
    NODE_ENV=production
-   NEXT_PUBLIC_API_BASE_URL=https://api-gateway-production-c8bc.up.railway.app
+   NEXT_PUBLIC_API_BASE_URL=https://api.50brains.in
    NEXT_PUBLIC_WEBSOCKET_URL=wss://websocket-gateway-production-dbb2.up.railway.app
    ```
 

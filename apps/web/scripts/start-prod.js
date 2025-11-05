@@ -33,7 +33,7 @@ async function startProdServer() {
     try {
         console.log('🚀 Starting 50BraIns in Production Mode...');
         console.log('📡 Using Railway Production URLs');
-        console.log('   API: https://api-gateway-production-c8bc.up.railway.app');
+        console.log('   API: https://api.50brains.in');
         console.log('   WebSocket: wss://websocket-gateway-production-dbb2.up.railway.app\n');
 
         // Backup .env.local if it exists
