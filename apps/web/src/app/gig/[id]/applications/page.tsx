@@ -29,7 +29,7 @@ interface Application {
   id: string;
   gigId: string;
   applicantId: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED';
+  status: 'PENDING' | 'SUBMITTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED' | 'CLOSED';
   proposal: string;
   quotedPrice: number;
   estimatedTime: string;
@@ -780,7 +780,7 @@ export default function GigApplicationsPage() {
                       {application.status === 'WITHDRAWN' &&
                         '↩️ Application Withdrawn'}
                     </div>
-                    {application.status === 'APPROVED' && (
+                    {(application.status === 'APPROVED' || application.status === 'SUBMITTED' || application.status === 'CLOSED') && (
                       <button
                         onClick={() => {
                           const params = new URLSearchParams({

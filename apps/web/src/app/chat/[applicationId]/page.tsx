@@ -24,6 +24,21 @@ interface ConversationResponse {
   timestamp: string;
 }
 
+interface ApplicationData {
+  id: string;
+  gigId: string;
+  applicantId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN' | 'CLOSED';
+  proposal: string;
+  quotedPrice: number;
+  estimatedTime: string;
+  applicantType: 'user' | 'clan' | 'owner';
+  appliedAt: string;
+  acceptedAt?: string;
+  rejectedAt?: string;
+  closedAt?: string;
+}
+
 interface ConversationData {
   id: string;
   gigId: string;
@@ -66,6 +81,7 @@ export default function ChatPage() {
   const [conversation, setConversation] = useState<ConversationData | null>(
     null
   );
+  const [application, setApplication] = useState<ApplicationData | null>(null);
   const [responses, setResponses] = useState<ConversationResponse[]>([]);
   const [newResponse, setNewResponse] = useState('');
   const [loading, setLoading] = useState(true);
@@ -93,12 +109,22 @@ export default function ChatPage() {
 
       console.log('🔍 Loading conversation for applicationId:', applicationId);
 
-      const response = await apiClient.get(
-        `/api/chat/application/${applicationId}?t=${Date.now()}&refresh=true`
-      );
+      // Load both conversation and application details
+      const [conversationResponse, applicationResponse] =
+        await Promise.allSettled([
+          apiClient.get(
+            `/api/chat/application/${applicationId}?t=${Date.now()}&refresh=true`
+          ),
+          apiClient.get(`/api/gig/applications/${applicationId}`),
+        ]);
 
-      if (response.success) {
-        const data = response.data as any;
+      // Handle conversation response
+      if (
+        conversationResponse.status === 'fulfilled' &&
+        conversationResponse.value.success
+      ) {
+        const data = conversationResponse.value.data as any;
+        console.log('🔍 [LOAD] Raw conversation data from server:', data);
         setConversation(data.conversation);
 
         // Handle responses array
@@ -106,7 +132,8 @@ export default function ChatPage() {
         console.log(
           '🔍 [LOAD] Raw responses from server:',
           responsesArray.length,
-          responsesArray
+          responsesArray,
+          data.conversation
         );
 
         const loadedResponses = responsesArray.map((response: any) => ({
@@ -138,6 +165,25 @@ export default function ChatPage() {
       } else {
         setError('Failed to load conversation');
       }
+
+      // Handle application response
+      if (
+        applicationResponse.status === 'fulfilled' &&
+        applicationResponse.value.success
+      ) {
+        const applicationData = applicationResponse.value
+          .data as ApplicationData;
+        setApplication(applicationData);
+        console.log('📄 Application loaded:', {
+          id: applicationData.id,
+          status: applicationData.status,
+          data: applicationData,
+        });
+      } else {
+        console.warn(
+          'Failed to load application details, chat will still work'
+        );
+      }
     } catch (err: any) {
       console.error('Failed to load conversation:', err);
       setError(err.message || 'Failed to load conversation');
@@ -145,7 +191,7 @@ export default function ChatPage() {
       setLoading(false);
     }
   };
-
+  
   // Manual refresh conversation
   const refreshConversation = async () => {
     if (!conversation) return;
@@ -159,12 +205,21 @@ export default function ChatPage() {
         applicationId
       );
 
-      const response = await apiClient.get(
-        `/api/chat/application/${applicationId}?t=${Date.now()}&refresh=true`
-      );
+      // Refresh both conversation and application details
+      const [conversationResponse, applicationResponse] =
+        await Promise.allSettled([
+          apiClient.get(
+            `/api/chat/application/${applicationId}?t=${Date.now()}&refresh=true`
+          ),
+          apiClient.get(`/api/gig/applications/${applicationId}`),
+        ]);
 
-      if (response.success) {
-        const data = response.data as any;
+      // Handle conversation response
+      if (
+        conversationResponse.status === 'fulfilled' &&
+        conversationResponse.value.success
+      ) {
+        const data = conversationResponse.value.data as any;
         setConversation(data.conversation);
 
         // Handle responses array
@@ -204,6 +259,20 @@ export default function ChatPage() {
       } else {
         setError('Failed to refresh conversation');
       }
+
+      // Handle application refresh
+      if (
+        applicationResponse.status === 'fulfilled' &&
+        applicationResponse.value.success
+      ) {
+        const applicationData = applicationResponse.value
+          .data as ApplicationData;
+        setApplication(applicationData);
+        console.log('🔄 Application refreshed successfully:', {
+          id: applicationData.id,
+          status: applicationData.status,
+        });
+      }
     } catch (error) {
       console.error('Refresh error:', error);
       setError('Failed to refresh conversation');
@@ -216,9 +285,17 @@ export default function ChatPage() {
   const addResponse = async () => {
     if (!newResponse.trim() || !conversation || sending) return;
 
-    // Check if conversation is closed
+    // Check if conversation or application is closed
     if (conversation.status === 'closed') {
       setError('This conversation is closed and read-only');
+      return;
+    }
+
+    if (
+      application &&
+      ['CLOSED', 'REJECTED', 'WITHDRAWN'].includes(application.status)
+    ) {
+      setError('This application is closed and the conversation is read-only');
       return;
     }
 
@@ -334,6 +411,34 @@ export default function ChatPage() {
     }
   };
 
+  // Helper function to determine if chat should be read-only
+  const isReadOnly = () => {
+    if (conversation?.status === 'closed') return true;
+    if (
+      application &&
+      ['CLOSED', 'REJECTED', 'WITHDRAWN'].includes(application.status)
+    )
+      return true;
+    return false;
+  };
+
+  // Helper function to get read-only message
+  const getReadOnlyMessage = () => {
+    if (conversation?.status === 'closed') {
+      return 'This conversation has been closed and is read-only.';
+    }
+    if (application?.status === 'CLOSED') {
+      return 'This application has been completed and the conversation is read-only.';
+    }
+    if (application?.status === 'REJECTED') {
+      return 'This application was rejected and the conversation is read-only.';
+    }
+    if (application?.status === 'WITHDRAWN') {
+      return 'This application was withdrawn and the conversation is read-only.';
+    }
+    return 'This conversation is read-only.';
+  };
+
   const formatTime = (dateInput: string | Date) => {
     try {
       const date =
@@ -374,6 +479,9 @@ export default function ChatPage() {
       return 'Invalid date';
     }
   };
+
+  console.log('Application status:', application?.status);
+  console.log('Conversation status:', conversation?.status);
 
   if (loading) {
     return (
@@ -420,12 +528,17 @@ export default function ChatPage() {
                 <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
                 <div>
                   <h1 className="text-lg font-semibold text-gray-900">
-                    {conversation?.status === 'closed'
-                      ? 'Discussion (Closed)'
+                    {isReadOnly()
+                      ? `Discussion (${application?.status === 'CLOSED' ? 'Completed' : application?.status === 'REJECTED' ? 'Rejected' : application?.status === 'WITHDRAWN' ? 'Withdrawn' : 'Closed'})`
                       : `Discussion with ${userType === 'brand' ? applicantName || 'Applicant' : brandName || 'Brand'}`}
                   </h1>
                   <p className="text-sm text-gray-600">
                     {conversation?.subject || gigTitle}
+                    {application && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        • Application: {application.status}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -454,9 +567,25 @@ export default function ChatPage() {
                 </svg>
               </button>
 
-              {conversation?.status === 'closed' && (
-                <div className="rounded bg-red-100 px-3 py-1 text-sm text-red-800">
-                  Closed
+              {isReadOnly() && (
+                <div
+                  className={`rounded px-3 py-1 text-sm ${
+                    application?.status === 'CLOSED'
+                      ? 'bg-green-100 text-green-800'
+                      : application?.status === 'REJECTED'
+                        ? 'bg-red-100 text-red-800'
+                        : application?.status === 'WITHDRAWN'
+                          ? 'bg-gray-100 text-gray-800'
+                          : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {application?.status === 'CLOSED'
+                    ? 'Completed'
+                    : application?.status === 'REJECTED'
+                      ? 'Rejected'
+                      : application?.status === 'WITHDRAWN'
+                        ? 'Withdrawn'
+                        : 'Closed'}
                 </div>
               )}
             </div>
@@ -575,7 +704,7 @@ export default function ChatPage() {
           </div>
 
           {/* Message Input - Fixed at bottom above navigation */}
-          {conversation?.status === 'open' ? (
+          {!isReadOnly() ? (
             <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-gray-200 bg-white p-1">
               <div className="mx-auto max-w-4xl">
                 <div className="mb-3 flex items-center justify-between">
@@ -612,12 +741,27 @@ export default function ChatPage() {
               </div>
             </div>
           ) : (
-            <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-gray-200 bg-gray-50 p-4">
+            <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-gray-200 bg-gray-50 p-1">
               <div className="mx-auto max-w-4xl text-center">
-                <p className="text-gray-600">
-                  This conversation is closed and read-only. No new responses
-                  can be added.
-                </p>
+                <div className="flex items-center justify-center space-x-2">
+                  <div
+                    className={`h-3 w-3 rounded-full ${
+                      application?.status === 'CLOSED'
+                        ? 'bg-green-500'
+                        : application?.status === 'REJECTED'
+                          ? 'bg-red-500'
+                          : application?.status === 'WITHDRAWN'
+                            ? 'bg-gray-500'
+                            : 'bg-red-500'
+                    }`}
+                  ></div>
+                  <p className="text-gray-600">{getReadOnlyMessage()}</p>
+                </div>
+                {application?.status === 'CLOSED' && (
+                  <p className="mt-2 text-sm text-green-600">
+                    🎉 This application was successfully completed!
+                  </p>
+                )}
               </div>
             </div>
           )}

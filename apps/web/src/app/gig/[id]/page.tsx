@@ -2044,7 +2044,9 @@ export default function GigDetailsPage() {
                       </Link>
                     </div>
                     {/* Chat with approved applicant */}
-                    {(myApplications as any)?.status === 'APPROVED' &&
+                    {((myApplications as any)?.status === 'APPROVED' ||
+                      (myApplications as any)?.status === 'SUBMITTED' ||
+                      (myApplications as any)?.status === 'CLOSED') &&
                       (myApplications as any)?.applicationId && (
                         <button
                           onClick={() => {
@@ -2268,20 +2270,37 @@ export default function GigDetailsPage() {
                   (myApplications as any)?.gigId === gigId &&
                   gigId &&
                   !isOwner ? (
-                  <div className="text-center">
-                    <div className="mb-2 text-4xl">📄</div>
-                    <p className="mb-2 font-semibold text-gray-600">
-                      Application Submitted
-                    </p>
-                    <p className="mb-4 text-sm text-gray-600">
-                      Your application has been submitted
-                    </p>
-                    <Link
-                      href="/my/applications"
-                      className="btn-secondary w-full"
+                  <div>
+                    <div className="text-center">
+                      <div className="mb-2 text-4xl">📄</div>
+                      <p className="mb-2 font-semibold text-gray-600">
+                        Application Submitted
+                      </p>
+                      <p className="mb-4 text-sm text-gray-600">
+                        Your application has been submitted
+                      </p>
+                      <Link
+                        href="/my/applications"
+                        className="btn-secondary w-full"
+                      >
+                        View My Applications
+                      </Link>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          gigTitle: gig?.title || 'Gig Chat',
+                          applicantName: 'Applicant',
+                          brandName: gig?.brand?.name || 'Brand',
+                        });
+                        router.push(
+                          `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                        );
+                      }}
+                      className="btn-secondary mt-2 w-full"
                     >
-                      View My Applications
-                    </Link>
+                      💬 Chat with Brand
+                    </button>
                   </div>
                 ) : (myApplications as any)?.status === 'REJECTED' &&
                   (myApplications as any)?.gigId === gigId &&
@@ -2311,6 +2330,7 @@ export default function GigDetailsPage() {
                   (myApplications as any)?.gigId === gigId &&
                   gigId &&
                   !isOwner ? (
+                    <div>
                   <div className="text-center">
                     <div className="mb-2 text-4xl">🎉</div>
                     <p className="mb-2 font-semibold text-gray-600">
@@ -2325,6 +2345,22 @@ export default function GigDetailsPage() {
                     >
                       View My Applications
                     </Link>
+                  </div>
+                  <button
+                        onClick={() => {
+                          const params = new URLSearchParams({
+                            gigTitle: gig?.title || 'Gig Chat',
+                            applicantName: 'Applicant',
+                            brandName: gig?.brand?.name || 'Brand',
+                          });
+                          router.push(
+                            `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                          );
+                        }}
+                        className="btn-secondary mt-2 w-full"
+                      >
+                        💬 Chat with Brand
+                      </button>
                   </div>
                 ) : !isOwner && !canApply ? (
                   <div className="text-center">
@@ -2780,7 +2816,7 @@ export default function GigDetailsPage() {
 
                   <div className="mb-4">
                     <label className="flex items-start gap-2 sm:gap-3">
-                      <div className='w-4 h-4'>
+                      <div className="h-4 w-4">
                         <input
                           type="checkbox"
                           checked={agreed}
