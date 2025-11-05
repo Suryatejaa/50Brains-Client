@@ -15,7 +15,7 @@ export default function RegisterPage() {
     confirmPassword: '',
     roles: [] as string[],
     instagramHandle: '',
-    agreedToTerms: false,
+    isAgreedToTermsAndRefundPolicy: false,
     subscribeToNewsletter: false,
   });
   const [isLoadingInternal, setIsLoadingInternal] = useState(false);
@@ -147,7 +147,7 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!formData.agreedToTerms) {
+    if (!formData.isAgreedToTermsAndRefundPolicy) {
       setError(
         'Please agree to the Terms of Service and Privacy Policy to continue.'
       );
@@ -179,6 +179,7 @@ export default function RegisterPage() {
         username: formatUsername(formData.email),
         roles: formData.roles as any[],
         instagramHandle: formData.instagramHandle.trim(),
+        isAgreedToTermsAndRefundPolicy: formData.isAgreedToTermsAndRefundPolicy
       });
 
       // Registration initiated - now show OTP verification modal
@@ -240,6 +241,7 @@ export default function RegisterPage() {
         username: formatUsername(formData.email),
         roles: formData.roles as any[],
         instagramHandle: formData.instagramHandle.trim(),
+        isAgreedToTermsAndRefundPolicy: formData.isAgreedToTermsAndRefundPolicy
       });
     } catch (err: any) {
       throw new Error(err.message || 'Failed to resend verification code.');
@@ -659,11 +661,11 @@ export default function RegisterPage() {
       <div className="mt-1 space-y-1 border-t border-gray-200 pt-1">
         <label className="flex items-start space-x-3">
           <input
-            name="agreedToTerms"
+            name="isAgreedToTermsAndRefundPolicy"
             type="checkbox"
             required
             className="text-brand-primary focus:ring-brand-primary mt-1 h-4 w-4 rounded border-gray-300 focus:ring-offset-0"
-            checked={formData.agreedToTerms}
+            checked={formData.isAgreedToTermsAndRefundPolicy}
             onChange={handleChange}
           />
           <span className="text-sm leading-relaxed text-gray-700">
@@ -753,7 +755,7 @@ export default function RegisterPage() {
                     isLoadingInternal ||
                     (step === 3 &&
                       (formData.roles.length === 0 ||
-                        !formData.agreedToTerms ||
+                        !formData.isAgreedToTermsAndRefundPolicy ||
                         (formData.roles.some(
                           (role) => role === 'CREW' || role === 'INFLUENCER'
                         ) &&

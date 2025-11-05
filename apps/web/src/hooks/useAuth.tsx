@@ -68,6 +68,7 @@ interface RegisterRequest {
   firstName?: string;
   instagramHandle?: string;
   lastName?: string;
+  isAgreedToTermsAndRefundPolicy: boolean;
   roles?: UserRole[]; // Optional for registration
 }
 
