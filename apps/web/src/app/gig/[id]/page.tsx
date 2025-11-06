@@ -873,7 +873,7 @@ export default function GigDetailsPage() {
           applicantType: applicantType,
           applicationId: applicationId,
         };
-        // console.log('🎯 Formatted my applications:', applicationWithType);
+        console.log('🎯 Formatted my applications:', applicationWithType);
         setMyApplications(applicationWithType);
       }
     } catch (error) {
@@ -1518,12 +1518,15 @@ export default function GigDetailsPage() {
                   <span> | </span>
                   {/* Only show applications link for published gigs */}
                   {gig.status !== 'DRAFT' && (
-                    <Link
-                      href={gigId ? `/gig/${gigId}/applications` : '#'}
-                      className="cursor-pointer text-sm text-blue-600 hover:underline"
-                    >
-                      Applications ({gig.applicationCount || 0})
-                    </Link>
+                    <>
+                      <Link
+                        href={gigId ? `/gig/${gigId}/applications` : '#'}
+                        className="cursor-pointer text-sm text-blue-600 hover:underline"
+                      >
+                        Applications ({gig.applicationCount || 0})
+                      </Link>
+                      <span> | </span>                     
+                    </>
                   )}
 
                   {/* Gig Management Actions */}
@@ -1648,7 +1651,32 @@ export default function GigDetailsPage() {
                       </p>
                       <p className="text-sm text-green-600">
                         {alreadyAppliedMessage ||
-                          'Your application has been approved. Please start working on the gig.'}
+                          'Your application has been approved. Upload your work for review.'}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/my/applications"
+                    className="cursor-pointer p-2 text-sm text-blue-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ) : myApplicationStatus === 'DELIVERED' &&
+              (myApplications as any)?.gigId === gigId &&
+              gigId ? (
+              <div className="mb-1 lg:col-span-3">
+                <div className="flex items-center justify-between rounded-none border border-blue-200 bg-blue-50 p-1">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-2xl">🚀</div>
+                    <div>
+                      <p className="font-semibold text-blue-800">
+                        Work Approved - Ready for Submission
+                      </p>
+                      <p className="text-sm text-blue-600">
+                        Your work has been approved! Post it publicly and submit
+                        the URL.
                       </p>
                     </div>
                   </div>
@@ -2127,13 +2155,71 @@ export default function GigDetailsPage() {
                       Application {myApplicationStatus}
                     </p>
                     <p className="mb-4 text-sm text-gray-600">
-                      Your application has been approved, submit your work.
+                      Upload your work for brand review before submission.
+                    </p>
+                    <button
+                      onClick={() => router.push(`/gig/${gigId}/upload`)}
+                      className="btn-primary w-full"
+                    >
+                      Upload Work
+                    </button>
+                    <button
+                      onClick={() => router.push(`/gig/${gigId}/history`)}
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      📁 View Uploads
+                    </button>
+                    <button
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          gigTitle: gig?.title || 'Gig Chat',
+                          applicantName: 'Applicant',
+                          brandName: gig?.brand?.name || 'Brand',
+                        });
+                        router.push(
+                          `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                        );
+                      }}
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      💬 Chat with Brand
+                    </button>
+                    {gig.deadline && new Date() > new Date(gig.deadline) && (
+                      <div>
+                        <p className="mb-2 text-sm text-red-600">
+                          Submission deadline has passed
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Deadline was:{' '}
+                          {new Date(gig.deadline).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (myApplications as any)?.status === 'DELIVERED' &&
+                  (myApplications as any)?.gigId === gigId &&
+                  gigId &&
+                  !isOwner ? (
+                  <div className="text-center">
+                    <div className="mb-2 text-4xl">🚀</div>
+                    <p className="mb-2 font-semibold text-blue-600">
+                      Work Approved - Ready for Submission
+                    </p>
+                    <p className="mb-4 text-sm text-gray-600">
+                      Your work has been approved! Now post it publicly and
+                      submit the URL.
                     </p>
                     <button
                       onClick={() => setShowSubmissionForm(true)}
                       className="btn-primary w-full"
                     >
                       Submit Work
+                    </button>
+                    <button
+                      onClick={() => router.push(`/gig/${gigId}/history`)}
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      📁 View Approved Work
                     </button>
                     <button
                       onClick={() => {
@@ -2330,37 +2416,37 @@ export default function GigDetailsPage() {
                   (myApplications as any)?.gigId === gigId &&
                   gigId &&
                   !isOwner ? (
-                    <div>
-                  <div className="text-center">
-                    <div className="mb-2 text-4xl">🎉</div>
-                    <p className="mb-2 font-semibold text-gray-600">
-                      Congratulations! The gig was completed
-                    </p>
-                    <p className="mb-4 text-sm text-gray-600">
-                      Thank you for being part of this campaign.
-                    </p>
-                    <Link
-                      href="/my/applications"
-                      className="btn-secondary w-full"
-                    >
-                      View My Applications
-                    </Link>
-                  </div>
-                  <button
-                        onClick={() => {
-                          const params = new URLSearchParams({
-                            gigTitle: gig?.title || 'Gig Chat',
-                            applicantName: 'Applicant',
-                            brandName: gig?.brand?.name || 'Brand',
-                          });
-                          router.push(
-                            `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
-                          );
-                        }}
-                        className="btn-secondary mt-2 w-full"
+                  <div>
+                    <div className="text-center">
+                      <div className="mb-2 text-4xl">🎉</div>
+                      <p className="mb-2 font-semibold text-gray-600">
+                        Congratulations! The gig was completed
+                      </p>
+                      <p className="mb-4 text-sm text-gray-600">
+                        Thank you for being part of this campaign.
+                      </p>
+                      <Link
+                        href="/my/applications"
+                        className="btn-secondary w-full"
                       >
-                        💬 Chat with Brand
-                      </button>
+                        View My Applications
+                      </Link>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          gigTitle: gig?.title || 'Gig Chat',
+                          applicantName: 'Applicant',
+                          brandName: gig?.brand?.name || 'Brand',
+                        });
+                        router.push(
+                          `/chat/${(myApplications as any)?.applicationId || null}?${params.toString()}`
+                        );
+                      }}
+                      className="btn-secondary mt-2 w-full"
+                    >
+                      💬 Chat with Brand
+                    </button>
                   </div>
                 ) : !isOwner && !canApply ? (
                   <div className="text-center">
@@ -2891,6 +2977,8 @@ export default function GigDetailsPage() {
               onCancel={() => setShowSubmissionForm(false)}
             />
           )}
+
+      
       </div>
 
       {/* Assign Modal */}

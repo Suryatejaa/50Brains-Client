@@ -99,7 +99,7 @@ export default function MyApplicationsPage() {
             (app: Application) => app.status === 'APPROVED'
           ).length,
           completed: applications.filter(
-            (app: Application) => app.status === 'COMPLETED'
+            (app: Application) => app.status === 'CLOSED'
           ).length,
         });
       }
@@ -204,7 +204,8 @@ export default function MyApplicationsPage() {
               'PENDING',
               'APPROVED',
               'REJECTED',
-              'COMPLETED',
+              'CLOSED',
+              'DELIVERED',
               'CANCELLED',
             ].map((status) => (
               <button

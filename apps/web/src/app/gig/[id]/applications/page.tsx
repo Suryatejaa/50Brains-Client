@@ -29,7 +29,13 @@ interface Application {
   id: string;
   gigId: string;
   applicantId: string;
-  status: 'PENDING' | 'SUBMITTED' | 'REJECTED' | 'WITHDRAWN' | 'APPROVED' | 'CLOSED';
+  status:
+    | 'PENDING'
+    | 'SUBMITTED'
+    | 'REJECTED'
+    | 'WITHDRAWN'
+    | 'APPROVED'
+    | 'CLOSED';
   proposal: string;
   quotedPrice: number;
   estimatedTime: string;
@@ -522,6 +528,7 @@ export default function GigApplicationsPage() {
                   'Back to My Gigs'
                 )}
               </Link>
+             
               <Link href={`/gig/${gigId}`} className="btn-secondary">
                 {isLoading ? (
                   <RefreshCcw className="h-4 w-4" />
@@ -780,24 +787,41 @@ export default function GigApplicationsPage() {
                       {application.status === 'WITHDRAWN' &&
                         '↩️ Application Withdrawn'}
                     </div>
-                    {(application.status === 'APPROVED' || application.status === 'SUBMITTED' || application.status === 'CLOSED') && (
-                      <button
-                        onClick={() => {
-                          const params = new URLSearchParams({
-                            gigTitle: gig?.title || 'Gig Chat',
-                            applicantName:
-                              getApplicantName(application.id) || 'Applicant',
-                            brandName: gig?.brand?.name || 'Brand',
-                          });
-                          router.push(
-                            `/chat/${application.id}?${params.toString()}`
-                          );
-                        }}
-                        className="btn-secondary text-sm"
-                      >
-                        💬 Chat with Applicant
-                      </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {(application.status === 'APPROVED' ||
+                        application.status === 'SUBMITTED' ||
+                        application.status === 'CLOSED') && (
+                        <>
+                          <button
+                            onClick={() => {
+                              router.push(
+                                `/gig/${gig?.id}/applications/${application.id}/deliveries`
+                              );
+                            }}
+                            className="px-1 border-2 border-gray-400 text-sm w-30 h-8"
+                          >
+                          Deliveries
+                          </button>
+                          <button
+                            onClick={() => {
+                              const params = new URLSearchParams({
+                                gigTitle: gig?.title || 'Gig Chat',
+                                applicantName:
+                                  getApplicantName(application.id) ||
+                                  'Applicant',
+                                brandName: gig?.brand?.name || 'Brand',
+                              });
+                              router.push(
+                                `/chat/${application.id}?${params.toString()}`
+                              );
+                            }}
+                            className="px-2 border-2 border-gray-400 text-sm w-30 h-8"
+                          >
+                            Chat
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
