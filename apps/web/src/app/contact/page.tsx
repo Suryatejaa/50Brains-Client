@@ -17,6 +17,7 @@ export default function ContactPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Get in Touch</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Illa Suryateja (Founder)</h2>
               
               <div className="space-y-4">
                 <div className="flex items-start">
@@ -25,7 +26,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-semibold text-gray-900">General Inquiries</h3>
-                    <a href="mailto:hello@50brains.com" className="text-teal-600 hover:underline">hello@50brains.com</a>
+                    <a href="mailto:hello@50brains.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a>
                   </div>
                 </div>
 
@@ -35,7 +36,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-semibold text-gray-900">Customer Support</h3>
-                    <a href="mailto:support@50brains.com" className="text-teal-600 hover:underline">support@50brains.com</a>
+                    <a href="mailto:support@50brains.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a>
                     <p className="text-sm text-gray-600 mt-1">Response time: 24-48 hours</p>
                   </div>
                 </div>
@@ -46,7 +47,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-semibold text-gray-900">Payment & Refunds</h3>
-                    <a href="mailto:refunds@50brains.com" className="text-teal-600 hover:underline">refunds@50brains.com</a>
+                    <a href="mailto:refunds@50brains.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a>
                   </div>
                 </div>
 
@@ -56,8 +57,8 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-semibold text-gray-900">Business Partnerships</h3>
-                    <a href="mailto:partnerships@50brains.com" className="text-teal-600 hover:underline">partnerships@50brains.com</a>
-                  </div>
+                        <a href="mailto:partnerships@50brains.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a>
+                      </div>
                 </div>
               </div>
             </div>

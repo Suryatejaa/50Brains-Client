@@ -380,8 +380,19 @@ export class APIClient {
           );
         }
 
-        // If refresh token is expired (401), this is a critical auth failure
+        // If refresh token is expired or not found in database (401), this is a critical auth failure
         if (refreshResponse.status === 401) {
+          const errorMessage =
+            refreshError.message || 'Refresh token has expired or is invalid';
+          console.log('🚨 Critical auth failure:', errorMessage);
+
+          // If the error mentions "Invalid or expired refresh token", it's likely a database sync issue
+          if (errorMessage.includes('Invalid or expired refresh token')) {
+            console.log(
+              '🔄 Database token mismatch detected - forcing re-authentication'
+            );
+          }
+
           throw new APIError(
             401,
             'REFRESH_TOKEN_EXPIRED',

@@ -2145,7 +2145,7 @@ export default function GigDetailsPage() {
                       Loading application status...
                     </p>
                   </div>
-                ) : (myApplications as any)?.status === 'APPROVED' &&
+                ) : (myApplications as any)?.status === 'WORK_IN_PROGRESS' &&
                   (myApplications as any)?.gigId === gigId &&
                   gigId &&
                   !isOwner ? (
@@ -2324,7 +2324,7 @@ export default function GigDetailsPage() {
                       </button>
                     </div>
                   </div>
-                ) : (myApplications as any)?.status === 'PENDING' &&
+                ) : ((myApplications as any)?.status === 'PENDING' || (myApplications as any)?.status === 'PAYMENT_PENDING') &&
                   (myApplications as any)?.gigId === gigId &&
                   gigId ? (
                   <div className="text-center">

@@ -63,6 +63,7 @@
   "env": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_API_URL": "https://api.50brains.in",
+    "NEXT_PUBLIC_API_BASE_URL": "https://api.50brains.in",
     "NEXT_PUBLIC_WEBSOCKET_URL": "wss://websocket-gateway-production-dbb2.up.railway.app",
     "NEXT_PUBLIC_APP_URL": "https://50-brains-client-web.vercel.app/",
     "VERCEL_FORCE_DEPLOY": "true"

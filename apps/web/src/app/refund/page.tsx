@@ -7,252 +7,321 @@ export const metadata: Metadata = {
 
 export default function RefundPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Refund & Cancellation Policy</h1>
-        <p className="text-sm text-gray-600 mb-8">Last Updated: November 3, 2025</p>
+    <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <h1 className="text-4xl font-bold mb-8">Refund & Cancellation Policy</h1>
+      
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
+        Last Updated: November 12, 2025
+      </p>
 
-        <div className="prose prose-sm max-w-none space-y-6">
-          {/* 1. Introduction */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Introduction</h2>
-            <p className="text-gray-700 leading-relaxed">
-              This Refund & Cancellation Policy governs transactions on the 50BraIns marketplace platform. 
-              Our escrow-based payment system protects both Brands and Creators while ensuring fair outcomes.
-            </p>
-          </section>
+      <div className="space-y-8 text-gray-800 dark:text-gray-200">
+        
+        {/* Introduction */}
+        <section>
+          <p className="mb-4">
+            This Refund & Cancellation Policy governs transactions on the 50BraIns marketplace platform. 
+            Our escrow-based payment system protects both Brands and Creators while ensuring fair outcomes.
+          </p>
+        </section>
 
-          {/* 2. Payment Escrow System */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Payment Escrow System</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">
-              When a Brand accepts a Creator's application:
-            </p>
-            <ol className="list-decimal pl-6 space-y-2 text-gray-700">
-              <li>Brand pays the full gig amount upfront</li>
-              <li>Funds are held in secure escrow by 50BraIns</li>
-              <li>Creator delivers the work as per agreed terms</li>
-              <li>Brand reviews and approves or requests revisions</li>
-              <li>Upon approval, 85% is released to Creator, 15% retained by Platform</li>
-            </ol>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              This system ensures Creators get paid for completed work while Brands receive quality deliverables.
-            </p>
-          </section>
-
-          {/* 3. Cancellation by Brand */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Cancellation by Brand</h2>
+        {/* How Payment Works */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">1. How Escrow Payments Work</h2>
+          
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg mb-4">
+            <h3 className="text-lg font-semibold mb-3">Payment Flow Timeline</h3>
             
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">3.1 Before Creator Accepts</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Brands can cancel gigs anytime before a Creator is selected</li>
-              <li><strong>Refund:</strong> Full refund minus payment gateway charges (typically 2-3%)</li>
-              <li><strong>Processing Time:</strong> 5-7 business days</li>
-            </ul>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-semibold">Brand Accepts Application</h4>
+                  <p className="text-sm">
+                    Payment is charged to Brand and held securely in escrow. Creator can now begin work.
+                  </p>
+                </div>
+              </div>
 
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">3.2 After Payment (Work Not Started)</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Brand can request cancellation within 24 hours of Creator acceptance</li>
-              <li>Creator must confirm cancellation</li>
-              <li><strong>Refund:</strong> Full amount minus payment gateway charges</li>
-              <li><strong>Platform Fee:</strong> Not charged if cancelled before work begins</li>
-            </ul>
+              <div className="flex items-start gap-4">
+                <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-semibold">Creator Completes Work</h4>
+                  <p className="text-sm">
+                    Creator submits deliverables through the platform. Brand has 24-72 hours to review.
+                  </p>
+                </div>
+              </div>
 
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">3.3 After Work Begins</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Both parties must mutually agree to cancellation</li>
-              <li>Creator is entitled to compensation for work completed</li>
-              <li><strong>Partial Payment:</strong> Based on milestone completion (if applicable)</li>
-              <li>Platform mediates in case of disagreement</li>
-            </ul>
-          </section>
+              <div className="flex items-start gap-4">
+                <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-semibold">Brand Approves Work</h4>
+                  <p className="text-sm">
+                    Once approved, payment is processed and transferred to Creator within <strong>2-3 working days</strong>.
+                  </p>
+                </div>
+              </div>
 
-          {/* 4. Cancellation by Creator */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Cancellation by Creator</h2>
-            
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">4.1 Before Starting Work</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Creator may cancel within 12 hours of acceptance without penalty</li>
-              <li><strong>Brand Refund:</strong> Full amount minus payment gateway charges</li>
-              <li>Repeated cancellations may affect Creator's account standing</li>
-            </ul>
+              <div className="flex items-start gap-4">
+                <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                  4
+                </div>
+                <div>
+                  <h4 className="font-semibold">Creator Receives Payout</h4>
+                  <p className="text-sm">
+                    Funds are credited to Creator&apos;s registered bank account. Additional 1-2 days may apply for bank processing.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">4.2 After Starting Work</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Creator must provide valid justification (scope change, Brand unresponsiveness, etc.)</li>
-              <li>Platform reviews the case and determines fair compensation</li>
-              <li>May result in account warnings for repeated cancellations</li>
-            </ul>
-          </section>
+          <p className="text-sm italic">
+            This system ensures Creators get paid for completed work while Brands receive quality deliverables.
+          </p>
+        </section>
 
-          {/* 5. Delivery & Review Period */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Delivery & Review Period</h2>
-            
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">5.1 Creator Deliverables</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Creator submits work through the platform</li>
-              <li>Brand has <strong>7 days</strong> to review and respond</li>
-              <li>Brand can: (a) Approve, (b) Request revisions, or (c) Dispute</li>
-            </ul>
+        {/* Creator Payment Details */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">2. Creator Payment Timeline</h2>
+          
+          <div className="space-y-4">
+            <div className="border-l-4 border-green-500 pl-4">
+              <h3 className="font-semibold mb-2">Standard Processing</h3>
+              <ul className="list-disc pl-6 space-y-1 text-sm">
+                <li>Payment initiation: <strong>2-3 working days</strong> after Brand approval</li>
+                <li>Bank credit time: Additional 1-2 days depending on your bank</li>
+                <li>Total timeline: <strong>3-5 working days</strong> from approval to bank credit</li>
+              </ul>
+            </div>
 
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">5.2 Auto-Approval</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>If Brand does not respond within 7 days, work is auto-approved</li>
-              <li>Payment is automatically released to Creator</li>
-              <li>No refunds after auto-approval</li>
-            </ul>
+            <div className="border-l-4 border-blue-500 pl-4">
+              <h3 className="font-semibold mb-2">Auto-Approval</h3>
+              <p className="text-sm mb-2">
+                If Brand doesn&apos;t respond within the review period (24-72 hours):
+              </p>
+              <ul className="list-disc pl-6 space-y-1 text-sm">
+                <li>Work is automatically approved</li>
+                <li>Payment processing begins immediately</li>
+                <li>Same 2-3 working day timeline applies</li>
+              </ul>
+            </div>
+          </div>
 
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">5.3 Revision Requests</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Brands can request reasonable revisions within original scope</li>
-              <li>Number of revisions as agreed in gig terms (default: 2 revisions)</li>
-              <li>Additional revisions may incur extra charges</li>
-              <li>Creator must deliver revisions within agreed timeline</li>
-            </ul>
-          </section>
-
-          {/* 6. Refund Eligibility */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Refund Eligibility</h2>
-            
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.1 Full Refund Cases</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Creator fails to deliver work after multiple reminders</li>
-              <li>Delivered work is substantially different from agreed scope</li>
-              <li>Creator violates platform policies (plagiarism, copyright infringement)</li>
-              <li>Mutual agreement between both parties before completion</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.2 Partial Refund Cases</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Work partially completed with Brand's approval</li>
-              <li>Milestone-based gigs where some milestones are met</li>
-              <li>Mutual agreement on partial delivery</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.3 No Refund Cases</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Work delivered as per agreed scope and approved by Brand</li>
-              <li>Auto-approval after 7-day review period</li>
-              <li>Brand changes requirements after work is delivered</li>
-              <li>Subjective dissatisfaction without valid technical issues</li>
-              <li>Brand fails to provide necessary inputs/feedback in time</li>
-            </ul>
-          </section>
-
-          {/* 7. Dispute Resolution */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Dispute Resolution Process</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">
-              If Brand disputes the deliverables:
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mt-4">
+            <p className="text-sm">
+              <strong>Note:</strong> &quot;Working days&quot; exclude weekends and public holidays. 
+              Payments initiated on Friday will begin processing on the following Monday.
             </p>
-            <ol className="list-decimal pl-6 space-y-2 text-gray-700">
-              <li>Brand raises a dispute within 7 days of delivery</li>
-              <li>Both parties submit evidence (work samples, communication logs, scope documents)</li>
-              <li>50BraIns reviews the case within 3-5 business days</li>
-              <li>Platform makes a binding decision on escrow release</li>
-              <li>Possible outcomes:
-                <ul className="list-disc pl-6 mt-2 space-y-1">
-                  <li>Full payment to Creator (work met requirements)</li>
-                  <li>Full refund to Brand (work failed to meet requirements)</li>
-                  <li>Partial payment (compromise based on completion percentage)</li>
-                  <li>Revision request with extended timeline</li>
-                </ul>
+          </div>
+        </section>
+
+        {/* Cancellation Policy */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">3. Cancellation Policy</h2>
+          
+          <h3 className="text-lg font-semibold mb-3">Before Work Begins</h3>
+          <div className="mb-6">
+            <p className="mb-2">Brands may cancel campaigns:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                <strong>Before accepting any Creator application:</strong> Cancel anytime with no charge
+              </li>
+              <li>
+                <strong>After accepting a Creator but before Creator starts work:</strong> Contact support 
+                immediately. Partial or full refund may be possible minus processing fees.
+              </li>
+            </ul>
+          </div>
+
+          <h3 className="text-lg font-semibold mb-3">After Work Has Started</h3>
+          <div className="mb-6">
+            <p className="mb-4">
+              Once a Creator begins work, cancellation is subject to dispute resolution. 
+              Brands must have valid reasons such as:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Creator did not follow campaign brief</li>
+              <li>Deliverables do not meet specified requirements</li>
+              <li>Creator failed to submit work within agreed timeline</li>
+              <li>Content violates platform policies or contains prohibited material</li>
+            </ul>
+          </div>
+
+          <h3 className="text-lg font-semibold mb-3">Creator-Initiated Cancellation</h3>
+          <div>
+            <p className="mb-2">Creators may cancel:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                <strong>Before starting work:</strong> Contact support for penalty-free cancellation. 
+                Brand receives full refund.
+              </li>
+              <li>
+                <strong>After starting work:</strong> May result in negative impact on Creator rating 
+                and potential account restrictions. Partial payment may be owed depending on work completed.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Disputes and Refunds */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">4. Disputes and Refunds</h2>
+          
+          <h3 className="text-lg font-semibold mb-3">If Brand Disputes Deliverables</h3>
+          <div className="mb-4">
+            <p className="mb-4">
+              Brands must raise disputes before approving work. Our mediation process:
+            </p>
+            <ol className="list-decimal pl-6 space-y-3">
+              <li>
+                <strong>Brand submits dispute:</strong> Clearly states issues with deliverables
+              </li>
+              <li>
+                <strong>Creator responds:</strong> Has 48 hours to address concerns or provide clarification
+              </li>
+              <li>
+                <strong>Platform review:</strong> Our team evaluates both sides against campaign requirements
+              </li>
+              <li>
+                <strong>Decision made:</strong> Within 3-5 business days, we determine appropriate action
               </li>
             </ol>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Platform decisions are final. Users may pursue legal recourse if unsatisfied, but 
-              dispute mediation decisions are binding for escrow release.
-            </p>
-          </section>
+          </div>
 
-          {/* 8. Platform Commission */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Platform Commission</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>50BraIns charges a <strong>15% service fee</strong> on all completed transactions</li>
-              <li>Platform fee is <strong>non-refundable</strong> once work is delivered and approved</li>
-              <li>If full refund is issued (pre-delivery cancellation), platform fee is not charged</li>
-              <li>In partial refunds, platform fee is calculated on the amount retained by Creator</li>
-            </ul>
-          </section>
-
-          {/* 9. Payment Gateway Charges */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">9. Payment Gateway Charges</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Payment gateway fees (Razorpay: ~2-3%) are borne by the Brand</li>
-              <li>Gateway charges are <strong>non-refundable</strong> even if transaction is cancelled</li>
-              <li>Refunds are processed through the original payment method</li>
-              <li>International card fees may apply as per Razorpay policies</li>
-            </ul>
-          </section>
-
-          {/* 10. Refund Processing Time */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">10. Refund Processing Time</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li><strong>Initiated by Platform:</strong> Within 24 hours of decision</li>
-              <li><strong>Bank Processing:</strong> 5-7 business days for most banks</li>
-              <li><strong>Credit Card Refunds:</strong> 7-10 business days</li>
-              <li><strong>UPI/Wallet Refunds:</strong> 2-3 business days</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Actual credit time depends on your bank or card issuer. Contact support@50brains.com if 
-              refund is delayed beyond 10 business days.
-            </p>
-          </section>
-
-          {/* 11. Force Majeure */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">11. Force Majeure</h2>
-            <p className="text-gray-700 leading-relaxed">
-              In case of unforeseen circumstances (natural disasters, platform outages, legal restrictions), 
-              both parties may mutually agree to cancel or extend timelines without penalty. Platform will 
-              assist in fair resolution.
-            </p>
-          </section>
-
-          {/* 12. Account Violations */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">12. Account Violations</h2>
-            <p className="text-gray-700 leading-relaxed">
-              If a user is found violating platform policies (fraud, harassment, IP theft):
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Affected party receives full refund</li>
-              <li>Violating user's account is suspended/terminated</li>
-              <li>Platform may withhold payments pending investigation</li>
-              <li>Legal action may be pursued for serious violations</li>
-            </ul>
-          </section>
-
-          {/* 13. Contact */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">13. Contact for Refund Queries</h2>
-            <p className="text-gray-700 leading-relaxed">
-              For refund or cancellation requests, contact:
-            </p>
-            <div className="mt-3 p-4 bg-gray-50 rounded-md">
-              <p className="text-gray-700"><strong>50BraIns Support Team</strong></p>
-              <p className="text-gray-700">Email: support@50brains.com</p>
-              <p className="text-gray-700">Refunds Email: refunds@50brains.com</p>
-              <p className="text-gray-700">Website: www.50brains.com</p>
-              <p className="text-gray-700">Response Time: 24-48 hours</p>
+          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-4">
+            <h4 className="font-semibold mb-3">Possible Outcomes:</h4>
+            <div className="space-y-3">
+              <div className="border-l-4 border-green-500 pl-4">
+                <h5 className="font-semibold text-sm">Creator revises work</h5>
+                <p className="text-sm">
+                  Creator makes requested changes. Payment held until Brand approves revisions.
+                </p>
+              </div>
+              <div className="border-l-4 border-yellow-500 pl-4">
+                <h5 className="font-semibold text-sm">Partial refund</h5>
+                <p className="text-sm">
+                  If work is partially completed or meets some requirements. Split determined by platform.
+                </p>
+              </div>
+              <div className="border-l-4 border-red-500 pl-4">
+                <h5 className="font-semibold text-sm">Full refund to Brand</h5>
+                <p className="text-sm">
+                  If deliverables completely fail to meet requirements or Creator violated terms.
+                </p>
+              </div>
             </div>
-          </section>
+          </div>
 
-          {/* Acceptance */}
-          <section className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600 italic">
-              By using 50BraIns, you acknowledge and accept this Refund & Cancellation Policy. 
-              This policy is subject to our Terms & Conditions.
+          <p className="italic text-sm">
+            Platform decisions are final. Users may pursue legal recourse if unsatisfied, 
+            but dispute mediation decisions are binding for escrow release.
+          </p>
+        </section>
+
+        {/* Refund Processing */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">5. Refund Processing Time</h2>
+          
+          <div className="space-y-4">
+            <div className="border-l-4 border-blue-500 pl-4">
+              <h3 className="font-semibold mb-2">Standard Refund Timeline</h3>
+              <ul className="list-disc pl-6 space-y-1 text-sm">
+                <li>Refund approval: Within 3-5 business days of dispute resolution</li>
+                <li>Processing time: 5-10 business days to original payment method</li>
+                <li>Platform fee: Non-refundable portion (payment gateway charges) may apply</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-yellow-500 pl-4">
+              <h3 className="font-semibold mb-2">What Gets Refunded</h3>
+              <ul className="list-disc pl-6 space-y-1 text-sm">
+                <li><strong>Full refund:</strong> Creator&apos;s quoted price + Brand&apos;s platform fee</li>
+                <li><strong>Partial refund:</strong> Proportional amount based on dispute outcome</li>
+                <li><strong>Non-refundable:</strong> Payment gateway processing fees (typically 2-3%)</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-4 text-sm">
+            Actual credit time depends on your bank or card issuer. Contact <strong>support@50brains.com</strong> if 
+            refund is delayed beyond 10 business days.
+          </p>
+        </section>
+
+        {/* Force Majeure */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">6. Force Majeure</h2>
+          <p className="mb-4">
+            In case of unforeseen circumstances (natural disasters, platform technical failures, 
+            government regulations, or other events beyond our control):
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Payments may be delayed beyond stated timelines</li>
+            <li>Campaign deadlines may be extended</li>
+            <li>Refunds will be processed as soon as circumstances allow</li>
+            <li>We will communicate transparently about any delays</li>
+          </ul>
+        </section>
+
+        {/* Platform Fee Policy */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">7. Platform Fee Refund Policy</h2>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+            <h3 className="font-semibold mb-3">Fee Structure Recap:</h3>
+            <ul className="list-disc pl-6 space-y-2 text-sm">
+              <li>
+                <strong>Creator fee (5%):</strong> Deducted from quoted price. Refundable if work not delivered.
+              </li>
+              <li>
+                <strong>Brand fee (5%):</strong> Added to quoted price. Refundable if campaign cancelled before work.
+              </li>
+              <li>
+                <strong>Payment gateway charges:</strong> Non-refundable processing fees (typically 2-3%).
+              </li>
+            </ul>
+
+            <div className="mt-4 p-4 bg-white dark:bg-gray-700 rounded">
+              <h4 className="font-semibold mb-2">Refund Example:</h4>
+              <div className="text-sm space-y-1">
+                <p>Original transaction: Creator quoted ₹10,000</p>
+                <p>Brand paid: ₹10,680 (₹10,000 + ₹500 fee + ₹180 GST)</p>
+                <hr className="my-2" />
+                <p><strong>Full refund scenario:</strong></p>
+                <p>Brand receives: ₹10,680 - gateway fees (₹~200-300)</p>
+                <p>Final refund: ₹10,380-10,480</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact for Refunds */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">8. Contact Us for Refund Inquiries</h2>
+          <p className="mb-4">
+            For questions about refunds, cancellations, or payment issues:
+          </p>
+          <ul className="list-none space-y-2">
+            <li><strong>Email:</strong> echoliftagency@gmail.com</li>
+            <li><strong>Response time:</strong> Within 24-48 hours</li>
+            <li><strong>Include:</strong> Transaction ID, campaign details, and nature of inquiry</li>
+          </ul>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mt-4">
+            <p className="text-sm">
+              <strong>Tip:</strong> Most payment and refund questions can be resolved quickly by providing 
+              your transaction reference number and clear description of the issue.
             </p>
-          </section>
-        </div>
+          </div>
+        </section>
+
       </div>
     </div>
   );

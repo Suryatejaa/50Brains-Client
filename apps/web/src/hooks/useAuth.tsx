@@ -1022,12 +1022,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       throw new Error('Failed to refresh token');
-    } catch (error) {
+    } catch (error: any) {
       // Token refresh failed, logout user
       console.error('❌ Token refresh failed:', error);
+
+      // Clear all authentication state
       apiClient.clearAuthTokens();
+      clearUserCache();
+      clearAllCachesOnLogout();
       setUser(null);
-      setError('Session expired. Please sign in again.');
+
+      // Don't set error immediately to avoid UI flash during silent auth checks
+      // Only set error if this was an explicit user action
+      if (!authCheckInProgress.current) {
+        setError('Session expired. Please sign in again.');
+      }
+
+      // If this is a 401 or token not found error, redirect to login
+      if (
+        error.statusCode === 401 ||
+        error.message?.includes('Invalid or expired')
+      ) {
+        console.log('🚪 Token expired, redirecting to login');
+        router.push('/login');
+      }
+
       throw error;
     }
   };

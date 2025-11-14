@@ -7,272 +7,263 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms & Conditions</h1>
-        <p className="text-sm text-gray-600 mb-8">Last Updated: November 3, 2025</p>
+    <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <h1 className="text-4xl font-bold mb-8">Terms & Conditions</h1>
+      
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
+        Last Updated: November 12, 2025
+      </p>
 
-        <div className="prose prose-sm max-w-none space-y-6">
-          {/* 1. Introduction */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Introduction</h2>
-            <p className="text-gray-700 leading-relaxed">
-              {/* Welcome to 50BraIns ("Platform", "we", "us", or "our"), operated under UDYAM-TS-09-0192429.  */}
-              By accessing or using our marketplace platform at www.50brains.com, you agree to be bound by these 
-              Terms and Conditions. If you do not agree, please do not use our services.
+      <div className="space-y-8 text-gray-800 dark:text-gray-200">
+        
+        {/* Introduction */}
+        <section>
+          <p className="mb-4">
+            Welcome to 50BraIns (&quot;Platform&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), operated under UDYAM-TS-09-0192429. 
+            By accessing or using our marketplace platform at www.50brains.com, you agree to be bound by these Terms and Conditions. 
+            If you do not agree, please do not use our services.
+          </p>
+        </section>
+
+        {/* Eligibility */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">1. Eligibility</h2>
+          <p className="mb-2">To use 50BraIns, you must:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Be at least 18 years of age</li>
+            <li>Have the legal capacity to enter into binding contracts</li>
+            <li>Provide accurate and complete registration information</li>
+            <li>Comply with all applicable laws and regulations in India</li>
+          </ul>
+        </section>
+
+        {/* Platform Services */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">2. Platform Services</h2>
+          <p className="mb-2">50BraIns provides:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>A marketplace connecting Brands with Content Creators</li>
+            <li>Secure escrow-based payment processing</li>
+            <li>Campaign management tools</li>
+            <li>Dispute resolution services</li>
+          </ul>
+          <p className="mt-4 italic">
+            We act as an intermediary platform only. We do not employ Creators, nor do we guarantee 
+            the quality, safety, or legality of services provided through the Platform.
+          </p>
+        </section>
+
+        {/* User Responsibilities */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">3. User Responsibilities</h2>
+          <p className="mb-2">Users must:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Maintain accurate account information</li>
+            <li>Keep login credentials confidential</li>
+            <li>Not engage in fraudulent, abusive, or illegal activities</li>
+            <li>Respect intellectual property rights of others</li>
+            <li>Provide honest and accurate information in all transactions</li>
+            <li>Respond promptly to communications regarding transactions</li>
+          </ul>
+        </section>
+
+        {/* Platform Fees */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">4. Platform Fees</h2>
+          
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg mb-4">
+            <h3 className="text-xl font-semibold mb-3">Fair Split Fee Structure</h3>
+            <p className="mb-4">
+              50BraIns charges a <strong>10% total platform fee</strong>, split equally between both parties:
             </p>
-          </section>
-
-          {/* 2. Definitions */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Definitions</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li><strong>"Brand"</strong> refers to businesses, companies, or individuals seeking content creation services.</li>
-              <li><strong>"Creator"</strong> refers to content creators, influencers, or freelancers offering services.</li>
-              <li><strong>"Gig"</strong> refers to a project or campaign posted by a Brand.</li>
-              <li><strong>"Platform"</strong> refers to the 50BraIns marketplace and all associated services.</li>
-              <li><strong>"User"</strong> refers to any person accessing or using the Platform.</li>
-            </ul>
-          </section>
-
-          {/* 3. Eligibility */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Eligibility</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">To use 50BraIns, you must:</p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Be at least 18 years of age</li>
-              <li>Have the legal capacity to enter into binding contracts</li>
-              <li>Provide accurate and complete registration information</li>
-              <li>Maintain the security of your account credentials</li>
-              <li>Comply with all applicable laws and regulations in India</li>
-            </ul>
-          </section>
-
-          {/* 4. Platform Services */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Platform Services</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">50BraIns provides:</p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>A marketplace connecting Brands with Creators</li>
-              <li>Secure payment processing and escrow services</li>
-              <li>Communication tools for project collaboration</li>
-              <li>Dispute resolution assistance (best effort basis)</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              We act as an intermediary platform only. We do not employ Creators, nor do we guarantee 
-              the quality, safety, or legality of services provided through the Platform.
-            </p>
-          </section>
-
-          {/* 5. Account Registration */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Account Registration</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">Users must:</p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Provide valid email address and phone number</li>
-              <li>Choose a secure password</li>
-              <li>Complete KYC verification for payment transactions (PAN required)</li>
-              <li>Not create multiple accounts or share account access</li>
-              <li>Notify us immediately of any unauthorized account use</li>
-            </ul>
-          </section>
-
-          {/* 6. Payment Terms */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Payment Terms</h2>
             
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.1 Platform Commission</h3>
-            <p className="text-gray-700 leading-relaxed">
-              50BraIns charges a <strong>15% service fee</strong> on the total transaction value. 
-              This fee is deducted from payments before release to Creators.
-            </p>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.2 Payment Flow</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Brands pay the full gig amount upfront</li>
-              <li>Funds are held in secure escrow until work is delivered and approved</li>
-              <li>Upon approval, 85% is released to Creator, 15% retained by Platform</li>
-              <li>All payments processed via Razorpay with applicable payment gateway charges</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.3 Escrow Protection</h3>
-            <p className="text-gray-700 leading-relaxed">
-              Funds remain in escrow until the Brand approves deliverables or the dispute resolution 
-              period expires (7 days from delivery). This protects both Brands and Creators.
-            </p>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">6.4 Taxes</h3>
-            <p className="text-gray-700 leading-relaxed">
-              Users are responsible for all applicable taxes (GST, TDS, income tax) as per Indian tax laws. 
-              Platform fees are exclusive of GST where applicable.
-            </p>
-          </section>
-
-          {/* 7. Gig Posting & Applications */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Gig Posting & Applications</h2>
-            
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">7.1 Brand Responsibilities</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Provide clear, accurate gig descriptions</li>
-              <li>Specify deliverables, timelines, and budget</li>
-              <li>Respond to Creator applications within 48 hours</li>
-              <li>Pay promptly upon accepting a Creator</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">7.2 Creator Responsibilities</h3>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Apply only to gigs you can deliver</li>
-              <li>Meet agreed deadlines and quality standards</li>
-              <li>Communicate proactively with Brands</li>
-              <li>Deliver work that complies with all laws and platform policies</li>
-            </ul>
-          </section>
-
-          {/* 8. Prohibited Activities */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Prohibited Activities</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">Users must NOT:</p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Engage in fraudulent, misleading, or illegal activities</li>
-              <li>Post offensive, defamatory, or infringing content</li>
-              <li>Circumvent platform fees by transacting off-platform</li>
-              <li>Harass, threaten, or abuse other users</li>
-              <li>Use bots, scrapers, or automated tools without permission</li>
-              <li>Violate intellectual property rights</li>
-              <li>Share or sell account access</li>
-            </ul>
-          </section>
-
-          {/* 9. Intellectual Property */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">9. Intellectual Property</h2>
-            <p className="text-gray-700 leading-relaxed">
-              All Platform content (logo, design, code, text) is owned by 50BraIns or licensed to us. 
-              Users retain ownership of content they create but grant us a worldwide, non-exclusive license 
-              to display, reproduce, and distribute such content for platform operations.
-            </p>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              For work commissioned through gigs, IP rights transfer as agreed between Brand and Creator. 
-              Platform assumes no liability for IP disputes between parties.
-            </p>
-          </section>
-
-          {/* 10. Dispute Resolution */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">10. Dispute Resolution</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">
-              If a dispute arises between Brand and Creator:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Parties should first attempt direct resolution</li>
-              <li>Either party may request Platform mediation within 7 days of delivery</li>
-              <li>Platform will review evidence and make a binding decision on escrow release</li>
-              <li>Decisions are final unless legal proceedings are initiated</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Platform mediation is offered as a courtesy. We are not liable for outcomes and may charge 
-              a dispute handling fee in case of frivolous claims.
-            </p>
-          </section>
-
-          {/* 11. Refunds & Cancellations */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">11. Refunds & Cancellations</h2>
-            <p className="text-gray-700 leading-relaxed">
-              Refer to our <a href="/refund" className="text-blue-600 hover:underline">Refund Policy</a> for 
-              detailed terms on cancellations, refunds, and escrow release conditions.
-            </p>
-          </section>
-
-          {/* 12. Limitation of Liability */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">12. Limitation of Liability</h2>
-            <p className="text-gray-700 leading-relaxed">
-              To the maximum extent permitted by law, 50BraIns is not liable for:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Quality, legality, or safety of services provided by Creators</li>
-              <li>Actions or omissions of Brands or Creators</li>
-              <li>Loss of data, revenue, or business opportunities</li>
-              <li>Indirect, incidental, or consequential damages</li>
-              <li>Failures caused by third-party services (payment gateways, hosting providers)</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Our maximum liability is limited to the platform fees paid by the affected party in the 
-              3 months prior to the claim.
-            </p>
-          </section>
-
-          {/* 13. Account Termination */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">13. Account Termination</h2>
-            <p className="text-gray-700 leading-relaxed mb-2">
-              We may suspend or terminate accounts for:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>Violation of these Terms</li>
-              <li>Fraudulent or illegal activity</li>
-              <li>Repeated disputes or poor conduct</li>
-              <li>Non-payment or chargebacks</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-3">
-              Users may close accounts at any time, but remain liable for pending obligations. 
-              Termination does not affect accrued rights or obligations.
-            </p>
-          </section>
-
-          {/* 14. Privacy */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">14. Privacy</h2>
-            <p className="text-gray-700 leading-relaxed">
-              Your use of the Platform is subject to our{' '}
-              <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>, 
-              which explains how we collect, use, and protect your personal data.
-            </p>
-          </section>
-
-          {/* 15. Modifications */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">15. Modifications to Terms</h2>
-            <p className="text-gray-700 leading-relaxed">
-              We reserve the right to update these Terms at any time. Changes will be effective upon 
-              posting. Continued use after changes constitutes acceptance. Material changes will be 
-              notified via email or platform notification.
-            </p>
-          </section>
-
-          {/* 16. Governing Law */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">16. Governing Law & Jurisdiction</h2>
-            <p className="text-gray-700 leading-relaxed">
-              These Terms are governed by the laws of India. Any disputes shall be subject to the 
-              exclusive jurisdiction of courts in Hyderabad, Telangana.
-            </p>
-          </section>
-
-          {/* 17. Contact */}
-          <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">17. Contact Information</h2>
-            <p className="text-gray-700 leading-relaxed">
-              For questions about these Terms, contact us at:
-            </p>
-            <div className="mt-3 p-4 bg-gray-50 rounded-md">
-              <p className="text-gray-700"><strong>50BraIns</strong></p>
-              {/* <p className="text-gray-700">UDYAM Registration: UDYAM-TS-09-0192429</p> */}
-              <p className="text-gray-700">Email: legal@50brains.com</p>
-              <p className="text-gray-700">Website: www.50brains.com</p>
+            <div className="space-y-4">
+              <div className="border-l-4 border-blue-500 pl-4">
+                <h4 className="font-semibold mb-2">For Creators:</h4>
+                <ul className="list-disc pl-6 space-y-1 text-sm">
+                  <li><strong>5% fee</strong> deducted from the quoted price</li>
+                  <li>If you quote ₹1,000, you receive ₹950 (₹1,000 - ₹50 fee)</li>
+                  <li>Minimum fee: ₹1 for transactions above ₹5</li>
+                </ul>
+              </div>
+              
+              <div className="border-l-4 border-green-500 pl-4">
+                <h4 className="font-semibold mb-2">For Brands:</h4>
+                <ul className="list-disc pl-6 space-y-1 text-sm">
+                  <li><strong>5% fee</strong> added to the quoted price</li>
+                  <li>If creator quotes ₹1,000, you pay ₹1,050 (₹1,000 + ₹50 fee)</li>
+                  <li>Plus applicable GST on the platform fee</li>
+                </ul>
+              </div>
             </div>
-          </section>
+            
+            <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded">
+              <h4 className="font-semibold mb-2">Example Breakdown:</h4>
+              <div className="text-sm space-y-1">
+                <p>Creator quotes: <strong>₹10,000</strong></p>
+                <p>Creator fee (5%): <strong>-₹500</strong></p>
+                <p>Creator receives: <strong>₹9,500</strong></p>
+                <hr className="my-2" />
+                <p>Brand fee (5%): <strong>+₹500</strong></p>
+                <p>GST on total fee (18%): <strong>+₹180</strong></p>
+                <p>Brand pays: <strong>₹10,680</strong></p>
+              </div>
+            </div>
+          </div>
 
-          {/* Acceptance */}
-          <section className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600 italic">
-              By using 50BraIns, you acknowledge that you have read, understood, and agree to be bound 
-              by these Terms and Conditions.
+          <p className="mt-4 text-sm">
+            <strong>Note:</strong> No platform fees are charged for transactions below ₹5. 
+            All fees above ₹5 have a minimum charge of ₹1 per party.
+          </p>
+        </section>
+
+        {/* Payment Terms */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">5. Payment Terms</h2>
+          
+          <h3 className="text-lg font-semibold mb-2">Escrow System</h3>
+          <p className="mb-4">
+            All payments are held securely in escrow until work is completed and approved. 
+            This protects both Brands and Creators.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-2">Payment Timeline</h3>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li>
+              <strong>When Brand accepts application:</strong> Payment is charged to the Brand and 
+              held in escrow
+            </li>
+            <li>
+              <strong>When Creator submits work:</strong> Brand has 24-72 hours to review and approve
+            </li>
+            <li>
+              <strong>After Brand approval:</strong> Payment is processed within <strong>2-3 working days</strong> 
+              to the Creator&apos;s bank account
+            </li>
+            <li>
+              <strong>Automatic approval:</strong> If Brand doesn&apos;t respond within the review period, 
+              work is auto-approved and payment is released
+            </li>
+          </ul>
+
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+            <p className="text-sm">
+              <strong>Processing Note:</strong> Payouts are initiated within 2-3 working days after approval. 
+              Actual credit time to your bank account may vary by 1-2 days depending on your bank&apos;s processing time.
             </p>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        {/* Dispute Resolution */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">6. Dispute Resolution</h2>
+          <p className="mb-4">
+            If a Brand is unsatisfied with deliverables, they may raise a dispute before approving. 
+            Our mediation team will:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Review submitted work against campaign requirements</li>
+            <li>Communicate with both parties</li>
+            <li>Make a binding decision on escrow release</li>
+            <li>Determine if revision, partial payment, or full refund is appropriate</li>
+          </ul>
+          <p className="mt-4">
+            Platform decisions are final for escrow purposes. Users may pursue legal recourse independently, 
+            but dispute mediation decisions are binding for payment release.
+          </p>
+        </section>
+
+        {/* Prohibited Activities */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">7. Prohibited Activities</h2>
+          <p className="mb-2">Users must not:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Attempt to bypass platform payments or communicate off-platform to avoid fees</li>
+            <li>Upload or share illegal, obscene, or defamatory content</li>
+            <li>Impersonate others or misrepresent credentials</li>
+            <li>Attempt to manipulate reviews, ratings, or platform algorithms</li>
+            <li>Use the platform for any purpose other than legitimate brand-creator collaborations</li>
+            <li>Scrape, copy, or redistribute platform data without authorization</li>
+          </ul>
+          <p className="mt-4">
+            Violation of these terms may result in account suspension or termination without refund.
+          </p>
+        </section>
+
+        {/* Intellectual Property */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">8. Intellectual Property</h2>
+          <p className="mb-4">
+            <strong>Platform IP:</strong> The 50BraIns name, logo, design, and all platform features 
+            are owned by 50BraIns and protected by applicable intellectual property laws.
+          </p>
+          <p>
+            <strong>User Content:</strong> Creators retain ownership of their work. By accepting a 
+            campaign, Creators grant Brands the usage rights specified in the campaign terms. 
+            Brands must respect these usage rights and not exceed agreed-upon terms.
+          </p>
+        </section>
+
+        {/* Liability Limitations */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">9. Limitation of Liability</h2>
+          <p className="mb-4">
+            50BraIns provides the platform &quot;as is&quot; without warranties. We are not liable for:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Quality or accuracy of services provided by Creators</li>
+            <li>Conduct or content of users on the platform</li>
+            <li>Losses resulting from user interactions or transactions</li>
+            <li>Technical issues, downtime, or data loss (though we take measures to prevent these)</li>
+            <li>Third-party payment processor delays or failures</li>
+          </ul>
+          <p className="mt-4">
+            Maximum liability is limited to the platform fees paid in the relevant transaction.
+          </p>
+        </section>
+
+        {/* Account Termination */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">10. Account Termination</h2>
+          <p className="mb-4">
+            We reserve the right to suspend or terminate accounts that violate these terms, 
+            engage in fraudulent activity, or harm the platform community.
+          </p>
+          <p>
+            Users may close their accounts at any time, but must complete all pending transactions first. 
+            Pending escrow payments will be processed according to campaign outcomes.
+          </p>
+        </section>
+
+        {/* Changes to Terms */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">11. Changes to Terms</h2>
+          <p>
+            We may update these Terms periodically. Continued use of the platform after changes 
+            constitutes acceptance. Material changes will be communicated via email and platform notification.
+          </p>
+        </section>
+
+        {/* Governing Law */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">12. Governing Law</h2>
+          <p>
+            These Terms are governed by the laws of India. Any disputes shall be subject to the 
+            exclusive jurisdiction of courts in Hyderabad, Telangana.
+          </p>
+        </section>
+
+        {/* Contact */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">13. Contact Us</h2>
+          <p className="mb-2">For questions about these Terms, contact us at:</p>
+          <ul className="list-none space-y-1">
+            <li><strong>Email:</strong> echoliftagency@gmail.com</li>
+            <li><strong>Address:</strong> Hyderabad</li>
+            {/* <li><strong>UDYAM:</strong> UDYAM-TS-09-0192429</li> */}
+          </ul>
+        </section>
+
       </div>
     </div>
   );

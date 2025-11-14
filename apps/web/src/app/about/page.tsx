@@ -329,9 +329,9 @@ export default function AboutPage() {
                 Have questions? Want to learn more? We'd love to hear from you.
               </p>
               <div className="space-y-2 text-gray-700">
-                <p><strong>Email:</strong> <a href="mailto:hello@50brains.com" className="text-teal-600 hover:underline">hello@50brains.com</a></p>
-                <p><strong>Support:</strong> <a href="mailto:support@50brains.com" className="text-teal-600 hover:underline">support@50brains.com</a></p>
-                <p><strong>Website:</strong> <a href="https://www.50brains.com" className="text-teal-600 hover:underline">www.50brains.com</a></p>
+                <p><strong>Email:</strong> <a href="mailto:echoliftagency@gmail.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a></p>
+                <p><strong>Support:</strong> <a href="mailto:echoliftagency@gmail.com" className="text-teal-600 hover:underline">echoliftagency@gmail.com</a></p>
+                <p><strong>Website:</strong> <a href="https://www.50brains.in" className="text-teal-600 hover:underline">www.50brains.in</a></p>
               </div>
             </div>
           </section>

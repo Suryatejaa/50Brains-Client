@@ -110,7 +110,7 @@ export default function UploadDeliveryPage() {
 
           // Check if user is authorized to upload (application must be APPROVED)
           if (
-            (appResponse.data as any).applicationStatus?.status !== 'APPROVED'
+            (appResponse.data as any).applicationStatus?.status !== 'WORK_IN_PROGRESS'
           ) {
             showToast(
               'error',

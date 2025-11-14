@@ -161,8 +161,8 @@ export default function ShippingPage() {
             </p>
             <div className="mt-3 p-4 bg-gray-50 rounded-md">
               <p className="text-gray-700"><strong>50BraIns Support</strong></p>
-              <p className="text-gray-700">Email: support@50brains.com</p>
-              <p className="text-gray-700">Delivery Issues: delivery@50brains.com</p>
+              <p className="text-gray-700">Email: echoliftagency@gmail.com</p>
+              <p className="text-gray-700">Delivery Issues: echoliftagency@gmail.com</p>
               <p className="text-gray-700">Response Time: 24-48 hours</p>
             </div>
           </section>

@@ -1,6 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 import { useAuth } from '@/hooks/useAuth';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
@@ -33,8 +39,11 @@ interface Application {
     | 'PENDING'
     | 'SUBMITTED'
     | 'REJECTED'
+    | 'DELIVERED'
     | 'WITHDRAWN'
     | 'APPROVED'
+    | 'PAYMENT_PENDING'
+    | 'WORK_IN_PROGRESS'
     | 'CLOSED';
   proposal: string;
   quotedPrice: number;
@@ -48,6 +57,11 @@ interface Application {
   rejectedAt?: string;
   rejectionReason?: string;
   respondedAt?: string;
+  totalAmount?: number;
+  creatorAmount?: number;
+  creatorFee?: number;
+  brandFee?: number;
+  platformFee?: number;
   _count?: {
     submissions: number;
   };
@@ -75,6 +89,19 @@ interface Gig {
   applications?: Application[];
 }
 
+interface PaymentCreateResponse {
+  paymentId: string;
+  orderId: string; // Backend returns 'orderId', not 'razorpayOrderId'
+  amount: number;
+  currency: string;
+  razorpayKeyId: string;
+  key: string; // Backend also provides 'key' field
+  quotedPrice: number;
+  totalAmount: number;
+  creatorAmount: number;
+  receipt: string;
+}
+
 export default function GigApplicationsPage() {
   const params = useParams();
   const router = useRouter();
@@ -95,6 +122,10 @@ export default function GigApplicationsPage() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [approveApplication, setApproveApplication] =
     useState<Application | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentApplication, setPaymentApplication] =
+    useState<Application | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [applicantProfiles, setApplicantProfiles] = useState<{
     [key: string]: Applicant;
   }>({});
@@ -174,11 +205,11 @@ export default function GigApplicationsPage() {
         applicationsResponse.value.success
       ) {
         const applicationsData = applicationsResponse.value.data as any;
-        //console.log((
-        //   '📊 Applications data structure:',
-        //   Object.keys(applicationsData || {})
-        // );
-        //console.log(('Applications:', applicationsData);
+        console.log(
+          '📊 Applications data structure:',
+          Object.keys(applicationsData || {})
+        );
+        console.log('Applications:', applicationsData);
         // Try different possible structures
         let extractedApplications = [];
         if (applicationsData?.applications) {
@@ -227,8 +258,6 @@ export default function GigApplicationsPage() {
   };
 
   const handleAcceptApplication = async (applicationId: string) => {
-    if (!confirm('Are you sure you want to accept this application?')) return;
-
     try {
       //console.log(('Accepting application:', applicationId);
       setProcessingApplicationId(applicationId);
@@ -241,28 +270,32 @@ export default function GigApplicationsPage() {
       );
 
       if (response.success) {
-        //console.log(('Application accepted successfully, updating UI...');
+        //console.log(('Application accepted successfully, status now PAYMENT_PENDING...');
 
-        // Immediately update the application status in the local state
+        // Update the application status to PAYMENT_PENDING
         setApplications((prevApplications) =>
           prevApplications.map((app) =>
             app.id === applicationId
-              ? { ...app, status: 'APPROVED' as const }
+              ? { ...app, status: 'PAYMENT_PENDING' as any }
               : app
           )
         );
 
-        // Show success message
-        alert('Application accepted successfully!');
-
-        // Optionally refresh data in background to ensure consistency
-        setTimeout(() => {
-          loadGigAndApplications().catch((error) => {
-            console.warn('Background refresh failed:', error);
+        // Find the application and open payment modal
+        const application = applications.find(
+          (app) => app.id === applicationId
+        );
+        if (application) {
+          setPaymentApplication({
+            ...application,
+            status: 'PAYMENT_PENDING' as any,
           });
-        }, 1000);
+          setShowPaymentModal(true);
+        }
 
-        window.location.reload();
+        // Close approve modal
+        setShowApproveModal(false);
+        setApproveApplication(null);
       } else {
         console.error('Failed to accept application:', response);
         alert('Failed to accept application. Please try again.');
@@ -367,9 +400,258 @@ export default function GigApplicationsPage() {
     setApproveApplication(app);
     setShowApproveModal(true);
   };
+
+  const handleManualPaymentVerification = async (
+    applicationId: string,
+    paymentId: string
+  ) => {
+    try {
+      console.log('🔍 Attempting manual payment verification...');
+
+      // Use the new manual verify endpoint
+      try {
+        const response = await apiClient.post(
+          `/api/applications/${applicationId}/payment/verify-manual`,
+          {
+            paymentId,
+            manualVerification: true,
+            forceVerify: true,
+          }
+        );
+
+        if (response.success) {
+          console.log('✅ Manual verification successful');
+
+          // Update application status
+          setApplications((prevApplications) =>
+            prevApplications.map((app) =>
+              app.id === applicationId
+                ? { ...app, status: 'WORK_IN_PROGRESS' as any }
+                : app
+            )
+          );
+
+          setShowPaymentModal(false);
+          setPaymentApplication(null);
+
+          alert('✅ Payment manually verified! Work can now begin.');
+          loadGigAndApplications();
+          return;
+        }
+      } catch (endpointError) {
+        console.log(`❌ Manual verification failed:`, endpointError);
+      }
+
+      // If manual verification fails, try refreshing application data to check status
+      console.log('🔄 Refreshing application data to check payment status...');
+      await loadGigAndApplications();
+
+      // Check if the application status changed (indicating backend processed payment)
+      const updatedApp = applications.find((app) => app.id === applicationId);
+      if (
+        updatedApp &&
+        (updatedApp.status === 'WORK_IN_PROGRESS' ||
+          updatedApp.status === 'APPROVED')
+      ) {
+        setShowPaymentModal(false);
+        setPaymentApplication(null);
+        alert('✅ Payment verified! Application status has been updated.');
+        return;
+      }
+
+      throw new Error('Manual verification failed');
+    } catch (error) {
+      console.error('❌ Manual verification failed:', error);
+      throw error;
+    }
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!paymentApplication) return;
+
+    try {
+      setIsProcessingPayment(true);
+      console.log(
+        '💳 Creating payment order for application:',
+        paymentApplication.id
+      );
+
+      // Step 1: Create payment order
+      const response = await apiClient.post<PaymentCreateResponse>(
+        `/api/applications/${paymentApplication.id}/payment/create`,
+        {
+          applicationId: paymentApplication.id,
+          amount:
+            paymentApplication.totalAmount || paymentApplication.quotedPrice,
+        }
+      );
+
+      console.log('📝 Payment order created:', response);
+      console.log('📝 Response data:', response.data);
+
+      // Validate response data structure
+      if (!response.success || !response.data) {
+        throw new Error('Invalid response from payment service');
+      }
+
+      const paymentData = response.data as PaymentCreateResponse;
+      console.log('💰 Payment data keys:', Object.keys(paymentData));
+
+      // Check for required fields
+      if (!paymentData.razorpayKeyId && !paymentData.key) {
+        console.error('❌ Missing razorpayKeyId/key in response:', paymentData);
+        throw new Error('Razorpay key not provided by server');
+      }
+
+      if (!paymentData.orderId) {
+        console.error('❌ Missing orderId in response:', paymentData);
+        throw new Error('Razorpay order ID not provided by server');
+      }
+
+      if (!paymentData.amount) {
+        console.error('❌ Missing amount in response:', paymentData);
+        throw new Error('Payment amount not provided by server');
+      }
+
+      // Step 2: Load Razorpay script if not already loaded
+      if (!window.Razorpay) {
+        console.log('📦 Loading Razorpay script...');
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+        console.log('✅ Razorpay script loaded');
+      }
+
+      // Step 3: Configure Razorpay checkout options
+      const options = {
+        key: paymentData.razorpayKeyId || paymentData.key,
+        amount: paymentData.amount, // Amount in paise
+        currency: paymentData.currency || 'INR',
+        name: '50BraIns',
+        description: `Payment for ${gig?.title}`,
+        order_id: paymentData.orderId, // Use 'orderId' from backend
+        handler: async (razorpayResponse: any) => {
+          try {
+            console.log(
+              '✅ Payment successful, verifying...',
+              razorpayResponse
+            );
+
+            // Step 4: Verify payment
+            const verifyResponse = await apiClient.post(
+              '/api/applications/payments/verify',
+              {
+                orderId: paymentData.orderId, // Use correct field name
+                paymentId: razorpayResponse.razorpay_payment_id,
+                signature: razorpayResponse.razorpay_signature,
+                applicationId: paymentApplication.id,
+              }
+            );
+
+            if (verifyResponse.success) {
+              console.log('🎉 Payment verified successfully!');
+
+              // Update application status to WORK_IN_PROGRESS
+              setApplications((prevApplications) =>
+                prevApplications.map((app) =>
+                  app.id === paymentApplication.id
+                    ? { ...app, status: 'WORK_IN_PROGRESS' as any }
+                    : app
+                )
+              );
+
+              // Close payment modal
+              setShowPaymentModal(false);
+              setPaymentApplication(null);
+
+              alert(
+                '✅ Payment successful! Creator has been notified and work can begin.'
+              );
+
+              // Refresh data
+              loadGigAndApplications();
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('❌ Payment verification error:', error);
+
+            // Show manual verification option
+            const shouldVerifyManually = confirm(
+              '❌ Automatic payment verification failed, but your payment may have been processed.\n\n' +
+                'Would you like to manually verify the payment? This will check if the payment was successful and update the application status accordingly.\n\n' +
+                'Click OK to manually verify, or Cancel to contact support.'
+            );
+
+            if (shouldVerifyManually) {
+              try {
+                // Manual verification by checking application status
+                await handleManualPaymentVerification(
+                  paymentApplication.id,
+                  razorpayResponse.razorpay_payment_id
+                );
+              } catch (manualError) {
+                alert(
+                  '❌ Manual verification also failed. Please contact support with payment ID: ' +
+                    razorpayResponse.razorpay_payment_id
+                );
+              }
+            } else {
+              alert(
+                '❌ Payment verification failed. Please contact support with payment ID: ' +
+                  razorpayResponse.razorpay_payment_id
+              );
+            }
+          }
+        },
+        prefill: {
+          name: user?.firstName + ' ' + (user?.lastName || ''),
+          email: user?.email,
+        },
+        theme: {
+          color: '#3399cc',
+        },
+        modal: {
+          ondismiss: () => {
+            console.log('💳 Payment modal dismissed');
+            setIsProcessingPayment(false);
+          },
+        },
+      };
+
+      console.log('🔧 Razorpay options:', {
+        key: options.key,
+        amount: options.amount,
+        currency: options.currency,
+        order_id: options.order_id,
+        name: options.name,
+      });
+
+      // Step 5: Open Razorpay checkout
+      console.log('🚀 Opening Razorpay checkout...');
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+      // Close our payment modal since Razorpay modal is now open
+      setShowPaymentModal(false);
+    } catch (error: any) {
+      console.error('❌ Payment initialization error:', error);
+      const errorMsg =
+        error.response?.data?.error ||
+        error.message ||
+        'Payment initialization failed';
+      alert(`❌ ${errorMsg}`);
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
   //console.log(('Applications:', applications);
   const filteredApplications = applications.filter((app) => {
-    //console.log(('App:', app);
+    console.log('App:', app);
     if (selectedStatus === 'all') return true;
     return (
       String(app.status || '').toLowerCase() ===
@@ -426,6 +708,10 @@ export default function GigApplicationsPage() {
         return 'bg-yellow-100 text-yellow-800';
       case 'APPROVED':
         return 'bg-green-100 text-green-800';
+      case 'PAYMENT_PENDING':
+        return 'bg-blue-100 text-blue-800';
+      case 'WORK_IN_PROGRESS':
+        return 'bg-purple-100 text-purple-800';
       case 'REJECTED':
         return 'bg-red-100 text-red-800';
       case 'WITHDRAWN':
@@ -528,7 +814,7 @@ export default function GigApplicationsPage() {
                   'Back to My Gigs'
                 )}
               </Link>
-             
+
               <Link href={`/gig/${gigId}`} className="btn-secondary">
                 {isLoading ? (
                   <RefreshCcw className="h-4 w-4" />
@@ -668,7 +954,12 @@ export default function GigApplicationsPage() {
                 </div>
 
                 {/* Application Details */}
-                <div className="mb-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
+                <div
+                  className="mb-2 grid cursor-pointer grid-cols-1 gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 lg:grid-cols-2"
+                  onClick={() =>
+                    router.push(`/gig/${gigId}/applications/${application.id}`)
+                  }
+                >
                   <div>
                     <h6>
                       <b>UPI Id:</b> {application.upiId}
@@ -688,8 +979,22 @@ export default function GigApplicationsPage() {
                           <span className="text-gray-600">Quoted Price:</span>
                           <span className="font-medium">
                             ₹
-                            {(application.quotedPrice || 0).toLocaleString() ??
+                            {(application.totalAmount || 0).toLocaleString() ??
                               '0'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Platform Fee:</span>
+                          <span className="font-medium">
+                            ₹
+                            {(application.brandFee || 0).toLocaleString() ??
+                              '0'}{' '}
+                            (5%)
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">
+                            <hr></hr>
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -776,54 +1081,163 @@ export default function GigApplicationsPage() {
                     </div>
                   )}
 
-                {/* Status Display and Chat for Processed Applications */}
-                {application.status !== 'PENDING' && (
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      {application.status === 'APPROVED' &&
-                        '✅ Application Approved'}
-                      {application.status === 'REJECTED' &&
-                        '❌ Application Rejected'}
-                      {application.status === 'WITHDRAWN' &&
-                        '↩️ Application Withdrawn'}
+                {/* Payment Action for PAYMENT_PENDING status */}
+                {application.status === 'PAYMENT_PENDING' && (
+                  <div className="flex items-center justify-end space-x-3">
+                    <div className="text-sm text-blue-600">
+                      💳 Application approved - Payment required to start work
                     </div>
-                    <div className="flex items-center space-x-2">
-                      {(application.status === 'APPROVED' ||
-                        application.status === 'SUBMITTED' ||
-                        application.status === 'CLOSED') && (
-                        <>
-                          <button
-                            onClick={() => {
-                              router.push(
-                                `/gig/${gig?.id}/applications/${application.id}/deliveries`
+                    <button
+                      onClick={() => {
+                        setPaymentApplication(application);
+                        setShowPaymentModal(true);
+                      }}
+                      className="btn-primary bg-blue-600 hover:bg-blue-700"
+                    >
+                      Proceed to Payment
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (
+                          confirm(
+                            'Check payment status and verify manually? This will attempt to verify any completed payments for this application.'
+                          )
+                        ) {
+                          try {
+                            console.log(
+                              '🔍 Attempting manual verification for application:',
+                              application.id
+                            );
+
+                            // Try manual verification endpoint first
+                            const response = await apiClient.post(
+                              `/api/applications/${application.id}/payment/verify-manual`,
+                              {
+                                manualVerification: true,
+                                forceVerify: true,
+                              }
+                            );
+
+                            if (response.success) {
+                              setApplications((prevApplications) =>
+                                prevApplications.map((app) =>
+                                  app.id === application.id
+                                    ? {
+                                        ...app,
+                                        status: 'WORK_IN_PROGRESS' as any,
+                                      }
+                                    : app
+                                )
                               );
-                            }}
-                            className="px-1 border-2 border-gray-400 text-sm w-30 h-8"
-                          >
-                          Deliveries
-                          </button>
-                          <button
-                            onClick={() => {
-                              const params = new URLSearchParams({
-                                gigTitle: gig?.title || 'Gig Chat',
-                                applicantName:
-                                  getApplicantName(application.id) ||
-                                  'Applicant',
-                                brandName: gig?.brand?.name || 'Brand',
-                              });
-                              router.push(
-                                `/chat/${application.id}?${params.toString()}`
+                              alert(
+                                '✅ Payment verified! Application status updated to WORK_IN_PROGRESS.'
                               );
-                            }}
-                            className="px-2 border-2 border-gray-400 text-sm w-30 h-8"
-                          >
-                            Chat
-                          </button>
-                        </>
-                      )}
-                    </div>
+                              return;
+                            }
+
+                            // If manual verification doesn't work, try refreshing data
+                            console.log(
+                              '🔄 Manual verification failed, refreshing application status...'
+                            );
+                            await loadGigAndApplications();
+
+                            // Check if the status has changed after refresh
+                            const refreshedApp = applications.find(
+                              (app) => app.id === application.id
+                            );
+                            if (
+                              refreshedApp &&
+                              refreshedApp.status === 'WORK_IN_PROGRESS'
+                            ) {
+                              alert(
+                                '✅ Application status updated! Payment appears to be verified.'
+                              );
+                              return;
+                            }
+
+                            // If status hasn't changed, offer manual local update
+                            const shouldForceUpdate = confirm(
+                              'No payment found for verification and status has not changed on the server.\n\n' +
+                                'Would you like to manually update it locally? This should only be done if you are certain the payment was successful.'
+                            );
+
+                            if (shouldForceUpdate) {
+                              setApplications((prevApplications) =>
+                                prevApplications.map((app) =>
+                                  app.id === application.id
+                                    ? {
+                                        ...app,
+                                        status: 'WORK_IN_PROGRESS' as any,
+                                      }
+                                    : app
+                                )
+                              );
+                              alert(
+                                '✅ Application status updated locally to WORK_IN_PROGRESS!'
+                              );
+                            }
+                          } catch (error) {
+                            console.error(
+                              'Manual verification/status update failed:',
+                              error
+                            );
+                            alert(
+                              '❌ Failed to verify payment or update status. Please refresh the page or contact support.'
+                            );
+                          }
+                        }
+                      }}
+                      className="btn-secondary border-green-500 text-green-600 hover:bg-green-50"
+                      title="Check payment status and verify manually if needed"
+                    >
+                      Verify Payment
+                    </button>
                   </div>
                 )}
+
+                {/* Status Display and Chat for Processed Applications */}
+                {application.status !== 'PENDING' &&
+                  application.status !== 'PAYMENT_PENDING' && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {(application.status === 'APPROVED' ||
+                          application.status === 'WORK_IN_PROGRESS' ||
+                          application.status === 'SUBMITTED' ||
+                          application.status === 'DELIVERED' ||
+                          application.status === 'CLOSED') && (
+                          <>
+                            <button
+                              onClick={() => {
+                                router.push(
+                                  `/gig/${gig?.id}/applications/${application.id}/deliveries`
+                                );
+                              }}
+                              className="w-30 h-8 border-2 border-gray-400 px-1 text-sm"
+                            >
+                              Deliveries
+                            </button>                           
+                            <button
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  gigTitle: gig?.title || 'Gig Chat',
+                                  applicantName:
+                                    getApplicantName(application.id) ||
+                                    'Applicant',
+                                  brandName: gig?.brand?.name || 'Brand',
+                                });
+                                router.push(
+                                  `/chat/${application.id}?${params.toString()}`
+                                );
+                              }}
+                              className="w-30 h-8 border-2 border-gray-400 px-2 text-sm"
+                            >
+                              Chat
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
             ))}
           </div>
@@ -903,8 +1317,22 @@ export default function GigApplicationsPage() {
                       <span className="font-medium">
                         ₹
                         {(
-                          approveApplication.quotedPrice || 0
+                          approveApplication.totalAmount || 0
                         ).toLocaleString() ?? '0'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Platform Fee:</span>
+                      <span className="font-medium">
+                        ₹
+                        {(approveApplication.brandFee || 0).toLocaleString() ??
+                          '0'}{' '}
+                        (5%)
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">
+                        <hr></hr>
                       </span>
                     </div>
                     {approveApplication.estimatedTime && (
@@ -923,40 +1351,48 @@ export default function GigApplicationsPage() {
                     </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="mb-1 font-semibold">Quick Checks</h3>
-                  {(() => {
-                    const msTotal =
-                      (approveApplication as any).milestonePlan?.reduce(
-                        (s: number, m: any) => s + (m.amount || 0),
-                        0
-                      ) || 0;
-                    const pctTotal =
-                      (approveApplication as any).payoutSplit?.reduce(
-                        (s: number, p: any) => s + (p.percentage || 0),
-                        0
-                      ) || 0;
-                    return (
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Milestone Total</span>
-                          <span className="font-medium">
-                            ₹{(msTotal || 0).toLocaleString() ?? '0'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Payout % Total</span>
-                          <span className="font-medium">{pctTotal || 0}%</span>
-                        </div>
-                        {msTotal > approveApplication.quotedPrice && (
-                          <div className="text-xs text-red-600">
-                            Warning: milestones exceed quoted price
+                {approveApplication.applicantType === 'clan' && (
+                  <div>
+                    <h3 className="mb-1 font-semibold">Quick Checks</h3>
+                    {(() => {
+                      const msTotal =
+                        (approveApplication as any).milestonePlan?.reduce(
+                          (s: number, m: any) => s + (m.amount || 0),
+                          0
+                        ) || 0;
+                      const pctTotal =
+                        (approveApplication as any).payoutSplit?.reduce(
+                          (s: number, p: any) => s + (p.percentage || 0),
+                          0
+                        ) || 0;
+                      return (
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">
+                              Milestone Total
+                            </span>
+                            <span className="font-medium">
+                              ₹{(msTotal || 0).toLocaleString() ?? '0'}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">
+                              Payout % Total
+                            </span>
+                            <span className="font-medium">
+                              {pctTotal || 0}%
+                            </span>
+                          </div>
+                          {msTotal > approveApplication.quotedPrice && (
+                            <div className="text-xs text-red-600">
+                              Warning: milestones exceed quoted price
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
 
               {/* Team Plan */}
@@ -1053,7 +1489,85 @@ export default function GigApplicationsPage() {
                 >
                   {processingApplicationId === approveApplication?.id
                     ? 'Approving…'
-                    : 'Approve'}
+                    : 'Approve & Pay'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Modal */}
+        {showPaymentModal && paymentApplication && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="w-full max-w-md rounded-lg bg-white p-6">
+              <h2 className="mb-4 text-xl font-bold">Proceed to Payment</h2>
+              <p className="mb-4 text-gray-600">
+                Application approved! Complete payment to start work.
+              </p>
+
+              <div className="mb-6 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Creator Amount:</span>
+                  <span className="font-medium">
+                    ₹
+                    {(
+                      paymentApplication.creatorAmount ||
+                      paymentApplication.quotedPrice ||
+                      0
+                    ).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Platform Fee:</span>
+                  <span className="font-medium">
+                    ₹{(paymentApplication.brandFee || 0).toLocaleString()}
+                  </span>
+                </div>
+                <hr />
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total Amount:</span>
+                  <span>
+                    ₹
+                    {(
+                      paymentApplication.totalAmount ||
+                      paymentApplication.quotedPrice ||
+                      0
+                    ).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mb-4 rounded-lg bg-blue-50 p-3">
+                <p className="text-sm text-blue-800">
+                  💡 Payment will be held in escrow until work is completed and
+                  approved.
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    setPaymentApplication(null);
+                  }}
+                  className="btn-secondary flex-1"
+                  disabled={isProcessingPayment}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleProceedToPayment}
+                  disabled={isProcessingPayment}
+                  className="btn-primary flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isProcessingPayment ? (
+                    <span className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      Processing...
+                    </span>
+                  ) : (
+                    'Proceed to Payment'
+                  )}
                 </button>
               </div>
             </div>

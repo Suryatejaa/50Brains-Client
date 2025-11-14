@@ -22,6 +22,10 @@ const nextConfig = {
         NEXT_PUBLIC_CLIENT_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173',
         NEXT_PUBLIC_WEBSOCKET_URL: process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:4000',
     },
+    eslint: {
+        // Skip ESLint during production builds to avoid failing when dev-only ESLint configs/plugins are missing
+        ignoreDuringBuilds: true,
+    },
     webpack: (config) => {
         config.resolve.alias = {
             ...config.resolve.alias,
