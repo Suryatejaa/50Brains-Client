@@ -129,8 +129,27 @@ export default function GigApplicationsPage() {
   const [applicantProfiles, setApplicantProfiles] = useState<{
     [key: string]: Applicant;
   }>({});
+  const [toast, setToast] = useState<{
+    type: 'success' | 'error' | 'warning';
+    message: string;
+  } | null>(null);
   const gigId = params.id as string;
   const userType = getUserTypeForRole(currentRole);
+
+  // Auto-hide toast after 5 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (
+    type: 'success' | 'error' | 'warning',
+    message: string
+  ) => {
+    setToast({ type, message });
+  };
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -298,7 +317,7 @@ export default function GigApplicationsPage() {
         setApproveApplication(null);
       } else {
         console.error('Failed to accept application:', response);
-        alert('Failed to accept application. Please try again.');
+        showToast('error', 'Failed to accept application. Please try again.');
       }
     } catch (error) {
       console.error('Error accepting application:', error);
@@ -307,14 +326,14 @@ export default function GigApplicationsPage() {
       if (error && typeof error === 'object' && 'message' in error) {
         const errorMessage = (error as any).message;
         if (errorMessage && errorMessage.includes('already approved')) {
-          alert('This application has already been approved.');
+          showToast('warning', 'This application has already been approved.');
           // Refresh data to get current status
           await loadGigAndApplications();
         } else {
-          alert('Failed to accept application. Please try again.');
+          showToast('error', 'Failed to accept application. Please try again.');
         }
       } else {
-        alert('Failed to accept application. Please try again.');
+        showToast('error', 'Failed to accept application. Please try again.');
       }
     } finally {
       setProcessingApplicationId(null);
@@ -358,7 +377,7 @@ export default function GigApplicationsPage() {
         setRejectionReason('');
 
         // Show success message
-        alert('Application rejected successfully.');
+        showToast('success', 'Application rejected successfully.');
 
         // Optionally refresh data in background to ensure consistency
         setTimeout(() => {
@@ -368,7 +387,7 @@ export default function GigApplicationsPage() {
         }, 1000);
       } else {
         console.error('Failed to reject application:', response);
-        alert('Failed to reject application. Please try again.');
+        showToast('error', 'Failed to reject application. Please try again.');
       }
     } catch (error) {
       console.error('Error rejecting application:', error);
@@ -377,14 +396,14 @@ export default function GigApplicationsPage() {
       if (error && typeof error === 'object' && 'message' in error) {
         const errorMessage = (error as any).message;
         if (errorMessage && errorMessage.includes('already rejected')) {
-          alert('This application has already been rejected.');
+          showToast('warning', 'This application has already been rejected.');
           // Refresh data to get current status
           await loadGigAndApplications();
         } else {
-          alert('Failed to reject application. Please try again.');
+          showToast('error', 'Failed to reject application. Please try again.');
         }
       } else {
-        alert('Failed to reject application. Please try again.');
+        showToast('error', 'Failed to reject application. Please try again.');
       }
     } finally {
       setProcessingApplicationId(null);
@@ -434,7 +453,10 @@ export default function GigApplicationsPage() {
           setShowPaymentModal(false);
           setPaymentApplication(null);
 
-          alert('✅ Payment manually verified! Work can now begin.');
+          showToast(
+            'success',
+            '✅ Payment manually verified! Work can now begin.'
+          );
           loadGigAndApplications();
           return;
         }
@@ -455,7 +477,10 @@ export default function GigApplicationsPage() {
       ) {
         setShowPaymentModal(false);
         setPaymentApplication(null);
-        alert('✅ Payment verified! Application status has been updated.');
+        showToast(
+          'success',
+          '✅ Payment verified! Application status has been updated.'
+        );
         return;
       }
 
@@ -568,8 +593,9 @@ export default function GigApplicationsPage() {
               setShowPaymentModal(false);
               setPaymentApplication(null);
 
-              alert(
-                '✅ Payment successful! Creator has been notified and work can begin.'
+              showToast(
+                'success',
+                'Payment successful! Creator has been notified and work can begin.'
               );
 
               // Refresh data
@@ -644,14 +670,14 @@ export default function GigApplicationsPage() {
         error.response?.data?.error ||
         error.message ||
         'Payment initialization failed';
-      alert(`❌ ${errorMsg}`);
+      showToast('error', `❌ ${errorMsg}`);
     } finally {
       setIsProcessingPayment(false);
     }
   };
   //console.log(('Applications:', applications);
   const filteredApplications = applications.filter((app) => {
-    console.log('App:', app);
+    // console.log('App:', app);
     if (selectedStatus === 'all') return true;
     return (
       String(app.status || '').toLowerCase() ===
@@ -1109,7 +1135,7 @@ export default function GigApplicationsPage() {
                               application.id
                             );
 
-                            // Try manual verification endpoint first
+                            // Try manual verification endpoint
                             const response = await apiClient.post(
                               `/api/applications/${application.id}/payment/verify-manual`,
                               {
@@ -1119,23 +1145,22 @@ export default function GigApplicationsPage() {
                             );
 
                             if (response.success) {
-                              setApplications((prevApplications) =>
-                                prevApplications.map((app) =>
-                                  app.id === application.id
-                                    ? {
-                                        ...app,
-                                        status: 'WORK_IN_PROGRESS' as any,
-                                      }
-                                    : app
-                                )
+                              // Only update UI if server confirms the status change
+                              console.log(
+                                '✅ Server verified payment successfully'
                               );
-                              alert(
-                                '✅ Payment verified! Application status updated to WORK_IN_PROGRESS.'
+
+                              // Refresh data from server to get the updated status
+                              await loadGigAndApplications();
+
+                              showToast(
+                                'success',
+                                'Payment verified! Application status has been updated.'
                               );
                               return;
                             }
 
-                            // If manual verification doesn't work, try refreshing data
+                            // If manual verification fails, try refreshing data
                             console.log(
                               '🔄 Manual verification failed, refreshing application status...'
                             );
@@ -1149,41 +1174,32 @@ export default function GigApplicationsPage() {
                               refreshedApp &&
                               refreshedApp.status === 'WORK_IN_PROGRESS'
                             ) {
-                              alert(
-                                '✅ Application status updated! Payment appears to be verified.'
+                              showToast(
+                                'success',
+                                'Payment verified! Application status has been updated.'
                               );
                               return;
                             }
 
-                            // If status hasn't changed, offer manual local update
-                            const shouldForceUpdate = confirm(
-                              'No payment found for verification and status has not changed on the server.\n\n' +
-                                'Would you like to manually update it locally? This should only be done if you are certain the payment was successful.'
+                            // If still no change, show warning
+                            showToast(
+                              'warning',
+                              'No payment found for verification. The payment may still be processing or was not completed.'
                             );
+                          } catch (error: any) {
+                            console.error('Manual verification failed:', error);
 
-                            if (shouldForceUpdate) {
-                              setApplications((prevApplications) =>
-                                prevApplications.map((app) =>
-                                  app.id === application.id
-                                    ? {
-                                        ...app,
-                                        status: 'WORK_IN_PROGRESS' as any,
-                                      }
-                                    : app
-                                )
-                              );
-                              alert(
-                                '✅ Application status updated locally to WORK_IN_PROGRESS!'
-                              );
+                            // Extract error message from response
+                            let errorMessage =
+                              'Failed to verify payment. Please refresh the page or contact support if the payment was successful.';
+
+                            if (error?.response?.data?.error) {
+                              errorMessage = error.response.data.error;
+                            } else if (error?.message) {
+                              errorMessage = error.message;
                             }
-                          } catch (error) {
-                            console.error(
-                              'Manual verification/status update failed:',
-                              error
-                            );
-                            alert(
-                              '❌ Failed to verify payment or update status. Please refresh the page or contact support.'
-                            );
+
+                            showToast('error', errorMessage);
                           }
                         }
                       }}
@@ -1215,7 +1231,7 @@ export default function GigApplicationsPage() {
                               className="w-30 h-8 border-2 border-gray-400 px-1 text-sm"
                             >
                               Deliveries
-                            </button>                           
+                            </button>
                             <button
                               onClick={() => {
                                 const params = new URLSearchParams({
@@ -1568,6 +1584,40 @@ export default function GigApplicationsPage() {
                   ) : (
                     'Proceed to Payment'
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toast Notification */}
+        {toast && (
+          <div className="fixed right-4 top-4 z-50 max-w-md">
+            <div
+              className={`rounded-lg border-l-4 p-4 shadow-lg ${
+                toast.type === 'success'
+                  ? 'border-green-500 bg-green-50 text-green-800'
+                  : toast.type === 'warning'
+                    ? 'border-yellow-500 bg-yellow-50 text-yellow-800'
+                    : 'border-red-500 bg-red-50 text-red-800'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-start space-x-2">
+                  <div className="text-lg">
+                    {toast.type === 'success'
+                      ? '✅'
+                      : toast.type === 'warning'
+                        ? '⚠️'
+                        : '❌'}
+                  </div>
+                  <p className="text-sm font-medium">{toast.message}</p>
+                </div>
+                <button
+                  onClick={() => setToast(null)}
+                  className="ml-2 text-gray-400 hover:text-gray-600"
+                >
+                  ✕
                 </button>
               </div>
             </div>

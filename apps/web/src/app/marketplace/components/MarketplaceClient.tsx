@@ -313,7 +313,7 @@ export function MarketplaceClient() {
                 </div>
               </div>
               <span className="btn-primary inline-block text-sm font-medium text-white group-hover:text-white">
-                Apply Now →
+                View →
               </span>
             </div>
           </Link>

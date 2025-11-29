@@ -112,18 +112,33 @@ export const BottomNavigation: React.FC = () => {
     }
 
     // Always include these core items
-    baseItems.push(
-      {
-        path: '/clans',
-        label: 'Clans',
-        icon: Building2,
-      },
-      {
-        path: '/profile',
-        label: 'Profile',
-        icon: User,
-      }
-    );
+    if (userType === 'admin') {
+      baseItems.push(
+        {
+          path: '/admin/payouts',
+          label: 'Payouts',
+          icon: BarChart3,
+        },
+        {
+          path: '/profile',
+          label: 'Profile',
+          icon: User,
+        }
+      );
+    } else {
+      baseItems.push(
+        {
+          path: '/clans',
+          label: 'Clans',
+          icon: Building2,
+        },
+        {
+          path: '/profile',
+          label: 'Profile',
+          icon: User,
+        }
+      );
+    }
 
     // Limit to 5 unique items for optimal mobile UX
     const uniqueItems = baseItems.filter(
@@ -163,30 +178,36 @@ export const BottomNavigation: React.FC = () => {
             <Link
               key={item.path}
               href={item.path as any}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center py-2 transition-all duration-200 relative ${active
+              className={`relative flex min-w-0 flex-1 flex-col items-center justify-center py-2 transition-all duration-200 ${
+                active
                   ? 'scale-105 text-[#6BC5F2]'
                   : 'text-gray-600 hover:text-[#6BC5F2]'
-                }`}
+              }`}
             >
               <div
-                className={`mb-1 transition-transform duration-200 ${active ? 'scale-110' : ''
-                  }`}
+                className={`mb-1 transition-transform duration-200 ${
+                  active ? 'scale-110' : ''
+                }`}
               >
                 <IconComponent
-                  className={`h-6 w-6 ${active ? 'text-[#437ebe]' : 'text-gray-600'
-                    }`}
+                  className={`h-6 w-6 ${
+                    active ? 'text-[#437ebe]' : 'text-gray-600'
+                  }`}
                 />
               </div>
               <span
-                className={`max-w-full truncate text-xs font-bold leading-none ${active ? 'text-[#437ebe]' : 'text-gray-600'
-                  }`}
+                className={`max-w-full truncate text-xs font-bold leading-none ${
+                  active ? 'text-[#437ebe]' : 'text-gray-600'
+                }`}
               >
                 {item.label}
               </span>
               {/* Pending Applications Badge for Clans tab */}
               {item.path === '/clans' && totalPendingApplications > 0 && (
-                <div className="absolute -top-1 -right-1 h-5 w-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                  {totalPendingApplications > 99 ? '99+' : totalPendingApplications}
+                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                  {totalPendingApplications > 99
+                    ? '99+'
+                    : totalPendingApplications}
                 </div>
               )}
               {active && (

@@ -616,7 +616,7 @@ export default function MarketplacePage() {
                           className={`${index === 0 && activeTab === 'featured' ? 'mb-3' : 'mt-2'}`}
                         >
                           <span className="btn-primary inline-block text-sm font-medium text-white group-hover:text-white">
-                            Apply Now →
+                            Apply Now  →
                           </span>
                         </div>
                         {index === 0 && activeTab === 'featured' && (

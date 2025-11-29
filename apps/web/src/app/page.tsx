@@ -58,7 +58,7 @@ export default function HomePage() {
           <Features />
           <BusinessRoadmap />
           <HowItWorks />
-          <Testimonials />
+          {/* <Testimonials /> */}
           <CTA />
         </main>
         <Footer />

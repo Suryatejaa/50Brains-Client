@@ -1,6 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 import { useAuth } from '@/hooks/useAuth';
 import { useRoleSwitch } from '@/hooks/useRoleSwitch';
 import { apiClient } from '@/lib/api-client';
@@ -20,6 +27,21 @@ import { GigDetailLoadingSkeleton } from '@/components/gig/ssr/GigDetailSkeleton
 import { GuidelinesModal } from '@/components/modals/GuidelinesModal';
 import { useGuidelinesModal } from '@/hooks/useGuidelinesModal';
 import { GigChat } from '@/components/chat/GigChat';
+
+// Payment interfaces
+interface PaymentCreateResponse {
+  razorpayKeyId?: string;
+  key?: string;
+  orderId: string;
+  amount: number;
+  currency?: string;
+}
+
+interface AssignmentResponse {
+  applicationId: string;
+  totalAmount: number;
+}
+
 interface Gig {
   id: string;
   title: string;
@@ -180,6 +202,11 @@ export default function GigDetailsPage() {
   const [upiId, setUpiId] = useState('');
   const [upiValidationError, setUpiValidationError] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [showAssignmentPaymentModal, setShowAssignmentPaymentModal] =
+    useState(false);
+  const [assignmentPaymentData, setAssignmentPaymentData] = useState<any>(null);
+  const [isProcessingAssignmentPayment, setIsProcessingAssignmentPayment] =
+    useState(false);
   const userType = getUserTypeForRole(currentRole);
 
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -642,30 +669,175 @@ export default function GigDetailsPage() {
     }
 
     try {
-      const response = await apiClient.post(`/api/gig/${gigId}/assign`, {
-        applicantId: selectedUserForAssignment.id,
-        applicantType: 'owner',
-        proposal: assignmentDetails.proposal.trim(),
-        quotedPrice: Number(assignmentDetails.quotedPrice),
-        estimatedTime: assignmentDetails.estimatedTime,
-      });
+      // Create assignment application first
+      const assignmentResponse = await apiClient.post(
+        `/api/gig/${gigId}/assign`,
+        {
+          applicantId: selectedUserForAssignment.id,
+          applicantType: 'owner',
+          proposal: assignmentDetails.proposal.trim(),
+          quotedPrice: Number(assignmentDetails.quotedPrice),
+          estimatedTime: assignmentDetails.estimatedTime,
+        }
+      );
 
-      if (response.success) {
-        showToast(
-          'success',
-          `Successfully assigned ${selectedUserForAssignment.firstName || selectedUserForAssignment.username} to this gig`
-        );
+      if (assignmentResponse.success) {
+        // Store assignment data and show payment modal
+        const responseData = assignmentResponse.data as AssignmentResponse;
+        setAssignmentPaymentData({
+          applicationId: responseData.applicationId,
+          quotedPrice: Number(assignmentDetails.quotedPrice),
+          totalAmount: responseData.totalAmount,
+          assignedUser: selectedUserForAssignment,
+        });
+        setShowAssignmentPaymentModal(true);
         setShowAssignDetailsModal(false);
-        setShowAssignModal(false);
-        setSelectedUserForAssignment(null);
-        loadGigDetails(true); // Refresh gig data
-      } else if (response && response.success === false) {
-        console.error('Assignment failed:', response);
-        showToast('error', response.message || 'Failed to assign user');
+      } else {
+        console.error('Assignment failed:', assignmentResponse);
+        showToast(
+          'error',
+          assignmentResponse.message || 'Failed to create assignment'
+        );
       }
     } catch (error: any) {
-      console.error('Error assigning user:', error);
-      showToast('error', error.message || 'Failed to assign user');
+      console.error('Error creating assignment:', error);
+      showToast('error', error.message || 'Failed to create assignment');
+    }
+  };
+
+  // Handle assignment payment
+  const handleProceedToAssignmentPayment = async () => {
+    if (!assignmentPaymentData) return;
+
+    try {
+      setIsProcessingAssignmentPayment(true);
+      console.log(
+        '💳 Creating assignment payment order:',
+        assignmentPaymentData.applicationId
+      );
+
+      // Step 1: Create payment order for assignment
+      const response = await apiClient.post(
+        `/api/applications/${assignmentPaymentData.applicationId}/payment/create`,
+        {
+          applicationId: assignmentPaymentData.applicationId,
+          amount:
+            assignmentPaymentData.totalAmount ||
+            assignmentPaymentData.quotedPrice,
+        }
+      );
+
+      console.log('📝 Assignment payment order created:', response);
+
+      if (!response.success || !response.data) {
+        throw new Error('Invalid response from payment service');
+      }
+
+      const paymentData = response.data as PaymentCreateResponse;
+
+      // Check for required fields
+      if (!paymentData.razorpayKeyId && !paymentData.key) {
+        throw new Error('Razorpay key not provided by server');
+      }
+
+      if (!paymentData.orderId) {
+        throw new Error('Razorpay order ID not provided by server');
+      }
+
+      // Step 2: Load Razorpay script if not already loaded
+      if (!window.Razorpay) {
+        console.log('📦 Loading Razorpay script...');
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      }
+
+      // Step 3: Configure Razorpay checkout options
+      const options = {
+        key: paymentData.razorpayKeyId || paymentData.key,
+        amount: paymentData.amount,
+        currency: paymentData.currency || 'INR',
+        name: '50BraIns',
+        description: `Assignment payment for ${gig?.title}`,
+        order_id: paymentData.orderId,
+        handler: async (razorpayResponse: any) => {
+          try {
+            console.log(
+              '✅ Assignment payment successful, verifying...',
+              razorpayResponse
+            );
+
+            // Step 4: Verify payment
+            const verifyResponse = await apiClient.post(
+              '/api/applications/payments/verify',
+              {
+                orderId: paymentData.orderId,
+                paymentId: razorpayResponse.razorpay_payment_id,
+                signature: razorpayResponse.razorpay_signature,
+                applicationId: assignmentPaymentData.applicationId,
+              }
+            );
+
+            if (verifyResponse.success) {
+              console.log('🎉 Assignment payment verified successfully!');
+
+              setShowAssignmentPaymentModal(false);
+              setAssignmentPaymentData(null);
+              setShowAssignModal(false);
+              setSelectedUserForAssignment(null);
+
+              showToast(
+                'success',
+                `Successfully assigned and paid ${assignmentPaymentData.assignedUser.firstName || assignmentPaymentData.assignedUser.username}!`
+              );
+
+              // Refresh gig data
+              loadGigDetails(true);
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('❌ Assignment payment verification error:', error);
+            showToast(
+              'error',
+              'Payment verification failed. Please contact support.'
+            );
+          }
+        },
+        prefill: {
+          name: user?.firstName + ' ' + (user?.lastName || ''),
+          email: user?.email,
+        },
+        theme: {
+          color: '#3399cc',
+        },
+        modal: {
+          ondismiss: () => {
+            console.log('💳 Assignment payment modal dismissed');
+            setIsProcessingAssignmentPayment(false);
+          },
+        },
+      };
+
+      // Step 5: Open Razorpay checkout
+      console.log('🚀 Opening assignment payment checkout...');
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+      setShowAssignmentPaymentModal(false);
+    } catch (error: any) {
+      console.error('❌ Assignment payment initialization error:', error);
+      const errorMsg =
+        error.response?.data?.error ||
+        error.message ||
+        'Payment initialization failed';
+      showToast('error', `❌ ${errorMsg}`);
+    } finally {
+      setIsProcessingAssignmentPayment(false);
     }
   };
 
@@ -863,7 +1035,7 @@ export default function GigDetailsPage() {
         const applicantType = (response.data as any).application?.applicantType;
         const applicationId = (response.data as any).application?.id;
         const applicationData = (response.data as any).application;
-        // console.log('🎯 Application data:', applicationData);
+        console.log('🎯 Application data:', applicationData);
         // Add applicantType to the application status object
         const applicationWithType = {
           ...formatMyApplications,
@@ -1466,9 +1638,12 @@ export default function GigDetailsPage() {
   console.log(
     `User type: ${userType}, Gig status: ${gig.status}, Can apply: ${canApply}`
   );
-  // console.log('🔍 Gig details:', gig);
+
+  //canApply1 should return boolean
+
+  console.log('🔍 Gig details:', gig);
   //console.log(('🔍 Is own gig:', isOwner);
-  //console.log(('🔍 My applications:', myApplications);
+  console.log('🔍 My applications:', myApplications);
 
   const myApplicationStatus = (myApplications as any)?.status || null;
   // console.log('🔍 My application status:', myApplicationStatus);
@@ -1525,7 +1700,7 @@ export default function GigDetailsPage() {
                       >
                         Applications ({gig.applicationCount || 0})
                       </Link>
-                      <span> | </span>                     
+                      <span> | </span>
                     </>
                   )}
 
@@ -1727,7 +1902,7 @@ export default function GigDetailsPage() {
                   </div>
                 </div>
               </div>
-            ) : myApplicationStatus === 'PENDING' &&
+            ) : myApplicationStatus === 'PAYMENT_PENDING' &&
               (myApplications as any)?.gigId === gigId &&
               (myApplications as any)?.applicantType === 'owner' &&
               gigId &&
@@ -2324,7 +2499,7 @@ export default function GigDetailsPage() {
                       </button>
                     </div>
                   </div>
-                ) : ((myApplications as any)?.status === 'PENDING' || (myApplications as any)?.status === 'PAYMENT_PENDING') &&
+                ) : (myApplications as any)?.status === 'PENDING' &&
                   (myApplications as any)?.gigId === gigId &&
                   gigId ? (
                   <div className="text-center">
@@ -2447,6 +2622,21 @@ export default function GigDetailsPage() {
                     >
                       💬 Chat with Brand
                     </button>
+                  </div>
+                ) : (myApplicationStatus as any) === 'PAYMENT_PENDING' &&
+                  (myApplications as any)?.gigId === gigId &&
+                  (myApplications as any)?.applicantType === 'owner' &&
+                  gigId &&
+                  !isOwner ? (
+                  <div className="text-center">
+                    <div className="mb-2 text-4xl">💰</div>
+                    <p className="mb-2 font-semibold text-gray-600">
+                      Payment Pending from Brand
+                    </p>
+                    <p className="mb-4 text-sm text-gray-600">
+                      The brand is processing your payment. You will be notified
+                      once it's completed.
+                    </p>
                   </div>
                 ) : !isOwner && !canApply ? (
                   <div className="text-center">
@@ -2977,8 +3167,6 @@ export default function GigDetailsPage() {
               onCancel={() => setShowSubmissionForm(false)}
             />
           )}
-
-      
       </div>
 
       {/* Assign Modal */}
@@ -3091,6 +3279,13 @@ export default function GigDetailsPage() {
                 </div>
               </div>
 
+              <div className="text-xs">
+                <span>
+                  The amount will be on hold until the final submission. You
+                  will get full refund if assignee reject the assignment.
+                </span>
+              </div>
+
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => {
@@ -3116,9 +3311,88 @@ export default function GigDetailsPage() {
                   }
                   className="flex-1 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Assign User
+                  Pay &amp; Assign
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Payment Modal */}
+      {showAssignmentPaymentModal && assignmentPaymentData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                💳 Complete Assignment Payment
+              </h3>
+              <p className="mt-1 text-sm text-gray-600">
+                Pay to assign{' '}
+                {assignmentPaymentData.assignedUser.firstName ||
+                  assignmentPaymentData.assignedUser.username}{' '}
+                to this gig.
+              </p>
+            </div>
+
+            <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Quoted Amount:</span>
+                <span className="font-medium">
+                  ₹{assignmentPaymentData.quotedPrice?.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Platform Fee:</span>
+                <span className="font-medium">
+                  ₹
+                  {(
+                    (assignmentPaymentData.totalAmount ||
+                      assignmentPaymentData.quotedPrice) -
+                    assignmentPaymentData.quotedPrice
+                  )?.toLocaleString()}
+                </span>
+              </div>
+              <hr className="my-2" />
+              <div className="flex justify-between font-semibold">
+                <span>Total Amount:</span>
+                <span>
+                  ₹
+                  {(
+                    assignmentPaymentData.totalAmount ||
+                    assignmentPaymentData.quotedPrice
+                  )?.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
+              <p className="text-xs text-blue-700">
+                💡 The amount will be held securely until the work is completed.
+                You'll get a full refund if the assignee rejects the assignment.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowAssignmentPaymentModal(false);
+                  setAssignmentPaymentData(null);
+                }}
+                className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={isProcessingAssignmentPayment}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleProceedToAssignmentPayment}
+                disabled={isProcessingAssignmentPayment}
+                className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isProcessingAssignmentPayment
+                  ? 'Processing...'
+                  : 'Pay & Assign'}
+              </button>
             </div>
           </div>
         </div>

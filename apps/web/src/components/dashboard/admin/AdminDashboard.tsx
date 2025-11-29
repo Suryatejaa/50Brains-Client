@@ -111,82 +111,148 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       const [
-        systemStatsResponse,
-        userAnalyticsResponse,
-        platformMetricsResponse,
-        moderationResponse,
+        dashboardOverviewResponse,
+        platformStatsResponse,
+        financialOverviewResponse,
+        pendingPayoutsResponse,
         systemHealthResponse,
-        activitiesResponse,
+        cronStatusResponse,
       ] = await Promise.allSettled([
-        apiClient.get('/api/admin/stats/system'),
-        apiClient.get('/api/admin/analytics/users'),
-        apiClient.get('/api/admin/metrics/platform'),
-        apiClient.get('/api/admin/moderation/queue'),
-        apiClient.get('/api/health'),
-        apiClient.get('/api/admin/activities/recent'),
+        apiClient.get('/api/gig-admin/dashboard/overview'),
+        apiClient.get('/api/gig-admin/analytics/platform-stats'),
+        apiClient.get('/api/gig-admin/financial/overview'),
+        apiClient.get('/api/gig-admin/payouts/pending'),
+        apiClient.get('/api/gig-admin/system/health'),
+        apiClient.get('/api/gig-admin/cron/status'),
       ]);
 
+      // Extract dashboard overview data
+      const overview =
+        dashboardOverviewResponse.status === 'fulfilled' &&
+        dashboardOverviewResponse.value.success
+          ? (dashboardOverviewResponse.value.data as any)
+          : null;
+      console.log('Dashboard Overview:', overview);
+      // Extract platform stats
+      const platformStats =
+        platformStatsResponse.status === 'fulfilled' &&
+        platformStatsResponse.value.success
+          ? (platformStatsResponse.value.data as any)
+          : null;
+
+      // Extract financial overview
+      const financial =
+        financialOverviewResponse.status === 'fulfilled' &&
+        financialOverviewResponse.value.success
+          ? (financialOverviewResponse.value.data as any)
+          : null;
+
+      // Extract pending payouts
+      const pendingPayouts =
+        pendingPayoutsResponse.status === 'fulfilled' &&
+        pendingPayoutsResponse.value.success
+          ? (pendingPayoutsResponse.value.data as any)
+          : { payouts: [], total: 0 };
+
+      // Extract system health
+      const health =
+        systemHealthResponse.status === 'fulfilled' &&
+        systemHealthResponse.value.success
+          ? (systemHealthResponse.value.data as any)
+          : null;
+
+      // Extract cron status
+      const cronStatus =
+        cronStatusResponse.status === 'fulfilled' &&
+        cronStatusResponse.value.success
+          ? (cronStatusResponse.value.data as any)
+          : null;
+
       const data: AdminDashboardData = {
-        systemStats:
-          systemStatsResponse.status === 'fulfilled' &&
-            systemStatsResponse.value.success
-            ? (systemStatsResponse.value.data as AdminDashboardData['systemStats'])
-            : {
-              totalUsers: 0,
-              activeUsers: 0,
-              totalGigs: 0,
-              totalClans: 0,
-              totalTransactions: 0,
-              systemUptime: 0,
-            },
+        systemStats: {
+          totalUsers: platformStats?.totalUsers || 0,
+          activeUsers: platformStats?.activeUsers || 0,
+          totalGigs: overview?.stats?.totalGigs || 0,
+          totalClans: 0, // Not available in gig service
+          totalTransactions: overview?.stats?.totalApplications || 0,
+          systemUptime: health?.uptime?.seconds || 0,
+        },
 
-        userAnalytics:
-          userAnalyticsResponse.status === 'fulfilled' &&
-            userAnalyticsResponse.value.success
-            ? (userAnalyticsResponse.value.data as AdminDashboardData['userAnalytics'])
-            : {
-              newUsers: 0,
-              userGrowth: 0,
-              activeToday: 0,
-              topUserCountries: [],
-            },
+        userAnalytics: {
+          newUsers: platformStats?.newUsersToday || 0,
+          userGrowth: platformStats?.userGrowthRate || 0,
+          activeToday: platformStats?.activeUsers || 0,
+          topUserCountries: platformStats?.topCountries || [],
+        },
 
-        platformMetrics:
-          platformMetricsResponse.status === 'fulfilled' &&
-            platformMetricsResponse.value.success
-            ? (platformMetricsResponse.value.data as AdminDashboardData['platformMetrics'])
-            : {
-              activeGigs: 0,
-              completedGigs: 0,
-              totalRevenue: 0,
-              dailyRevenue: 0,
-              conversionRate: 0,
-              averageOrderValue: 0,
-            },
+        platformMetrics: {
+          activeGigs: overview?.stats?.activeGigs || 0,
+          completedGigs:
+            overview?.distributions?.gigStatus?.find(
+              (s: any) => s.status === 'COMPLETED'
+            )?._count?.status || 0,
+          totalRevenue:
+            overview?.stats?.totalRevenue || financial?.totalRevenue || 0,
+          dailyRevenue: financial?.dailyRevenue || 0,
+          conversionRate: platformStats?.conversionRate || 0,
+          averageOrderValue: financial?.averageTransactionValue || 0,
+        },
 
         moderationQueue:
-          moderationResponse.status === 'fulfilled' &&
-            moderationResponse.value.success
-            ? (moderationResponse.value.data as AdminDashboardData['moderationQueue'])
-            : [],
+          overview?.pendingDisputes?.map((dispute: any) => ({
+            id: dispute.id || dispute._id,
+            type: 'gig_dispute',
+            title: dispute.title || `Dispute #${dispute.id}`,
+            description: dispute.description || dispute.reason,
+            priority: dispute.priority || 'medium',
+            reportedAt: dispute.createdAt,
+            reporterId: dispute.reporterId,
+            targetId: dispute.gigId,
+            status: dispute.status,
+          })) || [],
 
-        systemHealth:
-          systemHealthResponse.status === 'fulfilled' &&
-            systemHealthResponse.value.success
-            ? (systemHealthResponse.value.data as AdminDashboardData['systemHealth'])
-            : {
-              status: 'warning',
-              services: [],
-              lastChecked: new Date().toISOString(),
+        systemHealth: {
+          status: health?.status || 'warning',
+          services: health?.services || [
+            {
+              name: 'Gig Service',
+              status: health?.database?.connected ? 'online' : 'offline',
+              responseTime: health?.database?.latency || 0,
+              uptime: health?.uptime?.seconds || 0,
             },
+            {
+              name: 'Cron Scheduler',
+              status: cronStatus?.isRunning ? 'online' : 'offline',
+              responseTime: 0,
+              uptime: 100,
+            },
+          ],
+          lastChecked: health?.timestamp || new Date().toISOString(),
+        },
 
         recentActivities:
-          activitiesResponse.status === 'fulfilled' &&
-            activitiesResponse.value.success
-            ? (activitiesResponse.value.data as AdminDashboardData['recentActivities'])
-            : [],
+          overview?.recentActivity?.recentGigs?.slice(0, 5).map((gig: any) => ({
+            id: gig.id,
+            type: 'gig_created',
+            description: `New gig: ${gig.title} by ${gig.brandName}`,
+            timestamp: gig.createdAt,
+            severity: 'info' as const,
+          })) ||
+          overview?.recentActivity?.recentApplications
+            ?.slice(0, 5)
+            .map((app: any) => ({
+              id: app.id,
+              type: 'application_submitted',
+              description: `Application ${app.status.toLowerCase()} for: ${app.gig.title}`,
+              timestamp: app.appliedAt,
+              severity:
+                app.status === 'REJECTED'
+                  ? ('warning' as const)
+                  : ('info' as const),
+            })) ||
+          [],
       };
-
+      console.log('Admin Dashboard Data:', data);
       setDashboardData(data);
     } catch (error) {
       console.error('Failed to load admin dashboard data:', error);
@@ -198,56 +264,60 @@ export const AdminDashboard: React.FC = () => {
 
   const quickActions = [
     {
-      href: '/admin/users',
-      icon: '👤',
-      label: 'User Management',
-      description: 'Manage users',
-      permission: 'users.manage',
+      href: '/admin/gigs',
+      icon: '💼',
+      label: 'Gig Management',
+      description: 'Manage all gigs',
+      permission: 'gigs.manage',
     },
     {
-      href: '/admin/moderation',
+      href: '/admin/applications',
+      icon: '📋',
+      label: 'Applications',
+      description: 'Review applications',
+      permission: 'applications.manage',
+    },
+    {
+      href: '/admin/payouts',
+      icon: '💰',
+      label: 'Payouts',
+      description: 'Process payouts',
+      permission: 'financial.manage',
+    },
+    {
+      href: '/admin/disputes',
       icon: '⚠️',
-      label: 'Moderation',
-      description: 'Review reports',
-      permission: 'content.moderate',
+      label: 'Disputes',
+      description: 'Resolve disputes',
+      permission: 'disputes.manage',
+    },
+    {
+      href: '/admin/financial',
+      icon: '💳',
+      label: 'Financial',
+      description: 'Transaction logs',
+      permission: 'financial.view',
     },
     {
       href: '/admin/analytics',
       icon: '📊',
       label: 'Analytics',
-      description: 'View insights',
+      description: 'Platform insights',
       permission: 'analytics.full',
+    },
+    {
+      href: '/admin/users',
+      icon: '👤',
+      label: 'Users',
+      description: 'Brand & Influencers',
+      permission: 'users.manage',
     },
     {
       href: '/admin/system',
       icon: '⚙️',
-      label: 'System Settings',
-      description: 'Configure platform',
+      label: 'System',
+      description: 'Health & Logs',
       permission: 'system.configure',
-    },
-    {
-      href: '/admin/payments',
-      icon: '💳',
-      label: 'Payments',
-      description: 'Transaction logs',
-    },
-    {
-      href: '/admin/logs',
-      icon: '📝',
-      label: 'System Logs',
-      description: 'View logs',
-    },
-    {
-      href: '/admin/backup',
-      icon: '💾',
-      label: 'Backup',
-      description: 'Data backup',
-    },
-    {
-      href: '/admin/notifications',
-      icon: '📢',
-      label: 'Notifications',
-      description: 'Send alerts',
     },
   ];
 
@@ -344,15 +414,15 @@ export const AdminDashboard: React.FC = () => {
             value={`$${dashboardData?.platformMetrics?.dailyRevenue || 0}`}
             icon="💰"
             loading={loading}
-            onClick={() => (window.location.href = '/admin/revenue')}
+            onClick={() => (window.location.href = '/admin/financial')}
           />
           <MetricCard
-            title="Moderation Queue"
+            title="Pending Disputes"
             value={dashboardData?.moderationQueue?.length || 0}
             icon="⚠️"
             loading={loading}
             urgent={(dashboardData?.moderationQueue?.length || 0) > 10}
-            onClick={() => (window.location.href = '/admin/moderation')}
+            onClick={() => (window.location.href = '/admin/disputes')}
           />
         </div>
 
@@ -374,8 +444,8 @@ export const AdminDashboard: React.FC = () => {
                 Last checked:{' '}
                 {dashboardData?.systemHealth?.lastChecked
                   ? new Date(
-                    dashboardData.systemHealth.lastChecked
-                  ).toLocaleTimeString()
+                      dashboardData.systemHealth.lastChecked
+                    ).toLocaleTimeString()
                   : 'Unknown'}
               </span>
             </div>
@@ -411,10 +481,10 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             )) || (
-                <div className="col-span-4 py-4 text-center">
-                  <span className="text-muted">No service data available</span>
-                </div>
-              )}
+              <div className="col-span-4 py-4 text-center">
+                <span className="text-muted">No service data available</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -424,7 +494,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="card-glass p-3">
               <h3 className="text-heading mb-6 text-lg font-semibold">
-                📊 Platform Analytics
+                📊 Platform Statistics
               </h3>
 
               {loading ? (
@@ -433,30 +503,30 @@ export const AdminDashboard: React.FC = () => {
                   <div className="h-32 rounded bg-gray-300"></div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.systemStats?.activeUsers || 0}
+                      {dashboardData?.systemStats?.totalGigs || 0}
                     </div>
-                    <div className="text-muted text-sm">Active Users (24h)</div>
+                    <div className="text-muted text-sm">Total Gigs</div>
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.platformMetrics?.completedGigs || 0}
+                      {dashboardData?.platformMetrics?.activeGigs || 0}
                     </div>
-                    <div className="text-muted text-sm">Completed Gigs</div>
+                    <div className="text-muted text-sm">Active Gigs</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-heading text-2xl font-bold">
+                      {dashboardData?.systemStats?.totalTransactions || 0}
+                    </div>
+                    <div className="text-muted text-sm">Total Applications</div>
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
                       ${dashboardData?.platformMetrics?.totalRevenue || 0}
                     </div>
                     <div className="text-muted text-sm">Total Revenue</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-heading text-2xl font-bold">
-                      {dashboardData?.platformMetrics?.conversionRate || 0}%
-                    </div>
-                    <div className="text-muted text-sm">Conversion Rate</div>
                   </div>
                 </div>
               )}
@@ -490,14 +560,15 @@ export const AdminDashboard: React.FC = () => {
                         {report.title}
                       </h4>
                       <span
-                        className={`rounded px-2 py-1 text-xs ${report.priority === 'urgent'
-                          ? 'bg-red-100 text-red-600'
-                          : report.priority === 'high'
-                            ? 'bg-orange-100 text-orange-600'
-                            : report.priority === 'medium'
-                              ? 'bg-yellow-100 text-yellow-600'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
+                        className={`rounded px-2 py-1 text-xs ${
+                          report.priority === 'urgent'
+                            ? 'bg-red-100 text-red-600'
+                            : report.priority === 'high'
+                              ? 'bg-orange-100 text-orange-600'
+                              : report.priority === 'medium'
+                                ? 'bg-yellow-100 text-yellow-600'
+                                : 'bg-gray-100 text-gray-600'
+                        }`}
                       >
                         {report.priority}
                       </span>
@@ -510,23 +581,23 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                 )) || (
-                    <div className="py-4 text-center">
-                      <span className="mb-2 block text-2xl">✅</span>
-                      <p className="text-muted">No pending reports</p>
-                    </div>
-                  )}
+                  <div className="py-4 text-center">
+                    <span className="mb-2 block text-2xl">✅</span>
+                    <p className="text-muted">No pending reports</p>
+                  </div>
+                )}
 
                 {dashboardData?.moderationQueue &&
                   dashboardData.moderationQueue.length > 5 && (
                     <div className="border-t pt-2">
                       <button
                         onClick={() =>
-                          (window.location.href = '/admin/moderation')
+                          (window.location.href = '/admin/disputes')
                         }
                         className="text-accent w-full text-sm hover:underline"
                       >
-                        View All Reports ({dashboardData.moderationQueue.length}
-                        )
+                        View All Disputes (
+                        {dashboardData.moderationQueue.length})
                       </button>
                     </div>
                   )}
@@ -563,11 +634,11 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               )) || (
-                  <div className="py-4 text-center">
-                    <span className="mb-2 block text-2xl">📋</span>
-                    <p className="text-muted">No recent activities</p>
-                  </div>
-                )}
+                <div className="py-4 text-center">
+                  <span className="mb-2 block text-2xl">📋</span>
+                  <p className="text-muted">No recent activities</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -594,10 +665,11 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-body">User Growth</span>
                 <span
-                  className={`font-semibold ${(dashboardData?.userAnalytics?.userGrowth || 0) > 0
-                    ? 'text-green-600'
-                    : 'text-red-600'
-                    }`}
+                  className={`font-semibold ${
+                    (dashboardData?.userAnalytics?.userGrowth || 0) > 0
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  }`}
                 >
                   {dashboardData?.userAnalytics?.userGrowth || 0}%
                 </span>
@@ -618,8 +690,8 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       </div>
                     )) || (
-                      <p className="text-muted text-sm">No data available</p>
-                    )}
+                    <p className="text-muted text-sm">No data available</p>
+                  )}
                 </div>
               </div>
             </div>

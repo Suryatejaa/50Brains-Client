@@ -366,7 +366,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // First try to load from cache immediately and keep user state stable
       const cachedUser = loadUserFromCache();
 
-      // If cached user data is available, set it immediately and keep auth stable
+      // If cached user data is available, set it immediately and verify with server
       if (cachedUser) {
         // //console.log('📱 Using cached auth data - maintaining authentication');
         // //console.log('👤 Cached user:', {
@@ -389,25 +389,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Don't set loading here - it should already be true from initialization
       }
 
-      // Then try to verify with server in background (only if we have a backend)
+      // Then try to verify with server - THIS IS CRITICAL FOR SECURITY
+      // We MUST verify that the server actually has valid HttpOnly cookies
       try {
-        // //console.log('🌐 Attempting server verification...');
+        console.log('🌐 Attempting server verification...');
         const response = await apiClient.get<{ user: User }>(
           '/api/user/profile'
         );
         if (response.success && response.data) {
-          // //console.log('✅ Server verification successful');
+          console.log(
+            '✅ Server verification successful - user is authenticated'
+          );
           setUser(response.data.user);
-          // //console.log('✅ Auth status verified with server');
-        } else if (!cachedUser) {
-          // Only logout if there's no cached user data AND it's not a 404/network error
-          // //console.log('❌ Auth check failed, no cached user data');
+        } else {
+          // Server responded but said not authenticated - clear everything
+          console.log(
+            '❌ Server says not authenticated - clearing all auth state'
+          );
           setUser(null);
+          clearUserCache();
         }
       } catch (error) {
-        // //console.log('⚠️ Auth status check failed:', error);
+        console.log('⚠️ Auth status check failed:', error);
 
-        // Check for various error types that shouldn't cause logout
+        // Check for various error types
         const anyError = error as any;
         const isNetworkError =
           anyError.code === 'ERR_NETWORK' ||
@@ -420,36 +425,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           anyError.message?.includes('Failed to fetch') ||
           anyError.message?.includes('ECONNREFUSED') ||
           anyError.code === 'ECONNREFUSED';
+        const isUnauthorized =
+          anyError.statusCode === 401 ||
+          anyError.status === 401 ||
+          anyError.error === 'UNAUTHORIZED' ||
+          anyError.message?.includes('Unauthorized') ||
+          anyError.message?.includes('Authentication token is required');
         const isRefreshExpired =
           anyError.error === 'REFRESH_EXPIRED' ||
           anyError.message?.includes('Session expired') ||
           anyError.message?.includes('Refresh token has expired');
-        const isCrossDomainCookieError =
-          anyError.error === 'CROSS_DOMAIN_COOKIE_ERROR' ||
-          anyError.message?.includes('cross-domain cookie restrictions');
 
-        // //console.log('🔍 Error analysis:', {
-        //   isNetworkError,
-        //   isCorsError,
-        //   is404Error,
-        //   isConnectionError,
-        //   isRefreshExpired,
-        //   isCrossDomainCookieError,
-        //   hasCachedUser: !!cachedUser,
-        //   errorCode: anyError.code,
-        //   errorStatus: anyError.status || anyError.statusCode,
-        //   errorMessage: anyError.message,
-        // });
+        console.log('🔍 Error analysis:', {
+          isNetworkError,
+          isCorsError,
+          is404Error,
+          isConnectionError,
+          isUnauthorized,
+          isRefreshExpired,
+          hasCachedUser: !!cachedUser,
+          errorCode: anyError.code,
+          errorStatus: anyError.status || anyError.statusCode,
+          errorMessage: anyError.message,
+        });
 
-        // If refresh token is expired, clear auth state gracefully
-        if (isRefreshExpired) {
-          // //console.log(
-          //   '🔒 Refresh token expired - clearing auth state gracefully'
-          // );
+        // CRITICAL: If server explicitly says unauthorized (401), ALWAYS clear auth
+        // This means the HttpOnly cookies are missing or invalid
+        if (isUnauthorized || isRefreshExpired) {
+          console.log(
+            '❌ 401 Unauthorized or refresh expired - clearing ALL auth state'
+          );
           setUser(null);
           clearUserCache();
-          // Don't show error to user, just log it
-          // //console.log('✅ Auth state cleared due to expired refresh token');
 
           // Redirect to login if not already on an auth page
           if (typeof window !== 'undefined') {
@@ -464,60 +471,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               currentPath.startsWith(page)
             );
 
-            if (!isOnAuthPage) {
-              // //console.log(
-              //   '↗️ Redirecting to login due to expired refresh token'
-              // );
+            if (!isOnAuthPage && currentPath !== '/') {
+              console.log('↗️ Redirecting to login - no valid authentication');
               router.push('/login');
             }
           }
           return;
         }
 
-        // If cross-domain cookie error (Railway production issue), handle gracefully
-        if (isCrossDomainCookieError) {
-          //console.log(
-          //   '🍪 Cross-domain cookie error - keeping cached auth but logging issue'
-          // );
-          if (!cachedUser) {
-            setUser(null);
-            clearUserCache();
-            setError('Please login again to connect to production servers');
-          } else {
-            // //console.log(
-            //   '📱 Keeping cached user despite cross-domain cookie issue'
-            // );
-          }
-          return;
-        }
-
-        // If it's any kind of network/connection issue, keep cached auth
+        // If it's a network/connection issue (backend not reachable), keep cached auth
         if (isNetworkError || isCorsError || is404Error || isConnectionError) {
-          //console.log(
-          //  '⚠️ Network/connection error detected - keeping cached authentication'
-          //);
-          // Keep the cached user if available, otherwise set a default "offline" user
+          console.log(
+            '⚠️ Network/connection error detected - keeping cached authentication'
+          );
+          // Keep the cached user if available
           if (!cachedUser) {
-            // Don't logout on network errors - instead keep no user but don't set loading
-            //console.log('⚠️ No backend available, staying unauthenticated');
+            console.log(
+              '⚠️ No backend available and no cached user, staying unauthenticated'
+            );
             setUser(null);
           } else {
-            //console.log('✅ Keeping cached user despite network error');
+            console.log('✅ Keeping cached user despite network error');
           }
-        } else if (anyError.statusCode === 401) {
-          // Only logout on explicit 401 Unauthorized (not refresh expired)
-          //console.log('❌ 401 Unauthorized - clearing auth state');
+        } else {
+          // For other unexpected errors, clear auth to be safe
+          console.log('❌ Unexpected error - clearing auth state to be safe');
           setUser(null);
           clearUserCache();
-        } else if (!cachedUser) {
-          // For other errors, only clear if no cached data
-          //console.log(
-          //   '❌ Other error with no cached user data, clearing auth state'
-          // );
-          setUser(null);
-        } else {
-          //console.log('⚠️ Server error but keeping cached user data');
-          // Keep the cached user for other errors
         }
       }
     } finally {
@@ -707,6 +687,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const userData = responseData.data?.user || responseData.data.user;
 
         if (userData) {
+          // Note: Auth cookies are HttpOnly and not accessible via document.cookie
+          // They will be automatically sent with API requests by the browser
           setUser(userData);
           // Force save to cache immediately
           saveUserToCache(userData);
