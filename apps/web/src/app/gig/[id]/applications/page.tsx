@@ -832,20 +832,27 @@ export default function GigApplicationsPage() {
                   <RefreshCcw className="h-4 w-4" />
                 )}
               </button>
-              <Link href="/my-gigs" className="btn-secondary">
-                <ArrowLeft className="h-4 w-4" />{' '}
+              <Link href="/my-gigs" className="border border-gray-500 border-1 flex items-center px-2 py-1">
+                <ArrowLeft className="h-2 w-2" />{' '}
                 {isLoading ? (
                   <RefreshCcw className="h-4 w-4" />
                 ) : (
-                  'Back to My Gigs'
+                  'Back'
                 )}
               </Link>
 
-              <Link href={`/gig/${gigId}`} className="btn-secondary">
+              <Link href={`/gig/${gigId}`} className="border border-gray-500 border-1 flex items-center px-2 py-1">
                 {isLoading ? (
                   <RefreshCcw className="h-4 w-4" />
                 ) : (
-                  'View Gig Details'
+                  'View Gig'
+                )}
+              </Link>
+              <Link href={`/gig/${gigId}/submissions`} className="border border-gray-500 border-1 flex items-center px-2 py-1">
+                {isLoading ? (
+                  <RefreshCcw className="h-4 w-4" />
+                ) : (
+                  'Submissions'
                 )}
               </Link>
             </div>
