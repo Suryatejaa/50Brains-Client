@@ -3,17 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api-client';
+import { useParams, useRouter } from 'next/navigation';
 
 interface Payout {
   id: string;
-  gigId: string;
+  gigId?: string;
   gigTitle: string;
-  influencerId: string;
-  influencerName: string;
-  amount: number;
+  creatorId?: string;
+  creatorAmount: number;
+  upiId: string;
+  receipt: string;
   status: string;
-  submittedAt: string;
+  submittedAt?: string;
   approvedAt?: string;
+}
+interface Applicant {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  upiId?: string;
+  email: string;
+  profilePicture?: string;
+  primaryPlatform?: string;
+  primaryNiche?: string;
+  location?: string;
+  experienceLevel?: string;
+  followers?: number;
+  avgEngagement?: number;
 }
 
 export default function AdminPayoutsPage() {
@@ -21,6 +38,11 @@ export default function AdminPayoutsPage() {
   const [approvedSubmissions, setApprovedSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [applicantProfiles, setApplicantProfiles] = useState<{
+    [key: string]: Applicant;
+  }>({});
+  const params = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     loadData();
@@ -38,7 +60,7 @@ export default function AdminPayoutsPage() {
       console.log('Approved Submissions Response:', approvedResponse);
 
       if (pendingResponse.success) {
-        setPendingPayouts((pendingResponse.data as any)?.payouts || []);
+        setPendingPayouts((pendingResponse.data as any)?.payments || []);
       }
       if (approvedResponse.success) {
         setApprovedSubmissions(
@@ -50,6 +72,62 @@ export default function AdminPayoutsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchApplicantDetailsbyIds = async (applicantIds: string[]) => {
+    if (applicantIds.length === 0) return;
+
+    try {
+      const response = await apiClient.post(
+        '/api/public/profiles/internal/by-ids',
+        {
+          userIds: applicantIds,
+        }
+      );
+      console.log('Response from applicant details API:', response);
+      if (response.success) {
+        const profiles = Array.isArray(response.data) ? response.data : [];
+        setApplicantProfiles((prev) => ({
+          ...prev,
+          ...Object.fromEntries(profiles.map((p) => [p.id, p])),
+        }));
+        console.log('Applicant profiles fetched:', profiles.length);
+        console.log('Applicant Profiles Data:', profiles);
+      }
+    } catch (error) {
+      console.error('Error fetching applicant details:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (pendingPayouts.length > 0 || approvedSubmissions.length > 0) {
+      const pendingCreatorIds = pendingPayouts
+        .map((payout: any) => payout.creatorId)
+        .filter(Boolean);
+      const approvedCreatorIds = approvedSubmissions
+        .map((sub: any) => sub.creatorId)
+        .filter(Boolean);
+      const allCreatorIds = Array.from(
+        new Set([...pendingCreatorIds, ...approvedCreatorIds])
+      );
+
+      console.log('Creator IDs to fetch details for:', allCreatorIds);
+      if (allCreatorIds.length > 0) {
+        fetchApplicantDetailsbyIds(allCreatorIds);
+      }
+    }
+  }, [pendingPayouts, approvedSubmissions]);
+
+  const getApplicantName = (creatorId?: string): string => {
+    if (!creatorId || !applicantProfiles[creatorId]) {
+      return 'Unknown Creator';
+    }
+    const profile = applicantProfiles[creatorId];
+    return (
+      `${profile.firstName || ''} ${profile.lastName || ''}`.trim() ||
+      profile.username ||
+      'Unknown Creator'
+    );
   };
 
   const handleProcessDailyPayouts = async () => {
@@ -137,13 +215,13 @@ export default function AdminPayoutsPage() {
                         {payout.gigTitle}
                       </h3>
                       <div className="text-muted space-y-1 text-sm">
-                        <p>Influencer: {payout.influencerName}</p>
-                        <p>Amount: ${payout.amount}</p>
+                        <p>Creator: <span className='underline hover:cursor-pointer'
+                        onClick={() => router.push(`/profile/${payout.creatorId}`)}
+                        >{getApplicantName(payout.creatorId)}</span></p>
+                        <p>Amount: ₹{payout.creatorAmount}</p>
                         <p>Status: {payout.status}</p>
-                        <p>
-                          Submitted:{' '}
-                          {new Date(payout.submittedAt).toLocaleDateString()}
-                        </p>
+                        <p>UPI: {payout.upiId}</p>
+                        <p>Receipt: {payout.receipt}</p>
                       </div>
                     </div>
                     <button
@@ -174,7 +252,7 @@ export default function AdminPayoutsPage() {
             <div className="space-y-4">
               {approvedSubmissions.map((submission: any) => (
                 <div
-                  key={submission.id}
+                  key={submission.paymentId}
                   className="border-b pb-4 last:border-b-0"
                 >
                   <div className="flex items-start justify-between">
@@ -183,12 +261,16 @@ export default function AdminPayoutsPage() {
                         {submission.gigTitle}
                       </h3>
                       <div className="text-muted space-y-1 text-sm">
-                        <p>Influencer: {submission.influencerName}</p>
-                        <p>Amount: ${submission.amount}</p>
+                        <p>Creator:  <span className='underline hover:cursor-pointer'
+                        onClick={() => router.push(`/profile/${submission.creatorId}`)}
+                        >{getApplicantName(submission.creatorId)}</span></p>
+                        <p>Amount: ₹{submission.creatorAmount}</p>
                         <p>
                           Approved:{' '}
                           {new Date(submission.approvedAt).toLocaleDateString()}
                         </p>
+                        <p>UPI: {submission.upiId}</p>
+                        <p>Receipt: {submission.receipt}</p>
                       </div>
                     </div>
                     <span className="rounded bg-green-100 px-3 py-1 text-sm text-green-600">

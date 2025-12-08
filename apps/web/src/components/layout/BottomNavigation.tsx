@@ -164,7 +164,7 @@ export const BottomNavigation: React.FC = () => {
     if (path === '/dashboard') {
       return pathname === '/' || pathname === '/dashboard';
     }
-    return pathname.startsWith(path);
+    return pathname === path;
   };
 
   return (
