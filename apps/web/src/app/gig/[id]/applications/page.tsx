@@ -988,10 +988,7 @@ export default function GigApplicationsPage() {
 
                 {/* Application Details */}
                 <div
-                  className="mb-2 grid cursor-pointer grid-cols-1 gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 lg:grid-cols-2"
-                  onClick={() =>
-                    router.push(`/gig/${gigId}/applications/${application.id}`)
-                  }
+                  className="mb-2 grid cursor-pointer grid-cols-1 gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 lg:grid-cols-2"                 
                 >
                   <div>
                     <h6>
