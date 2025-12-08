@@ -1813,7 +1813,7 @@ export default function GigDetailsPage() {
                   </div>
                 </div>
               </div>
-            ) : (myApplications as any)?.status === 'APPROVED' &&
+            ) : (myApplications as any)?.status === 'WORK_IN_PROGRESS' &&
               (myApplications as any)?.gigId === gigId &&
               gigId ? (
               <div className="mb-1 lg:col-span-3">
