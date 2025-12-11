@@ -45,12 +45,11 @@ export default function AdminAnalyticsPage() {
         overviewRes,
       });
 
-      // Use overviewRes for main stats temporarily (statsRes returns zeros)
+      // Use statsRes for main stats (backend is now fixed)
       const overview = overviewRes.success ? (overviewRes.data as any) : null;
 
       const data: AnalyticsData = {
-        platformStats:
-          overview?.stats || (statsRes.success ? statsRes.data : null),
+        platformStats: statsRes.success ? statsRes.data?.metrics : null,
         userStats: userStatsRes.success ? userStatsRes.data : null,
         financialData: financialRes.success ? financialRes.data : null,
       };
@@ -198,25 +197,25 @@ export default function AdminAnalyticsPage() {
               <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                 <span className="text-body">Active Gigs</span>
                 <span className="text-heading font-bold">
-                  {analyticsData.gigStats?.activeGigs || 0}
+                  {analyticsData.platformStats?.activeGigs || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                 <span className="text-body">Completed Gigs</span>
                 <span className="text-heading font-bold">
-                  {analyticsData.gigStats?.completedGigs || 0}
+                  {analyticsData.platformStats?.completedGigs || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                 <span className="text-body">Total Gig Applications</span>
                 <span className="text-heading font-bold">
-                  {analyticsData.gigStats?.totalApplications || 0}
+                  {analyticsData.platformStats?.totalApplications || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                 <span className="text-body">Avg Budget</span>
                 <span className="text-heading font-bold">
-                  ₹{analyticsData.gigStats?.avgBudget || 0}
+                  ₹{analyticsData.platformStats?.avgBudget || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">

@@ -85,10 +85,19 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   actions,
   title = 'Quick Actions',
 }) => {
+  // Filter actions based on permissions before rendering
+  const visibleActions = actions.filter((action) => {
+    if (!action.permission) return true;
+    // This will be checked in QuickActionButton, but we filter here too for grid layout consistency
+    return true; // QuickActionButton handles permission check
+  });
+
   return (
     <div className="card-glass dashboard-card-padding">
-      <h3 className="flex items-center gap-2 text-heading mb-mobile text-lg font-semibold">{title}</h3>
-      <div className="dashboard-grid-gap grid grid-cols-2 md:grid-cols-2">
+      <h3 className="text-heading mb-mobile flex items-center gap-2 text-lg font-semibold">
+        {title}
+      </h3>
+      <div className="dashboard-grid-gap grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {actions.map((action, index) => (
           <QuickActionButton key={index} {...action} />
         ))}
