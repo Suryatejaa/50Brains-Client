@@ -1,3 +1,4 @@
+'use client';
 // ScrollToHashElement.tsx
 
 import React, { useEffect } from 'react';
