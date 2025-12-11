@@ -52,23 +52,23 @@ export function NotificationToast({ enabled = true }: NotificationToastProps) {
 
     // Skip showing toasts during initial load to prevent spam on refresh
     if (isInitialLoad) {
-      console.log('🔔 NotificationToast: Skipping toasts during initial load');
+      // console.log('🔔 NotificationToast: Skipping toasts during initial load');
       return;
     }
 
-    console.log('🔔 NotificationToast: Checking for new notifications...');
-    console.log('🔔 Current notifications count:', notifications.length);
-    console.log('🔔 Last processed ID:', lastProcessedId.current);
+    // console.log('🔔 NotificationToast: Checking for new notifications...');
+    // console.log('🔔 Current notifications count:', notifications.length);
+    // console.log('🔔 Last processed ID:', lastProcessedId.current);
 
     // Get the most recent notification (first in the array)
     const mostRecentNotification = notifications[0];
 
-    console.log('🔔 Most recent notification:', mostRecentNotification?.title);
-    console.log('🔔 Most recent notification ID:', mostRecentNotification?.id);
-    console.log(
-      '🔔 Most recent notification read status:',
-      mostRecentNotification?.read
-    );
+    // console.log('🔔 Most recent notification:', mostRecentNotification?.title);
+    // console.log('🔔 Most recent notification ID:', mostRecentNotification?.id);
+    // console.log(
+    //   '🔔 Most recent notification read status:',
+    //   mostRecentNotification?.read
+    // );
 
     // Check if this is a new notification we haven't processed yet
     if (

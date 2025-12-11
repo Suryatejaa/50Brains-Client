@@ -31,7 +31,7 @@ export function Features() {
   ];
 
   return (
-    <section className="page-container">
+    <section className="page-container" id="features">
       <div className="content-container section-spacing">
         <div className="mb-16 text-center">
           <h2 className="text-heading mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
@@ -73,7 +73,7 @@ export function Features() {
         </div>
 
         {/* 🔮 Additional Feature Highlights */}
-        <div className="mt-20 grid gap-3 md:grid-cols-3">
+        <div className="hidden mt-20 grid gap-3 md:grid-cols-3">
           <div className="card-soft p-3 text-center">
             <div className="text-brand-primary mb-2 text-2xl font-bold">
               50K+

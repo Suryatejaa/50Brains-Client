@@ -1,3 +1,5 @@
+'use client';
+
 // components/ProfileTabs.tsx
 import React, { useState } from 'react';
 import { CompleteProfileData } from '../types/profile.types';

@@ -34,6 +34,19 @@ interface AdminDashboardData {
     conversionRate: number;
     averageOrderValue: number;
   };
+  applicationDistribution: Array<{
+    status: string;
+    count: number;
+    color: string;
+  }>;
+  gigDistribution: Array<{
+    status: string;
+    count: number;
+  }>;
+  categoryDistribution: Array<{
+    category: string;
+    count: number;
+  }>;
   moderationQueue: Array<{
     id: string;
     type: 'user_report' | 'content_report' | 'gig_dispute' | 'clan_report';
@@ -117,6 +130,7 @@ export const AdminDashboard: React.FC = () => {
         pendingPayoutsResponse,
         systemHealthResponse,
         cronStatusResponse,
+        userStatsResponse,
       ] = await Promise.allSettled([
         apiClient.get('/api/gig-admin/dashboard/overview'),
         apiClient.get('/api/gig-admin/analytics/platform-stats'),
@@ -124,7 +138,18 @@ export const AdminDashboard: React.FC = () => {
         apiClient.get('/api/gig-admin/payouts/pending'),
         apiClient.get('/api/gig-admin/system/health'),
         apiClient.get('/api/gig-admin/cron/status'),
+        apiClient.get('/api/user/admin/stats'),
       ]);
+
+      console.log('API Responses:', {
+        dashboardOverviewResponse,
+        platformStatsResponse,
+        financialOverviewResponse,
+        pendingPayoutsResponse,
+        systemHealthResponse,
+        cronStatusResponse,
+        userStatsResponse,
+      });
 
       // Extract dashboard overview data
       const overview =
@@ -168,21 +193,29 @@ export const AdminDashboard: React.FC = () => {
           ? (cronStatusResponse.value.data as any)
           : null;
 
+      // Extract user stats
+      const userStats =
+        userStatsResponse.status === 'fulfilled' &&
+        userStatsResponse.value.success
+          ? (userStatsResponse.value.data as any)
+          : null;
+
       const data: AdminDashboardData = {
         systemStats: {
-          totalUsers: platformStats?.totalUsers || 0,
-          activeUsers: platformStats?.activeUsers || 0,
+          totalUsers: userStats?.stats?.totalUsers || 0,
+          activeUsers: userStats?.stats?.activeUsers || 0,
           totalGigs: overview?.stats?.totalGigs || 0,
-          totalClans: 0, // Not available in gig service
+          totalClans: 0, // Not available in current APIs
           totalTransactions: overview?.stats?.totalApplications || 0,
-          systemUptime: health?.uptime?.seconds || 0,
+          systemUptime:
+            userStats?.stats?.systemUptime || health?.uptime?.seconds || 0,
         },
 
         userAnalytics: {
-          newUsers: platformStats?.newUsersToday || 0,
-          userGrowth: platformStats?.userGrowthRate || 0,
-          activeToday: platformStats?.activeUsers || 0,
-          topUserCountries: platformStats?.topCountries || [],
+          newUsers: userStats?.stats?.newUsersToday || 0,
+          userGrowth: 0, // Will need historical data for this
+          activeToday: userStats?.stats?.activeSessions || 0,
+          topUserCountries: [],
         },
 
         platformMetrics: {
@@ -191,34 +224,62 @@ export const AdminDashboard: React.FC = () => {
             overview?.distributions?.gigStatus?.find(
               (s: any) => s.status === 'COMPLETED'
             )?._count?.status || 0,
-          totalRevenue:
-            overview?.stats?.totalRevenue || financial?.totalRevenue || 0,
-          dailyRevenue: financial?.dailyRevenue || 0,
-          conversionRate: platformStats?.conversionRate || 0,
-          averageOrderValue: financial?.averageTransactionValue || 0,
+          totalRevenue: financial?.totalRevenue || 0,
+          dailyRevenue: financial?.totalRevenue || 0,
+          conversionRate:
+            overview?.stats?.totalApplications > 0
+              ? ((overview?.distributions?.applicationStatus?.find(
+                  (s: any) => s.status === 'APPROVED'
+                )?._count?.status || 0) /
+                  overview?.stats?.totalApplications) *
+                100
+              : 0,
+          averageOrderValue:
+            overview?.stats?.totalRevenue > 0
+              ? overview?.stats?.totalRevenue /
+                Math.max(overview?.stats?.totalApplications || 1, 1)
+              : 0,
         },
 
-        moderationQueue:
-          overview?.pendingDisputes?.map((dispute: any) => ({
-            id: dispute.id || dispute._id,
-            type: 'gig_dispute',
-            title: dispute.title || `Dispute #${dispute.id}`,
-            description: dispute.description || dispute.reason,
-            priority: dispute.priority || 'medium',
-            reportedAt: dispute.createdAt,
-            reporterId: dispute.reporterId,
-            targetId: dispute.gigId,
-            status: dispute.status,
+        moderationQueue: [],
+
+        applicationDistribution:
+          overview?.distributions?.applicationStatus?.map((item: any) => {
+            const colorMap: { [key: string]: string } = {
+              APPROVED: 'bg-green-100 text-green-700',
+              CLOSED: 'bg-blue-100 text-blue-700',
+              SUBMITTED: 'bg-yellow-100 text-yellow-700',
+              REJECTED: 'bg-red-100 text-red-700',
+              WORK_IN_PROGRESS: 'bg-purple-100 text-purple-700',
+              DELIVERED: 'bg-teal-100 text-teal-700',
+            };
+            return {
+              status: item.status,
+              count: item._count?.status || 0,
+              color: colorMap[item.status] || 'bg-gray-100 text-gray-700',
+            };
+          }) || [],
+
+        gigDistribution:
+          overview?.distributions?.gigStatus?.map((item: any) => ({
+            status: item.status,
+            count: item._count?.status || 0,
+          })) || [],
+
+        categoryDistribution:
+          overview?.distributions?.categories?.map((item: any) => ({
+            category: item.category,
+            count: item._count?.category || 0,
           })) || [],
 
         systemHealth: {
           status: health?.status || 'warning',
-          services: health?.services || [
+          services: [
             {
-              name: 'Gig Service',
+              name: 'Database',
               status: health?.database?.connected ? 'online' : 'offline',
               responseTime: health?.database?.latency || 0,
-              uptime: health?.uptime?.seconds || 0,
+              uptime: 100,
             },
             {
               name: 'Cron Scheduler',
@@ -226,20 +287,34 @@ export const AdminDashboard: React.FC = () => {
               responseTime: 0,
               uptime: 100,
             },
+            {
+              name: 'Memory',
+              status:
+                (health?.memory?.used || 0) <
+                (health?.memory?.total || 100) * 0.9
+                  ? 'online'
+                  : 'degraded',
+              responseTime: health?.memory?.used || 0,
+              uptime:
+                ((health?.memory?.used || 0) / (health?.memory?.total || 100)) *
+                100,
+            },
           ],
           lastChecked: health?.timestamp || new Date().toISOString(),
         },
 
-        recentActivities:
-          overview?.recentActivity?.recentGigs?.slice(0, 5).map((gig: any) => ({
-            id: gig.id,
-            type: 'gig_created',
-            description: `New gig: ${gig.title} by ${gig.brandName}`,
-            timestamp: gig.createdAt,
-            severity: 'info' as const,
-          })) ||
-          overview?.recentActivity?.recentApplications
-            ?.slice(0, 5)
+        recentActivities: [
+          ...(overview?.recentActivity?.recentGigs
+            ?.slice(0, 3)
+            .map((gig: any) => ({
+              id: gig.id,
+              type: 'gig_created',
+              description: `New gig: ${gig.title} by ${gig.brandName} (₹${gig.budgetMin}-${gig.budgetMax})`,
+              timestamp: gig.createdAt,
+              severity: 'info' as const,
+            })) || []),
+          ...(overview?.recentActivity?.recentApplications
+            ?.slice(0, 3)
             .map((app: any) => ({
               id: app.id,
               type: 'application_submitted',
@@ -249,8 +324,8 @@ export const AdminDashboard: React.FC = () => {
                 app.status === 'REJECTED'
                   ? ('warning' as const)
                   : ('info' as const),
-            })) ||
-          [],
+            })) || []),
+        ],
       };
       console.log('Admin Dashboard Data:', data);
       setDashboardData(data);
@@ -524,13 +599,47 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-heading text-2xl font-bold">
-                      ${dashboardData?.platformMetrics?.totalRevenue || 0}
+                      ₹{dashboardData?.platformMetrics?.totalRevenue || 0}
                     </div>
                     <div className="text-muted text-sm">Total Revenue</div>
                   </div>
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Application Status Distribution */}
+          <div className="card-glass p-3">
+            <h3 className="text-heading mb-6 text-lg font-semibold">
+              📋 Application Status Distribution
+            </h3>
+
+            {loading ? (
+              <div className="animate-pulse space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex justify-between">
+                    <div className="h-3 w-1/3 rounded bg-gray-300"></div>
+                    <div className="h-3 w-1/6 rounded bg-gray-300"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {dashboardData?.applicationDistribution?.map((item) => (
+                  <div
+                    key={item.status}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-body text-sm">{item.status}</span>
+                    <span
+                      className={`rounded px-3 py-1 text-sm font-medium ${item.color}`}
+                    >
+                      {item.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Moderation Queue */}

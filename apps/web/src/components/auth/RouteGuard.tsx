@@ -121,7 +121,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         '/crew',
         '/influencer',
         '/clan',
-        // Note: '/marketplace', '/clans', '/gigs' are public for browsing
       ];
 
       // Define protected route patterns (for dynamic routes)

@@ -5,26 +5,26 @@ export function Footer() {
     Product: [
       { name: 'Features', href: '#features' },
       { name: 'How it Works', href: '#how-it-works' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'API', href: '#api' },
+      // { name: 'Pricing', href: '#pricing' },
+      // { name: 'API', href: '#api' },
     ],
-    Resources: [
-      { name: 'Blog', href: '#blog' },
-      { name: 'Documentation', href: '#docs' },
-      { name: 'Help Center', href: '#help' },
-      { name: 'Community', href: '#community' },
-    ],
+    // Resources: [
+      // { name: 'Blog', href: '#blog' },
+      // { name: 'Documentation', href: '#docs' },
+      // { name: 'Help Center', href: '#help' },
+      // { name: 'Community', href: '#community' },
+    // ],
     Company: [
-      { name: 'About', href: '#about' },
-      { name: 'Careers', href: '#careers' },
-      { name: 'Contact', href: '#contact' },
-      { name: 'Press', href: '#press' },
+      { name: 'About', href: 'about' },
+      // { name: 'Careers', href: '#careers' },
+      { name: 'Contact', href: 'contact' },
+      // { name: 'Press', href: '#press' },
     ],
     Legal: [
-      { name: 'Privacy Policy', href: '#privacy' },
-      { name: 'Terms of Service', href: '#terms' },
-      { name: 'Cookie Policy', href: '#cookies' },
-      { name: 'GDPR', href: '#gdpr' },
+      { name: 'Privacy Policy', href: 'privacy' },
+      { name: 'Terms of Service', href: 'terms' },
+      // { name: 'Cookie Policy', href: '#cookies' },
+      // { name: 'GDPR', href: '#gdpr' },
     ],
   };
 
@@ -44,7 +44,7 @@ export function Footer() {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="hover:text-primary-400 text-gray-400 transition-colors"
+                className="hidden hover:text-primary-400 text-gray-400 transition-colors"
               >
                 <svg
                   className="h-5 w-5"
@@ -56,7 +56,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="hover:text-primary-400 text-gray-400 transition-colors"
+                className="hidden hover:text-primary-400 text-gray-400 transition-colors"
               >
                 <svg
                   className="h-5 w-5"
@@ -68,7 +68,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="hover:text-primary-400 text-gray-400 transition-colors"
+                className="hidden hover:text-primary-400 text-gray-400 transition-colors"
               >
                 <svg
                   className="h-5 w-5"

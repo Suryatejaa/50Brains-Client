@@ -63,7 +63,7 @@ export function Hero() {
           </div>
 
           {/* 💡 Trust Indicators */}
-          <div className="mt-12 flex flex-col items-center justify-center gap-8 sm:flex-row">
+          <div className="hidden mt-12 flex flex-col items-center justify-center gap-8 sm:flex-row">
             <div className="text-muted text-sm">
               Trusted by 50,000+ creators
             </div>

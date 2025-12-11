@@ -15,6 +15,9 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [errorType, setErrorType] = useState<
+    'default' | 'suspended' | 'banned'
+  >('default');
   const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
@@ -53,6 +56,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setErrorType('default');
     setSuccessMessage(''); // Clear success message when attempting login
 
     try {
@@ -60,7 +64,39 @@ export default function LoginPage() {
       // The login function will handle the redirect to dashboard
       console.log('Login successful - redirect handled by useAuth');
     } catch (error: any) {
-      setError(error.message || 'Login failed. Please try again.');
+      // Extract error message from different error structures
+      let errorMessage = 'Login failed. Please try again.';
+
+      console.log('Login error:', error);
+
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.data?.message) {
+        // Direct response data
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+
+      const lowerMessage = errorMessage.toLowerCase();
+
+      // Check for suspension/ban messages
+      if (lowerMessage.includes('suspended')) {
+        setErrorType('suspended');
+        setError(
+          'Your account has been suspended. Please contact support@50brains.com for assistance.'
+        );
+      } else if (lowerMessage.includes('banned')) {
+        setErrorType('banned');
+        setError(
+          'Your account has been banned. Please contact support@50brains.com for assistance.'
+        );
+      } else {
+        setErrorType('default');
+        setError(errorMessage);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -90,8 +126,28 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/20 p-4 text-sm text-red-800">
+            <div
+              className={`mt-6 rounded-xl border p-4 text-sm ${
+                errorType === 'suspended' || errorType === 'banned'
+                  ? 'border-orange-500/30 bg-orange-500/20 text-orange-800'
+                  : 'border-red-500/30 bg-red-500/20 text-red-800'
+              }`}
+            >
               {error}
+              {(errorType === 'suspended' || errorType === 'banned') && (
+                <div className="mt-3 text-xs">
+                  <p className="font-semibold">Need help?</p>
+                  <p className="mt-1">
+                    Email:{' '}
+                    <a
+                      href="mailto:support@50brains.com"
+                      className="underline hover:no-underline"
+                    >
+                      support@50brains.com
+                    </a>
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

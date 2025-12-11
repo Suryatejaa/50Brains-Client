@@ -467,11 +467,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               '/forgot-password',
               '/login/otp',
             ];
+
+            const publicPages = [
+              '/',
+              '/landing',
+              '/about',
+              '/contact',
+              '/terms',
+              '/privacy',
+              '/refund',
+              '/shipping',
+              '/help',
+            ];
+
             const isOnAuthPage = authPages.some((page) =>
               currentPath.startsWith(page)
             );
+            const isOnPublicPage = publicPages.some(
+              (page) =>
+                currentPath === page || currentPath.startsWith(page + '/')
+            );
 
-            if (!isOnAuthPage && currentPath !== '/') {
+            // Only redirect if NOT on auth page AND NOT on public page
+            if (!isOnAuthPage && !isOnPublicPage) {
               console.log('↗️ Redirecting to login - no valid authentication');
               router.push('/login');
             }
@@ -704,7 +722,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Handle specific login errors based on API documentation
         const errorMessage =
           responseData.message || 'Login failed. Please try again.';
-
+        console.log('❌ Login failed with message:', errorMessage);
         // Map specific error messages to user-friendly messages
         switch (errorMessage) {
           case 'Invalid credentials':
@@ -714,7 +732,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             throw new Error(
               'Please verify your email address before signing in.'
             );
-          case 'Account suspended':
+          case 'Account is suspended':
             throw new Error(
               'Your account has been suspended. Please contact support.'
             );
@@ -729,31 +747,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error: any) {
       console.log('🔍 Login error details:', error);
 
+      // Extract the actual error message from the error object
+      let errorMessage = 'Login failed. Please try again.';
+
+      // Try to get message from various places in the error object
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message && !error.message.includes('Error:')) {
+        errorMessage = error.message;
+      }
+
+      console.log('📝 Extracted error message:', errorMessage);
+
       // Handle specific authentication errors first (401 = invalid credentials)
       if (
-        error.statusCode === 401 ||
-        error.status === 401 ||
-        error.message === 'Invalid credentials'
+        error?.statusCode === 401 ||
+        error?.status === 401 ||
+        error?.response?.status === 401
       ) {
-        const errorMessage =
-          error.error === 'Invalid credentials' ||
-          error.message?.includes('Invalid credentials') ||
-          error.message === 'Invalid credentials'
-            ? 'Email or password is incorrect.'
-            : error.error === 'User not found'
-              ? 'No account found with this email address.'
-              : error.error || error.message || 'Invalid email or password.';
+        // Check for suspended/banned messages
+        const lowerMessage = errorMessage.toLowerCase();
+        if (lowerMessage.includes('suspended')) {
+          console.log('❌ Account suspended:', errorMessage);
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        } else if (lowerMessage.includes('banned')) {
+          console.log('❌ Account banned:', errorMessage);
+          setError(errorMessage);
+          throw new Error(errorMessage);
+        }
 
-        console.log('❌ Authentication failed:', errorMessage);
-        setError(errorMessage);
-        throw new Error(errorMessage);
+        // Otherwise treat as invalid credentials
+        const credentialsError =
+          error?.error === 'Invalid credentials' ||
+          errorMessage?.includes('Invalid credentials') ||
+          error?.message === 'Invalid credentials'
+            ? 'Email or password is incorrect.'
+            : error?.error === 'User not found'
+              ? 'No account found with this email address.'
+              : errorMessage || 'Invalid email or password.';
+
+        console.log('❌ Authentication failed:', credentialsError);
+        setError(credentialsError);
+        throw new Error(credentialsError);
       }
 
       // Handle case where backend is not available
       if (
-        error.message?.includes('Failed to fetch') ||
-        error.message?.includes('fetch') ||
-        error.code === 'ERR_NETWORK'
+        error?.message?.includes('Failed to fetch') ||
+        error?.message?.includes('fetch') ||
+        error?.code === 'ERR_NETWORK'
       ) {
         //console.log('⚠️ Backend not available, using demo login');
         // For demo purposes when backend is not available
@@ -775,11 +820,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       // Handle other API errors with proper messaging
-      const errorMessage =
-        error.error ||
-        error.message ||
-        'Unable to sign in. Please check your connection and try again.';
-      //console.log('❌ Login failed with error:', errorMessage);
+      console.log('❌ Login failed with error:', errorMessage);
       setError(errorMessage);
       throw new Error(errorMessage);
     }

@@ -1,3 +1,5 @@
+'use client';
+
 // hooks/useProfile.ts
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/apiClient';

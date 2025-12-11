@@ -1,5 +1,3 @@
-'use client';
-
 // components/ProfileClientWrapper.tsx - Client wrapper for authenticated user profile
 import React from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
